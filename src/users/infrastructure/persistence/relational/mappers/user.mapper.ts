@@ -1,4 +1,7 @@
 import { FileEntity } from '../../../../../files/infrastructure/persistence/relational/entities/file.entity';
+
+import { DeviceMapper } from '../../../../../devices/infrastructure/persistence/relational/mappers/device.mapper';
+
 import { FileMapper } from '../../../../../files/infrastructure/persistence/relational/mappers/file.mapper';
 import { RoleEntity } from '../../../../../roles/infrastructure/persistence/relational/entities/role.entity';
 import { StatusEntity } from '../../../../../statuses/infrastructure/persistence/relational/entities/status.entity';
@@ -8,6 +11,16 @@ import { UserEntity } from '../entities/user.entity';
 export class UserMapper {
   static toDomain(raw: UserEntity): User {
     const domainEntity = new User();
+    domainEntity.phone = raw.phone;
+
+    if (raw.devices) {
+      domainEntity.devices = raw.devices.map((item) =>
+        DeviceMapper.toDomain(item),
+      );
+    } else if (raw.devices === null) {
+      domainEntity.devices = null;
+    }
+
     domainEntity.id = raw.id;
     domainEntity.email = raw.email;
     domainEntity.password = raw.password;
@@ -52,6 +65,16 @@ export class UserMapper {
     }
 
     const persistenceEntity = new UserEntity();
+    persistenceEntity.phone = domainEntity.phone;
+
+    if (domainEntity.devices) {
+      persistenceEntity.devices = domainEntity.devices.map((item) =>
+        DeviceMapper.toPersistence(item),
+      );
+    } else if (domainEntity.devices === null) {
+      persistenceEntity.devices = null;
+    }
+
     if (domainEntity.id && typeof domainEntity.id === 'number') {
       persistenceEntity.id = domainEntity.id;
     }

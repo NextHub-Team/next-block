@@ -1,5 +1,10 @@
+import { DevicesService } from '../devices/devices.service';
+import { Device } from '../devices/domain/device';
+
 import {
+  forwardRef,
   HttpStatus,
+  Inject,
   Injectable,
   UnprocessableEntityException,
 } from '@nestjs/common';
@@ -22,6 +27,8 @@ import { UpdateUserDto } from './dto/update-user.dto';
 @Injectable()
 export class UsersService {
   constructor(
+    @Inject(forwardRef(() => DevicesService))
+    private readonly deviceService: DevicesService,
     private readonly usersRepository: UserRepository,
     private readonly filesService: FilesService,
   ) {}
@@ -29,6 +36,25 @@ export class UsersService {
   async create(createUserDto: CreateUserDto): Promise<User> {
     // Do not remove comment below.
     // <creating-property />
+
+    let devices: Device[] | null | undefined = undefined;
+
+    if (createUserDto.devices) {
+      const devicesObjects = await this.deviceService.findByIds(
+        createUserDto.devices.map((entity) => entity.id),
+      );
+      if (devicesObjects.length !== createUserDto.devices.length) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: {
+            devices: 'notExists',
+          },
+        });
+      }
+      devices = devicesObjects;
+    } else if (createUserDto.devices === null) {
+      devices = null;
+    }
 
     let password: string | undefined = undefined;
 
@@ -116,6 +142,10 @@ export class UsersService {
     return this.usersRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
+      phone: createUserDto.phone,
+
+      devices,
+
       firstName: createUserDto.firstName,
       lastName: createUserDto.lastName,
       email: email,
@@ -175,6 +205,25 @@ export class UsersService {
   ): Promise<User | null> {
     // Do not remove comment below.
     // <updating-property />
+
+    let devices: Device[] | null | undefined = undefined;
+
+    if (updateUserDto.devices) {
+      const devicesObjects = await this.deviceService.findByIds(
+        updateUserDto.devices.map((entity) => entity.id),
+      );
+      if (devicesObjects.length !== updateUserDto.devices.length) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: {
+            devices: 'notExists',
+          },
+        });
+      }
+      devices = devicesObjects;
+    } else if (updateUserDto.devices === null) {
+      devices = null;
+    }
 
     let password: string | undefined = undefined;
 
@@ -270,6 +319,10 @@ export class UsersService {
     return this.usersRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
+      phone: updateUserDto.phone,
+
+      devices,
+
       firstName: updateUserDto.firstName,
       lastName: updateUserDto.lastName,
       email,

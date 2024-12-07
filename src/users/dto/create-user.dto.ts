@@ -1,3 +1,5 @@
+import { DeviceDto } from '../../devices/dto/device.dto';
+
 import {
   // decorators here
   Transform,
@@ -10,6 +12,9 @@ import {
   IsNotEmpty,
   IsOptional,
   MinLength,
+  IsArray,
+  ValidateNested,
+  IsString,
 } from 'class-validator';
 import { FileDto } from '../../files/dto/file.dto';
 import { RoleDto } from '../../roles/dto/role.dto';
@@ -17,6 +22,24 @@ import { StatusDto } from '../../statuses/dto/status.dto';
 import { lowerCaseTransformer } from '../../utils/transformers/lower-case.transformer';
 
 export class CreateUserDto {
+  @ApiProperty({
+    required: false,
+    type: () => String,
+  })
+  @IsOptional()
+  @IsString()
+  phone?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [DeviceDto],
+  })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => DeviceDto)
+  @IsArray()
+  devices?: DeviceDto[] | null;
+
   @ApiProperty({ example: 'test1@example.com', type: String })
   @Transform(lowerCaseTransformer)
   @IsNotEmpty()

@@ -1,18 +1,26 @@
+import { Device } from '../../devices/domain/device';
 import { Exclude, Expose } from 'class-transformer';
 import { FileType } from '../../files/domain/file';
 import { Role } from '../../roles/domain/role';
 import { Status } from '../../statuses/domain/status';
 import { ApiProperty } from '@nestjs/swagger';
-import databaseConfig from '../../database/config/database.config';
-import { DatabaseConfig } from '../../database/config/database-config.type';
 
-// <database-block>
-const idType = (databaseConfig() as DatabaseConfig).isDocumentDatabase
-  ? String
-  : Number;
-// </database-block>
+const idType = Number;
 
 export class User {
+  @ApiProperty({
+    type: () => String,
+    nullable: true,
+    example: '+13847923742',
+  })
+  phone?: string | null;
+
+  @ApiProperty({
+    type: () => [Device],
+    nullable: true,
+  })
+  devices?: Device[] | null;
+
   @ApiProperty({
     type: idType,
   })
