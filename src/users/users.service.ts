@@ -1,3 +1,6 @@
+import { PermissionsService } from '../permissions/permissions.service';
+import { Permission } from '../permissions/domain/permission';
+
 import { DevicesService } from '../devices/devices.service';
 import { Device } from '../devices/domain/device';
 
@@ -27,6 +30,8 @@ import { UpdateUserDto } from './dto/update-user.dto';
 @Injectable()
 export class UsersService {
   constructor(
+    @Inject(forwardRef(() => PermissionsService))
+    private readonly permissionService: PermissionsService,
     @Inject(forwardRef(() => DevicesService))
     private readonly deviceService: DevicesService,
     private readonly usersRepository: UserRepository,
@@ -36,6 +41,24 @@ export class UsersService {
   async create(createUserDto: CreateUserDto): Promise<User> {
     // Do not remove comment below.
     // <creating-property />
+    let permissions: Permission[] | null | undefined = undefined;
+
+    if (createUserDto.permissions) {
+      const permissionsObjects = await this.permissionService.findByIds(
+        createUserDto.permissions.map((entity) => entity.id),
+      );
+      if (permissionsObjects.length !== createUserDto.permissions.length) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: {
+            permissions: 'notExists',
+          },
+        });
+      }
+      permissions = permissionsObjects;
+    } else if (createUserDto.permissions === null) {
+      permissions = null;
+    }
 
     let devices: Device[] | null | undefined = undefined;
 
@@ -142,6 +165,8 @@ export class UsersService {
     return this.usersRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
+      permissions,
+
       phone: createUserDto.phone,
 
       devices,
@@ -205,6 +230,24 @@ export class UsersService {
   ): Promise<User | null> {
     // Do not remove comment below.
     // <updating-property />
+    let permissions: Permission[] | null | undefined = undefined;
+
+    if (updateUserDto.permissions) {
+      const permissionsObjects = await this.permissionService.findByIds(
+        updateUserDto.permissions.map((entity) => entity.id),
+      );
+      if (permissionsObjects.length !== updateUserDto.permissions.length) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: {
+            permissions: 'notExists',
+          },
+        });
+      }
+      permissions = permissionsObjects;
+    } else if (updateUserDto.permissions === null) {
+      permissions = null;
+    }
 
     let devices: Device[] | null | undefined = undefined;
 
@@ -319,6 +362,8 @@ export class UsersService {
     return this.usersRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
+      permissions,
+
       phone: updateUserDto.phone,
 
       devices,

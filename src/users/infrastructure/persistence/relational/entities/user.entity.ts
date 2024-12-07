@@ -1,3 +1,5 @@
+import { PermissionEntity } from '../../../../../permissions/infrastructure/persistence/relational/entities/permission.entity';
+
 import { DeviceEntity } from '../../../../../devices/infrastructure/persistence/relational/entities/device.entity';
 
 import {
@@ -24,6 +26,12 @@ import { EntityRelationalHelper } from '../../../../../utils/relational-entity-h
   name: 'user',
 })
 export class UserEntity extends EntityRelationalHelper {
+  @OneToMany(() => PermissionEntity, (childEntity) => childEntity.user, {
+    eager: true,
+    nullable: true,
+  })
+  permissions?: PermissionEntity[] | null;
+
   @Column({
     nullable: true,
     type: String,

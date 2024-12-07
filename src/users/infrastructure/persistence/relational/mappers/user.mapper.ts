@@ -1,4 +1,5 @@
 import { FileEntity } from '../../../../../files/infrastructure/persistence/relational/entities/file.entity';
+import { PermissionMapper } from '../../../../../permissions/infrastructure/persistence/relational/mappers/permission.mapper';
 
 import { DeviceMapper } from '../../../../../devices/infrastructure/persistence/relational/mappers/device.mapper';
 
@@ -11,6 +12,14 @@ import { UserEntity } from '../entities/user.entity';
 export class UserMapper {
   static toDomain(raw: UserEntity): User {
     const domainEntity = new User();
+    if (raw.permissions) {
+      domainEntity.permissions = raw.permissions.map((item) =>
+        PermissionMapper.toDomain(item),
+      );
+    } else if (raw.permissions === null) {
+      domainEntity.permissions = null;
+    }
+
     domainEntity.phone = raw.phone;
 
     if (raw.devices) {
@@ -65,6 +74,14 @@ export class UserMapper {
     }
 
     const persistenceEntity = new UserEntity();
+    if (domainEntity.permissions) {
+      persistenceEntity.permissions = domainEntity.permissions.map((item) =>
+        PermissionMapper.toPersistence(item),
+      );
+    } else if (domainEntity.permissions === null) {
+      persistenceEntity.permissions = null;
+    }
+
     persistenceEntity.phone = domainEntity.phone;
 
     if (domainEntity.devices) {

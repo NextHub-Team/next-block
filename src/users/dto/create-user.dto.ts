@@ -1,3 +1,5 @@
+import { PermissionDto } from '../../permissions/dto/permission.dto';
+
 import { DeviceDto } from '../../devices/dto/device.dto';
 
 import {
@@ -22,6 +24,16 @@ import { StatusDto } from '../../statuses/dto/status.dto';
 import { lowerCaseTransformer } from '../../utils/transformers/lower-case.transformer';
 
 export class CreateUserDto {
+  @ApiProperty({
+    required: false,
+    type: () => [PermissionDto],
+  })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => PermissionDto)
+  @IsArray()
+  permissions?: PermissionDto[] | null;
+
   @ApiProperty({
     required: false,
     type: () => String,

@@ -1,3 +1,4 @@
+import { Permission } from '../../permissions/domain/permission';
 import { Device } from '../../devices/domain/device';
 import { Exclude, Expose } from 'class-transformer';
 import { FileType } from '../../files/domain/file';
@@ -8,6 +9,12 @@ import { ApiProperty } from '@nestjs/swagger';
 const idType = Number;
 
 export class User {
+  @ApiProperty({
+    type: () => [Permission],
+    nullable: true,
+  })
+  permissions?: Permission[] | null;
+
   @ApiProperty({
     type: () => String,
     nullable: true,

@@ -32,8 +32,14 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
 
 import { DevicesModule } from './devices/devices.module';
 
+import { PermissionsModule } from './permissions/permissions.module';
+
+import { MainWalletsModule } from './main-wallets/main-wallets.module';
+
 @Module({
   imports: [
+    MainWalletsModule,
+    PermissionsModule,
     DevicesModule,
     ConfigModule.forRoot({
       isGlobal: true,
