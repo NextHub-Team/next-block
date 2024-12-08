@@ -21,6 +21,7 @@ import { Passphrase } from '../passphrases/domain/passphrase';
 @Injectable()
 export class MainWalletsService {
   constructor(
+    @Inject(forwardRef(() => WalletsService))
     private readonly walletService: WalletsService,
 
     private readonly PassphraseService: PassphrasesService,

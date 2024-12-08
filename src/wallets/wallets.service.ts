@@ -1,7 +1,12 @@
 import { MainWalletsService } from '../main-wallets/main-wallets.service';
 import { MainWallet } from '../main-wallets/domain/main-wallet';
 
-import { HttpStatus, UnprocessableEntityException } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpStatus,
+  Inject,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 
 import { Injectable } from '@nestjs/common';
 import { CreateWalletDto } from './dto/create-wallet.dto';
@@ -13,6 +18,7 @@ import { Wallet } from './domain/wallet';
 @Injectable()
 export class WalletsService {
   constructor(
+    @Inject(forwardRef(() => MainWalletsService))
     private readonly mainWalletService: MainWalletsService,
 
     // Dependencies here
