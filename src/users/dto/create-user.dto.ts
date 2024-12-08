@@ -1,3 +1,5 @@
+import { MainWalletDto } from '../../main-wallets/dto/main-wallet.dto';
+
 import { PermissionDto } from '../../permissions/dto/permission.dto';
 
 import { DeviceDto } from '../../devices/dto/device.dto';
@@ -24,6 +26,16 @@ import { StatusDto } from '../../statuses/dto/status.dto';
 import { lowerCaseTransformer } from '../../utils/transformers/lower-case.transformer';
 
 export class CreateUserDto {
+  @ApiProperty({
+    required: false,
+    type: () => [MainWalletDto],
+  })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => MainWalletDto)
+  @IsArray()
+  minWallets?: MainWalletDto[] | null;
+
   @ApiProperty({
     required: false,
     type: () => [PermissionDto],

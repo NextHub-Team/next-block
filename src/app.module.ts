@@ -36,8 +36,14 @@ import { PermissionsModule } from './permissions/permissions.module';
 
 import { MainWalletsModule } from './main-wallets/main-wallets.module';
 
+import { PassphrasesModule } from './passphrases/passphrases.module';
+
+import { WalletsModule } from './wallets/wallets.module';
+
 @Module({
   imports: [
+    WalletsModule,
+    PassphrasesModule,
     MainWalletsModule,
     PermissionsModule,
     DevicesModule,

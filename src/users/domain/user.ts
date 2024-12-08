@@ -1,3 +1,4 @@
+import { MainWallet } from '../../main-wallets/domain/main-wallet';
 import { Permission } from '../../permissions/domain/permission';
 import { Device } from '../../devices/domain/device';
 import { Exclude, Expose } from 'class-transformer';
@@ -9,6 +10,12 @@ import { ApiProperty } from '@nestjs/swagger';
 const idType = Number;
 
 export class User {
+  @ApiProperty({
+    type: () => [MainWallet],
+    nullable: true,
+  })
+  minWallets?: MainWallet[] | null;
+
   @ApiProperty({
     type: () => [Permission],
     nullable: true,

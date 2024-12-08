@@ -1,3 +1,4 @@
+import { MainWalletsModule } from '../main-wallets/main-wallets.module';
 import { PermissionsModule } from '../permissions/permissions.module';
 import { DevicesModule } from '../devices/devices.module';
 import { forwardRef, Module } from '@nestjs/common';
@@ -10,6 +11,8 @@ const infrastructurePersistenceModule = RelationalUserPersistenceModule;
 
 @Module({
   imports: [
+    MainWalletsModule,
+
     forwardRef(() => PermissionsModule),
     forwardRef(() => DevicesModule),
     // import modules, etc.
