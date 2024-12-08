@@ -40,8 +40,11 @@ import { PassphrasesModule } from './passphrases/passphrases.module';
 
 import { WalletsModule } from './wallets/wallets.module';
 
+import { SupportedAssetsModule } from './supported-assets/supported-assets.module';
+
 @Module({
   imports: [
+    SupportedAssetsModule,
     WalletsModule,
     PassphrasesModule,
     MainWalletsModule,
