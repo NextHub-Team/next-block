@@ -1,3 +1,5 @@
+import { UserLogDto } from '../../user-logs/dto/user-log.dto';
+
 import { MainWalletDto } from '../../main-wallets/dto/main-wallet.dto';
 
 import { PermissionDto } from '../../permissions/dto/permission.dto';
@@ -28,13 +30,23 @@ import { lowerCaseTransformer } from '../../utils/transformers/lower-case.transf
 export class CreateUserDto {
   @ApiProperty({
     required: false,
+    type: () => [UserLogDto],
+  })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => UserLogDto)
+  @IsArray()
+  logs?: UserLogDto[] | null;
+
+  @ApiProperty({
+    required: false,
     type: () => [MainWalletDto],
   })
   @IsOptional()
   @ValidateNested()
   @Type(() => MainWalletDto)
   @IsArray()
-  minWallets?: MainWalletDto[] | null;
+  mainWallets?: MainWalletDto[] | null;
 
   @ApiProperty({
     required: false,

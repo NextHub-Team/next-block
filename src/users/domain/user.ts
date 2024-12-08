@@ -1,3 +1,4 @@
+import { UserLog } from '../../user-logs/domain/user-log';
 import { MainWallet } from '../../main-wallets/domain/main-wallet';
 import { Permission } from '../../permissions/domain/permission';
 import { Device } from '../../devices/domain/device';
@@ -11,10 +12,16 @@ const idType = Number;
 
 export class User {
   @ApiProperty({
+    type: () => [UserLog],
+    nullable: true,
+  })
+  logs?: UserLog[] | null;
+
+  @ApiProperty({
     type: () => [MainWallet],
     nullable: true,
   })
-  minWallets?: MainWallet[] | null;
+  mainWallets?: MainWallet[] | null;
 
   @ApiProperty({
     type: () => [Permission],

@@ -42,8 +42,11 @@ import { WalletsModule } from './wallets/wallets.module';
 
 import { SupportedAssetsModule } from './supported-assets/supported-assets.module';
 
+import { UserLogsModule } from './user-logs/user-logs.module';
+
 @Module({
   imports: [
+    UserLogsModule,
     SupportedAssetsModule,
     WalletsModule,
     PassphrasesModule,

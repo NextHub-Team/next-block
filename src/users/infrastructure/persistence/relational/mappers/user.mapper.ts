@@ -1,6 +1,7 @@
 import { FileEntity } from '../../../../../files/infrastructure/persistence/relational/entities/file.entity';
-import { MainWalletMapper } from '../../../../../main-wallets/infrastructure/persistence/relational/mappers/main-wallet.mapper';
+import { UserLogMapper } from '../../../../../user-logs/infrastructure/persistence/relational/mappers/user-log.mapper';
 
+import { MainWalletMapper } from '../../../../../main-wallets/infrastructure/persistence/relational/mappers/main-wallet.mapper';
 import { PermissionMapper } from '../../../../../permissions/infrastructure/persistence/relational/mappers/permission.mapper';
 
 import { DeviceMapper } from '../../../../../devices/infrastructure/persistence/relational/mappers/device.mapper';
@@ -14,12 +15,18 @@ import { UserEntity } from '../entities/user.entity';
 export class UserMapper {
   static toDomain(raw: UserEntity): User {
     const domainEntity = new User();
-    if (raw.minWallets) {
-      domainEntity.minWallets = raw.minWallets.map((item) =>
+    if (raw.logs) {
+      domainEntity.logs = raw.logs.map((item) => UserLogMapper.toDomain(item));
+    } else if (raw.logs === null) {
+      domainEntity.logs = null;
+    }
+
+    if (raw.mainWallets) {
+      domainEntity.mainWallets = raw.mainWallets.map((item) =>
         MainWalletMapper.toDomain(item),
       );
-    } else if (raw.minWallets === null) {
-      domainEntity.minWallets = null;
+    } else if (raw.mainWallets === null) {
+      domainEntity.mainWallets = null;
     }
 
     if (raw.permissions) {
@@ -84,12 +91,20 @@ export class UserMapper {
     }
 
     const persistenceEntity = new UserEntity();
-    if (domainEntity.minWallets) {
-      persistenceEntity.minWallets = domainEntity.minWallets.map((item) =>
+    if (domainEntity.logs) {
+      persistenceEntity.logs = domainEntity.logs.map((item) =>
+        UserLogMapper.toPersistence(item),
+      );
+    } else if (domainEntity.logs === null) {
+      persistenceEntity.logs = null;
+    }
+
+    if (domainEntity.mainWallets) {
+      persistenceEntity.mainWallets = domainEntity.mainWallets.map((item) =>
         MainWalletMapper.toPersistence(item),
       );
-    } else if (domainEntity.minWallets === null) {
-      persistenceEntity.minWallets = null;
+    } else if (domainEntity.mainWallets === null) {
+      persistenceEntity.mainWallets = null;
     }
 
     if (domainEntity.permissions) {

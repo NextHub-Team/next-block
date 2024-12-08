@@ -1,3 +1,5 @@
+import { UserLogEntity } from '../../../../../user-logs/infrastructure/persistence/relational/entities/user-log.entity';
+
 import { MainWalletEntity } from '../../../../../main-wallets/infrastructure/persistence/relational/entities/main-wallet.entity';
 
 import { PermissionEntity } from '../../../../../permissions/infrastructure/persistence/relational/entities/permission.entity';
@@ -28,11 +30,17 @@ import { EntityRelationalHelper } from '../../../../../utils/relational-entity-h
   name: 'user',
 })
 export class UserEntity extends EntityRelationalHelper {
+  @OneToMany(() => UserLogEntity, (childEntity) => childEntity.user, {
+    eager: true,
+    nullable: true,
+  })
+  logs?: UserLogEntity[] | null;
+
   @OneToMany(() => MainWalletEntity, (childEntity) => childEntity.user, {
     eager: true,
     nullable: true,
   })
-  minWallets?: MainWalletEntity[] | null;
+  mainWallets?: MainWalletEntity[] | null;
 
   @OneToMany(() => PermissionEntity, (childEntity) => childEntity.user, {
     eager: true,

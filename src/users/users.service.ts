@@ -1,3 +1,6 @@
+import { UserLogsService } from '../user-logs/user-logs.service';
+import { UserLog } from '../user-logs/domain/user-log';
+
 import { MainWalletsService } from '../main-wallets/main-wallets.service';
 import { MainWallet } from '../main-wallets/domain/main-wallet';
 
@@ -33,6 +36,9 @@ import { UpdateUserDto } from './dto/update-user.dto';
 @Injectable()
 export class UsersService {
   constructor(
+    @Inject(forwardRef(() => UserLogsService))
+    private readonly userLogService: UserLogsService,
+
     @Inject(forwardRef(() => MainWalletsService))
     private readonly mainWalletService: MainWalletsService,
 
@@ -47,23 +53,42 @@ export class UsersService {
   async create(createUserDto: CreateUserDto): Promise<User> {
     // Do not remove comment below.
     // <creating-property />
-    let minWallets: MainWallet[] | null | undefined = undefined;
+    let logs: UserLog[] | null | undefined = undefined;
 
-    if (createUserDto.minWallets) {
-      const minWalletsObjects = await this.mainWalletService.findByIds(
-        createUserDto.minWallets.map((entity) => entity.id),
+    if (createUserDto.logs) {
+      const logsObjects = await this.userLogService.findByIds(
+        createUserDto.logs.map((entity) => entity.id),
       );
-      if (minWalletsObjects.length !== createUserDto.minWallets.length) {
+      if (logsObjects.length !== createUserDto.logs.length) {
         throw new UnprocessableEntityException({
           status: HttpStatus.UNPROCESSABLE_ENTITY,
           errors: {
-            minWallets: 'notExists',
+            logs: 'notExists',
           },
         });
       }
-      minWallets = minWalletsObjects;
-    } else if (createUserDto.minWallets === null) {
-      minWallets = null;
+      logs = logsObjects;
+    } else if (createUserDto.logs === null) {
+      logs = null;
+    }
+
+    let mainWallets: MainWallet[] | null | undefined = undefined;
+
+    if (createUserDto.mainWallets) {
+      const mainWalletsObjects = await this.mainWalletService.findByIds(
+        createUserDto.mainWallets.map((entity) => entity.id),
+      );
+      if (mainWalletsObjects.length !== createUserDto.mainWallets.length) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: {
+            mainWallets: 'notExists',
+          },
+        });
+      }
+      mainWallets = mainWalletsObjects;
+    } else if (createUserDto.mainWallets === null) {
+      mainWallets = null;
     }
 
     let permissions: Permission[] | null | undefined = undefined;
@@ -190,7 +215,9 @@ export class UsersService {
     return this.usersRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
-      minWallets,
+      logs,
+
+      mainWallets,
 
       permissions,
 
@@ -257,23 +284,42 @@ export class UsersService {
   ): Promise<User | null> {
     // Do not remove comment below.
     // <updating-property />
-    let minWallets: MainWallet[] | null | undefined = undefined;
+    let logs: UserLog[] | null | undefined = undefined;
 
-    if (updateUserDto.minWallets) {
-      const minWalletsObjects = await this.mainWalletService.findByIds(
-        updateUserDto.minWallets.map((entity) => entity.id),
+    if (updateUserDto.logs) {
+      const logsObjects = await this.userLogService.findByIds(
+        updateUserDto.logs.map((entity) => entity.id),
       );
-      if (minWalletsObjects.length !== updateUserDto.minWallets.length) {
+      if (logsObjects.length !== updateUserDto.logs.length) {
         throw new UnprocessableEntityException({
           status: HttpStatus.UNPROCESSABLE_ENTITY,
           errors: {
-            minWallets: 'notExists',
+            logs: 'notExists',
           },
         });
       }
-      minWallets = minWalletsObjects;
-    } else if (updateUserDto.minWallets === null) {
-      minWallets = null;
+      logs = logsObjects;
+    } else if (updateUserDto.logs === null) {
+      logs = null;
+    }
+
+    let mainWallets: MainWallet[] | null | undefined = undefined;
+
+    if (updateUserDto.mainWallets) {
+      const mainWalletsObjects = await this.mainWalletService.findByIds(
+        updateUserDto.mainWallets.map((entity) => entity.id),
+      );
+      if (mainWalletsObjects.length !== updateUserDto.mainWallets.length) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: {
+            mainWallets: 'notExists',
+          },
+        });
+      }
+      mainWallets = mainWalletsObjects;
+    } else if (updateUserDto.mainWallets === null) {
+      mainWallets = null;
     }
 
     let permissions: Permission[] | null | undefined = undefined;
@@ -408,7 +454,9 @@ export class UsersService {
     return this.usersRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
-      minWallets,
+      logs,
+
+      mainWallets,
 
       permissions,
 
