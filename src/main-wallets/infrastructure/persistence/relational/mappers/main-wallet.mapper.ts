@@ -10,7 +10,6 @@ export class MainWalletMapper {
   static toDomain(raw: MainWalletEntity): MainWallet {
     const domainEntity = new MainWallet();
     domainEntity.type = raw.type;
-
     domainEntity.name = raw.name;
 
     if (raw.wallets) {

@@ -48,7 +48,7 @@ export class MainWalletEntity extends EntityRelationalHelper {
   @JoinColumn()
   passphrase: PassphraseEntity;
 
-  @ManyToOne(() => UserEntity, (parentEntity) => parentEntity.minWallets, {
+  @ManyToOne(() => UserEntity, (parentEntity) => parentEntity.mainWallets, {
     eager: false,
     nullable: false,
   })
