@@ -1,3 +1,5 @@
+import { WalletEntity } from '../../../../../wallets/infrastructure/persistence/relational/entities/wallet.entity';
+
 import { PassphraseEntity } from '../../../../../passphrases/infrastructure/persistence/relational/entities/passphrase.entity';
 import { UserEntity } from '../../../../../users/infrastructure/persistence/relational/entities/user.entity';
 
@@ -10,6 +12,7 @@ import {
   JoinColumn,
   OneToOne,
   Column,
+  OneToMany,
 } from 'typeorm';
 import { EntityRelationalHelper } from '../../../../../utils/relational-entity-helper';
 
@@ -17,6 +20,12 @@ import { EntityRelationalHelper } from '../../../../../utils/relational-entity-h
   name: 'main_wallet',
 })
 export class MainWalletEntity extends EntityRelationalHelper {
+  @OneToMany(() => WalletEntity, (childEntity) => childEntity.mainWallet, {
+    eager: true,
+    nullable: true,
+  })
+  wallets?: WalletEntity[] | null;
+
   @Column({
     nullable: false,
     type: String,

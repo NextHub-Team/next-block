@@ -1,4 +1,6 @@
 import { MainWallet } from '../../../../domain/main-wallet';
+import { WalletMapper } from '../../../../../wallets/infrastructure/persistence/relational/mappers/wallet.mapper';
+
 import { UserMapper } from '../../../../../users/infrastructure/persistence/relational/mappers/user.mapper';
 import { MainWalletEntity } from '../entities/main-wallet.entity';
 import { PassphraseMapper } from '../../../../../passphrases/infrastructure/persistence/relational/mappers/passphrase.mapper';
@@ -6,6 +8,14 @@ import { PassphraseMapper } from '../../../../../passphrases/infrastructure/pers
 export class MainWalletMapper {
   static toDomain(raw: MainWalletEntity): MainWallet {
     const domainEntity = new MainWallet();
+    if (raw.wallets) {
+      domainEntity.wallets = raw.wallets.map((item) =>
+        WalletMapper.toDomain(item),
+      );
+    } else if (raw.wallets === null) {
+      domainEntity.wallets = null;
+    }
+
     domainEntity.address = raw.address;
 
     if (raw.passphrase) {
@@ -25,6 +35,14 @@ export class MainWalletMapper {
 
   static toPersistence(domainEntity: MainWallet): MainWalletEntity {
     const persistenceEntity = new MainWalletEntity();
+    if (domainEntity.wallets) {
+      persistenceEntity.wallets = domainEntity.wallets.map((item) =>
+        WalletMapper.toPersistence(item),
+      );
+    } else if (domainEntity.wallets === null) {
+      persistenceEntity.wallets = null;
+    }
+
     persistenceEntity.address = domainEntity.address;
 
     if (domainEntity.passphrase) {

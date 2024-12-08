@@ -1,3 +1,4 @@
+import { MainWalletsModule } from '../main-wallets/main-wallets.module';
 import { Module } from '@nestjs/common';
 import { WalletsService } from './wallets.service';
 import { WalletsController } from './wallets.controller';
@@ -5,6 +6,8 @@ import { RelationalWalletPersistenceModule } from './infrastructure/persistence/
 
 @Module({
   imports: [
+    MainWalletsModule,
+
     // import modules, etc.
     RelationalWalletPersistenceModule,
   ],

@@ -1,3 +1,8 @@
+import { MainWalletsService } from '../main-wallets/main-wallets.service';
+import { MainWallet } from '../main-wallets/domain/main-wallet';
+
+import { HttpStatus, UnprocessableEntityException } from '@nestjs/common';
+
 import { Injectable } from '@nestjs/common';
 import { CreateWalletDto } from './dto/create-wallet.dto';
 import { UpdateWalletDto } from './dto/update-wallet.dto';
@@ -8,20 +13,32 @@ import { Wallet } from './domain/wallet';
 @Injectable()
 export class WalletsService {
   constructor(
+    private readonly mainWalletService: MainWalletsService,
+
     // Dependencies here
     private readonly walletRepository: WalletRepository,
   ) {}
 
-  async create(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    createWalletDto: CreateWalletDto,
-  ) {
+  async create(createWalletDto: CreateWalletDto) {
     // Do not remove comment below.
     // <creating-property />
+    const mainWalletObject = await this.mainWalletService.findById(
+      createWalletDto.mainWallet.id,
+    );
+    if (!mainWalletObject) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: {
+          mainWallet: 'notExists',
+        },
+      });
+    }
+    const mainWallet = mainWalletObject;
 
     return this.walletRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
+      mainWallet,
     });
   }
 
@@ -48,15 +65,32 @@ export class WalletsService {
 
   async update(
     id: Wallet['id'],
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     updateWalletDto: UpdateWalletDto,
   ) {
     // Do not remove comment below.
     // <updating-property />
+    let mainWallet: MainWallet | undefined = undefined;
+
+    if (updateWalletDto.mainWallet) {
+      const mainWalletObject = await this.mainWalletService.findById(
+        updateWalletDto.mainWallet.id,
+      );
+      if (!mainWalletObject) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: {
+            mainWallet: 'notExists',
+          },
+        });
+      }
+      mainWallet = mainWalletObject;
+    }
 
     return this.walletRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
+      mainWallet,
     });
   }
 

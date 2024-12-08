@@ -1,3 +1,4 @@
+import { WalletsModule } from '../wallets/wallets.module';
 import { UsersModule } from '../users/users.module';
 import { forwardRef, Module } from '@nestjs/common';
 import { MainWalletsService } from './main-wallets.service';
@@ -7,6 +8,8 @@ import { PassphrasesModule } from '../passphrases/passphrases.module';
 
 @Module({
   imports: [
+    WalletsModule,
+
     PassphrasesModule,
     forwardRef(() => UsersModule),
     // import modules, etc.

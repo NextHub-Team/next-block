@@ -1,3 +1,6 @@
+import { WalletsService } from '../wallets/wallets.service';
+import { Wallet } from '../wallets/domain/wallet';
+
 import { UsersService } from '../users/users.service';
 import { User } from '../users/domain/user';
 import {
@@ -18,6 +21,8 @@ import { Passphrase } from '../passphrases/domain/passphrase';
 @Injectable()
 export class MainWalletsService {
   constructor(
+    private readonly walletService: WalletsService,
+
     private readonly PassphraseService: PassphrasesService,
     @Inject(forwardRef(() => UsersService))
     private readonly userService: UsersService,
@@ -28,6 +33,24 @@ export class MainWalletsService {
   async create(createMainWalletDto: CreateMainWalletDto) {
     // Do not remove comment below.
     // <creating-property />
+    let wallets: Wallet[] | null | undefined = undefined;
+
+    if (createMainWalletDto.wallets) {
+      const walletsObjects = await this.walletService.findByIds(
+        createMainWalletDto.wallets.map((entity) => entity.id),
+      );
+      if (walletsObjects.length !== createMainWalletDto.wallets.length) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: {
+            wallets: 'notExists',
+          },
+        });
+      }
+      wallets = walletsObjects;
+    } else if (createMainWalletDto.wallets === null) {
+      wallets = null;
+    }
 
     const PassphraseObject = await this.PassphraseService.findById(
       createMainWalletDto.passphrase.id,
@@ -58,6 +81,8 @@ export class MainWalletsService {
     return this.mainWalletRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
+      wallets,
+
       address: createMainWalletDto.address,
 
       passphrase,
@@ -94,6 +119,24 @@ export class MainWalletsService {
   ) {
     // Do not remove comment below.
     // <updating-property />
+    let wallets: Wallet[] | null | undefined = undefined;
+
+    if (updateMainWalletDto.wallets) {
+      const walletsObjects = await this.walletService.findByIds(
+        updateMainWalletDto.wallets.map((entity) => entity.id),
+      );
+      if (walletsObjects.length !== updateMainWalletDto.wallets.length) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: {
+            wallets: 'notExists',
+          },
+        });
+      }
+      wallets = walletsObjects;
+    } else if (updateMainWalletDto.wallets === null) {
+      wallets = null;
+    }
 
     let passphrase: Passphrase | undefined = undefined;
 
@@ -132,6 +175,8 @@ export class MainWalletsService {
     return this.mainWalletRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
+      wallets,
+
       address: updateMainWalletDto.address,
       passphrase,
       user,
