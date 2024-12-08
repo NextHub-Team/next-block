@@ -28,6 +28,7 @@ export class WalletsService {
   async create(createWalletDto: CreateWalletDto) {
     // Do not remove comment below.
     // <creating-property />
+
     const mainWalletObject = await this.mainWalletService.findById(
       createWalletDto.mainWallet.id,
     );
@@ -44,6 +45,12 @@ export class WalletsService {
     return this.walletRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
+      legacyAddress: createWalletDto.legacyAddress,
+
+      blockchain: createWalletDto.blockchain,
+
+      address: createWalletDto.address,
+
       mainWallet,
     });
   }
@@ -76,6 +83,7 @@ export class WalletsService {
   ) {
     // Do not remove comment below.
     // <updating-property />
+
     let mainWallet: MainWallet | undefined = undefined;
 
     if (updateWalletDto.mainWallet) {
@@ -96,6 +104,12 @@ export class WalletsService {
     return this.walletRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
+      legacyAddress: updateWalletDto.legacyAddress,
+
+      blockchain: updateWalletDto.blockchain,
+
+      address: updateWalletDto.address,
+
       mainWallet,
     });
   }

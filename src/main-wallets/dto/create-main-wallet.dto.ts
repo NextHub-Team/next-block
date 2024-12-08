@@ -26,6 +26,22 @@ import { PassphraseDto } from '../../passphrases/dto/passphrase.dto';
 export class CreateMainWalletDto {
   @ApiProperty({
     required: false,
+    type: () => String,
+  })
+  @IsOptional()
+  @IsString()
+  type?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => String,
+  })
+  @IsOptional()
+  @IsString()
+  name?: string | null;
+
+  @ApiProperty({
+    required: false,
     type: () => [WalletDto],
   })
   @IsOptional()

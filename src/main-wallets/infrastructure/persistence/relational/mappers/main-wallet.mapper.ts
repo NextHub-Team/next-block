@@ -1,4 +1,5 @@
 import { MainWallet } from '../../../../domain/main-wallet';
+
 import { WalletMapper } from '../../../../../wallets/infrastructure/persistence/relational/mappers/wallet.mapper';
 
 import { UserMapper } from '../../../../../users/infrastructure/persistence/relational/mappers/user.mapper';
@@ -8,6 +9,10 @@ import { PassphraseMapper } from '../../../../../passphrases/infrastructure/pers
 export class MainWalletMapper {
   static toDomain(raw: MainWalletEntity): MainWallet {
     const domainEntity = new MainWallet();
+    domainEntity.type = raw.type;
+
+    domainEntity.name = raw.name;
+
     if (raw.wallets) {
       domainEntity.wallets = raw.wallets.map((item) =>
         WalletMapper.toDomain(item),
@@ -35,6 +40,10 @@ export class MainWalletMapper {
 
   static toPersistence(domainEntity: MainWallet): MainWalletEntity {
     const persistenceEntity = new MainWalletEntity();
+    persistenceEntity.type = domainEntity.type;
+
+    persistenceEntity.name = domainEntity.name;
+
     if (domainEntity.wallets) {
       persistenceEntity.wallets = domainEntity.wallets.map((item) =>
         WalletMapper.toPersistence(item),

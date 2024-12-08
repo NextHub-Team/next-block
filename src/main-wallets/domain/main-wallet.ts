@@ -5,6 +5,18 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class MainWallet {
   @ApiProperty({
+    type: () => String,
+    nullable: true,
+  })
+  type?: string | null;
+
+  @ApiProperty({
+    type: () => String,
+    nullable: true,
+  })
+  name?: string | null;
+
+  @ApiProperty({
     type: () => [Wallet],
     nullable: true,
   })

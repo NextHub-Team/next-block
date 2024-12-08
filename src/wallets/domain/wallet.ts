@@ -3,6 +3,24 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class Wallet {
   @ApiProperty({
+    type: () => String,
+    nullable: false,
+  })
+  legacyAddress: string;
+
+  @ApiProperty({
+    type: () => String,
+    nullable: false,
+  })
+  blockchain: string;
+
+  @ApiProperty({
+    type: () => String,
+    nullable: false,
+  })
+  address: string;
+
+  @ApiProperty({
     type: () => MainWallet,
     nullable: false,
   })

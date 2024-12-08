@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   ManyToOne,
+  Column,
 } from 'typeorm';
 import { EntityRelationalHelper } from '../../../../../utils/relational-entity-helper';
 
@@ -13,6 +14,24 @@ import { EntityRelationalHelper } from '../../../../../utils/relational-entity-h
   name: 'wallet',
 })
 export class WalletEntity extends EntityRelationalHelper {
+  @Column({
+    nullable: false,
+    type: String,
+  })
+  legacyAddress: string;
+
+  @Column({
+    nullable: false,
+    type: String,
+  })
+  blockchain: string;
+
+  @Column({
+    nullable: false,
+    type: String,
+  })
+  address: string;
+
   @ManyToOne(() => MainWalletEntity, (parentEntity) => parentEntity.wallets, {
     eager: false,
     nullable: false,

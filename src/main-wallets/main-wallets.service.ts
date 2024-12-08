@@ -34,6 +34,7 @@ export class MainWalletsService {
   async create(createMainWalletDto: CreateMainWalletDto) {
     // Do not remove comment below.
     // <creating-property />
+
     let wallets: Wallet[] | null | undefined = undefined;
 
     if (createMainWalletDto.wallets) {
@@ -82,6 +83,10 @@ export class MainWalletsService {
     return this.mainWalletRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
+      type: createMainWalletDto.type,
+
+      name: createMainWalletDto.name,
+
       wallets,
 
       address: createMainWalletDto.address,
@@ -120,6 +125,7 @@ export class MainWalletsService {
   ) {
     // Do not remove comment below.
     // <updating-property />
+
     let wallets: Wallet[] | null | undefined = undefined;
 
     if (updateMainWalletDto.wallets) {
@@ -176,6 +182,10 @@ export class MainWalletsService {
     return this.mainWalletRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
+      type: updateMainWalletDto.type,
+
+      name: updateMainWalletDto.name,
+
       wallets,
 
       address: updateMainWalletDto.address,
