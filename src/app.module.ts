@@ -56,8 +56,11 @@ import { NftTransactionsModule } from './nft-transactions/nft-transactions.modul
 
 import { NFTsModule } from './nfts/nfts.module';
 
+import { EventLogsModule } from './event-logs/event-logs.module';
+
 @Module({
   imports: [
+    EventLogsModule,
     NFTsModule,
     NftTransactionsModule,
     TransferTransactionsModule,
