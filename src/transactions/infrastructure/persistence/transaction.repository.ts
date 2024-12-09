@@ -15,13 +15,11 @@ export abstract class TransactionRepository {
   }): Promise<Transaction[]>;
 
   abstract findById(id: Transaction['id']): Promise<NullableType<Transaction>>;
-
   abstract findByIds(ids: Transaction['id'][]): Promise<Transaction[]>;
 
   abstract update(
     id: Transaction['id'],
     payload: DeepPartial<Transaction>,
   ): Promise<Transaction | null>;
-
   abstract remove(id: Transaction['id']): Promise<void>;
 }

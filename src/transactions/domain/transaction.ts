@@ -1,12 +1,12 @@
-import { User } from '../../users/domain/user';
+import { Wallet } from '../../wallets/domain/wallet';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class Transaction {
   @ApiProperty({
-    type: () => User,
+    type: () => Wallet,
     nullable: false,
   })
-  user: User;
+  wallet: Wallet;
 
   @ApiProperty({
     type: String,

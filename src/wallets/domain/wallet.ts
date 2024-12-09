@@ -1,7 +1,14 @@
+import { Transaction } from '../../transactions/domain/transaction';
 import { MainWallet } from '../../main-wallets/domain/main-wallet';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class Wallet {
+  @ApiProperty({
+    type: () => [Transaction],
+    nullable: true,
+  })
+  transactions?: Transaction[] | null;
+
   @ApiProperty({
     type: () => String,
     nullable: false,

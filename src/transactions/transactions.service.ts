@@ -1,5 +1,5 @@
-import { UsersService } from '../users/users.service';
-import { User } from '../users/domain/user';
+import { WalletsService } from '../wallets/wallets.service';
+import { Wallet } from '../wallets/domain/wallet';
 
 import {
   forwardRef,
@@ -18,8 +18,8 @@ import { Transaction } from './domain/transaction';
 @Injectable()
 export class TransactionsService {
   constructor(
-    @Inject(forwardRef(() => UsersService))
-    private readonly userService: UsersService,
+    @Inject(forwardRef(() => WalletsService))
+    private readonly walletService: WalletsService,
 
     // Dependencies here
     private readonly transactionRepository: TransactionRepository,
@@ -28,23 +28,23 @@ export class TransactionsService {
   async create(createTransactionDto: CreateTransactionDto) {
     // Do not remove comment below.
     // <creating-property />
-    const userObject = await this.userService.findById(
-      createTransactionDto.user.id,
+    const walletObject = await this.walletService.findById(
+      createTransactionDto.wallet.id,
     );
-    if (!userObject) {
+    if (!walletObject) {
       throw new UnprocessableEntityException({
         status: HttpStatus.UNPROCESSABLE_ENTITY,
         errors: {
-          user: 'notExists',
+          wallet: 'notExists',
         },
       });
     }
-    const user = userObject;
+    const wallet = walletObject;
 
     return this.transactionRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
-      user,
+      wallet,
     });
   }
 
@@ -71,32 +71,32 @@ export class TransactionsService {
 
   async update(
     id: Transaction['id'],
-
     updateTransactionDto: UpdateTransactionDto,
   ) {
     // Do not remove comment below.
     // <updating-property />
-    let user: User | undefined = undefined;
 
-    if (updateTransactionDto.user) {
-      const userObject = await this.userService.findById(
-        updateTransactionDto.user.id,
+    let wallet: Wallet | undefined = undefined;
+
+    if (updateTransactionDto.wallet) {
+      const walletObject = await this.walletService.findById(
+        updateTransactionDto.wallet.id,
       );
-      if (!userObject) {
+      if (!walletObject) {
         throw new UnprocessableEntityException({
           status: HttpStatus.UNPROCESSABLE_ENTITY,
           errors: {
-            user: 'notExists',
+            wallet: 'notExists',
           },
         });
       }
-      user = userObject;
+      wallet = walletObject;
     }
 
     return this.transactionRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
-      user,
+      wallet,
     });
   }
 

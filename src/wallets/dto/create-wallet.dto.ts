@@ -1,3 +1,5 @@
+import { TransactionDto } from '../../transactions/dto/transaction.dto';
+
 import { MainWalletDto } from '../../main-wallets/dto/main-wallet.dto';
 
 import {
@@ -11,6 +13,8 @@ import {
   ValidateNested,
   IsNotEmptyObject,
   IsString,
+  IsArray,
+  IsOptional,
 } from 'class-validator';
 
 import {
@@ -19,6 +23,16 @@ import {
 } from '@nestjs/swagger';
 
 export class CreateWalletDto {
+  @ApiProperty({
+    required: false,
+    type: () => [TransactionDto],
+  })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => TransactionDto)
+  @IsArray()
+  transactions?: TransactionDto[] | null;
+
   @ApiProperty({
     required: true,
     type: () => String,

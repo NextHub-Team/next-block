@@ -1,3 +1,6 @@
+import { TransactionsService } from '../transactions/transactions.service';
+import { Transaction } from '../transactions/domain/transaction';
+
 import { MainWalletsService } from '../main-wallets/main-wallets.service';
 import { MainWallet } from '../main-wallets/domain/main-wallet';
 
@@ -18,6 +21,8 @@ import { Wallet } from './domain/wallet';
 @Injectable()
 export class WalletsService {
   constructor(
+    private readonly transactionService: TransactionsService,
+
     @Inject(forwardRef(() => MainWalletsService))
     private readonly mainWalletService: MainWalletsService,
 
@@ -28,6 +33,24 @@ export class WalletsService {
   async create(createWalletDto: CreateWalletDto) {
     // Do not remove comment below.
     // <creating-property />
+    let transactions: Transaction[] | null | undefined = undefined;
+
+    if (createWalletDto.transactions) {
+      const transactionsObjects = await this.transactionService.findByIds(
+        createWalletDto.transactions.map((entity) => entity.id),
+      );
+      if (transactionsObjects.length !== createWalletDto.transactions.length) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: {
+            transactions: 'notExists',
+          },
+        });
+      }
+      transactions = transactionsObjects;
+    } else if (createWalletDto.transactions === null) {
+      transactions = null;
+    }
 
     const mainWalletObject = await this.mainWalletService.findById(
       createWalletDto.mainWallet.id,
@@ -45,6 +68,8 @@ export class WalletsService {
     return this.walletRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
+      transactions,
+
       legacyAddress: createWalletDto.legacyAddress,
 
       blockchain: createWalletDto.blockchain,
@@ -83,6 +108,24 @@ export class WalletsService {
   ) {
     // Do not remove comment below.
     // <updating-property />
+    let transactions: Transaction[] | null | undefined = undefined;
+
+    if (updateWalletDto.transactions) {
+      const transactionsObjects = await this.transactionService.findByIds(
+        updateWalletDto.transactions.map((entity) => entity.id),
+      );
+      if (transactionsObjects.length !== updateWalletDto.transactions.length) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: {
+            transactions: 'notExists',
+          },
+        });
+      }
+      transactions = transactionsObjects;
+    } else if (updateWalletDto.transactions === null) {
+      transactions = null;
+    }
 
     let mainWallet: MainWallet | undefined = undefined;
 
@@ -104,6 +147,8 @@ export class WalletsService {
     return this.walletRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
+      transactions,
+
       legacyAddress: updateWalletDto.legacyAddress,
 
       blockchain: updateWalletDto.blockchain,

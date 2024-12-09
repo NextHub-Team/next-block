@@ -1,4 +1,4 @@
-import { UsersModule } from '../users/users.module';
+import { WalletsModule } from '../wallets/wallets.module';
 import { forwardRef, Module } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { TransactionsController } from './transactions.controller';
@@ -6,7 +6,8 @@ import { RelationalTransactionPersistenceModule } from './infrastructure/persist
 
 @Module({
   imports: [
-    forwardRef(() => UsersModule),
+    WalletsModule,
+    forwardRef(() => WalletsModule),
     // import modules, etc.
     RelationalTransactionPersistenceModule,
   ],

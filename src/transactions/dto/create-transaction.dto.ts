@@ -1,4 +1,4 @@
-import { UserDto } from '../../users/dto/user.dto';
+import { WalletDto } from '../../wallets/dto/wallet.dto';
 
 import {
   // decorators here
@@ -20,12 +20,11 @@ import {
 export class CreateTransactionDto {
   @ApiProperty({
     required: true,
-    type: () => UserDto,
+    type: () => WalletDto,
   })
   @ValidateNested()
-  @Type(() => UserDto)
+  @Type(() => WalletDto)
   @IsNotEmptyObject()
-  user: UserDto;
-
+  wallet: WalletDto;
   // Don't forget to use the class-validator decorators in the DTO properties.
 }

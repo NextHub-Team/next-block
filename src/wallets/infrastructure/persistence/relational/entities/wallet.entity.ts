@@ -1,3 +1,5 @@
+import { TransactionEntity } from '../../../../../transactions/infrastructure/persistence/relational/entities/transaction.entity';
+
 import { MainWalletEntity } from '../../../../../main-wallets/infrastructure/persistence/relational/entities/main-wallet.entity';
 
 import {
@@ -7,6 +9,7 @@ import {
   UpdateDateColumn,
   ManyToOne,
   Column,
+  OneToMany,
 } from 'typeorm';
 import { EntityRelationalHelper } from '../../../../../utils/relational-entity-helper';
 
@@ -14,6 +17,12 @@ import { EntityRelationalHelper } from '../../../../../utils/relational-entity-h
   name: 'wallet',
 })
 export class WalletEntity extends EntityRelationalHelper {
+  @OneToMany(() => TransactionEntity, (childEntity) => childEntity.wallet, {
+    eager: true,
+    nullable: true,
+  })
+  transactions?: TransactionEntity[] | null;
+
   @Column({
     nullable: false,
     type: String,

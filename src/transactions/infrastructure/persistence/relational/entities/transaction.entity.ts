@@ -1,4 +1,4 @@
-import { UserEntity } from '../../../../../users/infrastructure/persistence/relational/entities/user.entity';
+import { WalletEntity } from '../../../../../wallets/infrastructure/persistence/relational/entities/wallet.entity';
 
 import {
   CreateDateColumn,
@@ -13,11 +13,11 @@ import { EntityRelationalHelper } from '../../../../../utils/relational-entity-h
   name: 'transaction',
 })
 export class TransactionEntity extends EntityRelationalHelper {
-  @ManyToOne(() => UserEntity, (parentEntity) => parentEntity.transactions, {
+  @ManyToOne(() => WalletEntity, (parentEntity) => parentEntity.transactions, {
     eager: false,
     nullable: false,
   })
-  user: UserEntity;
+  wallet: WalletEntity;
 
   @PrimaryGeneratedColumn('uuid')
   id: string;

@@ -1,3 +1,4 @@
+import { TransactionsModule } from '../transactions/transactions.module';
 import { MainWalletsModule } from '../main-wallets/main-wallets.module';
 import { forwardRef, Module } from '@nestjs/common';
 import { WalletsService } from './wallets.service';
@@ -6,6 +7,8 @@ import { RelationalWalletPersistenceModule } from './infrastructure/persistence/
 
 @Module({
   imports: [
+    TransactionsModule,
+
     forwardRef(() => MainWalletsModule),
     // import modules, etc.
     RelationalWalletPersistenceModule,
