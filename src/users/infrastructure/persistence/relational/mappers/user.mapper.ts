@@ -1,4 +1,6 @@
 import { FileEntity } from '../../../../../files/infrastructure/persistence/relational/entities/file.entity';
+import { TransactionMapper } from '../../../../../transactions/infrastructure/persistence/relational/mappers/transaction.mapper';
+
 import { UserLogMapper } from '../../../../../user-logs/infrastructure/persistence/relational/mappers/user-log.mapper';
 
 import { MainWalletMapper } from '../../../../../main-wallets/infrastructure/persistence/relational/mappers/main-wallet.mapper';
@@ -15,6 +17,14 @@ import { UserEntity } from '../entities/user.entity';
 export class UserMapper {
   static toDomain(raw: UserEntity): User {
     const domainEntity = new User();
+    if (raw.transactions) {
+      domainEntity.transactions = raw.transactions.map((item) =>
+        TransactionMapper.toDomain(item),
+      );
+    } else if (raw.transactions === null) {
+      domainEntity.transactions = null;
+    }
+
     if (raw.logs) {
       domainEntity.logs = raw.logs.map((item) => UserLogMapper.toDomain(item));
     } else if (raw.logs === null) {
@@ -91,6 +101,14 @@ export class UserMapper {
     }
 
     const persistenceEntity = new UserEntity();
+    if (domainEntity.transactions) {
+      persistenceEntity.transactions = domainEntity.transactions.map((item) =>
+        TransactionMapper.toPersistence(item),
+      );
+    } else if (domainEntity.transactions === null) {
+      persistenceEntity.transactions = null;
+    }
+
     if (domainEntity.logs) {
       persistenceEntity.logs = domainEntity.logs.map((item) =>
         UserLogMapper.toPersistence(item),
