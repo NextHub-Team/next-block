@@ -8,7 +8,7 @@ import { RelationalWalletPersistenceModule } from './infrastructure/persistence/
 @Module({
   imports: [
     TransactionsModule,
-
+    forwardRef(() => TransactionsModule),
     forwardRef(() => MainWalletsModule),
     // import modules, etc.
     RelationalWalletPersistenceModule,

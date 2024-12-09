@@ -21,6 +21,7 @@ import { Wallet } from './domain/wallet';
 @Injectable()
 export class WalletsService {
   constructor(
+    @Inject(forwardRef(() => TransactionsService))
     private readonly transactionService: TransactionsService,
 
     @Inject(forwardRef(() => MainWalletsService))
