@@ -28,7 +28,7 @@ import {
 import { infinityPagination } from '../utils/infinity-pagination';
 import { FindAllTransferTransactionsDto } from './dto/find-all-transfer-transactions.dto';
 
-@ApiTags('Transfertransactions')
+@ApiTags('TransferTransactions')
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
 @Controller({
