@@ -1,4 +1,3 @@
-import { Transaction } from '../../transactions/domain/transaction';
 import { UserLog } from '../../user-logs/domain/user-log';
 import { MainWallet } from '../../main-wallets/domain/main-wallet';
 import { Permission } from '../../permissions/domain/permission';
@@ -12,12 +11,6 @@ import { ApiProperty } from '@nestjs/swagger';
 const idType = Number;
 
 export class User {
-  @ApiProperty({
-    type: () => [Transaction],
-    nullable: true,
-  })
-  transactions?: Transaction[] | null;
-
   @ApiProperty({
     type: () => [UserLog],
     nullable: true,

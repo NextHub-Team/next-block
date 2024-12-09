@@ -1,6 +1,3 @@
-import { TransactionsService } from '../transactions/transactions.service';
-import { Transaction } from '../transactions/domain/transaction';
-
 import { UserLogsService } from '../user-logs/user-logs.service';
 import { UserLog } from '../user-logs/domain/user-log';
 
@@ -39,9 +36,6 @@ import { UpdateUserDto } from './dto/update-user.dto';
 @Injectable()
 export class UsersService {
   constructor(
-    @Inject(forwardRef(() => TransactionsService))
-    private readonly transactionService: TransactionsService,
-
     @Inject(forwardRef(() => UserLogsService))
     private readonly userLogService: UserLogsService,
 
@@ -61,24 +55,6 @@ export class UsersService {
   async create(createUserDto: CreateUserDto): Promise<User> {
     // Do not remove comment below.
     // <creating-property />
-    let transactions: Transaction[] | null | undefined = undefined;
-
-    if (createUserDto.transactions) {
-      const transactionsObjects = await this.transactionService.findByIds(
-        createUserDto.transactions.map((entity) => entity.id),
-      );
-      if (transactionsObjects.length !== createUserDto.transactions.length) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            transactions: 'notExists',
-          },
-        });
-      }
-      transactions = transactionsObjects;
-    } else if (createUserDto.transactions === null) {
-      transactions = null;
-    }
 
     let logs: UserLog[] | null | undefined = undefined;
 
@@ -213,7 +189,6 @@ export class UsersService {
           },
         });
       }
-
       role = {
         id: createUserDto.role.id,
       };
@@ -242,18 +217,11 @@ export class UsersService {
     return this.usersRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
-      transactions,
-
       logs,
-
       mainWallets,
-
       permissions,
-
       phone: createUserDto.phone,
-
       devices,
-
       firstName: createUserDto.firstName,
       lastName: createUserDto.lastName,
       email: email,
@@ -313,24 +281,6 @@ export class UsersService {
   ): Promise<User | null> {
     // Do not remove comment below.
     // <updating-property />
-    let transactions: Transaction[] | null | undefined = undefined;
-
-    if (updateUserDto.transactions) {
-      const transactionsObjects = await this.transactionService.findByIds(
-        updateUserDto.transactions.map((entity) => entity.id),
-      );
-      if (transactionsObjects.length !== updateUserDto.transactions.length) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            transactions: 'notExists',
-          },
-        });
-      }
-      transactions = transactionsObjects;
-    } else if (updateUserDto.transactions === null) {
-      transactions = null;
-    }
 
     let logs: UserLog[] | null | undefined = undefined;
 
@@ -412,7 +362,6 @@ export class UsersService {
 
     if (updateUserDto.password) {
       const userObject = await this.usersRepository.findById(id);
-
       if (userObject && userObject?.password !== updateUserDto.password) {
         const salt = await bcrypt.genSalt();
         password = await bcrypt.hash(updateUserDto.password, salt);
@@ -434,7 +383,6 @@ export class UsersService {
           },
         });
       }
-
       email = updateUserDto.email;
     } else if (updateUserDto.email === null) {
       email = null;
@@ -473,14 +421,12 @@ export class UsersService {
           },
         });
       }
-
       role = {
         id: updateUserDto.role.id,
       };
     }
 
     let status: Status | undefined = undefined;
-
     if (updateUserDto.status?.id) {
       const statusObject = Object.values(StatusEnum)
         .map(String)
@@ -502,18 +448,11 @@ export class UsersService {
     return this.usersRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
-      transactions,
-
       logs,
-
       mainWallets,
-
       permissions,
-
       phone: updateUserDto.phone,
-
       devices,
-
       firstName: updateUserDto.firstName,
       lastName: updateUserDto.lastName,
       email,
