@@ -25,7 +25,7 @@ export class NftsService {
     private readonly walletService: WalletsService,
     // Dependencies here
     private readonly nftRepository: NftRepository,
-  ) { }
+  ) {}
 
   async create(createNftDto: CreateNftDto) {
     // Do not remove comment below.

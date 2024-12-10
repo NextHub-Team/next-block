@@ -16,4 +16,4 @@ import { RelationalNftPersistenceModule } from './infrastructure/persistence/rel
   providers: [NftsService],
   exports: [NftsService, RelationalNftPersistenceModule],
 })
-export class NftsModule { }
+export class NftsModule {}
