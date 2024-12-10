@@ -28,7 +28,7 @@ import {
 import { infinityPagination } from '../utils/infinity-pagination';
 import { FindAllNftTransactionsDto } from './dto/find-all-nft-transactions.dto';
 
-@ApiTags('Nfttransactions')
+@ApiTags('NftTransactions')
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
 @Controller({

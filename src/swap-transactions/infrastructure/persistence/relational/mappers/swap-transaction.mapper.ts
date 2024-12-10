@@ -1,4 +1,5 @@
 import { SwapTransaction } from '../../../../domain/swap-transaction';
+
 import { TransactionMapper } from '../../../../../transactions/infrastructure/persistence/relational/mappers/transaction.mapper';
 
 import { SwapTransactionEntity } from '../entities/swap-transaction.entity';
@@ -6,6 +7,20 @@ import { SwapTransactionEntity } from '../entities/swap-transaction.entity';
 export class SwapTransactionMapper {
   static toDomain(raw: SwapTransactionEntity): SwapTransaction {
     const domainEntity = new SwapTransaction();
+    domainEntity.transaction_fee = raw.transaction_fee;
+
+    domainEntity.dex = raw.dex;
+
+    domainEntity.amount_out = raw.amount_out;
+
+    domainEntity.amount_in = raw.amount_in;
+
+    domainEntity.to_token = raw.to_token;
+
+    domainEntity.wallet = raw.wallet;
+
+    domainEntity.from_token = raw.from_token;
+
     if (raw.transaction) {
       domainEntity.transaction = TransactionMapper.toDomain(raw.transaction);
     }
@@ -19,6 +34,20 @@ export class SwapTransactionMapper {
 
   static toPersistence(domainEntity: SwapTransaction): SwapTransactionEntity {
     const persistenceEntity = new SwapTransactionEntity();
+    persistenceEntity.transaction_fee = domainEntity.transaction_fee;
+
+    persistenceEntity.dex = domainEntity.dex;
+
+    persistenceEntity.amount_out = domainEntity.amount_out;
+
+    persistenceEntity.amount_in = domainEntity.amount_in;
+
+    persistenceEntity.to_token = domainEntity.to_token;
+
+    persistenceEntity.wallet = domainEntity.wallet;
+
+    persistenceEntity.from_token = domainEntity.from_token;
+
     if (domainEntity.transaction) {
       persistenceEntity.transaction = TransactionMapper.toPersistence(
         domainEntity.transaction,

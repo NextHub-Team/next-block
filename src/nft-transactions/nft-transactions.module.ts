@@ -7,7 +7,6 @@ import { RelationalNftTransactionPersistenceModule } from './infrastructure/pers
 @Module({
   imports: [
     TransactionsModule,
-
     // import modules, etc.
     RelationalNftTransactionPersistenceModule,
   ],

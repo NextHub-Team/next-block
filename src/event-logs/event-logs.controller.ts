@@ -28,7 +28,7 @@ import {
 import { infinityPagination } from '../utils/infinity-pagination';
 import { FindAllEventLogsDto } from './dto/find-all-event-logs.dto';
 
-@ApiTags('Eventlogs')
+@ApiTags('EventLogs')
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
 @Controller({

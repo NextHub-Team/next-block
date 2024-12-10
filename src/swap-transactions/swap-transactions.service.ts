@@ -22,6 +22,7 @@ export class SwapTransactionsService {
   async create(createSwapTransactionDto: CreateSwapTransactionDto) {
     // Do not remove comment below.
     // <creating-property />
+
     let transaction: Transaction | undefined = undefined;
 
     if (createSwapTransactionDto.transaction) {
@@ -42,6 +43,20 @@ export class SwapTransactionsService {
     return this.swapTransactionRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
+      transaction_fee: createSwapTransactionDto.transaction_fee,
+
+      dex: createSwapTransactionDto.dex,
+
+      amount_out: createSwapTransactionDto.amount_out,
+
+      amount_in: createSwapTransactionDto.amount_in,
+
+      to_token: createSwapTransactionDto.to_token,
+
+      wallet: createSwapTransactionDto.wallet,
+
+      from_token: createSwapTransactionDto.from_token,
+
       transaction,
     });
   }
@@ -74,6 +89,7 @@ export class SwapTransactionsService {
   ) {
     // Do not remove comment below.
     // <updating-property />
+
     let transaction: Transaction | undefined = undefined;
 
     if (updateSwapTransactionDto.transaction) {
@@ -94,6 +110,20 @@ export class SwapTransactionsService {
     return this.swapTransactionRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
+      transaction_fee: updateSwapTransactionDto.transaction_fee,
+
+      dex: updateSwapTransactionDto.dex,
+
+      amount_out: updateSwapTransactionDto.amount_out,
+
+      amount_in: updateSwapTransactionDto.amount_in,
+
+      to_token: updateSwapTransactionDto.to_token,
+
+      wallet: updateSwapTransactionDto.wallet,
+
+      from_token: updateSwapTransactionDto.from_token,
+
       transaction,
     });
   }

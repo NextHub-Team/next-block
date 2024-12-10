@@ -1,8 +1,6 @@
 import { TransactionsService } from '../transactions/transactions.service';
 import { Transaction } from '../transactions/domain/transaction';
-
 import { HttpStatus, UnprocessableEntityException } from '@nestjs/common';
-
 import { Injectable } from '@nestjs/common';
 import { CreateNftTransactionDto } from './dto/create-nft-transaction.dto';
 import { UpdateNftTransactionDto } from './dto/update-nft-transaction.dto';
@@ -22,6 +20,7 @@ export class NftTransactionsService {
   async create(createNftTransactionDto: CreateNftTransactionDto) {
     // Do not remove comment below.
     // <creating-property />
+
     let transaction: Transaction | undefined = undefined;
 
     if (createNftTransactionDto.transaction) {
@@ -74,6 +73,7 @@ export class NftTransactionsService {
   ) {
     // Do not remove comment below.
     // <updating-property />
+
     let transaction: Transaction | undefined = undefined;
 
     if (updateNftTransactionDto.transaction) {

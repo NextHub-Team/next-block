@@ -28,7 +28,7 @@ import {
 import { infinityPagination } from '../utils/infinity-pagination';
 import { FindAllSupportedAssetsDto } from './dto/find-all-supported-assets.dto';
 
-@ApiTags('Supportedassets')
+@ApiTags('SupportedAssets')
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
 @Controller({
