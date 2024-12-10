@@ -54,14 +54,11 @@ import { TransferTransactionsModule } from './transfer-transactions/transfer-tra
 
 import { NftTransactionsModule } from './nft-transactions/nft-transactions.module';
 
-import { NFTsModule } from './nfts/nfts.module';
-
 import { EventLogsModule } from './event-logs/event-logs.module';
 
 @Module({
   imports: [
     EventLogsModule,
-    NFTsModule,
     NftTransactionsModule,
     TransferTransactionsModule,
     OrderTransactionsModule,
