@@ -10,6 +10,7 @@ import {
 
   ValidateNested,
   IsNotEmptyObject,
+  IsString,
 } from 'class-validator';
 
 import {
@@ -18,6 +19,41 @@ import {
 } from '@nestjs/swagger';
 
 export class CreateTransactionDto {
+  @ApiProperty({
+    required: false,
+    type: () => String,
+  })
+  @IsString()
+  details: string;
+
+  @ApiProperty({
+    required: true,
+    type: () => String,
+  })
+  @IsString()
+  asset: string;
+
+  @ApiProperty({
+    required: true,
+    type: () => String,
+  })
+  @IsString()
+  priority: string;
+
+  @ApiProperty({
+    required: true,
+    type: () => String,
+  })
+  @IsString()
+  status: string;
+
+  @ApiProperty({
+    required: true,
+    type: () => String,
+  })
+  @IsString()
+  type: string;
+
   @ApiProperty({
     required: true,
     type: () => WalletDto,

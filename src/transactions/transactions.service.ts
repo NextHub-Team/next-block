@@ -28,6 +28,7 @@ export class TransactionsService {
   async create(createTransactionDto: CreateTransactionDto) {
     // Do not remove comment below.
     // <creating-property />
+
     const walletObject = await this.walletService.findById(
       createTransactionDto.wallet.id,
     );
@@ -44,6 +45,16 @@ export class TransactionsService {
     return this.transactionRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
+      details: createTransactionDto.details,
+
+      asset: createTransactionDto.asset,
+
+      priority: createTransactionDto.priority,
+
+      status: createTransactionDto.status,
+
+      type: createTransactionDto.type,
+
       wallet,
     });
   }
@@ -96,6 +107,16 @@ export class TransactionsService {
     return this.transactionRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
+      details: updateTransactionDto.details,
+
+      asset: updateTransactionDto.asset,
+
+      priority: updateTransactionDto.priority,
+
+      status: updateTransactionDto.status,
+
+      type: updateTransactionDto.type,
+
       wallet,
     });
   }
