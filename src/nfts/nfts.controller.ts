@@ -9,9 +9,9 @@ import {
   UseGuards,
   Query,
 } from '@nestjs/common';
-import { MainWalletsService } from './main-wallets.service';
-import { CreateMainWalletDto } from './dto/create-main-wallet.dto';
-import { UpdateMainWalletDto } from './dto/update-main-wallet.dto';
+import { NftsService } from './nfts.service';
+import { CreateNftDto } from './dto/create-nft.dto';
+import { UpdateNftDto } from './dto/update-nft.dto';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
@@ -19,40 +19,40 @@ import {
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
-import { MainWallet } from './domain/main-wallet';
+import { Nft } from './domain/nft';
 import { AuthGuard } from '@nestjs/passport';
 import {
   InfinityPaginationResponse,
   InfinityPaginationResponseDto,
 } from '../utils/dto/infinity-pagination-response.dto';
 import { infinityPagination } from '../utils/infinity-pagination';
-import { FindAllMainWalletsDto } from './dto/find-all-main-wallets.dto';
+import { FindAllNftsDto } from './dto/find-all-nfts.dto';
 
-@ApiTags('MainWallets')
+@ApiTags('Nfts')
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
 @Controller({
-  path: 'main-wallets',
+  path: 'nfts',
   version: '1',
 })
-export class MainWalletsController {
-  constructor(private readonly mainWalletsService: MainWalletsService) {}
+export class NftsController {
+  constructor(private readonly nftsService: NftsService) {}
 
   @Post()
   @ApiCreatedResponse({
-    type: MainWallet,
+    type: Nft,
   })
-  create(@Body() createMainWalletDto: CreateMainWalletDto) {
-    return this.mainWalletsService.create(createMainWalletDto);
+  create(@Body() createNftDto: CreateNftDto) {
+    return this.nftsService.create(createNftDto);
   }
 
   @Get()
   @ApiOkResponse({
-    type: InfinityPaginationResponse(MainWallet),
+    type: InfinityPaginationResponse(Nft),
   })
   async findAll(
-    @Query() query: FindAllMainWalletsDto,
-  ): Promise<InfinityPaginationResponseDto<MainWallet>> {
+    @Query() query: FindAllNftsDto,
+  ): Promise<InfinityPaginationResponseDto<Nft>> {
     const page = query?.page ?? 1;
     let limit = query?.limit ?? 10;
     if (limit > 50) {
@@ -60,7 +60,7 @@ export class MainWalletsController {
     }
 
     return infinityPagination(
-      await this.mainWalletsService.findAllWithPagination({
+      await this.nftsService.findAllWithPagination({
         paginationOptions: {
           page,
           limit,
@@ -77,10 +77,10 @@ export class MainWalletsController {
     required: true,
   })
   @ApiOkResponse({
-    type: MainWallet,
+    type: Nft,
   })
   findById(@Param('id') id: string) {
-    return this.mainWalletsService.findById(id);
+    return this.nftsService.findById(id);
   }
 
   @Patch(':id')
@@ -90,13 +90,10 @@ export class MainWalletsController {
     required: true,
   })
   @ApiOkResponse({
-    type: MainWallet,
+    type: Nft,
   })
-  update(
-    @Param('id') id: string,
-    @Body() updateMainWalletDto: UpdateMainWalletDto,
-  ) {
-    return this.mainWalletsService.update(id, updateMainWalletDto);
+  update(@Param('id') id: string, @Body() updateNftDto: UpdateNftDto) {
+    return this.nftsService.update(id, updateNftDto);
   }
 
   @Delete(':id')
@@ -106,6 +103,6 @@ export class MainWalletsController {
     required: true,
   })
   remove(@Param('id') id: string) {
-    return this.mainWalletsService.remove(id);
+    return this.nftsService.remove(id);
   }
 }

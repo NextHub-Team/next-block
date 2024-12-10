@@ -1,3 +1,5 @@
+import { NftEntity } from '../../../../../nfts/infrastructure/persistence/relational/entities/nft.entity';
+
 import { TransactionEntity } from '../../../../../transactions/infrastructure/persistence/relational/entities/transaction.entity';
 
 import {
@@ -7,6 +9,7 @@ import {
   UpdateDateColumn,
   JoinColumn,
   OneToOne,
+  ManyToOne,
 } from 'typeorm';
 import { EntityRelationalHelper } from '../../../../../utils/relational-entity-helper';
 
@@ -14,6 +17,12 @@ import { EntityRelationalHelper } from '../../../../../utils/relational-entity-h
   name: 'nft_transaction',
 })
 export class NftTransactionEntity extends EntityRelationalHelper {
+  @ManyToOne(() => NftEntity, (parentEntity) => parentEntity.nftTransactions, {
+    eager: false,
+    nullable: false,
+  })
+  nft?: NftEntity;
+
   @OneToOne(() => TransactionEntity, { eager: true, nullable: false })
   @JoinColumn()
   transaction?: TransactionEntity;

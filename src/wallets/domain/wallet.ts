@@ -1,8 +1,15 @@
+import { Nft } from '../../nfts/domain/nft';
 import { Transaction } from '../../transactions/domain/transaction';
 import { MainWallet } from '../../main-wallets/domain/main-wallet';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class Wallet {
+  @ApiProperty({
+    type: () => [Nft],
+    nullable: true,
+  })
+  nfts?: Nft[] | null;
+
   @ApiProperty({
     type: () => [Transaction],
     nullable: true,

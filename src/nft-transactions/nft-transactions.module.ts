@@ -1,12 +1,14 @@
+import { NftsModule } from '../nfts/nfts.module';
 import { TransactionsModule } from '../transactions/transactions.module';
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { NftTransactionsService } from './nft-transactions.service';
 import { NftTransactionsController } from './nft-transactions.controller';
 import { RelationalNftTransactionPersistenceModule } from './infrastructure/persistence/relational/relational-persistence.module';
 
 @Module({
   imports: [
-    TransactionsModule,
+    forwardRef(() => NftsModule),
+    forwardRef(() => TransactionsModule),
     // import modules, etc.
     RelationalNftTransactionPersistenceModule,
   ],

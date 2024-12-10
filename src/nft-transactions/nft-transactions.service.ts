@@ -1,18 +1,27 @@
+import { NftsService } from '../nfts/nfts.service';
 import { TransactionsService } from '../transactions/transactions.service';
 import { Transaction } from '../transactions/domain/transaction';
-import { HttpStatus, UnprocessableEntityException } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpStatus,
+  Inject,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { Injectable } from '@nestjs/common';
 import { CreateNftTransactionDto } from './dto/create-nft-transaction.dto';
 import { UpdateNftTransactionDto } from './dto/update-nft-transaction.dto';
 import { NftTransactionRepository } from './infrastructure/persistence/nft-transaction.repository';
 import { IPaginationOptions } from '../utils/types/pagination-options';
 import { NftTransaction } from './domain/nft-transaction';
+import { Nft } from '../nfts/domain/nft';
 
 @Injectable()
 export class NftTransactionsService {
   constructor(
-    private readonly transactionService: TransactionsService,
+    @Inject(forwardRef(() => NftsService))
+    private readonly nftService: NftsService,
 
+    private readonly transactionService: TransactionsService,
     // Dependencies here
     private readonly nftTransactionRepository: NftTransactionRepository,
   ) {}
@@ -20,6 +29,22 @@ export class NftTransactionsService {
   async create(createNftTransactionDto: CreateNftTransactionDto) {
     // Do not remove comment below.
     // <creating-property />
+    let nft: Nft | undefined = undefined;
+
+    if (createNftTransactionDto.nft) {
+      const nftObject = await this.nftService.findById(
+        createNftTransactionDto.nft.id,
+      );
+      if (!nftObject) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: {
+            nft: 'notExists',
+          },
+        });
+      }
+      nft = nftObject;
+    }
 
     let transaction: Transaction | undefined = undefined;
 
@@ -41,6 +66,8 @@ export class NftTransactionsService {
     return this.nftTransactionRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
+      nft,
+
       transaction,
     });
   }
@@ -73,6 +100,22 @@ export class NftTransactionsService {
   ) {
     // Do not remove comment below.
     // <updating-property />
+    let nft: Nft | undefined = undefined;
+
+    if (updateNftTransactionDto.nft) {
+      const nftObject = await this.nftService.findById(
+        updateNftTransactionDto.nft.id,
+      );
+      if (!nftObject) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: {
+            nft: 'notExists',
+          },
+        });
+      }
+      nft = nftObject;
+    }
 
     let transaction: Transaction | undefined = undefined;
 
@@ -94,6 +137,8 @@ export class NftTransactionsService {
     return this.nftTransactionRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
+      nft,
+
       transaction,
     });
   }

@@ -1,3 +1,5 @@
+import { NftEntity } from '../../../../../nfts/infrastructure/persistence/relational/entities/nft.entity';
+
 import { TransactionEntity } from '../../../../../transactions/infrastructure/persistence/relational/entities/transaction.entity';
 
 import { MainWalletEntity } from '../../../../../main-wallets/infrastructure/persistence/relational/entities/main-wallet.entity';
@@ -17,6 +19,12 @@ import { EntityRelationalHelper } from '../../../../../utils/relational-entity-h
   name: 'wallet',
 })
 export class WalletEntity extends EntityRelationalHelper {
+  @OneToMany(() => NftEntity, (childEntity) => childEntity.wallet, {
+    eager: true,
+    nullable: true,
+  })
+  nfts?: NftEntity[] | null;
+
   @OneToMany(() => TransactionEntity, (childEntity) => childEntity.wallet, {
     eager: true,
     nullable: true,

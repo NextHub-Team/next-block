@@ -1,3 +1,5 @@
+import { NftDto } from '../../nfts/dto/nft.dto';
+
 import { TransactionDto } from '../../transactions/dto/transaction.dto';
 
 import { MainWalletDto } from '../../main-wallets/dto/main-wallet.dto';
@@ -23,6 +25,8 @@ import {
 } from '@nestjs/swagger';
 
 export class CreateWalletDto {
+  nfts?: NftDto[] | null;
+
   @ApiProperty({
     required: false,
     type: () => [TransactionDto],
