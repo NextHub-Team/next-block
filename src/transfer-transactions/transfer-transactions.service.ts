@@ -22,6 +22,7 @@ export class TransferTransactionsService {
   async create(createTransferTransactionDto: CreateTransferTransactionDto) {
     // Do not remove comment below.
     // <creating-property />
+
     let transaction: Transaction | undefined = undefined;
 
     if (createTransferTransactionDto.transaction) {
@@ -42,6 +43,20 @@ export class TransferTransactionsService {
     return this.transferTransactionRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
+      from_address: createTransferTransactionDto.from_address,
+
+      to_address: createTransferTransactionDto.to_address,
+
+      transaction_fee: createTransferTransactionDto.transaction_fee,
+
+      amount: createTransferTransactionDto.amount,
+
+      blockchain: createTransferTransactionDto.blockchain,
+
+      transaction_hash: createTransferTransactionDto.transaction_hash,
+
+      wallet: createTransferTransactionDto.wallet,
+
       transaction,
     });
   }
@@ -74,6 +89,7 @@ export class TransferTransactionsService {
   ) {
     // Do not remove comment below.
     // <updating-property />
+
     let transaction: Transaction | undefined = undefined;
 
     if (updateTransferTransactionDto.transaction) {
@@ -94,6 +110,20 @@ export class TransferTransactionsService {
     return this.transferTransactionRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
+      from_address: updateTransferTransactionDto.from_address,
+
+      to_address: updateTransferTransactionDto.to_address,
+
+      transaction_fee: updateTransferTransactionDto.transaction_fee,
+
+      amount: updateTransferTransactionDto.amount,
+
+      blockchain: updateTransferTransactionDto.blockchain,
+
+      transaction_hash: updateTransferTransactionDto.transaction_hash,
+
+      wallet: updateTransferTransactionDto.wallet,
+
       transaction,
     });
   }
