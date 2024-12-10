@@ -1,8 +1,5 @@
 import { NftTransaction } from '../../../../domain/nft-transaction';
-import { NFTMapper } from '../../../../../n-f-ts/infrastructure/persistence/relational/mappers/n-f-t.mapper';
-
 import { TransactionMapper } from '../../../../../transactions/infrastructure/persistence/relational/mappers/transaction.mapper';
-
 import { NftTransactionEntity } from '../entities/nft-transaction.entity';
 
 export class NftTransactionMapper {
