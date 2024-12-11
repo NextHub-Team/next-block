@@ -25,6 +25,7 @@ export class NftTransactionsService {
   async create(createNftTransactionDto: CreateNftTransactionDto) {
     // Do not remove comment below.
     // <creating-property />
+
     let nft: Nft | undefined = undefined;
 
     if (createNftTransactionDto.nft) {
@@ -44,6 +45,20 @@ export class NftTransactionsService {
     return this.nftTransactionRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
+      gasFee: createNftTransactionDto.gasFee,
+
+      transactionHash: createNftTransactionDto.transactionHash,
+
+      toAddress: createNftTransactionDto.toAddress,
+
+      fromAddress: createNftTransactionDto.fromAddress,
+
+      contractAddress: createNftTransactionDto.contractAddress,
+
+      blockchain: createNftTransactionDto.blockchain,
+
+      wallet: createNftTransactionDto.wallet,
+
       nft,
     });
   }
@@ -76,6 +91,7 @@ export class NftTransactionsService {
   ) {
     // Do not remove comment below.
     // <updating-property />
+
     let nft: Nft | undefined = undefined;
 
     if (updateNftTransactionDto.nft) {
@@ -96,6 +112,20 @@ export class NftTransactionsService {
     return this.nftTransactionRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
+      gasFee: updateNftTransactionDto.gasFee,
+
+      transactionHash: updateNftTransactionDto.transactionHash,
+
+      toAddress: updateNftTransactionDto.toAddress,
+
+      fromAddress: updateNftTransactionDto.fromAddress,
+
+      contractAddress: updateNftTransactionDto.contractAddress,
+
+      blockchain: updateNftTransactionDto.blockchain,
+
+      wallet: updateNftTransactionDto.wallet,
+
       nft,
     });
   }
