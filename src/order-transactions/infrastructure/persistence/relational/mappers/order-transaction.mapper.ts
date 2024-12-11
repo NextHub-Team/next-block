@@ -1,14 +1,27 @@
 import { OrderTransaction } from '../../../../domain/order-transaction';
-import { TransactionMapper } from '../../../../../transactions/infrastructure/persistence/relational/mappers/transaction.mapper';
 
 import { OrderTransactionEntity } from '../entities/order-transaction.entity';
 
 export class OrderTransactionMapper {
   static toDomain(raw: OrderTransactionEntity): OrderTransaction {
     const domainEntity = new OrderTransaction();
-    if (raw.transaction) {
-      domainEntity.transaction = TransactionMapper.toDomain(raw.transaction);
-    }
+    domainEntity.type = raw.type;
+
+    domainEntity.fee = raw.fee;
+
+    domainEntity.paymentMethod = raw.paymentMethod;
+
+    domainEntity.totalValue = raw.totalValue;
+
+    domainEntity.price = raw.price;
+
+    domainEntity.cryptoAmount = raw.cryptoAmount;
+
+    domainEntity.currencyAmount = raw.currencyAmount;
+
+    domainEntity.wallet = raw.wallet;
+
+    domainEntity.wallet = raw.wallet;
 
     domainEntity.id = raw.id;
     domainEntity.createdAt = raw.createdAt;
@@ -19,11 +32,23 @@ export class OrderTransactionMapper {
 
   static toPersistence(domainEntity: OrderTransaction): OrderTransactionEntity {
     const persistenceEntity = new OrderTransactionEntity();
-    if (domainEntity.transaction) {
-      persistenceEntity.transaction = TransactionMapper.toPersistence(
-        domainEntity.transaction,
-      );
-    }
+    persistenceEntity.type = domainEntity.type;
+
+    persistenceEntity.fee = domainEntity.fee;
+
+    persistenceEntity.paymentMethod = domainEntity.paymentMethod;
+
+    persistenceEntity.totalValue = domainEntity.totalValue;
+
+    persistenceEntity.price = domainEntity.price;
+
+    persistenceEntity.cryptoAmount = domainEntity.cryptoAmount;
+
+    persistenceEntity.currencyAmount = domainEntity.currencyAmount;
+
+    persistenceEntity.wallet = domainEntity.wallet;
+
+    persistenceEntity.wallet = domainEntity.wallet;
 
     if (domainEntity.id) {
       persistenceEntity.id = domainEntity.id;

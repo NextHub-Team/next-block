@@ -1,5 +1,3 @@
-import { TransactionDto } from '../../transactions/dto/transaction.dto';
-
 import { UserLogDto } from '../../user-logs/dto/user-log.dto';
 
 import { MainWalletDto } from '../../main-wallets/dto/main-wallet.dto';
@@ -30,16 +28,6 @@ import { StatusDto } from '../../statuses/dto/status.dto';
 import { lowerCaseTransformer } from '../../utils/transformers/lower-case.transformer';
 
 export class CreateUserDto {
-  @ApiProperty({
-    required: false,
-    type: () => [TransactionDto],
-  })
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => TransactionDto)
-  @IsArray()
-  transactions?: TransactionDto[] | null;
-
   @ApiProperty({
     required: false,
     type: () => [UserLogDto],

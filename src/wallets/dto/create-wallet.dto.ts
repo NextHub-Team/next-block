@@ -1,6 +1,6 @@
-import { NftDto } from '../../nfts/dto/nft.dto';
+import { TransactionLogDto } from '../../transaction-logs/dto/transaction-log.dto';
 
-import { TransactionDto } from '../../transactions/dto/transaction.dto';
+import { NftDto } from '../../nfts/dto/nft.dto';
 
 import { MainWalletDto } from '../../main-wallets/dto/main-wallet.dto';
 
@@ -15,8 +15,6 @@ import {
   ValidateNested,
   IsNotEmptyObject,
   IsString,
-  IsArray,
-  IsOptional,
 } from 'class-validator';
 
 import {
@@ -25,17 +23,9 @@ import {
 } from '@nestjs/swagger';
 
 export class CreateWalletDto {
-  nfts?: NftDto[] | null;
+  transactionLog?: TransactionLogDto[] | null;
 
-  @ApiProperty({
-    required: false,
-    type: () => [TransactionDto],
-  })
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => TransactionDto)
-  @IsArray()
-  transactions?: TransactionDto[] | null;
+  nfts?: NftDto[] | null;
 
   @ApiProperty({
     required: true,

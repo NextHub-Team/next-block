@@ -1,7 +1,5 @@
 import { NftTransaction } from '../../../../domain/nft-transaction';
 import { NftMapper } from '../../../../../nfts/infrastructure/persistence/relational/mappers/nft.mapper';
-
-import { TransactionMapper } from '../../../../../transactions/infrastructure/persistence/relational/mappers/transaction.mapper';
 import { NftTransactionEntity } from '../entities/nft-transaction.entity';
 
 export class NftTransactionMapper {
@@ -10,15 +8,9 @@ export class NftTransactionMapper {
     if (raw.nft) {
       domainEntity.nft = NftMapper.toDomain(raw.nft);
     }
-
-    if (raw.transaction) {
-      domainEntity.transaction = TransactionMapper.toDomain(raw.transaction);
-    }
-
     domainEntity.id = raw.id;
     domainEntity.createdAt = raw.createdAt;
     domainEntity.updatedAt = raw.updatedAt;
-
     return domainEntity;
   }
 
@@ -26,12 +18,6 @@ export class NftTransactionMapper {
     const persistenceEntity = new NftTransactionEntity();
     if (domainEntity.nft) {
       persistenceEntity.nft = NftMapper.toPersistence(domainEntity.nft);
-    }
-
-    if (domainEntity.transaction) {
-      persistenceEntity.transaction = TransactionMapper.toPersistence(
-        domainEntity.transaction,
-      );
     }
 
     if (domainEntity.id) {

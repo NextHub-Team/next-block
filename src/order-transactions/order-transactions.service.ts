@@ -1,8 +1,3 @@
-import { TransactionsService } from '../transactions/transactions.service';
-import { Transaction } from '../transactions/domain/transaction';
-
-import { HttpStatus, UnprocessableEntityException } from '@nestjs/common';
-
 import { Injectable } from '@nestjs/common';
 import { CreateOrderTransactionDto } from './dto/create-order-transaction.dto';
 import { UpdateOrderTransactionDto } from './dto/update-order-transaction.dto';
@@ -13,8 +8,6 @@ import { OrderTransaction } from './domain/order-transaction';
 @Injectable()
 export class OrderTransactionsService {
   constructor(
-    private readonly transactionService: TransactionsService,
-
     // Dependencies here
     private readonly orderTransactionRepository: OrderTransactionRepository,
   ) {}
@@ -22,27 +15,25 @@ export class OrderTransactionsService {
   async create(createOrderTransactionDto: CreateOrderTransactionDto) {
     // Do not remove comment below.
     // <creating-property />
-    let transaction: Transaction | undefined = undefined;
-
-    if (createOrderTransactionDto.transaction) {
-      const transactionObject = await this.transactionService.findById(
-        createOrderTransactionDto.transaction.id,
-      );
-      if (!transactionObject) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            transaction: 'notExists',
-          },
-        });
-      }
-      transaction = transactionObject;
-    }
 
     return this.orderTransactionRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
-      transaction,
+      type: createOrderTransactionDto.type,
+
+      fee: createOrderTransactionDto.fee,
+
+      paymentMethod: createOrderTransactionDto.paymentMethod,
+
+      totalValue: createOrderTransactionDto.totalValue,
+
+      price: createOrderTransactionDto.price,
+
+      cryptoAmount: createOrderTransactionDto.cryptoAmount,
+
+      currencyAmount: createOrderTransactionDto.currencyAmount,
+
+      wallet: createOrderTransactionDto.wallet,
     });
   }
 
@@ -74,27 +65,25 @@ export class OrderTransactionsService {
   ) {
     // Do not remove comment below.
     // <updating-property />
-    let transaction: Transaction | undefined = undefined;
-
-    if (updateOrderTransactionDto.transaction) {
-      const transactionObject = await this.transactionService.findById(
-        updateOrderTransactionDto.transaction.id,
-      );
-      if (!transactionObject) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            transaction: 'notExists',
-          },
-        });
-      }
-      transaction = transactionObject;
-    }
 
     return this.orderTransactionRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
-      transaction,
+      type: updateOrderTransactionDto.type,
+
+      fee: updateOrderTransactionDto.fee,
+
+      paymentMethod: updateOrderTransactionDto.paymentMethod,
+
+      totalValue: updateOrderTransactionDto.totalValue,
+
+      price: updateOrderTransactionDto.price,
+
+      cryptoAmount: updateOrderTransactionDto.cryptoAmount,
+
+      currencyAmount: updateOrderTransactionDto.currencyAmount,
+
+      wallet: updateOrderTransactionDto.wallet,
     });
   }
 

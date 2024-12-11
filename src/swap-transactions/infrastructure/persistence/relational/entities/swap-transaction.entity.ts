@@ -1,12 +1,8 @@
-import { TransactionEntity } from '../../../../../transactions/infrastructure/persistence/relational/entities/transaction.entity';
-
 import {
   CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  JoinColumn,
-  OneToOne,
   Column,
 } from 'typeorm';
 import { EntityRelationalHelper } from '../../../../../utils/relational-entity-helper';
@@ -56,10 +52,6 @@ export class SwapTransactionEntity extends EntityRelationalHelper {
     type: String,
   })
   from_token: string;
-
-  @OneToOne(() => TransactionEntity, { eager: true, nullable: false })
-  @JoinColumn()
-  transaction?: TransactionEntity;
 
   @PrimaryGeneratedColumn('uuid')
   id: string;

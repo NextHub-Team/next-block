@@ -44,8 +44,6 @@ import { SupportedAssetsModule } from './supported-assets/supported-assets.modul
 
 import { UserLogsModule } from './user-logs/user-logs.module';
 
-import { TransactionsModule } from './transactions/transactions.module';
-
 import { SwapTransactionsModule } from './swap-transactions/swap-transactions.module';
 
 import { OrderTransactionsModule } from './order-transactions/order-transactions.module';
@@ -58,15 +56,17 @@ import { EventLogsModule } from './event-logs/event-logs.module';
 
 import { NftsModule } from './nfts/nfts.module';
 
+import { TransactionLogsModule } from './transaction-logs/transaction-logs.module';
+
 @Module({
   imports: [
+    TransactionLogsModule,
     NftsModule,
     EventLogsModule,
     NftTransactionsModule,
     TransferTransactionsModule,
     OrderTransactionsModule,
     SwapTransactionsModule,
-    TransactionsModule,
     UserLogsModule,
     SupportedAssetsModule,
     WalletsModule,

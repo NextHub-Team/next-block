@@ -1,7 +1,7 @@
 import { Wallet } from '../../../../domain/wallet';
-import { NftMapper } from '../../../../../nfts/infrastructure/persistence/relational/mappers/nft.mapper';
+import { TransactionLogMapper } from '../../../../../transaction-logs/infrastructure/persistence/relational/mappers/transaction-log.mapper';
 
-import { TransactionMapper } from '../../../../../transactions/infrastructure/persistence/relational/mappers/transaction.mapper';
+import { NftMapper } from '../../../../../nfts/infrastructure/persistence/relational/mappers/nft.mapper';
 
 import { MainWalletMapper } from '../../../../../main-wallets/infrastructure/persistence/relational/mappers/main-wallet.mapper';
 
@@ -10,18 +10,18 @@ import { WalletEntity } from '../entities/wallet.entity';
 export class WalletMapper {
   static toDomain(raw: WalletEntity): Wallet {
     const domainEntity = new Wallet();
+    if (raw.transactionLog) {
+      domainEntity.transactionLog = raw.transactionLog.map((item) =>
+        TransactionLogMapper.toDomain(item),
+      );
+    } else if (raw.transactionLog === null) {
+      domainEntity.transactionLog = null;
+    }
+
     if (raw.nfts) {
       domainEntity.nfts = raw.nfts.map((item) => NftMapper.toDomain(item));
     } else if (raw.nfts === null) {
       domainEntity.nfts = null;
-    }
-
-    if (raw.transactions) {
-      domainEntity.transactions = raw.transactions.map((item) =>
-        TransactionMapper.toDomain(item),
-      );
-    } else if (raw.transactions === null) {
-      domainEntity.transactions = null;
     }
 
     domainEntity.legacyAddress = raw.legacyAddress;
@@ -43,20 +43,20 @@ export class WalletMapper {
 
   static toPersistence(domainEntity: Wallet): WalletEntity {
     const persistenceEntity = new WalletEntity();
+    if (domainEntity.transactionLog) {
+      persistenceEntity.transactionLog = domainEntity.transactionLog.map(
+        (item) => TransactionLogMapper.toPersistence(item),
+      );
+    } else if (domainEntity.transactionLog === null) {
+      persistenceEntity.transactionLog = null;
+    }
+
     if (domainEntity.nfts) {
       persistenceEntity.nfts = domainEntity.nfts.map((item) =>
         NftMapper.toPersistence(item),
       );
     } else if (domainEntity.nfts === null) {
       persistenceEntity.nfts = null;
-    }
-
-    if (domainEntity.transactions) {
-      persistenceEntity.transactions = domainEntity.transactions.map((item) =>
-        TransactionMapper.toPersistence(item),
-      );
-    } else if (domainEntity.transactions === null) {
-      persistenceEntity.transactions = null;
     }
 
     persistenceEntity.legacyAddress = domainEntity.legacyAddress;

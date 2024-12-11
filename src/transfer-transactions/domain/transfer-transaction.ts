@@ -1,4 +1,3 @@
-import { Transaction } from '../../transactions/domain/transaction';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class TransferTransaction {
@@ -43,12 +42,6 @@ export class TransferTransaction {
     nullable: false,
   })
   wallet: number;
-
-  @ApiProperty({
-    type: () => Transaction,
-    nullable: false,
-  })
-  transaction?: Transaction;
 
   @ApiProperty({
     type: String,

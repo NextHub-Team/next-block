@@ -1,7 +1,5 @@
 import { SwapTransaction } from '../../../../domain/swap-transaction';
 
-import { TransactionMapper } from '../../../../../transactions/infrastructure/persistence/relational/mappers/transaction.mapper';
-
 import { SwapTransactionEntity } from '../entities/swap-transaction.entity';
 
 export class SwapTransactionMapper {
@@ -20,10 +18,6 @@ export class SwapTransactionMapper {
     domainEntity.wallet = raw.wallet;
 
     domainEntity.from_token = raw.from_token;
-
-    if (raw.transaction) {
-      domainEntity.transaction = TransactionMapper.toDomain(raw.transaction);
-    }
 
     domainEntity.id = raw.id;
     domainEntity.createdAt = raw.createdAt;
@@ -47,12 +41,6 @@ export class SwapTransactionMapper {
     persistenceEntity.wallet = domainEntity.wallet;
 
     persistenceEntity.from_token = domainEntity.from_token;
-
-    if (domainEntity.transaction) {
-      persistenceEntity.transaction = TransactionMapper.toPersistence(
-        domainEntity.transaction,
-      );
-    }
 
     if (domainEntity.id) {
       persistenceEntity.id = domainEntity.id;

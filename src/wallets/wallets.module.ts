@@ -1,5 +1,5 @@
+import { TransactionLogsModule } from '../transaction-logs/transaction-logs.module';
 import { NftsModule } from '../nfts/nfts.module';
-import { TransactionsModule } from '../transactions/transactions.module';
 import { MainWalletsModule } from '../main-wallets/main-wallets.module';
 import { forwardRef, Module } from '@nestjs/common';
 import { WalletsService } from './wallets.service';
@@ -9,7 +9,7 @@ import { RelationalWalletPersistenceModule } from './infrastructure/persistence/
 @Module({
   imports: [
     forwardRef(() => NftsModule),
-    forwardRef(() => TransactionsModule),
+    forwardRef(() => TransactionLogsModule),
     forwardRef(() => MainWalletsModule),
     // import modules, etc.
     RelationalWalletPersistenceModule,

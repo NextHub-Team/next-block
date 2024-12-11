@@ -1,12 +1,9 @@
-import { TransactionEntity } from '../../../../../transactions/infrastructure/persistence/relational/entities/transaction.entity';
-
 import {
   CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  JoinColumn,
-  OneToOne,
+  Column,
 } from 'typeorm';
 import { EntityRelationalHelper } from '../../../../../utils/relational-entity-helper';
 
@@ -14,9 +11,53 @@ import { EntityRelationalHelper } from '../../../../../utils/relational-entity-h
   name: 'order_transaction',
 })
 export class OrderTransactionEntity extends EntityRelationalHelper {
-  @OneToOne(() => TransactionEntity, { eager: true, nullable: false })
-  @JoinColumn()
-  transaction?: TransactionEntity;
+  @Column({
+    nullable: false,
+    type: String,
+  })
+  type: string;
+
+  @Column({
+    nullable: false,
+    type: Number,
+  })
+  fee: number;
+
+  @Column({
+    nullable: true,
+    type: String,
+  })
+  paymentMethod?: string | null;
+
+  @Column({
+    nullable: false,
+    type: Number,
+  })
+  totalValue: number;
+
+  @Column({
+    nullable: false,
+    type: Number,
+  })
+  price: number;
+
+  @Column({
+    nullable: false,
+    type: Number,
+  })
+  cryptoAmount: number;
+
+  @Column({
+    nullable: true,
+    type: Number,
+  })
+  currencyAmount?: number | null;
+
+  @Column({
+    nullable: false,
+    type: Number,
+  })
+  wallet: number;
 
   @PrimaryGeneratedColumn('uuid')
   id: string;

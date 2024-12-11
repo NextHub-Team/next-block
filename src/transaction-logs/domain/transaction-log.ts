@@ -1,12 +1,12 @@
-import { Nft } from '../../nfts/domain/nft';
+import { Wallet } from '../../wallets/domain/wallet';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class NftTransaction {
+export class TransactionLog {
   @ApiProperty({
-    type: () => Nft,
+    type: () => Wallet,
     nullable: false,
   })
-  nft?: Nft;
+  wallet?: Wallet;
 
   @ApiProperty({
     type: String,

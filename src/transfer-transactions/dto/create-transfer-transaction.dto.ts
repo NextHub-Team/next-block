@@ -1,8 +1,5 @@
-import { TransactionDto } from '../../transactions/dto/transaction.dto';
-
 import {
   // decorators here
-
   IsNumber,
   IsString,
 } from 'class-validator';
@@ -61,8 +58,6 @@ export class CreateTransferTransactionDto {
   })
   @IsNumber()
   wallet: number;
-
-  transaction?: TransactionDto;
 
   // Don't forget to use the class-validator decorators in the DTO properties.
 }

@@ -4,7 +4,6 @@ import { WalletDto } from '../../wallets/dto/wallet.dto';
 
 import {
   // decorators here
-
   IsString,
   IsOptional,
 } from 'class-validator';

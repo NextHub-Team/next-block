@@ -9,9 +9,9 @@ import {
   UseGuards,
   Query,
 } from '@nestjs/common';
-import { TransactionsService } from './transactions.service';
-import { CreateTransactionDto } from './dto/create-transaction.dto';
-import { UpdateTransactionDto } from './dto/update-transaction.dto';
+import { TransactionLogsService } from './transaction-logs.service';
+import { CreateTransactionLogDto } from './dto/create-transaction-log.dto';
+import { UpdateTransactionLogDto } from './dto/update-transaction-log.dto';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
@@ -19,40 +19,42 @@ import {
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
-import { Transaction } from './domain/transaction';
+import { TransactionLog } from './domain/transaction-log';
 import { AuthGuard } from '@nestjs/passport';
 import {
   InfinityPaginationResponse,
   InfinityPaginationResponseDto,
 } from '../utils/dto/infinity-pagination-response.dto';
 import { infinityPagination } from '../utils/infinity-pagination';
-import { FindAllTransactionsDto } from './dto/find-all-transactions.dto';
+import { FindAllTransactionLogsDto } from './dto/find-all-transaction-logs.dto';
 
-@ApiTags('Transactions')
+@ApiTags('TransactionLogs')
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
 @Controller({
-  path: 'transactions',
+  path: 'transaction-logs',
   version: '1',
 })
-export class TransactionsController {
-  constructor(private readonly transactionsService: TransactionsService) {}
+export class TransactionLogsController {
+  constructor(
+    private readonly transactionLogsService: TransactionLogsService,
+  ) {}
 
   @Post()
   @ApiCreatedResponse({
-    type: Transaction,
+    type: TransactionLog,
   })
-  create(@Body() createTransactionDto: CreateTransactionDto) {
-    return this.transactionsService.create(createTransactionDto);
+  create(@Body() createTransactionLogDto: CreateTransactionLogDto) {
+    return this.transactionLogsService.create(createTransactionLogDto);
   }
 
   @Get()
   @ApiOkResponse({
-    type: InfinityPaginationResponse(Transaction),
+    type: InfinityPaginationResponse(TransactionLog),
   })
   async findAll(
-    @Query() query: FindAllTransactionsDto,
-  ): Promise<InfinityPaginationResponseDto<Transaction>> {
+    @Query() query: FindAllTransactionLogsDto,
+  ): Promise<InfinityPaginationResponseDto<TransactionLog>> {
     const page = query?.page ?? 1;
     let limit = query?.limit ?? 10;
     if (limit > 50) {
@@ -60,7 +62,7 @@ export class TransactionsController {
     }
 
     return infinityPagination(
-      await this.transactionsService.findAllWithPagination({
+      await this.transactionLogsService.findAllWithPagination({
         paginationOptions: {
           page,
           limit,
@@ -77,10 +79,10 @@ export class TransactionsController {
     required: true,
   })
   @ApiOkResponse({
-    type: Transaction,
+    type: TransactionLog,
   })
   findById(@Param('id') id: string) {
-    return this.transactionsService.findById(id);
+    return this.transactionLogsService.findById(id);
   }
 
   @Patch(':id')
@@ -90,13 +92,13 @@ export class TransactionsController {
     required: true,
   })
   @ApiOkResponse({
-    type: Transaction,
+    type: TransactionLog,
   })
   update(
     @Param('id') id: string,
-    @Body() updateTransactionDto: UpdateTransactionDto,
+    @Body() updateTransactionLogDto: UpdateTransactionLogDto,
   ) {
-    return this.transactionsService.update(id, updateTransactionDto);
+    return this.transactionLogsService.update(id, updateTransactionLogDto);
   }
 
   @Delete(':id')
@@ -106,6 +108,6 @@ export class TransactionsController {
     required: true,
   })
   remove(@Param('id') id: string) {
-    return this.transactionsService.remove(id);
+    return this.transactionLogsService.remove(id);
   }
 }

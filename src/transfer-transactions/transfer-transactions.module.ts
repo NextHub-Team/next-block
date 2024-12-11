@@ -1,4 +1,3 @@
-import { TransactionsModule } from '../transactions/transactions.module';
 import { Module } from '@nestjs/common';
 import { TransferTransactionsService } from './transfer-transactions.service';
 import { TransferTransactionsController } from './transfer-transactions.controller';
@@ -6,8 +5,6 @@ import { RelationalTransferTransactionPersistenceModule } from './infrastructure
 
 @Module({
   imports: [
-    TransactionsModule,
-
     // import modules, etc.
     RelationalTransferTransactionPersistenceModule,
   ],

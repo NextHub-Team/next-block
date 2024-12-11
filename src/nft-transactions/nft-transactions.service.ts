@@ -1,6 +1,4 @@
 import { NftsService } from '../nfts/nfts.service';
-import { TransactionsService } from '../transactions/transactions.service';
-import { Transaction } from '../transactions/domain/transaction';
 import {
   forwardRef,
   HttpStatus,
@@ -20,8 +18,6 @@ export class NftTransactionsService {
   constructor(
     @Inject(forwardRef(() => NftsService))
     private readonly nftService: NftsService,
-
-    private readonly transactionService: TransactionsService,
     // Dependencies here
     private readonly nftTransactionRepository: NftTransactionRepository,
   ) {}
@@ -45,30 +41,10 @@ export class NftTransactionsService {
       }
       nft = nftObject;
     }
-
-    let transaction: Transaction | undefined = undefined;
-
-    if (createNftTransactionDto.transaction) {
-      const transactionObject = await this.transactionService.findById(
-        createNftTransactionDto.transaction.id,
-      );
-      if (!transactionObject) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            transaction: 'notExists',
-          },
-        });
-      }
-      transaction = transactionObject;
-    }
-
     return this.nftTransactionRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
       nft,
-
-      transaction,
     });
   }
 
@@ -117,29 +93,10 @@ export class NftTransactionsService {
       nft = nftObject;
     }
 
-    let transaction: Transaction | undefined = undefined;
-
-    if (updateNftTransactionDto.transaction) {
-      const transactionObject = await this.transactionService.findById(
-        updateNftTransactionDto.transaction.id,
-      );
-      if (!transactionObject) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            transaction: 'notExists',
-          },
-        });
-      }
-      transaction = transactionObject;
-    }
-
     return this.nftTransactionRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
       nft,
-
-      transaction,
     });
   }
 

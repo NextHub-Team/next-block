@@ -1,7 +1,4 @@
 import { TransferTransaction } from '../../../../domain/transfer-transaction';
-
-import { TransactionMapper } from '../../../../../transactions/infrastructure/persistence/relational/mappers/transaction.mapper';
-
 import { TransferTransactionEntity } from '../entities/transfer-transaction.entity';
 
 export class TransferTransactionMapper {
@@ -20,10 +17,6 @@ export class TransferTransactionMapper {
     domainEntity.transaction_hash = raw.transaction_hash;
 
     domainEntity.wallet = raw.wallet;
-
-    if (raw.transaction) {
-      domainEntity.transaction = TransactionMapper.toDomain(raw.transaction);
-    }
 
     domainEntity.id = raw.id;
     domainEntity.createdAt = raw.createdAt;
@@ -49,12 +42,6 @@ export class TransferTransactionMapper {
     persistenceEntity.transaction_hash = domainEntity.transaction_hash;
 
     persistenceEntity.wallet = domainEntity.wallet;
-
-    if (domainEntity.transaction) {
-      persistenceEntity.transaction = TransactionMapper.toPersistence(
-        domainEntity.transaction,
-      );
-    }
 
     if (domainEntity.id) {
       persistenceEntity.id = domainEntity.id;

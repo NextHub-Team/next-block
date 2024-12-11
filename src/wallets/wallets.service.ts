@@ -1,8 +1,8 @@
+import { TransactionLogsService } from '../transaction-logs/transaction-logs.service';
+import { TransactionLog } from '../transaction-logs/domain/transaction-log';
+
 import { NftsService } from '../nfts/nfts.service';
 import { Nft } from '../nfts/domain/nft';
-
-import { TransactionsService } from '../transactions/transactions.service';
-import { Transaction } from '../transactions/domain/transaction';
 
 import { MainWalletsService } from '../main-wallets/main-wallets.service';
 import { MainWallet } from '../main-wallets/domain/main-wallet';
@@ -24,11 +24,11 @@ import { Wallet } from './domain/wallet';
 @Injectable()
 export class WalletsService {
   constructor(
+    @Inject(forwardRef(() => TransactionLogsService))
+    private readonly transactionLogService: TransactionLogsService,
+
     @Inject(forwardRef(() => NftsService))
     private readonly nftService: NftsService,
-
-    @Inject(forwardRef(() => TransactionsService))
-    private readonly transactionService: TransactionsService,
 
     @Inject(forwardRef(() => MainWalletsService))
     private readonly mainWalletService: MainWalletsService,
@@ -40,6 +40,27 @@ export class WalletsService {
   async create(createWalletDto: CreateWalletDto) {
     // Do not remove comment below.
     // <creating-property />
+    let transactionLog: TransactionLog[] | null | undefined = undefined;
+
+    if (createWalletDto.transactionLog) {
+      const transactionLogObjects = await this.transactionLogService.findByIds(
+        createWalletDto.transactionLog.map((entity) => entity.id),
+      );
+      if (
+        transactionLogObjects.length !== createWalletDto.transactionLog.length
+      ) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: {
+            transactionLog: 'notExists',
+          },
+        });
+      }
+      transactionLog = transactionLogObjects;
+    } else if (createWalletDto.transactionLog === null) {
+      transactionLog = null;
+    }
+
     let nfts: Nft[] | null | undefined = undefined;
 
     if (createWalletDto.nfts) {
@@ -59,25 +80,6 @@ export class WalletsService {
       nfts = null;
     }
 
-    let transactions: Transaction[] | null | undefined = undefined;
-
-    if (createWalletDto.transactions) {
-      const transactionsObjects = await this.transactionService.findByIds(
-        createWalletDto.transactions.map((entity) => entity.id),
-      );
-      if (transactionsObjects.length !== createWalletDto.transactions.length) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            transactions: 'notExists',
-          },
-        });
-      }
-      transactions = transactionsObjects;
-    } else if (createWalletDto.transactions === null) {
-      transactions = null;
-    }
-
     const mainWalletObject = await this.mainWalletService.findById(
       createWalletDto.mainWallet.id,
     );
@@ -94,9 +96,9 @@ export class WalletsService {
     return this.walletRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
-      nfts,
+      transactionLog,
 
-      transactions,
+      nfts,
 
       legacyAddress: createWalletDto.legacyAddress,
 
@@ -136,6 +138,27 @@ export class WalletsService {
   ) {
     // Do not remove comment below.
     // <updating-property />
+    let transactionLog: TransactionLog[] | null | undefined = undefined;
+
+    if (updateWalletDto.transactionLog) {
+      const transactionLogObjects = await this.transactionLogService.findByIds(
+        updateWalletDto.transactionLog.map((entity) => entity.id),
+      );
+      if (
+        transactionLogObjects.length !== updateWalletDto.transactionLog.length
+      ) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: {
+            transactionLog: 'notExists',
+          },
+        });
+      }
+      transactionLog = transactionLogObjects;
+    } else if (updateWalletDto.transactionLog === null) {
+      transactionLog = null;
+    }
+
     let nfts: Nft[] | null | undefined = undefined;
 
     if (updateWalletDto.nfts) {
@@ -153,25 +176,6 @@ export class WalletsService {
       nfts = nftsObjects;
     } else if (updateWalletDto.nfts === null) {
       nfts = null;
-    }
-
-    let transactions: Transaction[] | null | undefined = undefined;
-
-    if (updateWalletDto.transactions) {
-      const transactionsObjects = await this.transactionService.findByIds(
-        updateWalletDto.transactions.map((entity) => entity.id),
-      );
-      if (transactionsObjects.length !== updateWalletDto.transactions.length) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            transactions: 'notExists',
-          },
-        });
-      }
-      transactions = transactionsObjects;
-    } else if (updateWalletDto.transactions === null) {
-      transactions = null;
     }
 
     let mainWallet: MainWallet | undefined = undefined;
@@ -194,9 +198,9 @@ export class WalletsService {
     return this.walletRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
-      nfts,
+      transactionLog,
 
-      transactions,
+      nfts,
 
       legacyAddress: updateWalletDto.legacyAddress,
 
