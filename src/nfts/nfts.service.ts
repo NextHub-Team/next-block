@@ -1,5 +1,4 @@
 import { NftTransactionsService } from '../nft-transactions/nft-transactions.service';
-import { NftTransaction } from '../nft-transactions/domain/nft-transaction';
 import { WalletsService } from '../wallets/wallets.service';
 import { Wallet } from '../wallets/domain/wallet';
 import {
@@ -30,27 +29,6 @@ export class NftsService {
   async create(createNftDto: CreateNftDto) {
     // Do not remove comment below.
     // <creating-property />
-
-    let nftTransactions: NftTransaction[] | null | undefined = undefined;
-
-    if (createNftDto.nftTransactions) {
-      const nftTransactionsObjects = await this.nftTransactionService.findByIds(
-        createNftDto.nftTransactions.map((entity) => entity.id),
-      );
-      if (
-        nftTransactionsObjects.length !== createNftDto.nftTransactions.length
-      ) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            nftTransactions: 'notExists',
-          },
-        });
-      }
-      nftTransactions = nftTransactionsObjects;
-    } else if (createNftDto.nftTransactions === null) {
-      nftTransactions = null;
-    }
 
     let wallet: Wallet | undefined = undefined;
 
@@ -88,8 +66,6 @@ export class NftsService {
 
       token: createNftDto.token,
 
-      nftTransactions,
-
       wallet,
     });
   }
@@ -122,28 +98,6 @@ export class NftsService {
   ) {
     // Do not remove comment below.
     // <updating-property />
-
-    let nftTransactions: NftTransaction[] | null | undefined = undefined;
-
-    if (updateNftDto.nftTransactions) {
-      const nftTransactionsObjects = await this.nftTransactionService.findByIds(
-        updateNftDto.nftTransactions.map((entity) => entity.id),
-      );
-      if (
-        nftTransactionsObjects.length !== updateNftDto.nftTransactions.length
-      ) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            nftTransactions: 'notExists',
-          },
-        });
-      }
-      nftTransactions = nftTransactionsObjects;
-    } else if (updateNftDto.nftTransactions === null) {
-      nftTransactions = null;
-    }
-
     let wallet: Wallet | undefined = undefined;
 
     if (updateNftDto.wallet) {
@@ -179,8 +133,6 @@ export class NftsService {
       blockchain: updateNftDto.blockchain,
 
       token: updateNftDto.token,
-
-      nftTransactions,
 
       wallet,
     });
