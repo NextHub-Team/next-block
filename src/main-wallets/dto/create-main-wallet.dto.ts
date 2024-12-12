@@ -1,4 +1,3 @@
-import { WalletDto } from '../../wallets/dto/wallet.dto';
 import { UserDto } from '../../users/dto/user.dto';
 
 import {
@@ -12,7 +11,6 @@ import {
   ValidateNested,
   IsNotEmptyObject,
   IsString,
-  IsArray,
   IsOptional,
 } from 'class-validator';
 
@@ -38,16 +36,6 @@ export class CreateMainWalletDto {
   @IsOptional()
   @IsString()
   name?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => [WalletDto],
-  })
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => WalletDto)
-  @IsArray()
-  wallets?: WalletDto[] | null;
 
   @ApiProperty({
     required: true,

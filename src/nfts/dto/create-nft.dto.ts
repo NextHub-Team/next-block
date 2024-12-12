@@ -1,5 +1,3 @@
-import { NftTransactionDto } from '../../nft-transactions/dto/nft-transaction.dto';
-
 import { WalletDto } from '../../wallets/dto/wallet.dto';
 
 import {
@@ -70,8 +68,6 @@ export class CreateNftDto {
   })
   @IsString()
   token: string;
-
-  nftTransactions?: NftTransactionDto[] | null;
 
   wallet?: WalletDto;
 

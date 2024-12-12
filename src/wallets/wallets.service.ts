@@ -1,9 +1,5 @@
 import { TransactionLogsService } from '../transaction-logs/transaction-logs.service';
-import { TransactionLog } from '../transaction-logs/domain/transaction-log';
-
 import { NftsService } from '../nfts/nfts.service';
-import { Nft } from '../nfts/domain/nft';
-
 import { MainWalletsService } from '../main-wallets/main-wallets.service';
 import { MainWallet } from '../main-wallets/domain/main-wallet';
 
@@ -40,45 +36,6 @@ export class WalletsService {
   async create(createWalletDto: CreateWalletDto) {
     // Do not remove comment below.
     // <creating-property />
-    let transactionLog: TransactionLog[] | null | undefined = undefined;
-
-    if (createWalletDto.transactionLog) {
-      const transactionLogObjects = await this.transactionLogService.findByIds(
-        createWalletDto.transactionLog.map((entity) => entity.id),
-      );
-      if (
-        transactionLogObjects.length !== createWalletDto.transactionLog.length
-      ) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            transactionLog: 'notExists',
-          },
-        });
-      }
-      transactionLog = transactionLogObjects;
-    } else if (createWalletDto.transactionLog === null) {
-      transactionLog = null;
-    }
-
-    let nfts: Nft[] | null | undefined = undefined;
-
-    if (createWalletDto.nfts) {
-      const nftsObjects = await this.nftService.findByIds(
-        createWalletDto.nfts.map((entity) => entity.id),
-      );
-      if (nftsObjects.length !== createWalletDto.nfts.length) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            nfts: 'notExists',
-          },
-        });
-      }
-      nfts = nftsObjects;
-    } else if (createWalletDto.nfts === null) {
-      nfts = null;
-    }
 
     const mainWalletObject = await this.mainWalletService.findById(
       createWalletDto.mainWallet.id,
@@ -96,9 +53,6 @@ export class WalletsService {
     return this.walletRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
-      transactionLog,
-
-      nfts,
 
       legacyAddress: createWalletDto.legacyAddress,
 
@@ -136,48 +90,6 @@ export class WalletsService {
 
     updateWalletDto: UpdateWalletDto,
   ) {
-    // Do not remove comment below.
-    // <updating-property />
-    let transactionLog: TransactionLog[] | null | undefined = undefined;
-
-    if (updateWalletDto.transactionLog) {
-      const transactionLogObjects = await this.transactionLogService.findByIds(
-        updateWalletDto.transactionLog.map((entity) => entity.id),
-      );
-      if (
-        transactionLogObjects.length !== updateWalletDto.transactionLog.length
-      ) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            transactionLog: 'notExists',
-          },
-        });
-      }
-      transactionLog = transactionLogObjects;
-    } else if (updateWalletDto.transactionLog === null) {
-      transactionLog = null;
-    }
-
-    let nfts: Nft[] | null | undefined = undefined;
-
-    if (updateWalletDto.nfts) {
-      const nftsObjects = await this.nftService.findByIds(
-        updateWalletDto.nfts.map((entity) => entity.id),
-      );
-      if (nftsObjects.length !== updateWalletDto.nfts.length) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            nfts: 'notExists',
-          },
-        });
-      }
-      nfts = nftsObjects;
-    } else if (updateWalletDto.nfts === null) {
-      nfts = null;
-    }
-
     let mainWallet: MainWallet | undefined = undefined;
 
     if (updateWalletDto.mainWallet) {
@@ -198,9 +110,6 @@ export class WalletsService {
     return this.walletRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
-      transactionLog,
-
-      nfts,
 
       legacyAddress: updateWalletDto.legacyAddress,
 

@@ -1,14 +1,10 @@
 import { UserLogsService } from '../user-logs/user-logs.service';
-import { UserLog } from '../user-logs/domain/user-log';
 
 import { MainWalletsService } from '../main-wallets/main-wallets.service';
-import { MainWallet } from '../main-wallets/domain/main-wallet';
 
 import { PermissionsService } from '../permissions/permissions.service';
-import { Permission } from '../permissions/domain/permission';
 
 import { DevicesService } from '../devices/devices.service';
-import { Device } from '../devices/domain/device';
 
 import {
   forwardRef,
@@ -55,82 +51,6 @@ export class UsersService {
   async create(createUserDto: CreateUserDto): Promise<User> {
     // Do not remove comment below.
     // <creating-property />
-
-    let logs: UserLog[] | null | undefined = undefined;
-
-    if (createUserDto.logs) {
-      const logsObjects = await this.userLogService.findByIds(
-        createUserDto.logs.map((entity) => entity.id),
-      );
-      if (logsObjects.length !== createUserDto.logs.length) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            logs: 'notExists',
-          },
-        });
-      }
-      logs = logsObjects;
-    } else if (createUserDto.logs === null) {
-      logs = null;
-    }
-
-    let mainWallets: MainWallet[] | null | undefined = undefined;
-
-    if (createUserDto.mainWallets) {
-      const mainWalletsObjects = await this.mainWalletService.findByIds(
-        createUserDto.mainWallets.map((entity) => entity.id),
-      );
-      if (mainWalletsObjects.length !== createUserDto.mainWallets.length) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            mainWallets: 'notExists',
-          },
-        });
-      }
-      mainWallets = mainWalletsObjects;
-    } else if (createUserDto.mainWallets === null) {
-      mainWallets = null;
-    }
-
-    let permissions: Permission[] | null | undefined = undefined;
-
-    if (createUserDto.permissions) {
-      const permissionsObjects = await this.permissionService.findByIds(
-        createUserDto.permissions.map((entity) => entity.id),
-      );
-      if (permissionsObjects.length !== createUserDto.permissions.length) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            permissions: 'notExists',
-          },
-        });
-      }
-      permissions = permissionsObjects;
-    } else if (createUserDto.permissions === null) {
-      permissions = null;
-    }
-
-    let devices: Device[] | null | undefined = undefined;
-
-    if (createUserDto.devices) {
-      const devicesObjects = await this.deviceService.findByIds(
-        createUserDto.devices.map((entity) => entity.id),
-      );
-      if (devicesObjects.length !== createUserDto.devices.length) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            devices: 'notExists',
-          },
-        });
-      }
-      devices = devicesObjects;
-    } else if (createUserDto.devices === null) {
-      devices = null;
-    }
 
     let password: string | undefined = undefined;
 
@@ -217,11 +137,7 @@ export class UsersService {
     return this.usersRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
-      logs,
-      mainWallets,
-      permissions,
       phone: createUserDto.phone,
-      devices,
       firstName: createUserDto.firstName,
       lastName: createUserDto.lastName,
       email: email,
@@ -281,82 +197,6 @@ export class UsersService {
   ): Promise<User | null> {
     // Do not remove comment below.
     // <updating-property />
-
-    let logs: UserLog[] | null | undefined = undefined;
-
-    if (updateUserDto.logs) {
-      const logsObjects = await this.userLogService.findByIds(
-        updateUserDto.logs.map((entity) => entity.id),
-      );
-      if (logsObjects.length !== updateUserDto.logs.length) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            logs: 'notExists',
-          },
-        });
-      }
-      logs = logsObjects;
-    } else if (updateUserDto.logs === null) {
-      logs = null;
-    }
-
-    let mainWallets: MainWallet[] | null | undefined = undefined;
-
-    if (updateUserDto.mainWallets) {
-      const mainWalletsObjects = await this.mainWalletService.findByIds(
-        updateUserDto.mainWallets.map((entity) => entity.id),
-      );
-      if (mainWalletsObjects.length !== updateUserDto.mainWallets.length) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            mainWallets: 'notExists',
-          },
-        });
-      }
-      mainWallets = mainWalletsObjects;
-    } else if (updateUserDto.mainWallets === null) {
-      mainWallets = null;
-    }
-
-    let permissions: Permission[] | null | undefined = undefined;
-
-    if (updateUserDto.permissions) {
-      const permissionsObjects = await this.permissionService.findByIds(
-        updateUserDto.permissions.map((entity) => entity.id),
-      );
-      if (permissionsObjects.length !== updateUserDto.permissions.length) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            permissions: 'notExists',
-          },
-        });
-      }
-      permissions = permissionsObjects;
-    } else if (updateUserDto.permissions === null) {
-      permissions = null;
-    }
-
-    let devices: Device[] | null | undefined = undefined;
-
-    if (updateUserDto.devices) {
-      const devicesObjects = await this.deviceService.findByIds(
-        updateUserDto.devices.map((entity) => entity.id),
-      );
-      if (devicesObjects.length !== updateUserDto.devices.length) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            devices: 'notExists',
-          },
-        });
-      }
-      devices = devicesObjects;
-    } else if (updateUserDto.devices === null) {
-      devices = null;
-    }
 
     let password: string | undefined = undefined;
 
@@ -448,11 +288,7 @@ export class UsersService {
     return this.usersRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
-      logs,
-      mainWallets,
-      permissions,
       phone: updateUserDto.phone,
-      devices,
       firstName: updateUserDto.firstName,
       lastName: updateUserDto.lastName,
       email,

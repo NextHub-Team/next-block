@@ -1,7 +1,3 @@
-import { TransactionLogDto } from '../../transaction-logs/dto/transaction-log.dto';
-
-import { NftDto } from '../../nfts/dto/nft.dto';
-
 import { MainWalletDto } from '../../main-wallets/dto/main-wallet.dto';
 
 import {
@@ -23,10 +19,6 @@ import {
 } from '@nestjs/swagger';
 
 export class CreateWalletDto {
-  transactionLog?: TransactionLogDto[] | null;
-
-  nfts?: NftDto[] | null;
-
   @ApiProperty({
     required: true,
     type: () => String,
