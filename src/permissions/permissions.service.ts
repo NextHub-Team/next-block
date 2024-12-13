@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { UsersService } from '../users/users.service';
 
 import { forwardRef, Inject } from '@nestjs/common';
@@ -18,7 +17,7 @@ export class PermissionsService {
     // Dependencies here
     private readonly permissionRepository: PermissionRepository,
   ) {}
-
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   async create(createPermissionDto: CreatePermissionDto) {
     // Do not remove comment below.
     // <creating-property />
@@ -49,13 +48,8 @@ export class PermissionsService {
   findByIds(ids: Permission['id'][]) {
     return this.permissionRepository.findByIds(ids);
   }
-
-  async update(
-    id: Permission['id'],
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    updatePermissionDto: UpdatePermissionDto,
-  ) {
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  async update(id: Permission['id'], updatePermissionDto: UpdatePermissionDto) {
     // Do not remove comment below.
     // <updating-property />
 

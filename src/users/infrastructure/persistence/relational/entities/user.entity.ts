@@ -1,8 +1,5 @@
 import { UserLogEntity } from '../../../../../user-logs/infrastructure/persistence/relational/entities/user-log.entity';
-
 import { MainWalletEntity } from '../../../../../main-wallets/infrastructure/persistence/relational/entities/main-wallet.entity';
-
-
 import { DeviceEntity } from '../../../../../devices/infrastructure/persistence/relational/entities/device.entity';
 
 import {

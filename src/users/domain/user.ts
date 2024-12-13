@@ -1,6 +1,5 @@
 import { UserLog } from '../../user-logs/domain/user-log';
 import { MainWallet } from '../../main-wallets/domain/main-wallet';
-import { Permission } from '../../permissions/domain/permission';
 import { Device } from '../../devices/domain/device';
 import { Exclude, Expose } from 'class-transformer';
 import { FileType } from '../../files/domain/file';
