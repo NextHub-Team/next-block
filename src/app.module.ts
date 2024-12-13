@@ -58,8 +58,17 @@ import { NftsModule } from './nfts/nfts.module';
 
 import { TransactionLogsModule } from './transaction-logs/transaction-logs.module';
 
+import { AccessControlsModule } from './access-controls/access-controls.module';
+
+import { PermissionsModule } from './permissions/permissions.module';
+
+import { TypesModule } from './types/types.module';
+
 @Module({
   imports: [
+    TypesModule,
+    PermissionsModule,
+    AccessControlsModule,
     TransactionLogsModule,
     NftsModule,
     EventLogsModule,
