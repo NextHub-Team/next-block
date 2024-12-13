@@ -24,12 +24,6 @@ export class User {
   mainWallets?: MainWallet[] | null;
 
   @ApiProperty({
-    type: () => [Permission],
-    nullable: true,
-  })
-  permissions?: Permission[] | null;
-
-  @ApiProperty({
     type: () => String,
     nullable: true,
     example: '+13847923742',

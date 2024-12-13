@@ -60,8 +60,6 @@ import { TransactionLogsModule } from './transaction-logs/transaction-logs.modul
 
 import { AccessControlsModule } from './access-controls/access-controls.module';
 
-import { PermissionsModule } from './permissions/permissions.module';
-
 import { TypesModule } from './types/types.module';
 
 @Module({

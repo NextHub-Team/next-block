@@ -1,12 +1,8 @@
 import { FileEntity } from '../../../../../files/infrastructure/persistence/relational/entities/file.entity';
-
 import { UserLogMapper } from '../../../../../user-logs/infrastructure/persistence/relational/mappers/user-log.mapper';
 
 import { MainWalletMapper } from '../../../../../main-wallets/infrastructure/persistence/relational/mappers/main-wallet.mapper';
-import { PermissionMapper } from '../../../../../permissions/infrastructure/persistence/relational/mappers/permission.mapper';
-
 import { DeviceMapper } from '../../../../../devices/infrastructure/persistence/relational/mappers/device.mapper';
-
 import { FileMapper } from '../../../../../files/infrastructure/persistence/relational/mappers/file.mapper';
 import { RoleEntity } from '../../../../../roles/infrastructure/persistence/relational/entities/role.entity';
 import { StatusEntity } from '../../../../../statuses/infrastructure/persistence/relational/entities/status.entity';
@@ -29,14 +25,6 @@ export class UserMapper {
       );
     } else if (raw.mainWallets === null) {
       domainEntity.mainWallets = null;
-    }
-
-    if (raw.permissions) {
-      domainEntity.permissions = raw.permissions.map((item) =>
-        PermissionMapper.toDomain(item),
-      );
-    } else if (raw.permissions === null) {
-      domainEntity.permissions = null;
     }
 
     domainEntity.phone = raw.phone;
@@ -107,14 +95,6 @@ export class UserMapper {
       );
     } else if (domainEntity.mainWallets === null) {
       persistenceEntity.mainWallets = null;
-    }
-
-    if (domainEntity.permissions) {
-      persistenceEntity.permissions = domainEntity.permissions.map((item) =>
-        PermissionMapper.toPersistence(item),
-      );
-    } else if (domainEntity.permissions === null) {
-      persistenceEntity.permissions = null;
     }
 
     persistenceEntity.phone = domainEntity.phone;

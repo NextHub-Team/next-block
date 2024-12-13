@@ -1,12 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { UsersService } from '../users/users.service';
-import { User } from '../users/domain/user';
 
-import {
-  forwardRef,
-  HttpStatus,
-  Inject,
-  UnprocessableEntityException,
-} from '@nestjs/common';
+import { forwardRef, Inject } from '@nestjs/common';
 
 import { Injectable } from '@nestjs/common';
 import { CreatePermissionDto } from './dto/create-permission.dto';
@@ -27,23 +22,10 @@ export class PermissionsService {
   async create(createPermissionDto: CreatePermissionDto) {
     // Do not remove comment below.
     // <creating-property />
-    const userObject = await this.userService.findById(
-      createPermissionDto.user.id,
-    );
-    if (!userObject) {
-      throw new UnprocessableEntityException({
-        status: HttpStatus.UNPROCESSABLE_ENTITY,
-        errors: {
-          user: 'notExists',
-        },
-      });
-    }
-    const user = userObject;
 
     return this.permissionRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
-      user,
     });
   }
 
@@ -71,31 +53,15 @@ export class PermissionsService {
   async update(
     id: Permission['id'],
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     updatePermissionDto: UpdatePermissionDto,
   ) {
     // Do not remove comment below.
     // <updating-property />
-    let user: User | undefined = undefined;
-
-    if (updatePermissionDto.user) {
-      const userObject = await this.userService.findById(
-        updatePermissionDto.user.id,
-      );
-      if (!userObject) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            user: 'notExists',
-          },
-        });
-      }
-      user = userObject;
-    }
 
     return this.permissionRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
-      user,
     });
   }
 

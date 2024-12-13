@@ -2,7 +2,6 @@ import { UserLogEntity } from '../../../../../user-logs/infrastructure/persisten
 
 import { MainWalletEntity } from '../../../../../main-wallets/infrastructure/persistence/relational/entities/main-wallet.entity';
 
-import { PermissionEntity } from '../../../../../permissions/infrastructure/persistence/relational/entities/permission.entity';
 
 import { DeviceEntity } from '../../../../../devices/infrastructure/persistence/relational/entities/device.entity';
 
@@ -41,12 +40,6 @@ export class UserEntity extends EntityRelationalHelper {
     nullable: true,
   })
   mainWallets?: MainWalletEntity[] | null;
-
-  @OneToMany(() => PermissionEntity, (childEntity) => childEntity.user, {
-    eager: true,
-    nullable: true,
-  })
-  permissions?: PermissionEntity[] | null;
 
   @Column({
     nullable: true,
