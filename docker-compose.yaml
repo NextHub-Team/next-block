@@ -25,15 +25,15 @@ services:
     build:
       context: .
       dockerfile: maildev.Dockerfile
-    container_name: vault-maildev
-    hostname: vault-maildev
+    container_name: vault-mailserver
+    hostname: vault-mailserver
     ports:
       - ${MAIL_CLIENT_PORT}:1080
       - ${MAIL_PORT}:1025
     networks:
       - vault-network
     profiles:
-      - apps
+      - mail
 
   redis:
     image: redis:7-alpine
