@@ -8,15 +8,12 @@ import {
   DeleteDateColumn,
   Entity,
   Index,
-  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   JoinColumn,
   OneToOne,
   OneToMany,
 } from 'typeorm';
-import { RoleEntity } from '../../../../../roles/infrastructure/persistence/relational/entities/role.entity';
-import { StatusEntity } from '../../../../../statuses/infrastructure/persistence/relational/entities/status.entity';
 import { FileEntity } from '../../../../../files/infrastructure/persistence/relational/entities/file.entity';
 
 import { AuthProvidersEnum } from '../../../../../auth/auth-providers.enum';
@@ -27,13 +24,13 @@ import { EntityRelationalHelper } from '../../../../../utils/relational-entity-h
 })
 export class UserEntity extends EntityRelationalHelper {
   @OneToMany(() => UserLogEntity, (childEntity) => childEntity.user, {
-    eager: true,
+    eager: false,
     nullable: true,
   })
   logs?: UserLogEntity[] | null;
 
   @OneToMany(() => MainWalletEntity, (childEntity) => childEntity.user, {
-    eager: true,
+    eager: false,
     nullable: true,
   })
   mainWallets?: MainWalletEntity[] | null;
@@ -45,7 +42,7 @@ export class UserEntity extends EntityRelationalHelper {
   phone?: string | null;
 
   @OneToMany(() => DeviceEntity, (childEntity) => childEntity.user, {
-    eager: true,
+    eager: false,
     nullable: true,
   })
   devices?: DeviceEntity[] | null;
@@ -81,16 +78,6 @@ export class UserEntity extends EntityRelationalHelper {
   })
   @JoinColumn()
   photo?: FileEntity | null;
-
-  @ManyToOne(() => RoleEntity, {
-    eager: true,
-  })
-  role?: RoleEntity | null;
-
-  @ManyToOne(() => StatusEntity, {
-    eager: true,
-  })
-  status?: StatusEntity;
 
   @CreateDateColumn()
   createdAt: Date;

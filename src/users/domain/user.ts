@@ -3,8 +3,6 @@ import { MainWallet } from '../../main-wallets/domain/main-wallet';
 import { Device } from '../../devices/domain/device';
 import { Exclude, Expose } from 'class-transformer';
 import { FileType } from '../../files/domain/file';
-import { Role } from '../../roles/domain/role';
-import { Status } from '../../statuses/domain/status';
 import { ApiProperty } from '@nestjs/swagger';
 
 const idType = Number;
@@ -80,16 +78,6 @@ export class User {
     type: () => FileType,
   })
   photo?: FileType | null;
-
-  @ApiProperty({
-    type: () => Role,
-  })
-  role?: Role | null;
-
-  @ApiProperty({
-    type: () => Status,
-  })
-  status?: Status;
 
   @ApiProperty()
   createdAt: Date;

@@ -1,9 +1,6 @@
 import { UserLogsService } from '../user-logs/user-logs.service';
-
 import { MainWalletsService } from '../main-wallets/main-wallets.service';
-
 import { PermissionsService } from '../permissions/permissions.service';
-
 import { DevicesService } from '../devices/devices.service';
 
 import {
@@ -21,12 +18,8 @@ import { User } from './domain/user';
 import bcrypt from 'bcryptjs';
 import { AuthProvidersEnum } from '../auth/auth-providers.enum';
 import { FilesService } from '../files/files.service';
-import { RoleEnum } from '../roles/roles.enum';
-import { StatusEnum } from '../statuses/statuses.enum';
 import { IPaginationOptions } from '../utils/types/pagination-options';
 import { FileType } from '../files/domain/file';
-import { Role } from '../roles/domain/role';
-import { Status } from '../statuses/domain/status';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
@@ -95,45 +88,6 @@ export class UsersService {
       photo = null;
     }
 
-    let role: Role | undefined = undefined;
-
-    if (createUserDto.role?.id) {
-      const roleObject = Object.values(RoleEnum)
-        .map(String)
-        .includes(String(createUserDto.role.id));
-      if (!roleObject) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            role: 'roleNotExists',
-          },
-        });
-      }
-      role = {
-        id: createUserDto.role.id,
-      };
-    }
-
-    let status: Status | undefined = undefined;
-
-    if (createUserDto.status?.id) {
-      const statusObject = Object.values(StatusEnum)
-        .map(String)
-        .includes(String(createUserDto.status.id));
-      if (!statusObject) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            status: 'statusNotExists',
-          },
-        });
-      }
-
-      status = {
-        id: createUserDto.status.id,
-      };
-    }
-
     return this.usersRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
@@ -143,8 +97,6 @@ export class UsersService {
       email: email,
       password: password,
       photo: photo,
-      role: role,
-      status: status,
       provider: createUserDto.provider ?? AuthProvidersEnum.email,
       socialId: createUserDto.socialId,
     });
@@ -247,44 +199,6 @@ export class UsersService {
       photo = null;
     }
 
-    let role: Role | undefined = undefined;
-
-    if (updateUserDto.role?.id) {
-      const roleObject = Object.values(RoleEnum)
-        .map(String)
-        .includes(String(updateUserDto.role.id));
-      if (!roleObject) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            role: 'roleNotExists',
-          },
-        });
-      }
-      role = {
-        id: updateUserDto.role.id,
-      };
-    }
-
-    let status: Status | undefined = undefined;
-    if (updateUserDto.status?.id) {
-      const statusObject = Object.values(StatusEnum)
-        .map(String)
-        .includes(String(updateUserDto.status.id));
-      if (!statusObject) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            status: 'statusNotExists',
-          },
-        });
-      }
-
-      status = {
-        id: updateUserDto.status.id,
-      };
-    }
-
     return this.usersRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
@@ -294,8 +208,6 @@ export class UsersService {
       email,
       password,
       photo,
-      role,
-      status,
       provider: updateUserDto.provider,
       socialId: updateUserDto.socialId,
     });

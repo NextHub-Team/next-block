@@ -24,7 +24,6 @@ import {
 import { Roles } from '../roles/roles.decorator';
 import { RoleEnum } from '../roles/roles.enum';
 import { AuthGuard } from '@nestjs/passport';
-
 import {
   InfinityPaginationResponse,
   InfinityPaginationResponseDto,
