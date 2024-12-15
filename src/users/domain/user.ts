@@ -1,3 +1,4 @@
+import { AccessControl } from '../../access-controls/domain/access-control';
 import { UserLog } from '../../user-logs/domain/user-log';
 import { MainWallet } from '../../main-wallets/domain/main-wallet';
 import { Device } from '../../devices/domain/device';
@@ -8,6 +9,12 @@ import { ApiProperty } from '@nestjs/swagger';
 const idType = Number;
 
 export class User {
+  @ApiProperty({
+    type: () => AccessControl,
+    nullable: true,
+  })
+  abilities?: AccessControl | null;
+
   @ApiProperty({
     type: () => [UserLog],
     nullable: true,

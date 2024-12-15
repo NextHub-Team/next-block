@@ -1,3 +1,4 @@
+import { AccessControlsModule } from '../access-controls/access-controls.module';
 import { UserLogsModule } from '../user-logs/user-logs.module';
 import { MainWalletsModule } from '../main-wallets/main-wallets.module';
 import { PermissionsModule } from '../permissions/permissions.module';
@@ -12,6 +13,8 @@ const infrastructurePersistenceModule = RelationalUserPersistenceModule;
 
 @Module({
   imports: [
+    AccessControlsModule,
+
     forwardRef(() => UserLogsModule),
     forwardRef(() => MainWalletsModule),
     forwardRef(() => PermissionsModule),

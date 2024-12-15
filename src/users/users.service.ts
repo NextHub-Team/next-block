@@ -1,3 +1,6 @@
+import { AccessControlsService } from '../access-controls/access-controls.service';
+import { AccessControl } from '../access-controls/domain/access-control';
+
 import { UserLogsService } from '../user-logs/user-logs.service';
 import { MainWalletsService } from '../main-wallets/main-wallets.service';
 import { PermissionsService } from '../permissions/permissions.service';
@@ -25,6 +28,8 @@ import { UpdateUserDto } from './dto/update-user.dto';
 @Injectable()
 export class UsersService {
   constructor(
+    private readonly accessControlService: AccessControlsService,
+
     @Inject(forwardRef(() => UserLogsService))
     private readonly userLogService: UserLogsService,
 
@@ -44,6 +49,24 @@ export class UsersService {
   async create(createUserDto: CreateUserDto): Promise<User> {
     // Do not remove comment below.
     // <creating-property />
+    let abilities: AccessControl | null | undefined = undefined;
+
+    if (createUserDto.abilities) {
+      const abilitiesObject = await this.accessControlService.findById(
+        createUserDto.abilities.id,
+      );
+      if (!abilitiesObject) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: {
+            abilities: 'notExists',
+          },
+        });
+      }
+      abilities = abilitiesObject;
+    } else if (createUserDto.abilities === null) {
+      abilities = null;
+    }
 
     let password: string | undefined = undefined;
 
@@ -91,6 +114,8 @@ export class UsersService {
     return this.usersRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
+      abilities,
+
       phone: createUserDto.phone,
       firstName: createUserDto.firstName,
       lastName: createUserDto.lastName,
@@ -149,6 +174,24 @@ export class UsersService {
   ): Promise<User | null> {
     // Do not remove comment below.
     // <updating-property />
+    let abilities: AccessControl | null | undefined = undefined;
+
+    if (updateUserDto.abilities) {
+      const abilitiesObject = await this.accessControlService.findById(
+        updateUserDto.abilities.id,
+      );
+      if (!abilitiesObject) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: {
+            abilities: 'notExists',
+          },
+        });
+      }
+      abilities = abilitiesObject;
+    } else if (updateUserDto.abilities === null) {
+      abilities = null;
+    }
 
     let password: string | undefined = undefined;
 
@@ -202,6 +245,8 @@ export class UsersService {
     return this.usersRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
+      abilities,
+
       phone: updateUserDto.phone,
       firstName: updateUserDto.firstName,
       lastName: updateUserDto.lastName,

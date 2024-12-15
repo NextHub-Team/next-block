@@ -1,4 +1,6 @@
 import { FileEntity } from '../../../../../files/infrastructure/persistence/relational/entities/file.entity';
+import { AccessControlMapper } from '../../../../../access-controls/infrastructure/persistence/relational/mappers/access-control.mapper';
+
 import { UserLogMapper } from '../../../../../user-logs/infrastructure/persistence/relational/mappers/user-log.mapper';
 import { MainWalletMapper } from '../../../../../main-wallets/infrastructure/persistence/relational/mappers/main-wallet.mapper';
 import { DeviceMapper } from '../../../../../devices/infrastructure/persistence/relational/mappers/device.mapper';
@@ -9,6 +11,11 @@ import { UserEntity } from '../entities/user.entity';
 export class UserMapper {
   static toDomain(raw: UserEntity): User {
     const domainEntity = new User();
+    if (raw.abilities) {
+      domainEntity.abilities = AccessControlMapper.toDomain(raw.abilities);
+    } else if (raw.abilities === null) {
+      domainEntity.abilities = null;
+    }
 
     if (raw.logs) {
       domainEntity.logs = raw.logs.map((item) => UserLogMapper.toDomain(item));
@@ -63,6 +70,14 @@ export class UserMapper {
     }
 
     const persistenceEntity = new UserEntity();
+    if (domainEntity.abilities) {
+      persistenceEntity.abilities = AccessControlMapper.toPersistence(
+        domainEntity.abilities,
+      );
+    } else if (domainEntity.abilities === null) {
+      persistenceEntity.abilities = null;
+    }
+
     if (domainEntity.logs) {
       persistenceEntity.logs = domainEntity.logs.map((item) =>
         UserLogMapper.toPersistence(item),
