@@ -62,8 +62,14 @@ import { AccessControlsModule } from './access-controls/access-controls.module';
 
 import { TypesModule } from './types/types.module';
 
+import { StatusesModule } from './statuses/statuses.module';
+
+import { RolesModule } from './roles/roles.module';
+
 @Module({
   imports: [
+    RolesModule,
+    StatusesModule,
     TypesModule,
     PermissionsModule,
     AccessControlsModule,
