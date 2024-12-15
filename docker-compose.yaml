@@ -13,11 +13,11 @@ services:
       POSTGRES_DB: ${DATABASE_NAME}
     networks:
       - vault-network
-    # healthcheck:
-    #   test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USERNAME}"]
-    #   interval: 20s
-    #   timeout: 5s
-    #   retries: 5
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USERNAME} -d ${DATABASE_NAME}"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
     profiles:
       - dbs
 
@@ -60,12 +60,10 @@ services:
     ports:
       - ${APP_PORT}:${APP_PORT}
     depends_on:
-      - postgres
-      - redis
-      # postgres:
-      #   condition: service_healthy
-      # redis:
-      #   condition: service_healthy
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     networks:
       - vault-network
     profiles:
