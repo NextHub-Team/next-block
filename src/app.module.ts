@@ -66,8 +66,11 @@ import { StatusesModule } from './statuses/statuses.module';
 
 import { RolesModule } from './roles/roles.module';
 
+import { WhiteListAddressesModule } from './white-list-addresses/white-list-addresses.module';
+
 @Module({
   imports: [
+    WhiteListAddressesModule,
     RolesModule,
     StatusesModule,
     TypesModule,
