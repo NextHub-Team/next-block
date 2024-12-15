@@ -12,16 +12,14 @@ export class StatusesService {
     private readonly statusRepository: StatusRepository,
   ) {}
 
-  async create(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    createStatusDto: CreateStatusDto,
-  ) {
+  async create(createStatusDto: CreateStatusDto) {
     // Do not remove comment below.
     // <creating-property />
 
     return this.statusRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
+      description: createStatusDto.description,
     });
   }
 
@@ -48,7 +46,7 @@ export class StatusesService {
 
   async update(
     id: Status['id'],
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     updateStatusDto: UpdateStatusDto,
   ) {
     // Do not remove comment below.
@@ -57,6 +55,7 @@ export class StatusesService {
     return this.statusRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
+      description: updateStatusDto.description,
     });
   }
 

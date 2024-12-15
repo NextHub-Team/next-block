@@ -1,7 +1,3 @@
-import { UsersService } from '../users/users.service';
-
-import { forwardRef, Inject } from '@nestjs/common';
-
 import { Injectable } from '@nestjs/common';
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
@@ -12,12 +8,10 @@ import { Permission } from './domain/permission';
 @Injectable()
 export class PermissionsService {
   constructor(
-    @Inject(forwardRef(() => UsersService))
-    private readonly userService: UsersService,
     // Dependencies here
     private readonly permissionRepository: PermissionRepository,
   ) {}
-  /* eslint-disable @typescript-eslint/no-unused-vars */
+
   async create(createPermissionDto: CreatePermissionDto) {
     // Do not remove comment below.
     // <creating-property />
@@ -25,6 +19,7 @@ export class PermissionsService {
     return this.permissionRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
+      description: createPermissionDto.description,
     });
   }
 
@@ -48,7 +43,7 @@ export class PermissionsService {
   findByIds(ids: Permission['id'][]) {
     return this.permissionRepository.findByIds(ids);
   }
-  /* eslint-disable @typescript-eslint/no-unused-vars */
+
   async update(id: Permission['id'], updatePermissionDto: UpdatePermissionDto) {
     // Do not remove comment below.
     // <updating-property />
@@ -56,6 +51,7 @@ export class PermissionsService {
     return this.permissionRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
+      description: updatePermissionDto.description,
     });
   }
 

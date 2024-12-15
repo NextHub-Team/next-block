@@ -12,16 +12,14 @@ export class RolesService {
     private readonly roleRepository: RoleRepository,
   ) {}
 
-  async create(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    createRoleDto: CreateRoleDto,
-  ) {
+  async create(createRoleDto: CreateRoleDto) {
     // Do not remove comment below.
     // <creating-property />
 
     return this.roleRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
+      description: createRoleDto.description,
     });
   }
 
@@ -48,7 +46,7 @@ export class RolesService {
 
   async update(
     id: Role['id'],
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     updateRoleDto: UpdateRoleDto,
   ) {
     // Do not remove comment below.
@@ -57,6 +55,7 @@ export class RolesService {
     return this.roleRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
+      description: updateRoleDto.description,
     });
   }
 

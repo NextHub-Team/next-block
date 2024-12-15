@@ -1,9 +1,12 @@
 import { Status } from '../../../../domain/status';
+
 import { StatusEntity } from '../entities/status.entity';
 
 export class StatusMapper {
   static toDomain(raw: StatusEntity): Status {
     const domainEntity = new Status();
+    domainEntity.description = raw.description;
+
     domainEntity.id = raw.id;
     domainEntity.createdAt = raw.createdAt;
     domainEntity.updatedAt = raw.updatedAt;
@@ -13,6 +16,8 @@ export class StatusMapper {
 
   static toPersistence(domainEntity: Status): StatusEntity {
     const persistenceEntity = new StatusEntity();
+    persistenceEntity.description = domainEntity.description;
+
     if (domainEntity.id) {
       persistenceEntity.id = domainEntity.id;
     }

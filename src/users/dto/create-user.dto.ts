@@ -1,9 +1,6 @@
-// import { AccessControlDto } from '../../access-controls/dto/access-control.dto';
-
 import {
   // decorators here
   Transform,
-  // Type,
 } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
@@ -13,23 +10,11 @@ import {
   IsOptional,
   MinLength,
   IsString,
-  // ValidateNested,
-  // IsNotEmptyObject,
 } from 'class-validator';
 import { FileDto } from '../../files/dto/file.dto';
 import { lowerCaseTransformer } from '../../utils/transformers/lower-case.transformer';
 
 export class CreateUserDto {
-  // @ApiProperty({
-  //   required: false,
-  //   type: () => AccessControlDto,
-  // })
-  // @IsOptional()
-  // @ValidateNested()
-  // @Type(() => AccessControlDto)
-  // @IsNotEmptyObject()
-  // abilities?: AccessControlDto | null;
-
   @ApiProperty({
     required: false,
     type: () => String,

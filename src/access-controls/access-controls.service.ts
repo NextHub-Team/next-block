@@ -1,3 +1,12 @@
+import { PermissionsService } from '../permissions/permissions.service';
+import { Permission } from '../permissions/domain/permission';
+
+import { StatusesService } from '../statuses/statuses.service';
+import { Status } from '../statuses/domain/status';
+
+import { RolesService } from '../roles/roles.service';
+import { Role } from '../roles/domain/role';
+
 import { UsersService } from '../users/users.service';
 import { User } from '../users/domain/user';
 
@@ -18,9 +27,11 @@ import { AccessControl } from './domain/access-control';
 @Injectable()
 export class AccessControlsService {
   constructor(
+    private readonly permissionService: PermissionsService,
+    private readonly statusService: StatusesService,
+    private readonly roleService: RolesService,
     @Inject(forwardRef(() => UsersService))
     private readonly userService: UsersService,
-
     // Dependencies here
     private readonly accessControlRepository: AccessControlRepository,
   ) {}
@@ -28,6 +39,58 @@ export class AccessControlsService {
   async create(createAccessControlDto: CreateAccessControlDto) {
     // Do not remove comment below.
     // <creating-property />
+
+    let permission: Permission | null | undefined = undefined;
+
+    if (createAccessControlDto.permission) {
+      const permissionObject = await this.permissionService.findById(
+        createAccessControlDto.permission.id,
+      );
+      if (!permissionObject) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: {
+            permission: 'notExists',
+          },
+        });
+      }
+      permission = permissionObject;
+    } else if (createAccessControlDto.permission === null) {
+      permission = null;
+    }
+
+    let status: Status | null | undefined = undefined;
+
+    if (createAccessControlDto.status) {
+      const statusObject = await this.statusService.findById(
+        createAccessControlDto.status.id,
+      );
+      if (!statusObject) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: {
+            status: 'notExists',
+          },
+        });
+      }
+      status = statusObject;
+    } else if (createAccessControlDto.status === null) {
+      status = null;
+    }
+
+    const roleObject = await this.roleService.findById(
+      createAccessControlDto.role.id,
+    );
+    if (!roleObject) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: {
+          role: 'notExists',
+        },
+      });
+    }
+    const role = roleObject;
+
     const userObject = await this.userService.findById(
       createAccessControlDto.user.id,
     );
@@ -44,6 +107,14 @@ export class AccessControlsService {
     return this.accessControlRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
+      description: createAccessControlDto.description,
+
+      permission,
+
+      status,
+
+      role,
+
       user,
     });
   }
@@ -76,6 +147,62 @@ export class AccessControlsService {
   ) {
     // Do not remove comment below.
     // <updating-property />
+
+    let permission: Permission | null | undefined = undefined;
+
+    if (updateAccessControlDto.permission) {
+      const permissionObject = await this.permissionService.findById(
+        updateAccessControlDto.permission.id,
+      );
+      if (!permissionObject) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: {
+            permission: 'notExists',
+          },
+        });
+      }
+      permission = permissionObject;
+    } else if (updateAccessControlDto.permission === null) {
+      permission = null;
+    }
+
+    let status: Status | null | undefined = undefined;
+
+    if (updateAccessControlDto.status) {
+      const statusObject = await this.statusService.findById(
+        updateAccessControlDto.status.id,
+      );
+      if (!statusObject) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: {
+            status: 'notExists',
+          },
+        });
+      }
+      status = statusObject;
+    } else if (updateAccessControlDto.status === null) {
+      status = null;
+    }
+
+    let role: Role | undefined = undefined;
+
+    if (updateAccessControlDto.role) {
+      const roleObject = await this.roleService.findById(
+        updateAccessControlDto.role.id,
+      );
+      if (!roleObject) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: {
+            role: 'notExists',
+          },
+        });
+      }
+      role = roleObject;
+    }
+
     let user: User | undefined = undefined;
 
     if (updateAccessControlDto.user) {
@@ -96,6 +223,14 @@ export class AccessControlsService {
     return this.accessControlRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
+      description: updateAccessControlDto.description,
+
+      permission,
+
+      status,
+
+      role,
+
       user,
     });
   }

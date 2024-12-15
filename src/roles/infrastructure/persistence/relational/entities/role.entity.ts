@@ -3,6 +3,7 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  Column,
 } from 'typeorm';
 import { EntityRelationalHelper } from '../../../../../utils/relational-entity-helper';
 
@@ -10,6 +11,12 @@ import { EntityRelationalHelper } from '../../../../../utils/relational-entity-h
   name: 'role',
 })
 export class RoleEntity extends EntityRelationalHelper {
+  @Column({
+    nullable: true,
+    type: String,
+  })
+  description?: string | null;
+
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

@@ -1,9 +1,6 @@
 import { AccessControlsService } from '../access-controls/access-controls.service';
-// import { AccessControl } from '../access-controls/domain/access-control';
-
 import { UserLogsService } from '../user-logs/user-logs.service';
 import { MainWalletsService } from '../main-wallets/main-wallets.service';
-import { PermissionsService } from '../permissions/permissions.service';
 import { DevicesService } from '../devices/devices.service';
 
 import {
@@ -36,9 +33,6 @@ export class UsersService {
 
     @Inject(forwardRef(() => MainWalletsService))
     private readonly mainWalletService: MainWalletsService,
-
-    @Inject(forwardRef(() => PermissionsService))
-    private readonly permissionService: PermissionsService,
 
     @Inject(forwardRef(() => DevicesService))
     private readonly deviceService: DevicesService,

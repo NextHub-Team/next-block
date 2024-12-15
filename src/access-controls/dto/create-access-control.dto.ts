@@ -1,3 +1,6 @@
+import { PermissionDto } from '../../permissions/dto/permission.dto';
+import { StatusDto } from '../../statuses/dto/status.dto';
+import { RoleDto } from '../../roles/dto/role.dto';
 import { UserDto } from '../../users/dto/user.dto';
 
 import {
@@ -10,6 +13,8 @@ import {
 
   ValidateNested,
   IsNotEmptyObject,
+  IsOptional,
+  IsString,
 } from 'class-validator';
 
 import {
@@ -18,6 +23,43 @@ import {
 } from '@nestjs/swagger';
 
 export class CreateAccessControlDto {
+  @ApiProperty({
+    required: false,
+    type: () => String,
+  })
+  @IsOptional()
+  @IsString()
+  description?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => PermissionDto,
+  })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => PermissionDto)
+  @IsNotEmptyObject()
+  permission?: PermissionDto | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => StatusDto,
+  })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => StatusDto)
+  @IsNotEmptyObject()
+  status?: StatusDto | null;
+
+  @ApiProperty({
+    required: true,
+    type: () => RoleDto,
+  })
+  @ValidateNested()
+  @Type(() => RoleDto)
+  @IsNotEmptyObject()
+  role: RoleDto;
+
   @ApiProperty({
     required: true,
     type: () => UserDto,

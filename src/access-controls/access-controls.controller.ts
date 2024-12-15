@@ -28,7 +28,7 @@ import {
 import { infinityPagination } from '../utils/infinity-pagination';
 import { FindAllAccessControlsDto } from './dto/find-all-access-controls.dto';
 
-@ApiTags('Accesscontrols')
+@ApiTags('AccessControls')
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
 @Controller({

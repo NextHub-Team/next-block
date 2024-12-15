@@ -1,5 +1,4 @@
 import { AccessControlEntity } from '../../../../../access-controls/infrastructure/persistence/relational/entities/access-control.entity';
-
 import { UserLogEntity } from '../../../../../user-logs/infrastructure/persistence/relational/entities/user-log.entity';
 import { MainWalletEntity } from '../../../../../main-wallets/infrastructure/persistence/relational/entities/main-wallet.entity';
 import { DeviceEntity } from '../../../../../devices/infrastructure/persistence/relational/entities/device.entity';
@@ -17,7 +16,6 @@ import {
   OneToMany,
 } from 'typeorm';
 import { FileEntity } from '../../../../../files/infrastructure/persistence/relational/entities/file.entity';
-
 import { AuthProvidersEnum } from '../../../../../auth/auth-providers.enum';
 import { EntityRelationalHelper } from '../../../../../utils/relational-entity-helper';
 
