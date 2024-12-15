@@ -13,8 +13,7 @@ const infrastructurePersistenceModule = RelationalUserPersistenceModule;
 
 @Module({
   imports: [
-    AccessControlsModule,
-
+    forwardRef(() => AccessControlsModule),
     forwardRef(() => UserLogsModule),
     forwardRef(() => MainWalletsModule),
     forwardRef(() => PermissionsModule),

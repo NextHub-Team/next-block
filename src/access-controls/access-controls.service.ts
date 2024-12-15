@@ -1,3 +1,13 @@
+import { UsersService } from '../users/users.service';
+import { User } from '../users/domain/user';
+
+import {
+  forwardRef,
+  HttpStatus,
+  Inject,
+  UnprocessableEntityException,
+} from '@nestjs/common';
+
 import { Injectable } from '@nestjs/common';
 import { CreateAccessControlDto } from './dto/create-access-control.dto';
 import { UpdateAccessControlDto } from './dto/update-access-control.dto';
@@ -8,20 +18,33 @@ import { AccessControl } from './domain/access-control';
 @Injectable()
 export class AccessControlsService {
   constructor(
+    @Inject(forwardRef(() => UsersService))
+    private readonly userService: UsersService,
+
     // Dependencies here
     private readonly accessControlRepository: AccessControlRepository,
   ) {}
 
-  async create(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    createAccessControlDto: CreateAccessControlDto,
-  ) {
+  async create(createAccessControlDto: CreateAccessControlDto) {
     // Do not remove comment below.
     // <creating-property />
+    const userObject = await this.userService.findById(
+      createAccessControlDto.user.id,
+    );
+    if (!userObject) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: {
+          user: 'notExists',
+        },
+      });
+    }
+    const user = userObject;
 
     return this.accessControlRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
+      user,
     });
   }
 
@@ -48,15 +71,32 @@ export class AccessControlsService {
 
   async update(
     id: AccessControl['id'],
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     updateAccessControlDto: UpdateAccessControlDto,
   ) {
     // Do not remove comment below.
     // <updating-property />
+    let user: User | undefined = undefined;
+
+    if (updateAccessControlDto.user) {
+      const userObject = await this.userService.findById(
+        updateAccessControlDto.user.id,
+      );
+      if (!userObject) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: {
+            user: 'notExists',
+          },
+        });
+      }
+      user = userObject;
+    }
 
     return this.accessControlRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
+      user,
     });
   }
 
