@@ -27,6 +27,7 @@ import {
 } from '../utils/dto/infinity-pagination-response.dto';
 import { infinityPagination } from '../utils/infinity-pagination';
 import { FindAllAccessControlsDto } from './dto/find-all-access-controls.dto';
+import { Description } from '../utils/custom-decorators/swagger.decorator';
 
 @ApiTags('AccessControls')
 @ApiBearerAuth()
@@ -39,6 +40,12 @@ export class AccessControlsController {
   constructor(private readonly accessControlsService: AccessControlsService) {}
 
   @Post()
+  @Description(
+    'Admin',
+    `Access the admin dashboard.
+    This endpoint provides an overview of the application metrics.`,
+    { manageUsers: true, viewReports: true, configureSettings: true },
+  )
   @ApiCreatedResponse({
     type: AccessControl,
   })
