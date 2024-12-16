@@ -58,6 +58,8 @@ import { NftsModule } from './nfts/nfts.module';
 
 import { TransactionLogsModule } from './transaction-logs/transaction-logs.module';
 
+import { FireblocksModule } from './fireblocks/fireblocks.module';
+
 @Module({
   imports: [
     TransactionLogsModule,
@@ -74,6 +76,7 @@ import { TransactionLogsModule } from './transaction-logs/transaction-logs.modul
     MainWalletsModule,
     PermissionsModule,
     DevicesModule,
+    FireblocksModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [
