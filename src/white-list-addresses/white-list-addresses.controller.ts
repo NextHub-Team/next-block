@@ -28,7 +28,7 @@ import {
 import { infinityPagination } from '../utils/infinity-pagination';
 import { FindAllWhiteListAddressesDto } from './dto/find-all-white-list-addresses.dto';
 
-@ApiTags('Whitelistaddresses')
+@ApiTags('WhiteListAddresses')
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
 @Controller({
