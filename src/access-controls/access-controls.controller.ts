@@ -40,12 +40,12 @@ export class AccessControlsController {
   constructor(private readonly accessControlsService: AccessControlsService) {}
 
   @Post()
-  // @Description(
-  //   'Admin',
-  //   `Access the admin dashboard.
-  //   This endpoint provides an overview of the application metrics.`,
-  //   { manageUsers: true, viewReports: true, configureSettings: true },
-  // )
+  @Description(
+    'Admin',
+    `Access the admin dashboard.
+    This endpoint provides an overview of the application metrics.`,
+    { manageUsers: true, viewReports: true, configureSettings: true },
+  )
   @ApiCreatedResponse({
     type: AccessControl,
   })
