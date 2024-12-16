@@ -1,25 +1,36 @@
-import { Notification } from '../../notifications/domain/notification';
-import { User } from '../../users/domain/user';
+import { Device } from '../../devices/domain/device';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class Device {
+export class Notification {
   @ApiProperty({
-    type: () => [Notification],
+    type: () => String,
     nullable: true,
   })
-  notifications?: Notification[] | null;
+  scheduledAt?: string | null;
 
   @ApiProperty({
     type: () => String,
     nullable: true,
   })
-  name?: string | null;
+  sentAt?: string | null;
+
+  @ApiProperty({
+    type: () => Boolean,
+    nullable: true,
+  })
+  isRead?: boolean | null;
 
   @ApiProperty({
     type: () => String,
     nullable: true,
   })
-  physicalId?: string | null;
+  status?: string | null;
+
+  @ApiProperty({
+    type: () => String,
+    nullable: true,
+  })
+  priority?: string | null;
 
   @ApiProperty({
     type: () => String,
@@ -28,16 +39,22 @@ export class Device {
   type: string;
 
   @ApiProperty({
+    type: () => Device,
+    nullable: false,
+  })
+  device: Device;
+
+  @ApiProperty({
     type: () => String,
     nullable: false,
   })
-  token?: string;
+  message: string;
 
   @ApiProperty({
-    type: () => User,
+    type: () => String,
     nullable: false,
   })
-  user: User;
+  title: string;
 
   @ApiProperty({
     type: String,
