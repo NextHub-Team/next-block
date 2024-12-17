@@ -19,6 +19,8 @@ export class StatusesService {
     return this.statusRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
+      name: createStatusDto.name,
+
       description: createStatusDto.description,
     });
   }
@@ -55,6 +57,8 @@ export class StatusesService {
     return this.statusRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
+      name: updateStatusDto.name,
+
       description: updateStatusDto.description,
     });
   }

@@ -3,6 +3,12 @@ import { ApiProperty } from '@nestjs/swagger';
 export class Status {
   @ApiProperty({
     type: () => String,
+    nullable: false,
+  })
+  name: string;
+
+  @ApiProperty({
+    type: () => String,
     nullable: true,
   })
   description?: string | null;

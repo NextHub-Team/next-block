@@ -11,6 +11,13 @@ import {
 
 export class CreateStatusDto {
   @ApiProperty({
+    required: true,
+    type: () => String,
+  })
+  @IsString()
+  name: string;
+
+  @ApiProperty({
     required: false,
     type: () => String,
   })

@@ -12,6 +12,12 @@ import { EntityRelationalHelper } from '../../../../../utils/relational-entity-h
 })
 export class StatusEntity extends EntityRelationalHelper {
   @Column({
+    nullable: false,
+    type: String,
+  })
+  name: string;
+
+  @Column({
     nullable: true,
     type: String,
   })

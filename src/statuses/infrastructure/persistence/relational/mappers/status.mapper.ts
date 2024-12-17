@@ -5,6 +5,8 @@ import { StatusEntity } from '../entities/status.entity';
 export class StatusMapper {
   static toDomain(raw: StatusEntity): Status {
     const domainEntity = new Status();
+    domainEntity.name = raw.name;
+
     domainEntity.description = raw.description;
 
     domainEntity.id = raw.id;
@@ -16,6 +18,8 @@ export class StatusMapper {
 
   static toPersistence(domainEntity: Status): StatusEntity {
     const persistenceEntity = new StatusEntity();
+    persistenceEntity.name = domainEntity.name;
+
     persistenceEntity.description = domainEntity.description;
 
     if (domainEntity.id) {
