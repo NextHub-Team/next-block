@@ -45,7 +45,7 @@ export class NftTransactionsService {
     return this.nftTransactionRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
-      gasFee: createNftTransactionDto.gasFee,
+      fee: createNftTransactionDto.fee,
 
       transactionHash: createNftTransactionDto.transactionHash,
 
@@ -112,7 +112,7 @@ export class NftTransactionsService {
     return this.nftTransactionRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
-      gasFee: updateNftTransactionDto.gasFee,
+      fee: updateNftTransactionDto.fee,
 
       transactionHash: updateNftTransactionDto.transactionHash,
 
