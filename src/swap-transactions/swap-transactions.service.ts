@@ -19,7 +19,7 @@ export class SwapTransactionsService {
     return this.swapTransactionRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
-      transaction_fee: createSwapTransactionDto.transaction_fee,
+      fee: createSwapTransactionDto.fee,
 
       dex: createSwapTransactionDto.dex,
 
@@ -67,7 +67,7 @@ export class SwapTransactionsService {
     return this.swapTransactionRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
-      transaction_fee: updateSwapTransactionDto.transaction_fee,
+      fee: updateSwapTransactionDto.fee,
 
       dex: updateSwapTransactionDto.dex,
 

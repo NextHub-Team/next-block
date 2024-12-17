@@ -16,7 +16,7 @@ export class CreateSwapTransactionDto {
     type: () => Number,
   })
   @IsNumber()
-  transaction_fee: number;
+  fee: number;
 
   @ApiProperty({
     required: true,

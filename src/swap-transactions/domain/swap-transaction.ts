@@ -5,7 +5,7 @@ export class SwapTransaction {
     type: () => Number,
     nullable: false,
   })
-  transaction_fee: number;
+  fee: number;
 
   @ApiProperty({
     type: () => String,

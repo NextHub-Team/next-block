@@ -5,7 +5,7 @@ import { SwapTransactionEntity } from '../entities/swap-transaction.entity';
 export class SwapTransactionMapper {
   static toDomain(raw: SwapTransactionEntity): SwapTransaction {
     const domainEntity = new SwapTransaction();
-    domainEntity.transaction_fee = raw.transaction_fee;
+    domainEntity.fee = raw.fee;
 
     domainEntity.dex = raw.dex;
 
@@ -28,7 +28,7 @@ export class SwapTransactionMapper {
 
   static toPersistence(domainEntity: SwapTransaction): SwapTransactionEntity {
     const persistenceEntity = new SwapTransactionEntity();
-    persistenceEntity.transaction_fee = domainEntity.transaction_fee;
+    persistenceEntity.fee = domainEntity.fee;
 
     persistenceEntity.dex = domainEntity.dex;
 
