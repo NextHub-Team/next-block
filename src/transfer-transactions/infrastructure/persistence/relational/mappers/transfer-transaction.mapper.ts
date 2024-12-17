@@ -8,7 +8,7 @@ export class TransferTransactionMapper {
 
     domainEntity.to_address = raw.to_address;
 
-    domainEntity.transaction_fee = raw.transaction_fee;
+    domainEntity.fee = raw.fee;
 
     domainEntity.amount = raw.amount;
 
@@ -33,7 +33,7 @@ export class TransferTransactionMapper {
 
     persistenceEntity.to_address = domainEntity.to_address;
 
-    persistenceEntity.transaction_fee = domainEntity.transaction_fee;
+    persistenceEntity.fee = domainEntity.fee;
 
     persistenceEntity.amount = domainEntity.amount;
 

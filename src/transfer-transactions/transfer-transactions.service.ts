@@ -23,7 +23,7 @@ export class TransferTransactionsService {
 
       to_address: createTransferTransactionDto.to_address,
 
-      transaction_fee: createTransferTransactionDto.transaction_fee,
+      fee: createTransferTransactionDto.fee,
 
       amount: createTransferTransactionDto.amount,
 
@@ -71,7 +71,7 @@ export class TransferTransactionsService {
 
       to_address: updateTransferTransactionDto.to_address,
 
-      transaction_fee: updateTransferTransactionDto.transaction_fee,
+      fee: updateTransferTransactionDto.fee,
 
       amount: updateTransferTransactionDto.amount,
 

@@ -29,7 +29,7 @@ export class CreateTransferTransactionDto {
     type: () => Number,
   })
   @IsNumber()
-  transaction_fee: number;
+  fee: number;
 
   @ApiProperty({
     required: true,

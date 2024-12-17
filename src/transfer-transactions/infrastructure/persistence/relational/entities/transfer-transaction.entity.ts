@@ -27,7 +27,7 @@ export class TransferTransactionEntity extends EntityRelationalHelper {
     nullable: false,
     type: Number,
   })
-  transaction_fee: number;
+  fee: number;
 
   @Column({
     nullable: false,
