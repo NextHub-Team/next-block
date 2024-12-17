@@ -6,8 +6,8 @@ import { ZeroxService } from './zerox.service';
 
 @Module({
   // imports: [HttpModule, FireblocksModule],
-  imports: [HttpModule,],
+  imports: [HttpModule],
   controllers: [SwapController],
   providers: [ZeroxService],
 })
-export class SwapModule { }
+export class SwapModule {}

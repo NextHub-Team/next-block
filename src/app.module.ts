@@ -22,7 +22,7 @@ import { DataSource, DataSourceOptions } from 'typeorm';
 import { AllConfigType } from './config/config.type';
 import { SessionModule } from './session/session.module';
 import { MailerModule } from './mailer/mailer.module';
-import ZeroxConfig from './swap/zerox/config/zerox.config'
+import ZeroxConfig from './swap/zerox/config/zerox.config';
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
@@ -91,7 +91,7 @@ import { SwapModule } from './swap/zerox/zerox.module';
         fileConfig,
         googleConfig,
         appleConfig,
-        ZeroxConfig
+        ZeroxConfig,
       ],
       envFilePath: ['.env'],
     }),
@@ -130,4 +130,4 @@ import { SwapModule } from './swap/zerox/zerox.module';
     HomeModule,
   ],
 })
-export class AppModule { }
+export class AppModule {}
