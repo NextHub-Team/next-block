@@ -1,5 +1,4 @@
-export interface FireblocksConfig {
-  apiSecret: string;
+export interface ZeroxConfig {
   apiKey: string;
-  baseUrl?: string;
+  apiUrl: string;
 }

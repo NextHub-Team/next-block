@@ -22,6 +22,7 @@ import { DataSource, DataSourceOptions } from 'typeorm';
 import { AllConfigType } from './config/config.type';
 import { SessionModule } from './session/session.module';
 import { MailerModule } from './mailer/mailer.module';
+import ZeroxConfig from './swap/zerox/config/zerox.config'
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
@@ -60,6 +61,8 @@ import { TransactionLogsModule } from './transaction-logs/transaction-logs.modul
 
 import { FireblocksModule } from './fireblocks/fireblocks.module';
 
+import { SwapModule } from './swap/zerox/zerox.module';
+
 @Module({
   imports: [
     TransactionLogsModule,
@@ -77,6 +80,7 @@ import { FireblocksModule } from './fireblocks/fireblocks.module';
     PermissionsModule,
     DevicesModule,
     FireblocksModule,
+    SwapModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [
@@ -87,6 +91,7 @@ import { FireblocksModule } from './fireblocks/fireblocks.module';
         fileConfig,
         googleConfig,
         appleConfig,
+        ZeroxConfig
       ],
       envFilePath: ['.env'],
     }),
@@ -125,4 +130,4 @@ import { FireblocksModule } from './fireblocks/fireblocks.module';
     HomeModule,
   ],
 })
-export class AppModule {}
+export class AppModule { }
