@@ -12,6 +12,13 @@ import {
 
 export class CreatePermissionDto {
   @ApiProperty({
+    required: true,
+    type: () => String,
+  })
+  @IsString()
+  names: string;
+
+  @ApiProperty({
     required: false,
     type: () => String,
   })

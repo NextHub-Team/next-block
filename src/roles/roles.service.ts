@@ -19,6 +19,8 @@ export class RolesService {
     return this.roleRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
+      name: createRoleDto.name,
+
       description: createRoleDto.description,
     });
   }
@@ -55,6 +57,8 @@ export class RolesService {
     return this.roleRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
+      name: updateRoleDto.name,
+
       description: updateRoleDto.description,
     });
   }

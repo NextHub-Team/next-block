@@ -12,6 +12,12 @@ import { EntityRelationalHelper } from '../../../../../utils/relational-entity-h
 })
 export class PermissionEntity extends EntityRelationalHelper {
   @Column({
+    nullable: false,
+    type: String,
+  })
+  names: string;
+
+  @Column({
     nullable: true,
     type: String,
   })

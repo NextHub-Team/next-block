@@ -19,6 +19,8 @@ export class PermissionsService {
     return this.permissionRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
+      names: createPermissionDto.names,
+
       description: createPermissionDto.description,
     });
   }
@@ -51,6 +53,8 @@ export class PermissionsService {
     return this.permissionRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
+      names: updatePermissionDto.names,
+
       description: updatePermissionDto.description,
     });
   }

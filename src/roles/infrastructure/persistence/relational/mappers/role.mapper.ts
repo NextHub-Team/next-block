@@ -5,6 +5,8 @@ import { RoleEntity } from '../entities/role.entity';
 export class RoleMapper {
   static toDomain(raw: RoleEntity): Role {
     const domainEntity = new Role();
+    domainEntity.name = raw.name;
+
     domainEntity.description = raw.description;
 
     domainEntity.id = raw.id;
@@ -16,6 +18,8 @@ export class RoleMapper {
 
   static toPersistence(domainEntity: Role): RoleEntity {
     const persistenceEntity = new RoleEntity();
+    persistenceEntity.name = domainEntity.name;
+
     persistenceEntity.description = domainEntity.description;
 
     if (domainEntity.id) {

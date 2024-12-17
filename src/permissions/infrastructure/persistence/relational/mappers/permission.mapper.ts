@@ -5,6 +5,8 @@ import { PermissionEntity } from '../entities/permission.entity';
 export class PermissionMapper {
   static toDomain(raw: PermissionEntity): Permission {
     const domainEntity = new Permission();
+    domainEntity.names = raw.names;
+
     domainEntity.description = raw.description;
 
     domainEntity.id = raw.id;
@@ -15,6 +17,8 @@ export class PermissionMapper {
 
   static toPersistence(domainEntity: Permission): PermissionEntity {
     const persistenceEntity = new PermissionEntity();
+    persistenceEntity.names = domainEntity.names;
+
     persistenceEntity.description = domainEntity.description;
 
     if (domainEntity.id) {
