@@ -1,6 +1,5 @@
 import {
   // decorators here
-
   IsString,
   IsOptional,
 } from 'class-validator';

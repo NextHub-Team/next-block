@@ -27,6 +27,7 @@ export class TransactionLogsService {
   async create(createTransactionLogDto: CreateTransactionLogDto) {
     // Do not remove comment below.
     // <creating-property />
+
     let wallet: Wallet | undefined = undefined;
 
     if (createTransactionLogDto.wallet) {
@@ -47,6 +48,16 @@ export class TransactionLogsService {
     return this.transactionLogRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
+      details: createTransactionLogDto.details,
+
+      priority: createTransactionLogDto.priority,
+
+      status: createTransactionLogDto.status,
+
+      type: createTransactionLogDto.type,
+
+      assetName: createTransactionLogDto.assetName,
+
       wallet,
     });
   }
@@ -79,6 +90,7 @@ export class TransactionLogsService {
   ) {
     // Do not remove comment below.
     // <updating-property />
+
     let wallet: Wallet | undefined = undefined;
 
     if (updateTransactionLogDto.wallet) {
@@ -98,6 +110,13 @@ export class TransactionLogsService {
     return this.transactionLogRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
+      details: updateTransactionLogDto.details,
+
+      priority: updateTransactionLogDto.priority,
+      status: updateTransactionLogDto.status,
+      type: updateTransactionLogDto.type,
+      assetName: updateTransactionLogDto.assetName,
+
       wallet,
     });
   }
