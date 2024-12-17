@@ -9,8 +9,6 @@ import { NftEntity } from '../entities/nft.entity';
 export class NftMapper {
   static toDomain(raw: NftEntity): Nft {
     const domainEntity = new Nft();
-    domainEntity.details = raw.details;
-
     domainEntity.attributes = raw.attributes;
 
     domainEntity.OwnerAddress = raw.OwnerAddress;
@@ -48,7 +46,6 @@ export class NftMapper {
 
   static toPersistence(domainEntity: Nft): NftEntity {
     const persistenceEntity = new NftEntity();
-    persistenceEntity.details = domainEntity.details;
 
     persistenceEntity.attributes = domainEntity.attributes;
 

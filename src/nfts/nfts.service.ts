@@ -50,8 +50,6 @@ export class NftsService {
     return this.nftRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
-      details: createNftDto.details,
-
       attributes: createNftDto.attributes,
 
       OwnerAddress: createNftDto.OwnerAddress,
@@ -121,8 +119,6 @@ export class NftsService {
     return this.nftRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
-      details: updateNftDto.details,
-
       attributes: updateNftDto.attributes,
 
       OwnerAddress: updateNftDto.OwnerAddress,
