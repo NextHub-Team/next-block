@@ -31,7 +31,7 @@ export class SupportedAssetsService {
 
       contractAddress: createSupportedAssetDto.contractAddress,
 
-      chainName: createSupportedAssetDto.chainName,
+      blockchain: createSupportedAssetDto.blockchain,
 
       symbol: createSupportedAssetDto.symbol,
 
@@ -83,7 +83,7 @@ export class SupportedAssetsService {
 
       contractAddress: updateSupportedAssetDto.contractAddress,
 
-      chainName: updateSupportedAssetDto.chainName,
+      blockchain: updateSupportedAssetDto.blockchain,
 
       symbol: updateSupportedAssetDto.symbol,
 

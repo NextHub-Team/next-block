@@ -64,7 +64,7 @@ export class CreateSupportedAssetDto {
     type: () => String,
   })
   @IsString()
-  chainName: string;
+  blockchain: string;
 
   @ApiProperty({
     required: true,

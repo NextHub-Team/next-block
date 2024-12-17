@@ -17,7 +17,7 @@ export class SupportedAssetMapper {
 
     domainEntity.contractAddress = raw.contractAddress;
 
-    domainEntity.chainName = raw.chainName;
+    domainEntity.blockchain = raw.blockchain;
 
     domainEntity.symbol = raw.symbol;
 
@@ -44,7 +44,7 @@ export class SupportedAssetMapper {
 
     persistenceEntity.contractAddress = domainEntity.contractAddress;
 
-    persistenceEntity.chainName = domainEntity.chainName;
+    persistenceEntity.blockchain = domainEntity.blockchain;
 
     persistenceEntity.symbol = domainEntity.symbol;
 
