@@ -7,6 +7,12 @@ export class Nft {
     type: () => String,
     nullable: true,
   })
+  details?: string | null;
+
+  @ApiProperty({
+    type: () => String,
+    nullable: true,
+  })
   attributes?: string | null;
 
   @ApiProperty({

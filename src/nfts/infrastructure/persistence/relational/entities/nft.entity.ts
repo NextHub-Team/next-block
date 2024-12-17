@@ -21,6 +21,12 @@ export class NftEntity extends EntityRelationalHelper {
     nullable: true,
     type: String,
   })
+  details?: string | null;
+
+  @Column({
+    nullable: true,
+    type: String,
+  })
   attributes?: string | null;
 
   @Column({
