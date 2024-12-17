@@ -1,4 +1,5 @@
 import { Wallet } from '../../../../domain/wallet';
+
 import { TransactionLogMapper } from '../../../../../transaction-logs/infrastructure/persistence/relational/mappers/transaction-log.mapper';
 
 import { NftMapper } from '../../../../../nfts/infrastructure/persistence/relational/mappers/nft.mapper';
@@ -10,6 +11,8 @@ import { WalletEntity } from '../entities/wallet.entity';
 export class WalletMapper {
   static toDomain(raw: WalletEntity): Wallet {
     const domainEntity = new Wallet();
+    domainEntity.details = raw.details;
+
     if (raw.transactionLog) {
       domainEntity.transactionLog = raw.transactionLog.map((item) =>
         TransactionLogMapper.toDomain(item),
@@ -43,6 +46,8 @@ export class WalletMapper {
 
   static toPersistence(domainEntity: Wallet): WalletEntity {
     const persistenceEntity = new WalletEntity();
+    persistenceEntity.details = domainEntity.details;
+
     if (domainEntity.transactionLog) {
       persistenceEntity.transactionLog = domainEntity.transactionLog.map(
         (item) => TransactionLogMapper.toPersistence(item),
