@@ -19,9 +19,9 @@ export class TransferTransactionsService {
     return this.transferTransactionRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
-      from_address: createTransferTransactionDto.from_address,
+      fromAddress: createTransferTransactionDto.fromAddress,
 
-      to_address: createTransferTransactionDto.to_address,
+      toAddress: createTransferTransactionDto.toAddress,
 
       fee: createTransferTransactionDto.fee,
 
@@ -29,7 +29,7 @@ export class TransferTransactionsService {
 
       blockchain: createTransferTransactionDto.blockchain,
 
-      transaction_hash: createTransferTransactionDto.transaction_hash,
+      transactionHash: createTransferTransactionDto.transactionHash,
 
       wallet: createTransferTransactionDto.wallet,
     });
@@ -58,7 +58,6 @@ export class TransferTransactionsService {
 
   async update(
     id: TransferTransaction['id'],
-
     updateTransferTransactionDto: UpdateTransferTransactionDto,
   ) {
     // Do not remove comment below.
@@ -67,9 +66,9 @@ export class TransferTransactionsService {
     return this.transferTransactionRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
-      from_address: updateTransferTransactionDto.from_address,
+      fromAddress: updateTransferTransactionDto.fromAddress,
 
-      to_address: updateTransferTransactionDto.to_address,
+      toAddress: updateTransferTransactionDto.toAddress,
 
       fee: updateTransferTransactionDto.fee,
 
@@ -77,7 +76,7 @@ export class TransferTransactionsService {
 
       blockchain: updateTransferTransactionDto.blockchain,
 
-      transaction_hash: updateTransferTransactionDto.transaction_hash,
+      transactionHash: updateTransferTransactionDto.transactionHash,
 
       wallet: updateTransferTransactionDto.wallet,
     });

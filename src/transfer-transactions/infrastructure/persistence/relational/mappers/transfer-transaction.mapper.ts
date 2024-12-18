@@ -4,9 +4,9 @@ import { TransferTransactionEntity } from '../entities/transfer-transaction.enti
 export class TransferTransactionMapper {
   static toDomain(raw: TransferTransactionEntity): TransferTransaction {
     const domainEntity = new TransferTransaction();
-    domainEntity.from_address = raw.from_address;
+    domainEntity.fromAddress = raw.fromAddress;
 
-    domainEntity.to_address = raw.to_address;
+    domainEntity.toAddress = raw.toAddress;
 
     domainEntity.fee = raw.fee;
 
@@ -14,7 +14,7 @@ export class TransferTransactionMapper {
 
     domainEntity.blockchain = raw.blockchain;
 
-    domainEntity.transaction_hash = raw.transaction_hash;
+    domainEntity.transactionHash = raw.transactionHash;
 
     domainEntity.wallet = raw.wallet;
 
@@ -29,9 +29,9 @@ export class TransferTransactionMapper {
     domainEntity: TransferTransaction,
   ): TransferTransactionEntity {
     const persistenceEntity = new TransferTransactionEntity();
-    persistenceEntity.from_address = domainEntity.from_address;
+    persistenceEntity.fromAddress = domainEntity.fromAddress;
 
-    persistenceEntity.to_address = domainEntity.to_address;
+    persistenceEntity.toAddress = domainEntity.toAddress;
 
     persistenceEntity.fee = domainEntity.fee;
 
@@ -39,7 +39,7 @@ export class TransferTransactionMapper {
 
     persistenceEntity.blockchain = domainEntity.blockchain;
 
-    persistenceEntity.transaction_hash = domainEntity.transaction_hash;
+    persistenceEntity.transactionHash = domainEntity.transactionHash;
 
     persistenceEntity.wallet = domainEntity.wallet;
 

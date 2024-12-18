@@ -1,13 +1,6 @@
-import {
-  // decorators here
-  IsNumber,
-  IsString,
-} from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 
-import {
-  // decorators here
-  ApiProperty,
-} from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateTransferTransactionDto {
   @ApiProperty({
@@ -15,14 +8,14 @@ export class CreateTransferTransactionDto {
     type: () => String,
   })
   @IsString()
-  from_address: string;
+  fromAddress: string;
 
   @ApiProperty({
     required: true,
     type: () => String,
   })
   @IsString()
-  to_address: string;
+  toAddress: string;
 
   @ApiProperty({
     required: true,
@@ -50,7 +43,7 @@ export class CreateTransferTransactionDto {
     type: () => String,
   })
   @IsString()
-  transaction_hash: string;
+  transactionHash: string;
 
   @ApiProperty({
     required: true,
