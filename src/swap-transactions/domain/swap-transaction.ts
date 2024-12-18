@@ -17,19 +17,19 @@ export class SwapTransaction {
     type: () => Number,
     nullable: false,
   })
-  amount_out: number;
+  amountOut: number;
 
   @ApiProperty({
     type: () => Number,
     nullable: false,
   })
-  amount_in: number;
+  amountIn: number;
 
   @ApiProperty({
     type: () => String,
     nullable: false,
   })
-  to_token: string;
+  toToken: string;
 
   @ApiProperty({
     type: () => Number,
@@ -41,7 +41,7 @@ export class SwapTransaction {
     type: () => String,
     nullable: false,
   })
-  from_token: string;
+  fromToken: string;
 
   @ApiProperty({
     type: String,

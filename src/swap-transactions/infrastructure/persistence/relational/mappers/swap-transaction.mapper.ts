@@ -9,15 +9,15 @@ export class SwapTransactionMapper {
 
     domainEntity.dex = raw.dex;
 
-    domainEntity.amount_out = raw.amount_out;
+    domainEntity.amountOut = raw.amountOut;
 
-    domainEntity.amount_in = raw.amount_in;
+    domainEntity.amountIn = raw.amountIn;
 
-    domainEntity.to_token = raw.to_token;
+    domainEntity.toToken = raw.toToken;
 
     domainEntity.wallet = raw.wallet;
 
-    domainEntity.from_token = raw.from_token;
+    domainEntity.fromToken = raw.fromToken;
 
     domainEntity.id = raw.id;
     domainEntity.createdAt = raw.createdAt;
@@ -32,15 +32,15 @@ export class SwapTransactionMapper {
 
     persistenceEntity.dex = domainEntity.dex;
 
-    persistenceEntity.amount_out = domainEntity.amount_out;
+    persistenceEntity.amountOut = domainEntity.amountOut;
 
-    persistenceEntity.amount_in = domainEntity.amount_in;
+    persistenceEntity.amountIn = domainEntity.amountIn;
 
-    persistenceEntity.to_token = domainEntity.to_token;
+    persistenceEntity.toToken = domainEntity.toToken;
 
     persistenceEntity.wallet = domainEntity.wallet;
 
-    persistenceEntity.from_token = domainEntity.from_token;
+    persistenceEntity.fromToken = domainEntity.fromToken;
 
     if (domainEntity.id) {
       persistenceEntity.id = domainEntity.id;

@@ -23,15 +23,15 @@ export class SwapTransactionsService {
 
       dex: createSwapTransactionDto.dex,
 
-      amount_out: createSwapTransactionDto.amount_out,
+      amountOut: createSwapTransactionDto.amountOut,
 
-      amount_in: createSwapTransactionDto.amount_in,
+      amountIn: createSwapTransactionDto.amountIn,
 
-      to_token: createSwapTransactionDto.to_token,
+      toToken: createSwapTransactionDto.toToken,
 
       wallet: createSwapTransactionDto.wallet,
 
-      from_token: createSwapTransactionDto.from_token,
+      fromToken: createSwapTransactionDto.fromToken,
     });
   }
 
@@ -71,15 +71,15 @@ export class SwapTransactionsService {
 
       dex: updateSwapTransactionDto.dex,
 
-      amount_out: updateSwapTransactionDto.amount_out,
+      amountOut: updateSwapTransactionDto.amountOut,
 
-      amount_in: updateSwapTransactionDto.amount_in,
+      amountIn: updateSwapTransactionDto.amountIn,
 
-      to_token: updateSwapTransactionDto.to_token,
+      toToken: updateSwapTransactionDto.toToken,
 
       wallet: updateSwapTransactionDto.wallet,
 
-      from_token: updateSwapTransactionDto.from_token,
+      fromToken: updateSwapTransactionDto.fromToken,
     });
   }
 
