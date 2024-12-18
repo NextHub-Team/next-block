@@ -55,13 +55,13 @@ async function bootstrap() {
 
   // Serve Swagger JSON for RapiDoc
   const swaggerJsonPath = '/docs/swagger-json';
-  app.getHttpAdapter().get(swaggerJsonPath, (req, res: Response) => {
+  app.getHttpAdapter().get(swaggerJsonPath, (_req, res: Response) => {
     res.json(document); // Serve Swagger JSON
   });
 
   // RapiDoc HTML served from '/docs/rapidoc'
   const filePath = join(__dirname, 'public', 'html', 'rapidoc.html');
-  app.getHttpAdapter().get('/docs/rapidoc', (req, res: Response) => {
+  app.getHttpAdapter().get('/docs/rapidoc', (_req, res: Response) => {
     if (!existsSync(filePath)) {
       logger.error(`File not found at: ${filePath}`);
       res.status(404).send('File not found');
