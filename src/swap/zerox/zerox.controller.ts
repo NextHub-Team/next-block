@@ -1,6 +1,6 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ZeroxService } from './zerox.service';
-// import { FireblocksService } from '../../fireblocks/fireblocks.service';
+import { FireblocksService } from '../../fireblocks/fireblocks.service';
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Swap')
@@ -11,7 +11,7 @@ import { ApiTags } from '@nestjs/swagger';
 export class SwapController {
   constructor(
     private readonly zeroxService: ZeroxService,
-    // private readonly fireblocksService: FireblocksService,
+    private readonly fireblocksService: FireblocksService,
   ) {}
 
   @Get('quote')
@@ -38,9 +38,14 @@ export class SwapController {
     return this.zeroxService.getPrice(sellToken, buyToken, sellAmount);
   }
 
-  //     @Post('send-transaction')
-  //     async sendTransaction(@Body() body: any) {
-  //         const { assetId, amount, srcId, destId } = body;
-  //         return this.fireblocksService.createTransaction(assetId, amount, srcId, destId);
-  //     }
+  @Post('send-transaction')
+  async sendTransaction(@Body() body: any) {
+    const { assetId, amount, srcId, destId } = body;
+    return this.fireblocksService.createTransaction(
+      assetId,
+      amount,
+      srcId,
+      destId,
+    );
+  }
 }
