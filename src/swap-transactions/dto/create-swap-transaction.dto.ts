@@ -16,7 +16,7 @@ export class CreateSwapTransactionDto {
     type: () => Number,
   })
   @IsNumber()
-  transaction_fee: number;
+  fee: number;
 
   @ApiProperty({
     required: true,
@@ -30,21 +30,21 @@ export class CreateSwapTransactionDto {
     type: () => Number,
   })
   @IsNumber()
-  amount_out: number;
+  amountOut: number;
 
   @ApiProperty({
     required: true,
     type: () => Number,
   })
   @IsNumber()
-  amount_in: number;
+  amountIn: number;
 
   @ApiProperty({
     required: true,
     type: () => String,
   })
   @IsString()
-  to_token: string;
+  toToken: string;
 
   @ApiProperty({
     required: true,
@@ -58,7 +58,7 @@ export class CreateSwapTransactionDto {
     type: () => String,
   })
   @IsString()
-  from_token: string;
+  fromToken: string;
 
   // Don't forget to use the class-validator decorators in the DTO properties.
 }

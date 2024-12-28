@@ -1,11 +1,9 @@
 import { APP_URL, ADMIN_EMAIL, ADMIN_PASSWORD } from '../utils/constants';
 import request from 'supertest';
-import { RoleEnum } from '../../src/roles/roles.enum';
-import { StatusEnum } from '../../src/statuses/statuses.enum';
 
 describe('Users Module', () => {
   const app = APP_URL;
-  let apiToken;
+  let apiToken: string;
 
   beforeAll(async () => {
     await request(app)
@@ -98,12 +96,12 @@ describe('Users Module', () => {
             password: newUserByAdminPassword,
             firstName: `UserByAdmin${Date.now()}`,
             lastName: 'E2E',
-            role: {
-              id: RoleEnum.user,
-            },
-            status: {
-              id: StatusEnum.active,
-            },
+            // role: {
+            //   id: RoleEnum.user,
+            // },
+            // status: {
+            //   id: StatusEnum.active,
+            // },
           })
           .expect(201);
       });

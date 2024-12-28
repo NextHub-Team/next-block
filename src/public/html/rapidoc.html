@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API Documentation</title>
+    <!-- Use RapiDoc from CDN -->
+    <script
+      type="module"
+      src="https://unpkg.com/rapidoc/dist/rapidoc-min.js"
+    ></script>
+    <style>
+      rapi-doc {
+        /* Typography */
+        --font-size: 16px; /* Base font size */
+        --font-family: "Open Sans", sans-serif; /* Default font family */
+        --heading-font-family: "Roboto", sans-serif; /* Font for headings */
+        --code-font-family: "Fira Code", monospace; /* Font for code blocks */
+      }
+    </style>
+  </head>
+  <body>
+    <!-- RapiDoc Configuration -->
+    <rapi-doc
+      id="thedoc"
+      regular-font="Open Sans"
+      mono-font="Fira Code"
+      spec-url="/docs/swagger-json"
+      theme="dark"
+      show-header="false"
+      render-style="read"
+      schema-style="table"
+      show-info="true"
+      allow-authentication="true"
+      allow-server-selection="true"
+      allow-api-list-style-selection="true"
+      allow-try="true">
+    </rapi-doc>
+  </body>
+</html>

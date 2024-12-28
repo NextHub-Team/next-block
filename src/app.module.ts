@@ -22,6 +22,7 @@ import { DataSource, DataSourceOptions } from 'typeorm';
 import { AllConfigType } from './config/config.type';
 import { SessionModule } from './session/session.module';
 import { MailerModule } from './mailer/mailer.module';
+import ZeroxConfig from './swap/zerox/config/zerox.config';
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
@@ -58,8 +59,32 @@ import { NftsModule } from './nfts/nfts.module';
 
 import { TransactionLogsModule } from './transaction-logs/transaction-logs.module';
 
+import { AccessControlsModule } from './access-controls/access-controls.module';
+
+import { TypesModule } from './types/types.module';
+
+import { StatusesModule } from './statuses/statuses.module';
+
+import { RolesModule } from './roles/roles.module';
+
+import { WhiteListAddressesModule } from './white-list-addresses/white-list-addresses.module';
+
+import { NotificationsModule } from './notifications/notifications.module';
+
+import { FireblocksModule } from './fireblocks/fireblocks.module';
+
+import { SwapModule } from './swap/zerox/zerox.module';
+
+
 @Module({
   imports: [
+    NotificationsModule,
+    WhiteListAddressesModule,
+    RolesModule,
+    StatusesModule,
+    TypesModule,
+    PermissionsModule,
+    AccessControlsModule,
     TransactionLogsModule,
     NftsModule,
     EventLogsModule,
@@ -74,6 +99,8 @@ import { TransactionLogsModule } from './transaction-logs/transaction-logs.modul
     MainWalletsModule,
     PermissionsModule,
     DevicesModule,
+    FireblocksModule,
+    SwapModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [
@@ -84,6 +111,7 @@ import { TransactionLogsModule } from './transaction-logs/transaction-logs.modul
         fileConfig,
         googleConfig,
         appleConfig,
+        ZeroxConfig,
       ],
       envFilePath: ['.env'],
     }),

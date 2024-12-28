@@ -1,9 +1,6 @@
+import { AccessControlsService } from '../access-controls/access-controls.service';
 import { UserLogsService } from '../user-logs/user-logs.service';
-
 import { MainWalletsService } from '../main-wallets/main-wallets.service';
-
-import { PermissionsService } from '../permissions/permissions.service';
-
 import { DevicesService } from '../devices/devices.service';
 
 import {
@@ -21,25 +18,21 @@ import { User } from './domain/user';
 import bcrypt from 'bcryptjs';
 import { AuthProvidersEnum } from '../auth/auth-providers.enum';
 import { FilesService } from '../files/files.service';
-import { RoleEnum } from '../roles/roles.enum';
-import { StatusEnum } from '../statuses/statuses.enum';
 import { IPaginationOptions } from '../utils/types/pagination-options';
 import { FileType } from '../files/domain/file';
-import { Role } from '../roles/domain/role';
-import { Status } from '../statuses/domain/status';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
   constructor(
+    @Inject(forwardRef(() => AccessControlsService))
+    private readonly accessControlService: AccessControlsService,
+
     @Inject(forwardRef(() => UserLogsService))
     private readonly userLogService: UserLogsService,
 
     @Inject(forwardRef(() => MainWalletsService))
     private readonly mainWalletService: MainWalletsService,
-
-    @Inject(forwardRef(() => PermissionsService))
-    private readonly permissionService: PermissionsService,
 
     @Inject(forwardRef(() => DevicesService))
     private readonly deviceService: DevicesService,
@@ -51,6 +44,24 @@ export class UsersService {
   async create(createUserDto: CreateUserDto): Promise<User> {
     // Do not remove comment below.
     // <creating-property />
+    // let abilities: AccessControl | null | undefined = undefined;
+
+    // if (createUserDto.abilities) {
+    //   const abilitiesObject = await this.accessControlService.findById(
+    //     createUserDto.abilities.id,
+    //   );
+    //   if (!abilitiesObject) {
+    //     throw new UnprocessableEntityException({
+    //       status: HttpStatus.UNPROCESSABLE_ENTITY,
+    //       errors: {
+    //         abilities: 'notExists',
+    //       },
+    //     });
+    //   }
+    //   abilities = abilitiesObject;
+    // } else if (createUserDto.abilities === null) {
+    //   abilities = null;
+    // }
 
     let password: string | undefined = undefined;
 
@@ -95,56 +106,17 @@ export class UsersService {
       photo = null;
     }
 
-    let role: Role | undefined = undefined;
-
-    if (createUserDto.role?.id) {
-      const roleObject = Object.values(RoleEnum)
-        .map(String)
-        .includes(String(createUserDto.role.id));
-      if (!roleObject) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            role: 'roleNotExists',
-          },
-        });
-      }
-      role = {
-        id: createUserDto.role.id,
-      };
-    }
-
-    let status: Status | undefined = undefined;
-
-    if (createUserDto.status?.id) {
-      const statusObject = Object.values(StatusEnum)
-        .map(String)
-        .includes(String(createUserDto.status.id));
-      if (!statusObject) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            status: 'statusNotExists',
-          },
-        });
-      }
-
-      status = {
-        id: createUserDto.status.id,
-      };
-    }
-
     return this.usersRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
+      // abilities,
+
       phone: createUserDto.phone,
       firstName: createUserDto.firstName,
       lastName: createUserDto.lastName,
       email: email,
       password: password,
       photo: photo,
-      role: role,
-      status: status,
       provider: createUserDto.provider ?? AuthProvidersEnum.email,
       socialId: createUserDto.socialId,
     });
@@ -197,6 +169,24 @@ export class UsersService {
   ): Promise<User | null> {
     // Do not remove comment below.
     // <updating-property />
+    // let abilities: AccessControl | null | undefined = undefined;
+
+    // if (updateUserDto.abilities) {
+    //   const abilitiesObject = await this.accessControlService.findById(
+    //     updateUserDto.abilities.id,
+    //   );
+    //   if (!abilitiesObject) {
+    //     throw new UnprocessableEntityException({
+    //       status: HttpStatus.UNPROCESSABLE_ENTITY,
+    //       errors: {
+    //         abilities: 'notExists',
+    //       },
+    //     });
+    //   }
+    //   abilities = abilitiesObject;
+    // } else if (updateUserDto.abilities === null) {
+    //   abilities = null;
+    // }
 
     let password: string | undefined = undefined;
 
@@ -247,55 +237,17 @@ export class UsersService {
       photo = null;
     }
 
-    let role: Role | undefined = undefined;
-
-    if (updateUserDto.role?.id) {
-      const roleObject = Object.values(RoleEnum)
-        .map(String)
-        .includes(String(updateUserDto.role.id));
-      if (!roleObject) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            role: 'roleNotExists',
-          },
-        });
-      }
-      role = {
-        id: updateUserDto.role.id,
-      };
-    }
-
-    let status: Status | undefined = undefined;
-    if (updateUserDto.status?.id) {
-      const statusObject = Object.values(StatusEnum)
-        .map(String)
-        .includes(String(updateUserDto.status.id));
-      if (!statusObject) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            status: 'statusNotExists',
-          },
-        });
-      }
-
-      status = {
-        id: updateUserDto.status.id,
-      };
-    }
-
     return this.usersRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
+      // abilities,
+
       phone: updateUserDto.phone,
       firstName: updateUserDto.firstName,
       lastName: updateUserDto.lastName,
       email,
       password,
       photo,
-      role,
-      status,
       provider: updateUserDto.provider,
       socialId: updateUserDto.socialId,
     });

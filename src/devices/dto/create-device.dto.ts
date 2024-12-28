@@ -1,3 +1,5 @@
+import { NotificationDto } from '../../notifications/dto/notification.dto';
+
 import { UserDto } from '../../users/dto/user.dto';
 
 import {
@@ -12,6 +14,7 @@ import {
   IsNotEmptyObject,
   IsString,
   IsOptional,
+  IsArray,
 } from 'class-validator';
 
 import {
@@ -20,6 +23,16 @@ import {
 } from '@nestjs/swagger';
 
 export class CreateDeviceDto {
+  @ApiProperty({
+    required: false,
+    type: () => [NotificationDto],
+  })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => NotificationDto)
+  @IsArray()
+  notifications?: NotificationDto[] | null;
+
   @ApiProperty({
     required: false,
     type: () => String,

@@ -1,9 +1,9 @@
 import {
+  Column,
   CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  Column,
 } from 'typeorm';
 import { EntityRelationalHelper } from '../../../../../utils/relational-entity-helper';
 
@@ -15,19 +15,19 @@ export class TransferTransactionEntity extends EntityRelationalHelper {
     nullable: false,
     type: String,
   })
-  from_address: string;
+  fromAddress: string;
 
   @Column({
     nullable: false,
     type: String,
   })
-  to_address: string;
+  toAddress: string;
 
   @Column({
     nullable: false,
     type: Number,
   })
-  transaction_fee: number;
+  fee: number;
 
   @Column({
     nullable: false,
@@ -45,7 +45,7 @@ export class TransferTransactionEntity extends EntityRelationalHelper {
     nullable: false,
     type: String,
   })
-  transaction_hash: string;
+  transactionHash: string;
 
   @Column({
     nullable: false,

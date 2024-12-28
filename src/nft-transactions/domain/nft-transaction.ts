@@ -6,7 +6,7 @@ export class NftTransaction {
     type: () => Number,
     nullable: true,
   })
-  gasFee?: number | null;
+  fee?: number | null;
 
   @ApiProperty({
     type: () => String,

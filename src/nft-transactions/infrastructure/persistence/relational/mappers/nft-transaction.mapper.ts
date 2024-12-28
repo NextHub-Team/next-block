@@ -6,7 +6,7 @@ import { NftTransactionEntity } from '../entities/nft-transaction.entity';
 export class NftTransactionMapper {
   static toDomain(raw: NftTransactionEntity): NftTransaction {
     const domainEntity = new NftTransaction();
-    domainEntity.gasFee = raw.gasFee;
+    domainEntity.fee = raw.fee;
 
     domainEntity.transactionHash = raw.transactionHash;
 
@@ -31,7 +31,7 @@ export class NftTransactionMapper {
 
   static toPersistence(domainEntity: NftTransaction): NftTransactionEntity {
     const persistenceEntity = new NftTransactionEntity();
-    persistenceEntity.gasFee = domainEntity.gasFee;
+    persistenceEntity.fee = domainEntity.fee;
 
     persistenceEntity.transactionHash = domainEntity.transactionHash;
 

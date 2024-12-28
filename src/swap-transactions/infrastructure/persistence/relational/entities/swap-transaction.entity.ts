@@ -15,7 +15,7 @@ export class SwapTransactionEntity extends EntityRelationalHelper {
     nullable: false,
     type: Number,
   })
-  transaction_fee: number;
+  fee: number;
 
   @Column({
     nullable: false,
@@ -27,19 +27,19 @@ export class SwapTransactionEntity extends EntityRelationalHelper {
     nullable: false,
     type: Number,
   })
-  amount_out: number;
+  amountOut: number;
 
   @Column({
     nullable: false,
     type: Number,
   })
-  amount_in: number;
+  amountIn: number;
 
   @Column({
     nullable: false,
     type: String,
   })
-  to_token: string;
+  toToken: string;
 
   @Column({
     nullable: false,
@@ -51,7 +51,7 @@ export class SwapTransactionEntity extends EntityRelationalHelper {
     nullable: false,
     type: String,
   })
-  from_token: string;
+  fromToken: string;
 
   @PrimaryGeneratedColumn('uuid')
   id: string;

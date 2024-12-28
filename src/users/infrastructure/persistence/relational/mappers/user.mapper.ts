@@ -1,21 +1,20 @@
 import { FileEntity } from '../../../../../files/infrastructure/persistence/relational/entities/file.entity';
-
+import { AccessControlMapper } from '../../../../../access-controls/infrastructure/persistence/relational/mappers/access-control.mapper';
 import { UserLogMapper } from '../../../../../user-logs/infrastructure/persistence/relational/mappers/user-log.mapper';
-
 import { MainWalletMapper } from '../../../../../main-wallets/infrastructure/persistence/relational/mappers/main-wallet.mapper';
-import { PermissionMapper } from '../../../../../permissions/infrastructure/persistence/relational/mappers/permission.mapper';
-
 import { DeviceMapper } from '../../../../../devices/infrastructure/persistence/relational/mappers/device.mapper';
-
 import { FileMapper } from '../../../../../files/infrastructure/persistence/relational/mappers/file.mapper';
-import { RoleEntity } from '../../../../../roles/infrastructure/persistence/relational/entities/role.entity';
-import { StatusEntity } from '../../../../../statuses/infrastructure/persistence/relational/entities/status.entity';
 import { User } from '../../../../domain/user';
 import { UserEntity } from '../entities/user.entity';
 
 export class UserMapper {
   static toDomain(raw: UserEntity): User {
     const domainEntity = new User();
+    if (raw.abilities) {
+      domainEntity.abilities = AccessControlMapper.toDomain(raw.abilities);
+    } else if (raw.abilities === null) {
+      domainEntity.abilities = null;
+    }
 
     if (raw.logs) {
       domainEntity.logs = raw.logs.map((item) => UserLogMapper.toDomain(item));
@@ -29,14 +28,6 @@ export class UserMapper {
       );
     } else if (raw.mainWallets === null) {
       domainEntity.mainWallets = null;
-    }
-
-    if (raw.permissions) {
-      domainEntity.permissions = raw.permissions.map((item) =>
-        PermissionMapper.toDomain(item),
-      );
-    } else if (raw.permissions === null) {
-      domainEntity.permissions = null;
     }
 
     domainEntity.phone = raw.phone;
@@ -59,8 +50,7 @@ export class UserMapper {
     if (raw.photo) {
       domainEntity.photo = FileMapper.toDomain(raw.photo);
     }
-    domainEntity.role = raw.role;
-    domainEntity.status = raw.status;
+
     domainEntity.createdAt = raw.createdAt;
     domainEntity.updatedAt = raw.updatedAt;
     domainEntity.deletedAt = raw.deletedAt;
@@ -68,13 +58,6 @@ export class UserMapper {
   }
 
   static toPersistence(domainEntity: User): UserEntity {
-    let role: RoleEntity | undefined = undefined;
-
-    if (domainEntity.role) {
-      role = new RoleEntity();
-      role.id = Number(domainEntity.role.id);
-    }
-
     let photo: FileEntity | undefined | null = undefined;
 
     if (domainEntity.photo) {
@@ -85,14 +68,15 @@ export class UserMapper {
       photo = null;
     }
 
-    let status: StatusEntity | undefined = undefined;
-
-    if (domainEntity.status) {
-      status = new StatusEntity();
-      status.id = Number(domainEntity.status.id);
+    const persistenceEntity = new UserEntity();
+    if (domainEntity.abilities) {
+      persistenceEntity.abilities = AccessControlMapper.toPersistence(
+        domainEntity.abilities,
+      );
+    } else if (domainEntity.abilities === null) {
+      persistenceEntity.abilities = null;
     }
 
-    const persistenceEntity = new UserEntity();
     if (domainEntity.logs) {
       persistenceEntity.logs = domainEntity.logs.map((item) =>
         UserLogMapper.toPersistence(item),
@@ -109,16 +93,7 @@ export class UserMapper {
       persistenceEntity.mainWallets = null;
     }
 
-    if (domainEntity.permissions) {
-      persistenceEntity.permissions = domainEntity.permissions.map((item) =>
-        PermissionMapper.toPersistence(item),
-      );
-    } else if (domainEntity.permissions === null) {
-      persistenceEntity.permissions = null;
-    }
-
     persistenceEntity.phone = domainEntity.phone;
-
     if (domainEntity.devices) {
       persistenceEntity.devices = domainEntity.devices.map((item) =>
         DeviceMapper.toPersistence(item),
@@ -130,6 +105,7 @@ export class UserMapper {
     if (domainEntity.id && typeof domainEntity.id === 'number') {
       persistenceEntity.id = domainEntity.id;
     }
+
     persistenceEntity.email = domainEntity.email;
     persistenceEntity.password = domainEntity.password;
     persistenceEntity.provider = domainEntity.provider;
@@ -137,8 +113,6 @@ export class UserMapper {
     persistenceEntity.firstName = domainEntity.firstName;
     persistenceEntity.lastName = domainEntity.lastName;
     persistenceEntity.photo = photo;
-    persistenceEntity.role = role;
-    persistenceEntity.status = status;
     persistenceEntity.createdAt = domainEntity.createdAt;
     persistenceEntity.updatedAt = domainEntity.updatedAt;
     persistenceEntity.deletedAt = domainEntity.deletedAt;

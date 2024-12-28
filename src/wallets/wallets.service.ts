@@ -53,6 +53,7 @@ export class WalletsService {
     return this.walletRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
+      details: createWalletDto.details,
 
       legacyAddress: createWalletDto.legacyAddress,
 
@@ -110,6 +111,7 @@ export class WalletsService {
     return this.walletRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
+      details: updateWalletDto.details,
 
       legacyAddress: updateWalletDto.legacyAddress,
 
