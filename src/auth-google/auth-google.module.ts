@@ -5,9 +5,9 @@ import { AuthGoogleController } from './auth-google.controller';
 import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports: [ConfigModule, AuthModule],
-  providers: [AuthGoogleService],
-  exports: [AuthGoogleService],
-  controllers: [AuthGoogleController],
+	imports: [ConfigModule, AuthModule],
+	providers: [AuthGoogleService],
+	exports: [AuthGoogleService],
+	controllers: [AuthGoogleController],
 })
 export class AuthGoogleModule {}

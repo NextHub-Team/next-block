@@ -3,59 +3,59 @@ import { SupportedAsset } from '../../../../domain/supported-asset';
 import { SupportedAssetEntity } from '../entities/supported-asset.entity';
 
 export class SupportedAssetMapper {
-  static toDomain(raw: SupportedAssetEntity): SupportedAsset {
-    const domainEntity = new SupportedAsset();
-    domainEntity.protocol = raw.protocol;
+	static toDomain(raw: SupportedAssetEntity): SupportedAsset {
+		const domainEntity = new SupportedAsset();
+		domainEntity.protocol = raw.protocol;
 
-    domainEntity.nativeAsset = raw.nativeAsset;
+		domainEntity.nativeAsset = raw.nativeAsset;
 
-    domainEntity.issuerAddress = raw.issuerAddress;
+		domainEntity.issuerAddress = raw.issuerAddress;
 
-    domainEntity.type = raw.type;
+		domainEntity.type = raw.type;
 
-    domainEntity.decimals = raw.decimals;
+		domainEntity.decimals = raw.decimals;
 
-    domainEntity.contractAddress = raw.contractAddress;
+		domainEntity.contractAddress = raw.contractAddress;
 
-    domainEntity.blockchain = raw.blockchain;
+		domainEntity.blockchain = raw.blockchain;
 
-    domainEntity.symbol = raw.symbol;
+		domainEntity.symbol = raw.symbol;
 
-    domainEntity.name = raw.name;
+		domainEntity.name = raw.name;
 
-    domainEntity.id = raw.id;
-    domainEntity.createdAt = raw.createdAt;
-    domainEntity.updatedAt = raw.updatedAt;
+		domainEntity.id = raw.id;
+		domainEntity.createdAt = raw.createdAt;
+		domainEntity.updatedAt = raw.updatedAt;
 
-    return domainEntity;
-  }
+		return domainEntity;
+	}
 
-  static toPersistence(domainEntity: SupportedAsset): SupportedAssetEntity {
-    const persistenceEntity = new SupportedAssetEntity();
-    persistenceEntity.protocol = domainEntity.protocol;
+	static toPersistence(domainEntity: SupportedAsset): SupportedAssetEntity {
+		const persistenceEntity = new SupportedAssetEntity();
+		persistenceEntity.protocol = domainEntity.protocol;
 
-    persistenceEntity.nativeAsset = domainEntity.nativeAsset;
+		persistenceEntity.nativeAsset = domainEntity.nativeAsset;
 
-    persistenceEntity.issuerAddress = domainEntity.issuerAddress;
+		persistenceEntity.issuerAddress = domainEntity.issuerAddress;
 
-    persistenceEntity.type = domainEntity.type;
+		persistenceEntity.type = domainEntity.type;
 
-    persistenceEntity.decimals = domainEntity.decimals;
+		persistenceEntity.decimals = domainEntity.decimals;
 
-    persistenceEntity.contractAddress = domainEntity.contractAddress;
+		persistenceEntity.contractAddress = domainEntity.contractAddress;
 
-    persistenceEntity.blockchain = domainEntity.blockchain;
+		persistenceEntity.blockchain = domainEntity.blockchain;
 
-    persistenceEntity.symbol = domainEntity.symbol;
+		persistenceEntity.symbol = domainEntity.symbol;
 
-    persistenceEntity.name = domainEntity.name;
+		persistenceEntity.name = domainEntity.name;
 
-    if (domainEntity.id) {
-      persistenceEntity.id = domainEntity.id;
-    }
-    persistenceEntity.createdAt = domainEntity.createdAt;
-    persistenceEntity.updatedAt = domainEntity.updatedAt;
+		if (domainEntity.id) {
+			persistenceEntity.id = domainEntity.id;
+		}
+		persistenceEntity.createdAt = domainEntity.createdAt;
+		persistenceEntity.updatedAt = domainEntity.updatedAt;
 
-    return persistenceEntity;
-  }
+		return persistenceEntity;
+	}
 }

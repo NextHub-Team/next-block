@@ -7,11 +7,11 @@ import { GoogleConfig } from '../auth-google/config/google-config.type';
 import { MailConfig } from '../mail/config/mail-config.type';
 
 export type AllConfigType = {
-  app: AppConfig;
-  apple: AppleConfig;
-  auth: AuthConfig;
-  database: DatabaseConfig;
-  file: FileConfig;
-  google: GoogleConfig;
-  mail: MailConfig;
+	app: AppConfig;
+	apple: AppleConfig;
+	auth: AuthConfig;
+	database: DatabaseConfig;
+	file: FileConfig;
+	google: GoogleConfig;
+	mail: MailConfig;
 };

@@ -5,5 +5,5 @@ import { PartialType } from '@nestjs/swagger';
 import { CreateWhiteListAddressDto } from './create-white-list-address.dto';
 
 export class UpdateWhiteListAddressDto extends PartialType(
-  CreateWhiteListAddressDto,
+	CreateWhiteListAddressDto,
 ) {}

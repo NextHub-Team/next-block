@@ -5,13 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DeviceEntity } from './entities/device.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([DeviceEntity])],
-  providers: [
-    {
-      provide: DeviceRepository,
-      useClass: DeviceRelationalRepository,
-    },
-  ],
-  exports: [DeviceRepository],
+	imports: [TypeOrmModule.forFeature([DeviceEntity])],
+	providers: [
+		{
+			provide: DeviceRepository,
+			useClass: DeviceRelationalRepository,
+		},
+	],
+	exports: [DeviceRepository],
 })
 export class RelationalDevicePersistenceModule {}

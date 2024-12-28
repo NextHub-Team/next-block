@@ -10,73 +10,73 @@ import { IPaginationOptions } from '../../../../../utils/types/pagination-option
 
 @Injectable()
 export class MainWalletRelationalRepository implements MainWalletRepository {
-  constructor(
-    @InjectRepository(MainWalletEntity)
-    private readonly mainWalletRepository: Repository<MainWalletEntity>,
-  ) {}
+	constructor(
+		@InjectRepository(MainWalletEntity)
+		private readonly mainWalletRepository: Repository<MainWalletEntity>,
+	) {}
 
-  async create(data: MainWallet): Promise<MainWallet> {
-    const persistenceModel = MainWalletMapper.toPersistence(data);
-    const newEntity = await this.mainWalletRepository.save(
-      this.mainWalletRepository.create(persistenceModel),
-    );
-    return MainWalletMapper.toDomain(newEntity);
-  }
+	async create(data: MainWallet): Promise<MainWallet> {
+		const persistenceModel = MainWalletMapper.toPersistence(data);
+		const newEntity = await this.mainWalletRepository.save(
+			this.mainWalletRepository.create(persistenceModel),
+		);
+		return MainWalletMapper.toDomain(newEntity);
+	}
 
-  async findAllWithPagination({
-    paginationOptions,
-  }: {
-    paginationOptions: IPaginationOptions;
-  }): Promise<MainWallet[]> {
-    const entities = await this.mainWalletRepository.find({
-      skip: (paginationOptions.page - 1) * paginationOptions.limit,
-      take: paginationOptions.limit,
-    });
+	async findAllWithPagination({
+		paginationOptions,
+	}: {
+		paginationOptions: IPaginationOptions;
+	}): Promise<MainWallet[]> {
+		const entities = await this.mainWalletRepository.find({
+			skip: (paginationOptions.page - 1) * paginationOptions.limit,
+			take: paginationOptions.limit,
+		});
 
-    return entities.map((entity) => MainWalletMapper.toDomain(entity));
-  }
+		return entities.map((entity) => MainWalletMapper.toDomain(entity));
+	}
 
-  async findById(id: MainWallet['id']): Promise<NullableType<MainWallet>> {
-    const entity = await this.mainWalletRepository.findOne({
-      where: { id },
-    });
+	async findById(id: MainWallet['id']): Promise<NullableType<MainWallet>> {
+		const entity = await this.mainWalletRepository.findOne({
+			where: { id },
+		});
 
-    return entity ? MainWalletMapper.toDomain(entity) : null;
-  }
+		return entity ? MainWalletMapper.toDomain(entity) : null;
+	}
 
-  async findByIds(ids: MainWallet['id'][]): Promise<MainWallet[]> {
-    const entities = await this.mainWalletRepository.find({
-      where: { id: In(ids) },
-    });
+	async findByIds(ids: MainWallet['id'][]): Promise<MainWallet[]> {
+		const entities = await this.mainWalletRepository.find({
+			where: { id: In(ids) },
+		});
 
-    return entities.map((entity) => MainWalletMapper.toDomain(entity));
-  }
+		return entities.map((entity) => MainWalletMapper.toDomain(entity));
+	}
 
-  async update(
-    id: MainWallet['id'],
-    payload: Partial<MainWallet>,
-  ): Promise<MainWallet> {
-    const entity = await this.mainWalletRepository.findOne({
-      where: { id },
-    });
+	async update(
+		id: MainWallet['id'],
+		payload: Partial<MainWallet>,
+	): Promise<MainWallet> {
+		const entity = await this.mainWalletRepository.findOne({
+			where: { id },
+		});
 
-    if (!entity) {
-      throw new Error('Record not found');
-    }
+		if (!entity) {
+			throw new Error('Record not found');
+		}
 
-    const updatedEntity = await this.mainWalletRepository.save(
-      this.mainWalletRepository.create(
-        MainWalletMapper.toPersistence({
-          ...MainWalletMapper.toDomain(entity),
-          ...payload,
-        }),
-      ),
-    );
+		const updatedEntity = await this.mainWalletRepository.save(
+			this.mainWalletRepository.create(
+				MainWalletMapper.toPersistence({
+					...MainWalletMapper.toDomain(entity),
+					...payload,
+				}),
+			),
+		);
 
-    return MainWalletMapper.toDomain(updatedEntity);
-  }
+		return MainWalletMapper.toDomain(updatedEntity);
+	}
 
-  async remove(id: MainWallet['id']): Promise<void> {
-    await this.mainWalletRepository.delete(id);
-  }
+	async remove(id: MainWallet['id']): Promise<void> {
+		await this.mainWalletRepository.delete(id);
+	}
 }

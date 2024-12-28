@@ -4,48 +4,48 @@ import { RoleEntity } from '../../../../../roles/infrastructure/persistence/rela
 import { UserEntity } from '../../../../../users/infrastructure/persistence/relational/entities/user.entity';
 
 import {
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-  JoinColumn,
-  OneToOne,
-  Column,
+	CreateDateColumn,
+	Entity,
+	PrimaryGeneratedColumn,
+	UpdateDateColumn,
+	JoinColumn,
+	OneToOne,
+	Column,
 } from 'typeorm';
 import { EntityRelationalHelper } from '../../../../../utils/relational-entity-helper';
 
 @Entity({
-  name: 'access_control',
+	name: 'access_control',
 })
 export class AccessControlEntity extends EntityRelationalHelper {
-  @Column({
-    nullable: true,
-    type: String,
-  })
-  description?: string | null;
+	@Column({
+		nullable: true,
+		type: String,
+	})
+	description?: string | null;
 
-  @OneToOne(() => PermissionEntity, { eager: true, nullable: true })
-  @JoinColumn()
-  permission?: PermissionEntity | null;
+	@OneToOne(() => PermissionEntity, { eager: true, nullable: true })
+	@JoinColumn()
+	permission?: PermissionEntity | null;
 
-  @OneToOne(() => StatusEntity, { eager: true, nullable: true })
-  @JoinColumn()
-  status?: StatusEntity | null;
+	@OneToOne(() => StatusEntity, { eager: true, nullable: true })
+	@JoinColumn()
+	status?: StatusEntity | null;
 
-  @OneToOne(() => RoleEntity, { eager: true, nullable: false })
-  @JoinColumn()
-  role: RoleEntity;
+	@OneToOne(() => RoleEntity, { eager: true, nullable: false })
+	@JoinColumn()
+	role: RoleEntity;
 
-  @OneToOne(() => UserEntity, { eager: true, nullable: false })
-  @JoinColumn()
-  user: UserEntity;
+	@OneToOne(() => UserEntity, { eager: true, nullable: false })
+	@JoinColumn()
+	user: UserEntity;
 
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+	@PrimaryGeneratedColumn('uuid')
+	id: string;
 
-  @CreateDateColumn()
-  createdAt: Date;
+	@CreateDateColumn()
+	createdAt: Date;
 
-  @UpdateDateColumn()
-  updatedAt: Date;
+	@UpdateDateColumn()
+	updatedAt: Date;
 }

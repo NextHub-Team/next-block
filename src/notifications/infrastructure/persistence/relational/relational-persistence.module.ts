@@ -5,13 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { NotificationEntity } from './entities/notification.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([NotificationEntity])],
-  providers: [
-    {
-      provide: NotificationRepository,
-      useClass: NotificationRelationalRepository,
-    },
-  ],
-  exports: [NotificationRepository],
+	imports: [TypeOrmModule.forFeature([NotificationEntity])],
+	providers: [
+		{
+			provide: NotificationRepository,
+			useClass: NotificationRelationalRepository,
+		},
+	],
+	exports: [NotificationRepository],
 })
 export class RelationalNotificationPersistenceModule {}

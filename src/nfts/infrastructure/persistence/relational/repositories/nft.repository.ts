@@ -10,70 +10,70 @@ import { IPaginationOptions } from '../../../../../utils/types/pagination-option
 
 @Injectable()
 export class NftRelationalRepository implements NftRepository {
-  constructor(
-    @InjectRepository(NftEntity)
-    private readonly nftRepository: Repository<NftEntity>,
-  ) {}
+	constructor(
+		@InjectRepository(NftEntity)
+		private readonly nftRepository: Repository<NftEntity>,
+	) {}
 
-  async create(data: Nft): Promise<Nft> {
-    const persistenceModel = NftMapper.toPersistence(data);
-    const newEntity = await this.nftRepository.save(
-      this.nftRepository.create(persistenceModel),
-    );
-    return NftMapper.toDomain(newEntity);
-  }
+	async create(data: Nft): Promise<Nft> {
+		const persistenceModel = NftMapper.toPersistence(data);
+		const newEntity = await this.nftRepository.save(
+			this.nftRepository.create(persistenceModel),
+		);
+		return NftMapper.toDomain(newEntity);
+	}
 
-  async findAllWithPagination({
-    paginationOptions,
-  }: {
-    paginationOptions: IPaginationOptions;
-  }): Promise<Nft[]> {
-    const entities = await this.nftRepository.find({
-      skip: (paginationOptions.page - 1) * paginationOptions.limit,
-      take: paginationOptions.limit,
-    });
+	async findAllWithPagination({
+		paginationOptions,
+	}: {
+		paginationOptions: IPaginationOptions;
+	}): Promise<Nft[]> {
+		const entities = await this.nftRepository.find({
+			skip: (paginationOptions.page - 1) * paginationOptions.limit,
+			take: paginationOptions.limit,
+		});
 
-    return entities.map((entity) => NftMapper.toDomain(entity));
-  }
+		return entities.map((entity) => NftMapper.toDomain(entity));
+	}
 
-  async findById(id: Nft['id']): Promise<NullableType<Nft>> {
-    const entity = await this.nftRepository.findOne({
-      where: { id },
-    });
+	async findById(id: Nft['id']): Promise<NullableType<Nft>> {
+		const entity = await this.nftRepository.findOne({
+			where: { id },
+		});
 
-    return entity ? NftMapper.toDomain(entity) : null;
-  }
+		return entity ? NftMapper.toDomain(entity) : null;
+	}
 
-  async findByIds(ids: Nft['id'][]): Promise<Nft[]> {
-    const entities = await this.nftRepository.find({
-      where: { id: In(ids) },
-    });
+	async findByIds(ids: Nft['id'][]): Promise<Nft[]> {
+		const entities = await this.nftRepository.find({
+			where: { id: In(ids) },
+		});
 
-    return entities.map((entity) => NftMapper.toDomain(entity));
-  }
+		return entities.map((entity) => NftMapper.toDomain(entity));
+	}
 
-  async update(id: Nft['id'], payload: Partial<Nft>): Promise<Nft> {
-    const entity = await this.nftRepository.findOne({
-      where: { id },
-    });
+	async update(id: Nft['id'], payload: Partial<Nft>): Promise<Nft> {
+		const entity = await this.nftRepository.findOne({
+			where: { id },
+		});
 
-    if (!entity) {
-      throw new Error('Record not found');
-    }
+		if (!entity) {
+			throw new Error('Record not found');
+		}
 
-    const updatedEntity = await this.nftRepository.save(
-      this.nftRepository.create(
-        NftMapper.toPersistence({
-          ...NftMapper.toDomain(entity),
-          ...payload,
-        }),
-      ),
-    );
+		const updatedEntity = await this.nftRepository.save(
+			this.nftRepository.create(
+				NftMapper.toPersistence({
+					...NftMapper.toDomain(entity),
+					...payload,
+				}),
+			),
+		);
 
-    return NftMapper.toDomain(updatedEntity);
-  }
+		return NftMapper.toDomain(updatedEntity);
+	}
 
-  async remove(id: Nft['id']): Promise<void> {
-    await this.nftRepository.delete(id);
-  }
+	async remove(id: Nft['id']): Promise<void> {
+		await this.nftRepository.delete(id);
+	}
 }

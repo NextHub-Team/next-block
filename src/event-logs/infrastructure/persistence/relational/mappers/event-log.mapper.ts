@@ -5,57 +5,57 @@ import { UserLogMapper } from '../../../../../user-logs/infrastructure/persisten
 import { EventLogEntity } from '../entities/event-log.entity';
 
 export class EventLogMapper {
-  static toDomain(raw: EventLogEntity): EventLog {
-    const domainEntity = new EventLog();
-    domainEntity.status = raw.status;
+	static toDomain(raw: EventLogEntity): EventLog {
+		const domainEntity = new EventLog();
+		domainEntity.status = raw.status;
 
-    domainEntity.processed = raw.processed;
+		domainEntity.processed = raw.processed;
 
-    domainEntity.newValue = raw.newValue;
+		domainEntity.newValue = raw.newValue;
 
-    domainEntity.oldValue = raw.oldValue;
+		domainEntity.oldValue = raw.oldValue;
 
-    domainEntity.property = raw.property;
+		domainEntity.property = raw.property;
 
-    domainEntity.entity = raw.entity;
+		domainEntity.entity = raw.entity;
 
-    if (raw.userLog) {
-      domainEntity.userLog = UserLogMapper.toDomain(raw.userLog);
-    }
+		if (raw.userLog) {
+			domainEntity.userLog = UserLogMapper.toDomain(raw.userLog);
+		}
 
-    domainEntity.id = raw.id;
-    domainEntity.createdAt = raw.createdAt;
-    domainEntity.updatedAt = raw.updatedAt;
+		domainEntity.id = raw.id;
+		domainEntity.createdAt = raw.createdAt;
+		domainEntity.updatedAt = raw.updatedAt;
 
-    return domainEntity;
-  }
+		return domainEntity;
+	}
 
-  static toPersistence(domainEntity: EventLog): EventLogEntity {
-    const persistenceEntity = new EventLogEntity();
-    persistenceEntity.status = domainEntity.status;
+	static toPersistence(domainEntity: EventLog): EventLogEntity {
+		const persistenceEntity = new EventLogEntity();
+		persistenceEntity.status = domainEntity.status;
 
-    persistenceEntity.processed = domainEntity.processed;
+		persistenceEntity.processed = domainEntity.processed;
 
-    persistenceEntity.newValue = domainEntity.newValue;
+		persistenceEntity.newValue = domainEntity.newValue;
 
-    persistenceEntity.oldValue = domainEntity.oldValue;
+		persistenceEntity.oldValue = domainEntity.oldValue;
 
-    persistenceEntity.property = domainEntity.property;
+		persistenceEntity.property = domainEntity.property;
 
-    persistenceEntity.entity = domainEntity.entity;
+		persistenceEntity.entity = domainEntity.entity;
 
-    if (domainEntity.userLog) {
-      persistenceEntity.userLog = UserLogMapper.toPersistence(
-        domainEntity.userLog,
-      );
-    }
+		if (domainEntity.userLog) {
+			persistenceEntity.userLog = UserLogMapper.toPersistence(
+				domainEntity.userLog,
+			);
+		}
 
-    if (domainEntity.id) {
-      persistenceEntity.id = domainEntity.id;
-    }
-    persistenceEntity.createdAt = domainEntity.createdAt;
-    persistenceEntity.updatedAt = domainEntity.updatedAt;
+		if (domainEntity.id) {
+			persistenceEntity.id = domainEntity.id;
+		}
+		persistenceEntity.createdAt = domainEntity.createdAt;
+		persistenceEntity.updatedAt = domainEntity.updatedAt;
 
-    return persistenceEntity;
-  }
+		return persistenceEntity;
+	}
 }

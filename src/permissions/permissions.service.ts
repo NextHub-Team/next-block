@@ -7,59 +7,59 @@ import { Permission } from './domain/permission';
 
 @Injectable()
 export class PermissionsService {
-  constructor(
-    // Dependencies here
-    private readonly permissionRepository: PermissionRepository,
-  ) {}
+	constructor(
+		// Dependencies here
+		private readonly permissionRepository: PermissionRepository,
+	) {}
 
-  async create(createPermissionDto: CreatePermissionDto) {
-    // Do not remove comment below.
-    // <creating-property />
+	async create(createPermissionDto: CreatePermissionDto) {
+		// Do not remove comment below.
+		// <creating-property />
 
-    return this.permissionRepository.create({
-      // Do not remove comment below.
-      // <creating-property-payload />
-      names: createPermissionDto.names,
+		return this.permissionRepository.create({
+			// Do not remove comment below.
+			// <creating-property-payload />
+			names: createPermissionDto.names,
 
-      description: createPermissionDto.description,
-    });
-  }
+			description: createPermissionDto.description,
+		});
+	}
 
-  findAllWithPagination({
-    paginationOptions,
-  }: {
-    paginationOptions: IPaginationOptions;
-  }) {
-    return this.permissionRepository.findAllWithPagination({
-      paginationOptions: {
-        page: paginationOptions.page,
-        limit: paginationOptions.limit,
-      },
-    });
-  }
+	findAllWithPagination({
+		paginationOptions,
+	}: {
+		paginationOptions: IPaginationOptions;
+	}) {
+		return this.permissionRepository.findAllWithPagination({
+			paginationOptions: {
+				page: paginationOptions.page,
+				limit: paginationOptions.limit,
+			},
+		});
+	}
 
-  findById(id: Permission['id']) {
-    return this.permissionRepository.findById(id);
-  }
+	findById(id: Permission['id']) {
+		return this.permissionRepository.findById(id);
+	}
 
-  findByIds(ids: Permission['id'][]) {
-    return this.permissionRepository.findByIds(ids);
-  }
+	findByIds(ids: Permission['id'][]) {
+		return this.permissionRepository.findByIds(ids);
+	}
 
-  async update(id: Permission['id'], updatePermissionDto: UpdatePermissionDto) {
-    // Do not remove comment below.
-    // <updating-property />
+	async update(id: Permission['id'], updatePermissionDto: UpdatePermissionDto) {
+		// Do not remove comment below.
+		// <updating-property />
 
-    return this.permissionRepository.update(id, {
-      // Do not remove comment below.
-      // <updating-property-payload />
-      names: updatePermissionDto.names,
+		return this.permissionRepository.update(id, {
+			// Do not remove comment below.
+			// <updating-property-payload />
+			names: updatePermissionDto.names,
 
-      description: updatePermissionDto.description,
-    });
-  }
+			description: updatePermissionDto.description,
+		});
+	}
 
-  remove(id: Permission['id']) {
-    return this.permissionRepository.remove(id);
-  }
+	remove(id: Permission['id']) {
+		return this.permissionRepository.remove(id);
+	}
 }

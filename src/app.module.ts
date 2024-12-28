@@ -25,10 +25,10 @@ import { MailerModule } from './mailer/mailer.module';
 import ZeroxConfig from './swap/zerox/config/zerox.config';
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
-  useClass: TypeOrmConfigService,
-  dataSourceFactory: async (options: DataSourceOptions) => {
-    return new DataSource(options).initialize();
-  },
+	useClass: TypeOrmConfigService,
+	dataSourceFactory: async (options: DataSourceOptions) => {
+		return new DataSource(options).initialize();
+	},
 });
 
 import { DevicesModule } from './devices/devices.module';
@@ -75,79 +75,78 @@ import { FireblocksModule } from './fireblocks/fireblocks.module';
 
 import { SwapModule } from './swap/zerox/zerox.module';
 
-
 @Module({
-  imports: [
-    NotificationsModule,
-    WhiteListAddressesModule,
-    RolesModule,
-    StatusesModule,
-    TypesModule,
-    PermissionsModule,
-    AccessControlsModule,
-    TransactionLogsModule,
-    NftsModule,
-    EventLogsModule,
-    NftTransactionsModule,
-    TransferTransactionsModule,
-    OrderTransactionsModule,
-    SwapTransactionsModule,
-    UserLogsModule,
-    SupportedAssetsModule,
-    WalletsModule,
-    PassphrasesModule,
-    MainWalletsModule,
-    PermissionsModule,
-    DevicesModule,
-    FireblocksModule,
-    SwapModule,
-    ConfigModule.forRoot({
-      isGlobal: true,
-      load: [
-        databaseConfig,
-        authConfig,
-        appConfig,
-        mailConfig,
-        fileConfig,
-        googleConfig,
-        appleConfig,
-        ZeroxConfig,
-      ],
-      envFilePath: ['.env'],
-    }),
-    infrastructureDatabaseModule,
-    I18nModule.forRootAsync({
-      useFactory: (configService: ConfigService<AllConfigType>) => ({
-        fallbackLanguage: configService.getOrThrow('app.fallbackLanguage', {
-          infer: true,
-        }),
-        loaderOptions: { path: path.join(__dirname, '/i18n/'), watch: true },
-      }),
-      resolvers: [
-        {
-          use: HeaderResolver,
-          useFactory: (configService: ConfigService<AllConfigType>) => {
-            return [
-              configService.get('app.headerLanguage', {
-                infer: true,
-              }),
-            ];
-          },
-          inject: [ConfigService],
-        },
-      ],
-      imports: [ConfigModule],
-      inject: [ConfigService],
-    }),
-    UsersModule,
-    FilesModule,
-    AuthModule,
-    AuthGoogleModule,
-    AuthAppleModule,
-    SessionModule,
-    MailModule,
-    MailerModule,
-    HomeModule,
-  ],
+	imports: [
+		NotificationsModule,
+		WhiteListAddressesModule,
+		RolesModule,
+		StatusesModule,
+		TypesModule,
+		PermissionsModule,
+		AccessControlsModule,
+		TransactionLogsModule,
+		NftsModule,
+		EventLogsModule,
+		NftTransactionsModule,
+		TransferTransactionsModule,
+		OrderTransactionsModule,
+		SwapTransactionsModule,
+		UserLogsModule,
+		SupportedAssetsModule,
+		WalletsModule,
+		PassphrasesModule,
+		MainWalletsModule,
+		PermissionsModule,
+		DevicesModule,
+		FireblocksModule,
+		SwapModule,
+		ConfigModule.forRoot({
+			isGlobal: true,
+			load: [
+				databaseConfig,
+				authConfig,
+				appConfig,
+				mailConfig,
+				fileConfig,
+				googleConfig,
+				appleConfig,
+				ZeroxConfig,
+			],
+			envFilePath: ['.env'],
+		}),
+		infrastructureDatabaseModule,
+		I18nModule.forRootAsync({
+			useFactory: (configService: ConfigService<AllConfigType>) => ({
+				fallbackLanguage: configService.getOrThrow('app.fallbackLanguage', {
+					infer: true,
+				}),
+				loaderOptions: { path: path.join(__dirname, '/i18n/'), watch: true },
+			}),
+			resolvers: [
+				{
+					use: HeaderResolver,
+					useFactory: (configService: ConfigService<AllConfigType>) => {
+						return [
+							configService.get('app.headerLanguage', {
+								infer: true,
+							}),
+						];
+					},
+					inject: [ConfigService],
+				},
+			],
+			imports: [ConfigModule],
+			inject: [ConfigService],
+		}),
+		UsersModule,
+		FilesModule,
+		AuthModule,
+		AuthGoogleModule,
+		AuthAppleModule,
+		SessionModule,
+		MailModule,
+		MailerModule,
+		HomeModule,
+	],
 })
 export class AppModule {}

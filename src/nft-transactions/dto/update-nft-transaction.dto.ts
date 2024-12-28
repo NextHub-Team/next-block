@@ -5,5 +5,5 @@ import { PartialType } from '@nestjs/swagger';
 import { CreateNftTransactionDto } from './create-nft-transaction.dto';
 
 export class UpdateNftTransactionDto extends PartialType(
-  CreateNftTransactionDto,
+	CreateNftTransactionDto,
 ) {}

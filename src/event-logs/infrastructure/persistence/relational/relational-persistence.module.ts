@@ -5,13 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { EventLogEntity } from './entities/event-log.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([EventLogEntity])],
-  providers: [
-    {
-      provide: EventLogRepository,
-      useClass: EventLogRelationalRepository,
-    },
-  ],
-  exports: [EventLogRepository],
+	imports: [TypeOrmModule.forFeature([EventLogEntity])],
+	providers: [
+		{
+			provide: EventLogRepository,
+			useClass: EventLogRelationalRepository,
+		},
+	],
+	exports: [EventLogRepository],
 })
 export class RelationalEventLogPersistenceModule {}

@@ -7,82 +7,82 @@ import { TransferTransaction } from './domain/transfer-transaction';
 
 @Injectable()
 export class TransferTransactionsService {
-  constructor(
-    // Dependencies here
-    private readonly transferTransactionRepository: TransferTransactionRepository,
-  ) {}
+	constructor(
+		// Dependencies here
+		private readonly transferTransactionRepository: TransferTransactionRepository,
+	) {}
 
-  async create(createTransferTransactionDto: CreateTransferTransactionDto) {
-    // Do not remove comment below.
-    // <creating-property />
+	async create(createTransferTransactionDto: CreateTransferTransactionDto) {
+		// Do not remove comment below.
+		// <creating-property />
 
-    return this.transferTransactionRepository.create({
-      // Do not remove comment below.
-      // <creating-property-payload />
-      fromAddress: createTransferTransactionDto.fromAddress,
+		return this.transferTransactionRepository.create({
+			// Do not remove comment below.
+			// <creating-property-payload />
+			fromAddress: createTransferTransactionDto.fromAddress,
 
-      toAddress: createTransferTransactionDto.toAddress,
+			toAddress: createTransferTransactionDto.toAddress,
 
-      fee: createTransferTransactionDto.fee,
+			fee: createTransferTransactionDto.fee,
 
-      amount: createTransferTransactionDto.amount,
+			amount: createTransferTransactionDto.amount,
 
-      blockchain: createTransferTransactionDto.blockchain,
+			blockchain: createTransferTransactionDto.blockchain,
 
-      transactionHash: createTransferTransactionDto.transactionHash,
+			transactionHash: createTransferTransactionDto.transactionHash,
 
-      wallet: createTransferTransactionDto.wallet,
-    });
-  }
+			wallet: createTransferTransactionDto.wallet,
+		});
+	}
 
-  findAllWithPagination({
-    paginationOptions,
-  }: {
-    paginationOptions: IPaginationOptions;
-  }) {
-    return this.transferTransactionRepository.findAllWithPagination({
-      paginationOptions: {
-        page: paginationOptions.page,
-        limit: paginationOptions.limit,
-      },
-    });
-  }
+	findAllWithPagination({
+		paginationOptions,
+	}: {
+		paginationOptions: IPaginationOptions;
+	}) {
+		return this.transferTransactionRepository.findAllWithPagination({
+			paginationOptions: {
+				page: paginationOptions.page,
+				limit: paginationOptions.limit,
+			},
+		});
+	}
 
-  findById(id: TransferTransaction['id']) {
-    return this.transferTransactionRepository.findById(id);
-  }
+	findById(id: TransferTransaction['id']) {
+		return this.transferTransactionRepository.findById(id);
+	}
 
-  findByIds(ids: TransferTransaction['id'][]) {
-    return this.transferTransactionRepository.findByIds(ids);
-  }
+	findByIds(ids: TransferTransaction['id'][]) {
+		return this.transferTransactionRepository.findByIds(ids);
+	}
 
-  async update(
-    id: TransferTransaction['id'],
-    updateTransferTransactionDto: UpdateTransferTransactionDto,
-  ) {
-    // Do not remove comment below.
-    // <updating-property />
+	async update(
+		id: TransferTransaction['id'],
+		updateTransferTransactionDto: UpdateTransferTransactionDto,
+	) {
+		// Do not remove comment below.
+		// <updating-property />
 
-    return this.transferTransactionRepository.update(id, {
-      // Do not remove comment below.
-      // <updating-property-payload />
-      fromAddress: updateTransferTransactionDto.fromAddress,
+		return this.transferTransactionRepository.update(id, {
+			// Do not remove comment below.
+			// <updating-property-payload />
+			fromAddress: updateTransferTransactionDto.fromAddress,
 
-      toAddress: updateTransferTransactionDto.toAddress,
+			toAddress: updateTransferTransactionDto.toAddress,
 
-      fee: updateTransferTransactionDto.fee,
+			fee: updateTransferTransactionDto.fee,
 
-      amount: updateTransferTransactionDto.amount,
+			amount: updateTransferTransactionDto.amount,
 
-      blockchain: updateTransferTransactionDto.blockchain,
+			blockchain: updateTransferTransactionDto.blockchain,
 
-      transactionHash: updateTransferTransactionDto.transactionHash,
+			transactionHash: updateTransferTransactionDto.transactionHash,
 
-      wallet: updateTransferTransactionDto.wallet,
-    });
-  }
+			wallet: updateTransferTransactionDto.wallet,
+		});
+	}
 
-  remove(id: TransferTransaction['id']) {
-    return this.transferTransactionRepository.remove(id);
-  }
+	remove(id: TransferTransaction['id']) {
+		return this.transferTransactionRepository.remove(id);
+	}
 }

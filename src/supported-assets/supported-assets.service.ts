@@ -7,91 +7,91 @@ import { SupportedAsset } from './domain/supported-asset';
 
 @Injectable()
 export class SupportedAssetsService {
-  constructor(
-    // Dependencies here
-    private readonly supportedAssetRepository: SupportedAssetRepository,
-  ) {}
+	constructor(
+		// Dependencies here
+		private readonly supportedAssetRepository: SupportedAssetRepository,
+	) {}
 
-  async create(createSupportedAssetDto: CreateSupportedAssetDto) {
-    // Do not remove comment below.
-    // <creating-property />
+	async create(createSupportedAssetDto: CreateSupportedAssetDto) {
+		// Do not remove comment below.
+		// <creating-property />
 
-    return this.supportedAssetRepository.create({
-      // Do not remove comment below.
-      // <creating-property-payload />
-      protocol: createSupportedAssetDto.protocol,
+		return this.supportedAssetRepository.create({
+			// Do not remove comment below.
+			// <creating-property-payload />
+			protocol: createSupportedAssetDto.protocol,
 
-      nativeAsset: createSupportedAssetDto.nativeAsset,
+			nativeAsset: createSupportedAssetDto.nativeAsset,
 
-      issuerAddress: createSupportedAssetDto.issuerAddress,
+			issuerAddress: createSupportedAssetDto.issuerAddress,
 
-      type: createSupportedAssetDto.type,
+			type: createSupportedAssetDto.type,
 
-      decimals: createSupportedAssetDto.decimals,
+			decimals: createSupportedAssetDto.decimals,
 
-      contractAddress: createSupportedAssetDto.contractAddress,
+			contractAddress: createSupportedAssetDto.contractAddress,
 
-      blockchain: createSupportedAssetDto.blockchain,
+			blockchain: createSupportedAssetDto.blockchain,
 
-      symbol: createSupportedAssetDto.symbol,
+			symbol: createSupportedAssetDto.symbol,
 
-      name: createSupportedAssetDto.name,
-    });
-  }
+			name: createSupportedAssetDto.name,
+		});
+	}
 
-  findAllWithPagination({
-    paginationOptions,
-  }: {
-    paginationOptions: IPaginationOptions;
-  }) {
-    return this.supportedAssetRepository.findAllWithPagination({
-      paginationOptions: {
-        page: paginationOptions.page,
-        limit: paginationOptions.limit,
-      },
-    });
-  }
+	findAllWithPagination({
+		paginationOptions,
+	}: {
+		paginationOptions: IPaginationOptions;
+	}) {
+		return this.supportedAssetRepository.findAllWithPagination({
+			paginationOptions: {
+				page: paginationOptions.page,
+				limit: paginationOptions.limit,
+			},
+		});
+	}
 
-  findById(id: SupportedAsset['id']) {
-    return this.supportedAssetRepository.findById(id);
-  }
+	findById(id: SupportedAsset['id']) {
+		return this.supportedAssetRepository.findById(id);
+	}
 
-  findByIds(ids: SupportedAsset['id'][]) {
-    return this.supportedAssetRepository.findByIds(ids);
-  }
+	findByIds(ids: SupportedAsset['id'][]) {
+		return this.supportedAssetRepository.findByIds(ids);
+	}
 
-  async update(
-    id: SupportedAsset['id'],
+	async update(
+		id: SupportedAsset['id'],
 
-    updateSupportedAssetDto: UpdateSupportedAssetDto,
-  ) {
-    // Do not remove comment below.
-    // <updating-property />
+		updateSupportedAssetDto: UpdateSupportedAssetDto,
+	) {
+		// Do not remove comment below.
+		// <updating-property />
 
-    return this.supportedAssetRepository.update(id, {
-      // Do not remove comment below.
-      // <updating-property-payload />
-      protocol: updateSupportedAssetDto.protocol,
+		return this.supportedAssetRepository.update(id, {
+			// Do not remove comment below.
+			// <updating-property-payload />
+			protocol: updateSupportedAssetDto.protocol,
 
-      nativeAsset: updateSupportedAssetDto.nativeAsset,
+			nativeAsset: updateSupportedAssetDto.nativeAsset,
 
-      issuerAddress: updateSupportedAssetDto.issuerAddress,
+			issuerAddress: updateSupportedAssetDto.issuerAddress,
 
-      type: updateSupportedAssetDto.type,
+			type: updateSupportedAssetDto.type,
 
-      decimals: updateSupportedAssetDto.decimals,
+			decimals: updateSupportedAssetDto.decimals,
 
-      contractAddress: updateSupportedAssetDto.contractAddress,
+			contractAddress: updateSupportedAssetDto.contractAddress,
 
-      blockchain: updateSupportedAssetDto.blockchain,
+			blockchain: updateSupportedAssetDto.blockchain,
 
-      symbol: updateSupportedAssetDto.symbol,
+			symbol: updateSupportedAssetDto.symbol,
 
-      name: updateSupportedAssetDto.name,
-    });
-  }
+			name: updateSupportedAssetDto.name,
+		});
+	}
 
-  remove(id: SupportedAsset['id']) {
-    return this.supportedAssetRepository.remove(id);
-  }
+	remove(id: SupportedAsset['id']) {
+		return this.supportedAssetRepository.remove(id);
+	}
 }

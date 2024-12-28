@@ -12,115 +12,115 @@ import { EventLog } from './domain/event-log';
 
 @Injectable()
 export class EventLogsService {
-  constructor(
-    private readonly userLogService: UserLogsService,
+	constructor(
+		private readonly userLogService: UserLogsService,
 
-    // Dependencies here
-    private readonly eventLogRepository: EventLogRepository,
-  ) {}
+		// Dependencies here
+		private readonly eventLogRepository: EventLogRepository,
+	) {}
 
-  async create(createEventLogDto: CreateEventLogDto) {
-    // Do not remove comment below.
-    // <creating-property />
+	async create(createEventLogDto: CreateEventLogDto) {
+		// Do not remove comment below.
+		// <creating-property />
 
-    const userLogObject = await this.userLogService.findById(
-      createEventLogDto.userLog.id,
-    );
-    if (!userLogObject) {
-      throw new UnprocessableEntityException({
-        status: HttpStatus.UNPROCESSABLE_ENTITY,
-        errors: {
-          userLog: 'notExists',
-        },
-      });
-    }
-    const userLog = userLogObject;
+		const userLogObject = await this.userLogService.findById(
+			createEventLogDto.userLog.id,
+		);
+		if (!userLogObject) {
+			throw new UnprocessableEntityException({
+				status: HttpStatus.UNPROCESSABLE_ENTITY,
+				errors: {
+					userLog: 'notExists',
+				},
+			});
+		}
+		const userLog = userLogObject;
 
-    return this.eventLogRepository.create({
-      // Do not remove comment below.
-      // <creating-property-payload />
-      status: createEventLogDto.status,
+		return this.eventLogRepository.create({
+			// Do not remove comment below.
+			// <creating-property-payload />
+			status: createEventLogDto.status,
 
-      processed: createEventLogDto.processed,
+			processed: createEventLogDto.processed,
 
-      newValue: createEventLogDto.newValue,
+			newValue: createEventLogDto.newValue,
 
-      oldValue: createEventLogDto.oldValue,
+			oldValue: createEventLogDto.oldValue,
 
-      property: createEventLogDto.property,
+			property: createEventLogDto.property,
 
-      entity: createEventLogDto.entity,
+			entity: createEventLogDto.entity,
 
-      userLog,
-    });
-  }
+			userLog,
+		});
+	}
 
-  findAllWithPagination({
-    paginationOptions,
-  }: {
-    paginationOptions: IPaginationOptions;
-  }) {
-    return this.eventLogRepository.findAllWithPagination({
-      paginationOptions: {
-        page: paginationOptions.page,
-        limit: paginationOptions.limit,
-      },
-    });
-  }
+	findAllWithPagination({
+		paginationOptions,
+	}: {
+		paginationOptions: IPaginationOptions;
+	}) {
+		return this.eventLogRepository.findAllWithPagination({
+			paginationOptions: {
+				page: paginationOptions.page,
+				limit: paginationOptions.limit,
+			},
+		});
+	}
 
-  findById(id: EventLog['id']) {
-    return this.eventLogRepository.findById(id);
-  }
+	findById(id: EventLog['id']) {
+		return this.eventLogRepository.findById(id);
+	}
 
-  findByIds(ids: EventLog['id'][]) {
-    return this.eventLogRepository.findByIds(ids);
-  }
+	findByIds(ids: EventLog['id'][]) {
+		return this.eventLogRepository.findByIds(ids);
+	}
 
-  async update(
-    id: EventLog['id'],
+	async update(
+		id: EventLog['id'],
 
-    updateEventLogDto: UpdateEventLogDto,
-  ) {
-    // Do not remove comment below.
-    // <updating-property />
+		updateEventLogDto: UpdateEventLogDto,
+	) {
+		// Do not remove comment below.
+		// <updating-property />
 
-    let userLog: UserLog | undefined = undefined;
+		let userLog: UserLog | undefined = undefined;
 
-    if (updateEventLogDto.userLog) {
-      const userLogObject = await this.userLogService.findById(
-        updateEventLogDto.userLog.id,
-      );
-      if (!userLogObject) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            userLog: 'notExists',
-          },
-        });
-      }
-      userLog = userLogObject;
-    }
+		if (updateEventLogDto.userLog) {
+			const userLogObject = await this.userLogService.findById(
+				updateEventLogDto.userLog.id,
+			);
+			if (!userLogObject) {
+				throw new UnprocessableEntityException({
+					status: HttpStatus.UNPROCESSABLE_ENTITY,
+					errors: {
+						userLog: 'notExists',
+					},
+				});
+			}
+			userLog = userLogObject;
+		}
 
-    return this.eventLogRepository.update(id, {
-      // Do not remove comment below.
-      // <updating-property-payload />
-      status: updateEventLogDto.status,
+		return this.eventLogRepository.update(id, {
+			// Do not remove comment below.
+			// <updating-property-payload />
+			status: updateEventLogDto.status,
 
-      processed: updateEventLogDto.processed,
+			processed: updateEventLogDto.processed,
 
-      newValue: updateEventLogDto.newValue,
+			newValue: updateEventLogDto.newValue,
 
-      oldValue: updateEventLogDto.oldValue,
+			oldValue: updateEventLogDto.oldValue,
 
-      property: updateEventLogDto.property,
+			property: updateEventLogDto.property,
 
-      entity: updateEventLogDto.entity,
+			entity: updateEventLogDto.entity,
 
-      userLog,
-    });
-  }
+			userLog,
+		});
+	}
 
-  remove(id: EventLog['id']) {
-    return this.eventLogRepository.remove(id);
-  }
+	remove(id: EventLog['id']) {
+		return this.eventLogRepository.remove(id);
+	}
 }

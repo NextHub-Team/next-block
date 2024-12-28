@@ -1,4 +1,4 @@
 export interface ZeroxConfig {
-  apiKey: string;
-  apiUrl: string;
+	apiKey: string;
+	apiUrl: string;
 }

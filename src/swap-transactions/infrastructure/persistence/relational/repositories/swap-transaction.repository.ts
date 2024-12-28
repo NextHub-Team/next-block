@@ -10,77 +10,77 @@ import { IPaginationOptions } from '../../../../../utils/types/pagination-option
 
 @Injectable()
 export class SwapTransactionRelationalRepository
-  implements SwapTransactionRepository
+	implements SwapTransactionRepository
 {
-  constructor(
-    @InjectRepository(SwapTransactionEntity)
-    private readonly swapTransactionRepository: Repository<SwapTransactionEntity>,
-  ) {}
+	constructor(
+		@InjectRepository(SwapTransactionEntity)
+		private readonly swapTransactionRepository: Repository<SwapTransactionEntity>,
+	) {}
 
-  async create(data: SwapTransaction): Promise<SwapTransaction> {
-    const persistenceModel = SwapTransactionMapper.toPersistence(data);
-    const newEntity = await this.swapTransactionRepository.save(
-      this.swapTransactionRepository.create(persistenceModel),
-    );
-    return SwapTransactionMapper.toDomain(newEntity);
-  }
+	async create(data: SwapTransaction): Promise<SwapTransaction> {
+		const persistenceModel = SwapTransactionMapper.toPersistence(data);
+		const newEntity = await this.swapTransactionRepository.save(
+			this.swapTransactionRepository.create(persistenceModel),
+		);
+		return SwapTransactionMapper.toDomain(newEntity);
+	}
 
-  async findAllWithPagination({
-    paginationOptions,
-  }: {
-    paginationOptions: IPaginationOptions;
-  }): Promise<SwapTransaction[]> {
-    const entities = await this.swapTransactionRepository.find({
-      skip: (paginationOptions.page - 1) * paginationOptions.limit,
-      take: paginationOptions.limit,
-    });
+	async findAllWithPagination({
+		paginationOptions,
+	}: {
+		paginationOptions: IPaginationOptions;
+	}): Promise<SwapTransaction[]> {
+		const entities = await this.swapTransactionRepository.find({
+			skip: (paginationOptions.page - 1) * paginationOptions.limit,
+			take: paginationOptions.limit,
+		});
 
-    return entities.map((entity) => SwapTransactionMapper.toDomain(entity));
-  }
+		return entities.map((entity) => SwapTransactionMapper.toDomain(entity));
+	}
 
-  async findById(
-    id: SwapTransaction['id'],
-  ): Promise<NullableType<SwapTransaction>> {
-    const entity = await this.swapTransactionRepository.findOne({
-      where: { id },
-    });
+	async findById(
+		id: SwapTransaction['id'],
+	): Promise<NullableType<SwapTransaction>> {
+		const entity = await this.swapTransactionRepository.findOne({
+			where: { id },
+		});
 
-    return entity ? SwapTransactionMapper.toDomain(entity) : null;
-  }
+		return entity ? SwapTransactionMapper.toDomain(entity) : null;
+	}
 
-  async findByIds(ids: SwapTransaction['id'][]): Promise<SwapTransaction[]> {
-    const entities = await this.swapTransactionRepository.find({
-      where: { id: In(ids) },
-    });
+	async findByIds(ids: SwapTransaction['id'][]): Promise<SwapTransaction[]> {
+		const entities = await this.swapTransactionRepository.find({
+			where: { id: In(ids) },
+		});
 
-    return entities.map((entity) => SwapTransactionMapper.toDomain(entity));
-  }
+		return entities.map((entity) => SwapTransactionMapper.toDomain(entity));
+	}
 
-  async update(
-    id: SwapTransaction['id'],
-    payload: Partial<SwapTransaction>,
-  ): Promise<SwapTransaction> {
-    const entity = await this.swapTransactionRepository.findOne({
-      where: { id },
-    });
+	async update(
+		id: SwapTransaction['id'],
+		payload: Partial<SwapTransaction>,
+	): Promise<SwapTransaction> {
+		const entity = await this.swapTransactionRepository.findOne({
+			where: { id },
+		});
 
-    if (!entity) {
-      throw new Error('Record not found');
-    }
+		if (!entity) {
+			throw new Error('Record not found');
+		}
 
-    const updatedEntity = await this.swapTransactionRepository.save(
-      this.swapTransactionRepository.create(
-        SwapTransactionMapper.toPersistence({
-          ...SwapTransactionMapper.toDomain(entity),
-          ...payload,
-        }),
-      ),
-    );
+		const updatedEntity = await this.swapTransactionRepository.save(
+			this.swapTransactionRepository.create(
+				SwapTransactionMapper.toPersistence({
+					...SwapTransactionMapper.toDomain(entity),
+					...payload,
+				}),
+			),
+		);
 
-    return SwapTransactionMapper.toDomain(updatedEntity);
-  }
+		return SwapTransactionMapper.toDomain(updatedEntity);
+	}
 
-  async remove(id: SwapTransaction['id']): Promise<void> {
-    await this.swapTransactionRepository.delete(id);
-  }
+	async remove(id: SwapTransaction['id']): Promise<void> {
+		await this.swapTransactionRepository.delete(id);
+	}
 }

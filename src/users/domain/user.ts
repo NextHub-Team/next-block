@@ -9,89 +9,89 @@ import { ApiProperty } from '@nestjs/swagger';
 const idType = Number;
 
 export class User {
-  @ApiProperty({
-    type: () => AccessControl,
-    nullable: true,
-  })
-  abilities?: AccessControl | null;
+	@ApiProperty({
+		type: () => AccessControl,
+		nullable: true,
+	})
+	abilities?: AccessControl | null;
 
-  @ApiProperty({
-    type: () => [UserLog],
-    nullable: true,
-  })
-  logs?: UserLog[] | null;
+	@ApiProperty({
+		type: () => [UserLog],
+		nullable: true,
+	})
+	logs?: UserLog[] | null;
 
-  @ApiProperty({
-    type: () => [MainWallet],
-    nullable: true,
-  })
-  mainWallets?: MainWallet[] | null;
+	@ApiProperty({
+		type: () => [MainWallet],
+		nullable: true,
+	})
+	mainWallets?: MainWallet[] | null;
 
-  @ApiProperty({
-    type: () => String,
-    nullable: true,
-    example: '+13847923742',
-  })
-  phone?: string | null;
+	@ApiProperty({
+		type: () => String,
+		nullable: true,
+		example: '+13847923742',
+	})
+	phone?: string | null;
 
-  @ApiProperty({
-    type: () => [Device],
-    nullable: true,
-  })
-  devices?: Device[] | null;
+	@ApiProperty({
+		type: () => [Device],
+		nullable: true,
+	})
+	devices?: Device[] | null;
 
-  @ApiProperty({
-    type: idType,
-  })
-  id: number | string;
+	@ApiProperty({
+		type: idType,
+	})
+	id: number | string;
 
-  @ApiProperty({
-    type: String,
-    example: 'john.doe@example.com',
-  })
-  @Expose({ groups: ['me', 'admin'] })
-  email: string | null;
+	@ApiProperty({
+		type: String,
+		example: 'john.doe@example.com',
+	})
+	@Expose({ groups: ['me', 'admin'] })
+	email: string | null;
 
-  @Exclude({ toPlainOnly: true })
-  password?: string;
+	@Exclude({ toPlainOnly: true })
+	password?: string;
 
-  @ApiProperty({
-    type: String,
-    example: 'email',
-  })
-  @Expose({ groups: ['me', 'admin'] })
-  provider: string;
+	@ApiProperty({
+		type: String,
+		example: 'email',
+	})
+	@Expose({ groups: ['me', 'admin'] })
+	provider: string;
 
-  @ApiProperty({
-    type: String,
-    example: '1234567890',
-  })
-  @Expose({ groups: ['me', 'admin'] })
-  socialId?: string | null;
+	@ApiProperty({
+		type: String,
+		example: '1234567890',
+	})
+	@Expose({ groups: ['me', 'admin'] })
+	socialId?: string | null;
 
-  @ApiProperty({
-    type: String,
-    example: 'John',
-  })
-  firstName: string | null;
+	@ApiProperty({
+		type: String,
+		example: 'John',
+	})
+	firstName: string | null;
 
-  @ApiProperty({
-    type: String,
-    example: 'Doe',
-  })
-  lastName: string | null;
+	@ApiProperty({
+		type: String,
+		example: 'Doe',
+	})
+	lastName: string | null;
 
-  @ApiProperty({
-    type: () => FileType,
-  })
-  photo?: FileType | null;
+	@ApiProperty({
+		type: () => FileType,
+	})
+	photo?: FileType | null;
 
-  @ApiProperty()
-  createdAt: Date;
+	@ApiProperty()
+	createdAt: Date;
 
-  @ApiProperty()
-  updatedAt: Date;
+	@ApiProperty()
+	updatedAt: Date;
 
-  @ApiProperty()
-  deletedAt: Date;
+	@ApiProperty()
+	deletedAt: Date;
 }

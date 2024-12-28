@@ -10,70 +10,70 @@ import { IPaginationOptions } from '../../../../../utils/types/pagination-option
 
 @Injectable()
 export class TypeRelationalRepository implements TypeRepository {
-  constructor(
-    @InjectRepository(TypeEntity)
-    private readonly typeRepository: Repository<TypeEntity>,
-  ) {}
+	constructor(
+		@InjectRepository(TypeEntity)
+		private readonly typeRepository: Repository<TypeEntity>,
+	) {}
 
-  async create(data: Type): Promise<Type> {
-    const persistenceModel = TypeMapper.toPersistence(data);
-    const newEntity = await this.typeRepository.save(
-      this.typeRepository.create(persistenceModel),
-    );
-    return TypeMapper.toDomain(newEntity);
-  }
+	async create(data: Type): Promise<Type> {
+		const persistenceModel = TypeMapper.toPersistence(data);
+		const newEntity = await this.typeRepository.save(
+			this.typeRepository.create(persistenceModel),
+		);
+		return TypeMapper.toDomain(newEntity);
+	}
 
-  async findAllWithPagination({
-    paginationOptions,
-  }: {
-    paginationOptions: IPaginationOptions;
-  }): Promise<Type[]> {
-    const entities = await this.typeRepository.find({
-      skip: (paginationOptions.page - 1) * paginationOptions.limit,
-      take: paginationOptions.limit,
-    });
+	async findAllWithPagination({
+		paginationOptions,
+	}: {
+		paginationOptions: IPaginationOptions;
+	}): Promise<Type[]> {
+		const entities = await this.typeRepository.find({
+			skip: (paginationOptions.page - 1) * paginationOptions.limit,
+			take: paginationOptions.limit,
+		});
 
-    return entities.map((entity) => TypeMapper.toDomain(entity));
-  }
+		return entities.map((entity) => TypeMapper.toDomain(entity));
+	}
 
-  async findById(id: Type['id']): Promise<NullableType<Type>> {
-    const entity = await this.typeRepository.findOne({
-      where: { id },
-    });
+	async findById(id: Type['id']): Promise<NullableType<Type>> {
+		const entity = await this.typeRepository.findOne({
+			where: { id },
+		});
 
-    return entity ? TypeMapper.toDomain(entity) : null;
-  }
+		return entity ? TypeMapper.toDomain(entity) : null;
+	}
 
-  async findByIds(ids: Type['id'][]): Promise<Type[]> {
-    const entities = await this.typeRepository.find({
-      where: { id: In(ids) },
-    });
+	async findByIds(ids: Type['id'][]): Promise<Type[]> {
+		const entities = await this.typeRepository.find({
+			where: { id: In(ids) },
+		});
 
-    return entities.map((entity) => TypeMapper.toDomain(entity));
-  }
+		return entities.map((entity) => TypeMapper.toDomain(entity));
+	}
 
-  async update(id: Type['id'], payload: Partial<Type>): Promise<Type> {
-    const entity = await this.typeRepository.findOne({
-      where: { id },
-    });
+	async update(id: Type['id'], payload: Partial<Type>): Promise<Type> {
+		const entity = await this.typeRepository.findOne({
+			where: { id },
+		});
 
-    if (!entity) {
-      throw new Error('Record not found');
-    }
+		if (!entity) {
+			throw new Error('Record not found');
+		}
 
-    const updatedEntity = await this.typeRepository.save(
-      this.typeRepository.create(
-        TypeMapper.toPersistence({
-          ...TypeMapper.toDomain(entity),
-          ...payload,
-        }),
-      ),
-    );
+		const updatedEntity = await this.typeRepository.save(
+			this.typeRepository.create(
+				TypeMapper.toPersistence({
+					...TypeMapper.toDomain(entity),
+					...payload,
+				}),
+			),
+		);
 
-    return TypeMapper.toDomain(updatedEntity);
-  }
+		return TypeMapper.toDomain(updatedEntity);
+	}
 
-  async remove(id: Type['id']): Promise<void> {
-    await this.typeRepository.delete(id);
-  }
+	async remove(id: Type['id']): Promise<void> {
+		await this.typeRepository.delete(id);
+	}
 }

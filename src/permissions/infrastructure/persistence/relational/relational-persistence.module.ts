@@ -5,13 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PermissionEntity } from './entities/permission.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([PermissionEntity])],
-  providers: [
-    {
-      provide: PermissionRepository,
-      useClass: PermissionRelationalRepository,
-    },
-  ],
-  exports: [PermissionRepository],
+	imports: [TypeOrmModule.forFeature([PermissionEntity])],
+	providers: [
+		{
+			provide: PermissionRepository,
+			useClass: PermissionRelationalRepository,
+		},
+	],
+	exports: [PermissionRepository],
 })
 export class RelationalPermissionPersistenceModule {}

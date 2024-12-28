@@ -5,13 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { TransactionLogEntity } from './entities/transaction-log.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([TransactionLogEntity])],
-  providers: [
-    {
-      provide: TransactionLogRepository,
-      useClass: TransactionLogRelationalRepository,
-    },
-  ],
-  exports: [TransactionLogRepository],
+	imports: [TypeOrmModule.forFeature([TransactionLogEntity])],
+	providers: [
+		{
+			provide: TransactionLogRepository,
+			useClass: TransactionLogRelationalRepository,
+		},
+	],
+	exports: [TransactionLogRepository],
 })
 export class RelationalTransactionLogPersistenceModule {}

@@ -7,83 +7,83 @@ import { SwapTransaction } from './domain/swap-transaction';
 
 @Injectable()
 export class SwapTransactionsService {
-  constructor(
-    // Dependencies here
-    private readonly swapTransactionRepository: SwapTransactionRepository,
-  ) {}
+	constructor(
+		// Dependencies here
+		private readonly swapTransactionRepository: SwapTransactionRepository,
+	) {}
 
-  async create(createSwapTransactionDto: CreateSwapTransactionDto) {
-    // Do not remove comment below.
-    // <creating-property />
+	async create(createSwapTransactionDto: CreateSwapTransactionDto) {
+		// Do not remove comment below.
+		// <creating-property />
 
-    return this.swapTransactionRepository.create({
-      // Do not remove comment below.
-      // <creating-property-payload />
-      fee: createSwapTransactionDto.fee,
+		return this.swapTransactionRepository.create({
+			// Do not remove comment below.
+			// <creating-property-payload />
+			fee: createSwapTransactionDto.fee,
 
-      dex: createSwapTransactionDto.dex,
+			dex: createSwapTransactionDto.dex,
 
-      amountOut: createSwapTransactionDto.amountOut,
+			amountOut: createSwapTransactionDto.amountOut,
 
-      amountIn: createSwapTransactionDto.amountIn,
+			amountIn: createSwapTransactionDto.amountIn,
 
-      toToken: createSwapTransactionDto.toToken,
+			toToken: createSwapTransactionDto.toToken,
 
-      wallet: createSwapTransactionDto.wallet,
+			wallet: createSwapTransactionDto.wallet,
 
-      fromToken: createSwapTransactionDto.fromToken,
-    });
-  }
+			fromToken: createSwapTransactionDto.fromToken,
+		});
+	}
 
-  findAllWithPagination({
-    paginationOptions,
-  }: {
-    paginationOptions: IPaginationOptions;
-  }) {
-    return this.swapTransactionRepository.findAllWithPagination({
-      paginationOptions: {
-        page: paginationOptions.page,
-        limit: paginationOptions.limit,
-      },
-    });
-  }
+	findAllWithPagination({
+		paginationOptions,
+	}: {
+		paginationOptions: IPaginationOptions;
+	}) {
+		return this.swapTransactionRepository.findAllWithPagination({
+			paginationOptions: {
+				page: paginationOptions.page,
+				limit: paginationOptions.limit,
+			},
+		});
+	}
 
-  findById(id: SwapTransaction['id']) {
-    return this.swapTransactionRepository.findById(id);
-  }
+	findById(id: SwapTransaction['id']) {
+		return this.swapTransactionRepository.findById(id);
+	}
 
-  findByIds(ids: SwapTransaction['id'][]) {
-    return this.swapTransactionRepository.findByIds(ids);
-  }
+	findByIds(ids: SwapTransaction['id'][]) {
+		return this.swapTransactionRepository.findByIds(ids);
+	}
 
-  async update(
-    id: SwapTransaction['id'],
+	async update(
+		id: SwapTransaction['id'],
 
-    updateSwapTransactionDto: UpdateSwapTransactionDto,
-  ) {
-    // Do not remove comment below.
-    // <updating-property />
+		updateSwapTransactionDto: UpdateSwapTransactionDto,
+	) {
+		// Do not remove comment below.
+		// <updating-property />
 
-    return this.swapTransactionRepository.update(id, {
-      // Do not remove comment below.
-      // <updating-property-payload />
-      fee: updateSwapTransactionDto.fee,
+		return this.swapTransactionRepository.update(id, {
+			// Do not remove comment below.
+			// <updating-property-payload />
+			fee: updateSwapTransactionDto.fee,
 
-      dex: updateSwapTransactionDto.dex,
+			dex: updateSwapTransactionDto.dex,
 
-      amountOut: updateSwapTransactionDto.amountOut,
+			amountOut: updateSwapTransactionDto.amountOut,
 
-      amountIn: updateSwapTransactionDto.amountIn,
+			amountIn: updateSwapTransactionDto.amountIn,
 
-      toToken: updateSwapTransactionDto.toToken,
+			toToken: updateSwapTransactionDto.toToken,
 
-      wallet: updateSwapTransactionDto.wallet,
+			wallet: updateSwapTransactionDto.wallet,
 
-      fromToken: updateSwapTransactionDto.fromToken,
-    });
-  }
+			fromToken: updateSwapTransactionDto.fromToken,
+		});
+	}
 
-  remove(id: SwapTransaction['id']) {
-    return this.swapTransactionRepository.remove(id);
-  }
+	remove(id: SwapTransaction['id']) {
+		return this.swapTransactionRepository.remove(id);
+	}
 }

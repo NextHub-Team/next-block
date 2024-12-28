@@ -2,10 +2,10 @@ import { WalletsService } from '../wallets/wallets.service';
 import { Wallet } from '../wallets/domain/wallet';
 
 import {
-  forwardRef,
-  HttpStatus,
-  Inject,
-  UnprocessableEntityException,
+	forwardRef,
+	HttpStatus,
+	Inject,
+	UnprocessableEntityException,
 } from '@nestjs/common';
 
 import { Injectable } from '@nestjs/common';
@@ -17,111 +17,111 @@ import { TransactionLog } from './domain/transaction-log';
 
 @Injectable()
 export class TransactionLogsService {
-  constructor(
-    @Inject(forwardRef(() => WalletsService))
-    private readonly walletService: WalletsService,
-    // Dependencies here
-    private readonly transactionLogRepository: TransactionLogRepository,
-  ) {}
+	constructor(
+		@Inject(forwardRef(() => WalletsService))
+		private readonly walletService: WalletsService,
+		// Dependencies here
+		private readonly transactionLogRepository: TransactionLogRepository,
+	) {}
 
-  async create(createTransactionLogDto: CreateTransactionLogDto) {
-    // Do not remove comment below.
-    // <creating-property />
+	async create(createTransactionLogDto: CreateTransactionLogDto) {
+		// Do not remove comment below.
+		// <creating-property />
 
-    let wallet: Wallet | undefined = undefined;
+		let wallet: Wallet | undefined = undefined;
 
-    if (createTransactionLogDto.wallet) {
-      const walletObject = await this.walletService.findById(
-        createTransactionLogDto.wallet.id,
-      );
-      if (!walletObject) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            wallet: 'notExists',
-          },
-        });
-      }
-      wallet = walletObject;
-    }
+		if (createTransactionLogDto.wallet) {
+			const walletObject = await this.walletService.findById(
+				createTransactionLogDto.wallet.id,
+			);
+			if (!walletObject) {
+				throw new UnprocessableEntityException({
+					status: HttpStatus.UNPROCESSABLE_ENTITY,
+					errors: {
+						wallet: 'notExists',
+					},
+				});
+			}
+			wallet = walletObject;
+		}
 
-    return this.transactionLogRepository.create({
-      // Do not remove comment below.
-      // <creating-property-payload />
-      details: createTransactionLogDto.details,
+		return this.transactionLogRepository.create({
+			// Do not remove comment below.
+			// <creating-property-payload />
+			details: createTransactionLogDto.details,
 
-      priority: createTransactionLogDto.priority,
+			priority: createTransactionLogDto.priority,
 
-      status: createTransactionLogDto.status,
+			status: createTransactionLogDto.status,
 
-      type: createTransactionLogDto.type,
+			type: createTransactionLogDto.type,
 
-      assetName: createTransactionLogDto.assetName,
+			assetName: createTransactionLogDto.assetName,
 
-      wallet,
-    });
-  }
+			wallet,
+		});
+	}
 
-  findAllWithPagination({
-    paginationOptions,
-  }: {
-    paginationOptions: IPaginationOptions;
-  }) {
-    return this.transactionLogRepository.findAllWithPagination({
-      paginationOptions: {
-        page: paginationOptions.page,
-        limit: paginationOptions.limit,
-      },
-    });
-  }
+	findAllWithPagination({
+		paginationOptions,
+	}: {
+		paginationOptions: IPaginationOptions;
+	}) {
+		return this.transactionLogRepository.findAllWithPagination({
+			paginationOptions: {
+				page: paginationOptions.page,
+				limit: paginationOptions.limit,
+			},
+		});
+	}
 
-  findById(id: TransactionLog['id']) {
-    return this.transactionLogRepository.findById(id);
-  }
+	findById(id: TransactionLog['id']) {
+		return this.transactionLogRepository.findById(id);
+	}
 
-  findByIds(ids: TransactionLog['id'][]) {
-    return this.transactionLogRepository.findByIds(ids);
-  }
+	findByIds(ids: TransactionLog['id'][]) {
+		return this.transactionLogRepository.findByIds(ids);
+	}
 
-  async update(
-    id: TransactionLog['id'],
+	async update(
+		id: TransactionLog['id'],
 
-    updateTransactionLogDto: UpdateTransactionLogDto,
-  ) {
-    // Do not remove comment below.
-    // <updating-property />
+		updateTransactionLogDto: UpdateTransactionLogDto,
+	) {
+		// Do not remove comment below.
+		// <updating-property />
 
-    let wallet: Wallet | undefined = undefined;
+		let wallet: Wallet | undefined = undefined;
 
-    if (updateTransactionLogDto.wallet) {
-      const walletObject = await this.walletService.findById(
-        updateTransactionLogDto.wallet.id,
-      );
-      if (!walletObject) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            wallet: 'notExists',
-          },
-        });
-      }
-      wallet = walletObject;
-    }
-    return this.transactionLogRepository.update(id, {
-      // Do not remove comment below.
-      // <updating-property-payload />
-      details: updateTransactionLogDto.details,
+		if (updateTransactionLogDto.wallet) {
+			const walletObject = await this.walletService.findById(
+				updateTransactionLogDto.wallet.id,
+			);
+			if (!walletObject) {
+				throw new UnprocessableEntityException({
+					status: HttpStatus.UNPROCESSABLE_ENTITY,
+					errors: {
+						wallet: 'notExists',
+					},
+				});
+			}
+			wallet = walletObject;
+		}
+		return this.transactionLogRepository.update(id, {
+			// Do not remove comment below.
+			// <updating-property-payload />
+			details: updateTransactionLogDto.details,
 
-      priority: updateTransactionLogDto.priority,
-      status: updateTransactionLogDto.status,
-      type: updateTransactionLogDto.type,
-      assetName: updateTransactionLogDto.assetName,
+			priority: updateTransactionLogDto.priority,
+			status: updateTransactionLogDto.status,
+			type: updateTransactionLogDto.type,
+			assetName: updateTransactionLogDto.assetName,
 
-      wallet,
-    });
-  }
+			wallet,
+		});
+	}
 
-  remove(id: TransactionLog['id']) {
-    return this.transactionLogRepository.remove(id);
-  }
+	remove(id: TransactionLog['id']) {
+		return this.transactionLogRepository.remove(id);
+	}
 }

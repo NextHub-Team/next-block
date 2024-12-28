@@ -10,77 +10,77 @@ import { IPaginationOptions } from '../../../../../utils/types/pagination-option
 
 @Injectable()
 export class AccessControlRelationalRepository
-  implements AccessControlRepository
+	implements AccessControlRepository
 {
-  constructor(
-    @InjectRepository(AccessControlEntity)
-    private readonly accessControlRepository: Repository<AccessControlEntity>,
-  ) {}
+	constructor(
+		@InjectRepository(AccessControlEntity)
+		private readonly accessControlRepository: Repository<AccessControlEntity>,
+	) {}
 
-  async create(data: AccessControl): Promise<AccessControl> {
-    const persistenceModel = AccessControlMapper.toPersistence(data);
-    const newEntity = await this.accessControlRepository.save(
-      this.accessControlRepository.create(persistenceModel),
-    );
-    return AccessControlMapper.toDomain(newEntity);
-  }
+	async create(data: AccessControl): Promise<AccessControl> {
+		const persistenceModel = AccessControlMapper.toPersistence(data);
+		const newEntity = await this.accessControlRepository.save(
+			this.accessControlRepository.create(persistenceModel),
+		);
+		return AccessControlMapper.toDomain(newEntity);
+	}
 
-  async findAllWithPagination({
-    paginationOptions,
-  }: {
-    paginationOptions: IPaginationOptions;
-  }): Promise<AccessControl[]> {
-    const entities = await this.accessControlRepository.find({
-      skip: (paginationOptions.page - 1) * paginationOptions.limit,
-      take: paginationOptions.limit,
-    });
+	async findAllWithPagination({
+		paginationOptions,
+	}: {
+		paginationOptions: IPaginationOptions;
+	}): Promise<AccessControl[]> {
+		const entities = await this.accessControlRepository.find({
+			skip: (paginationOptions.page - 1) * paginationOptions.limit,
+			take: paginationOptions.limit,
+		});
 
-    return entities.map((entity) => AccessControlMapper.toDomain(entity));
-  }
+		return entities.map((entity) => AccessControlMapper.toDomain(entity));
+	}
 
-  async findById(
-    id: AccessControl['id'],
-  ): Promise<NullableType<AccessControl>> {
-    const entity = await this.accessControlRepository.findOne({
-      where: { id },
-    });
+	async findById(
+		id: AccessControl['id'],
+	): Promise<NullableType<AccessControl>> {
+		const entity = await this.accessControlRepository.findOne({
+			where: { id },
+		});
 
-    return entity ? AccessControlMapper.toDomain(entity) : null;
-  }
+		return entity ? AccessControlMapper.toDomain(entity) : null;
+	}
 
-  async findByIds(ids: AccessControl['id'][]): Promise<AccessControl[]> {
-    const entities = await this.accessControlRepository.find({
-      where: { id: In(ids) },
-    });
+	async findByIds(ids: AccessControl['id'][]): Promise<AccessControl[]> {
+		const entities = await this.accessControlRepository.find({
+			where: { id: In(ids) },
+		});
 
-    return entities.map((entity) => AccessControlMapper.toDomain(entity));
-  }
+		return entities.map((entity) => AccessControlMapper.toDomain(entity));
+	}
 
-  async update(
-    id: AccessControl['id'],
-    payload: Partial<AccessControl>,
-  ): Promise<AccessControl> {
-    const entity = await this.accessControlRepository.findOne({
-      where: { id },
-    });
+	async update(
+		id: AccessControl['id'],
+		payload: Partial<AccessControl>,
+	): Promise<AccessControl> {
+		const entity = await this.accessControlRepository.findOne({
+			where: { id },
+		});
 
-    if (!entity) {
-      throw new Error('Record not found');
-    }
+		if (!entity) {
+			throw new Error('Record not found');
+		}
 
-    const updatedEntity = await this.accessControlRepository.save(
-      this.accessControlRepository.create(
-        AccessControlMapper.toPersistence({
-          ...AccessControlMapper.toDomain(entity),
-          ...payload,
-        }),
-      ),
-    );
+		const updatedEntity = await this.accessControlRepository.save(
+			this.accessControlRepository.create(
+				AccessControlMapper.toPersistence({
+					...AccessControlMapper.toDomain(entity),
+					...payload,
+				}),
+			),
+		);
 
-    return AccessControlMapper.toDomain(updatedEntity);
-  }
+		return AccessControlMapper.toDomain(updatedEntity);
+	}
 
-  async remove(id: AccessControl['id']): Promise<void> {
-    await this.accessControlRepository.delete(id);
-  }
+	async remove(id: AccessControl['id']): Promise<void> {
+		await this.accessControlRepository.delete(id);
+	}
 }

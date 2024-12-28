@@ -2,10 +2,10 @@ import { NftTransactionsService } from '../nft-transactions/nft-transactions.ser
 import { WalletsService } from '../wallets/wallets.service';
 import { Wallet } from '../wallets/domain/wallet';
 import {
-  forwardRef,
-  HttpStatus,
-  Inject,
-  UnprocessableEntityException,
+	forwardRef,
+	HttpStatus,
+	Inject,
+	UnprocessableEntityException,
 } from '@nestjs/common';
 import { Injectable } from '@nestjs/common';
 import { CreateNftDto } from './dto/create-nft.dto';
@@ -16,130 +16,130 @@ import { Nft } from './domain/nft';
 
 @Injectable()
 export class NftsService {
-  constructor(
-    @Inject(forwardRef(() => NftTransactionsService))
-    private readonly nftTransactionService: NftTransactionsService,
+	constructor(
+		@Inject(forwardRef(() => NftTransactionsService))
+		private readonly nftTransactionService: NftTransactionsService,
 
-    @Inject(forwardRef(() => WalletsService))
-    private readonly walletService: WalletsService,
-    // Dependencies here
-    private readonly nftRepository: NftRepository,
-  ) {}
+		@Inject(forwardRef(() => WalletsService))
+		private readonly walletService: WalletsService,
+		// Dependencies here
+		private readonly nftRepository: NftRepository,
+	) {}
 
-  async create(createNftDto: CreateNftDto) {
-    // Do not remove comment below.
-    // <creating-property />
+	async create(createNftDto: CreateNftDto) {
+		// Do not remove comment below.
+		// <creating-property />
 
-    let wallet: Wallet | undefined = undefined;
+		let wallet: Wallet | undefined = undefined;
 
-    if (createNftDto.wallet) {
-      const walletObject = await this.walletService.findById(
-        createNftDto.wallet.id,
-      );
-      if (!walletObject) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            wallet: 'notExists',
-          },
-        });
-      }
-      wallet = walletObject;
-    }
+		if (createNftDto.wallet) {
+			const walletObject = await this.walletService.findById(
+				createNftDto.wallet.id,
+			);
+			if (!walletObject) {
+				throw new UnprocessableEntityException({
+					status: HttpStatus.UNPROCESSABLE_ENTITY,
+					errors: {
+						wallet: 'notExists',
+					},
+				});
+			}
+			wallet = walletObject;
+		}
 
-    return this.nftRepository.create({
-      // Do not remove comment below.
-      // <creating-property-payload />
-      attributes: createNftDto.attributes,
+		return this.nftRepository.create({
+			// Do not remove comment below.
+			// <creating-property-payload />
+			attributes: createNftDto.attributes,
 
-      OwnerAddress: createNftDto.OwnerAddress,
+			OwnerAddress: createNftDto.OwnerAddress,
 
-      name: createNftDto.name,
+			name: createNftDto.name,
 
-      objectUri: createNftDto.objectUri,
+			objectUri: createNftDto.objectUri,
 
-      metadataUri: createNftDto.metadataUri,
+			metadataUri: createNftDto.metadataUri,
 
-      contractAddress: createNftDto.contractAddress,
+			contractAddress: createNftDto.contractAddress,
 
-      blockchain: createNftDto.blockchain,
+			blockchain: createNftDto.blockchain,
 
-      token: createNftDto.token,
+			token: createNftDto.token,
 
-      wallet,
-    });
-  }
+			wallet,
+		});
+	}
 
-  findAllWithPagination({
-    paginationOptions,
-  }: {
-    paginationOptions: IPaginationOptions;
-  }) {
-    return this.nftRepository.findAllWithPagination({
-      paginationOptions: {
-        page: paginationOptions.page,
-        limit: paginationOptions.limit,
-      },
-    });
-  }
+	findAllWithPagination({
+		paginationOptions,
+	}: {
+		paginationOptions: IPaginationOptions;
+	}) {
+		return this.nftRepository.findAllWithPagination({
+			paginationOptions: {
+				page: paginationOptions.page,
+				limit: paginationOptions.limit,
+			},
+		});
+	}
 
-  findById(id: Nft['id']) {
-    return this.nftRepository.findById(id);
-  }
+	findById(id: Nft['id']) {
+		return this.nftRepository.findById(id);
+	}
 
-  findByIds(ids: Nft['id'][]) {
-    return this.nftRepository.findByIds(ids);
-  }
+	findByIds(ids: Nft['id'][]) {
+		return this.nftRepository.findByIds(ids);
+	}
 
-  async update(
-    id: Nft['id'],
+	async update(
+		id: Nft['id'],
 
-    updateNftDto: UpdateNftDto,
-  ) {
-    // Do not remove comment below.
-    // <updating-property />
+		updateNftDto: UpdateNftDto,
+	) {
+		// Do not remove comment below.
+		// <updating-property />
 
-    let wallet: Wallet | undefined = undefined;
+		let wallet: Wallet | undefined = undefined;
 
-    if (updateNftDto.wallet) {
-      const walletObject = await this.walletService.findById(
-        updateNftDto.wallet.id,
-      );
-      if (!walletObject) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            wallet: 'notExists',
-          },
-        });
-      }
-      wallet = walletObject;
-    }
+		if (updateNftDto.wallet) {
+			const walletObject = await this.walletService.findById(
+				updateNftDto.wallet.id,
+			);
+			if (!walletObject) {
+				throw new UnprocessableEntityException({
+					status: HttpStatus.UNPROCESSABLE_ENTITY,
+					errors: {
+						wallet: 'notExists',
+					},
+				});
+			}
+			wallet = walletObject;
+		}
 
-    return this.nftRepository.update(id, {
-      // Do not remove comment below.
-      // <updating-property-payload />
-      attributes: updateNftDto.attributes,
+		return this.nftRepository.update(id, {
+			// Do not remove comment below.
+			// <updating-property-payload />
+			attributes: updateNftDto.attributes,
 
-      OwnerAddress: updateNftDto.OwnerAddress,
+			OwnerAddress: updateNftDto.OwnerAddress,
 
-      name: updateNftDto.name,
+			name: updateNftDto.name,
 
-      objectUri: updateNftDto.objectUri,
+			objectUri: updateNftDto.objectUri,
 
-      metadataUri: updateNftDto.metadataUri,
+			metadataUri: updateNftDto.metadataUri,
 
-      contractAddress: updateNftDto.contractAddress,
+			contractAddress: updateNftDto.contractAddress,
 
-      blockchain: updateNftDto.blockchain,
+			blockchain: updateNftDto.blockchain,
 
-      token: updateNftDto.token,
+			token: updateNftDto.token,
 
-      wallet,
-    });
-  }
+			wallet,
+		});
+	}
 
-  remove(id: Nft['id']) {
-    return this.nftRepository.remove(id);
-  }
+	remove(id: Nft['id']) {
+		return this.nftRepository.remove(id);
+	}
 }

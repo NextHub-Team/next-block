@@ -69,7 +69,10 @@ module.exports = {
                   message: 'Primitive (string, number, etc)',
                   value: 'primitive',
                 },
-                { message: 'Reference to entity', value: 'reference' },
+                {
+                  message: 'Reference to entity',
+                  value: 'reference',
+                },
                 {
                   message: 'Duplication data from entity',
                   value: 'duplication',

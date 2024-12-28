@@ -10,75 +10,75 @@ import { IPaginationOptions } from '../../../../../utils/types/pagination-option
 
 @Injectable()
 export class NotificationRelationalRepository
-  implements NotificationRepository
+	implements NotificationRepository
 {
-  constructor(
-    @InjectRepository(NotificationEntity)
-    private readonly notificationRepository: Repository<NotificationEntity>,
-  ) {}
+	constructor(
+		@InjectRepository(NotificationEntity)
+		private readonly notificationRepository: Repository<NotificationEntity>,
+	) {}
 
-  async create(data: Notification): Promise<Notification> {
-    const persistenceModel = NotificationMapper.toPersistence(data);
-    const newEntity = await this.notificationRepository.save(
-      this.notificationRepository.create(persistenceModel),
-    );
-    return NotificationMapper.toDomain(newEntity);
-  }
+	async create(data: Notification): Promise<Notification> {
+		const persistenceModel = NotificationMapper.toPersistence(data);
+		const newEntity = await this.notificationRepository.save(
+			this.notificationRepository.create(persistenceModel),
+		);
+		return NotificationMapper.toDomain(newEntity);
+	}
 
-  async findAllWithPagination({
-    paginationOptions,
-  }: {
-    paginationOptions: IPaginationOptions;
-  }): Promise<Notification[]> {
-    const entities = await this.notificationRepository.find({
-      skip: (paginationOptions.page - 1) * paginationOptions.limit,
-      take: paginationOptions.limit,
-    });
+	async findAllWithPagination({
+		paginationOptions,
+	}: {
+		paginationOptions: IPaginationOptions;
+	}): Promise<Notification[]> {
+		const entities = await this.notificationRepository.find({
+			skip: (paginationOptions.page - 1) * paginationOptions.limit,
+			take: paginationOptions.limit,
+		});
 
-    return entities.map((entity) => NotificationMapper.toDomain(entity));
-  }
+		return entities.map((entity) => NotificationMapper.toDomain(entity));
+	}
 
-  async findById(id: Notification['id']): Promise<NullableType<Notification>> {
-    const entity = await this.notificationRepository.findOne({
-      where: { id },
-    });
+	async findById(id: Notification['id']): Promise<NullableType<Notification>> {
+		const entity = await this.notificationRepository.findOne({
+			where: { id },
+		});
 
-    return entity ? NotificationMapper.toDomain(entity) : null;
-  }
+		return entity ? NotificationMapper.toDomain(entity) : null;
+	}
 
-  async findByIds(ids: Notification['id'][]): Promise<Notification[]> {
-    const entities = await this.notificationRepository.find({
-      where: { id: In(ids) },
-    });
+	async findByIds(ids: Notification['id'][]): Promise<Notification[]> {
+		const entities = await this.notificationRepository.find({
+			where: { id: In(ids) },
+		});
 
-    return entities.map((entity) => NotificationMapper.toDomain(entity));
-  }
+		return entities.map((entity) => NotificationMapper.toDomain(entity));
+	}
 
-  async update(
-    id: Notification['id'],
-    payload: Partial<Notification>,
-  ): Promise<Notification> {
-    const entity = await this.notificationRepository.findOne({
-      where: { id },
-    });
+	async update(
+		id: Notification['id'],
+		payload: Partial<Notification>,
+	): Promise<Notification> {
+		const entity = await this.notificationRepository.findOne({
+			where: { id },
+		});
 
-    if (!entity) {
-      throw new Error('Record not found');
-    }
+		if (!entity) {
+			throw new Error('Record not found');
+		}
 
-    const updatedEntity = await this.notificationRepository.save(
-      this.notificationRepository.create(
-        NotificationMapper.toPersistence({
-          ...NotificationMapper.toDomain(entity),
-          ...payload,
-        }),
-      ),
-    );
+		const updatedEntity = await this.notificationRepository.save(
+			this.notificationRepository.create(
+				NotificationMapper.toPersistence({
+					...NotificationMapper.toDomain(entity),
+					...payload,
+				}),
+			),
+		);
 
-    return NotificationMapper.toDomain(updatedEntity);
-  }
+		return NotificationMapper.toDomain(updatedEntity);
+	}
 
-  async remove(id: Notification['id']): Promise<void> {
-    await this.notificationRepository.delete(id);
-  }
+	async remove(id: Notification['id']): Promise<void> {
+		await this.notificationRepository.delete(id);
+	}
 }

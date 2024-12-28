@@ -4,24 +4,24 @@ import { IPaginationOptions } from '../../../utils/types/pagination-options';
 import { Nft } from '../../domain/nft';
 
 export abstract class NftRepository {
-  abstract create(
-    data: Omit<Nft, 'id' | 'createdAt' | 'updatedAt'>,
-  ): Promise<Nft>;
+	abstract create(
+		data: Omit<Nft, 'id' | 'createdAt' | 'updatedAt'>,
+	): Promise<Nft>;
 
-  abstract findAllWithPagination({
-    paginationOptions,
-  }: {
-    paginationOptions: IPaginationOptions;
-  }): Promise<Nft[]>;
+	abstract findAllWithPagination({
+		paginationOptions,
+	}: {
+		paginationOptions: IPaginationOptions;
+	}): Promise<Nft[]>;
 
-  abstract findById(id: Nft['id']): Promise<NullableType<Nft>>;
+	abstract findById(id: Nft['id']): Promise<NullableType<Nft>>;
 
-  abstract findByIds(ids: Nft['id'][]): Promise<Nft[]>;
+	abstract findByIds(ids: Nft['id'][]): Promise<Nft[]>;
 
-  abstract update(
-    id: Nft['id'],
-    payload: DeepPartial<Nft>,
-  ): Promise<Nft | null>;
+	abstract update(
+		id: Nft['id'],
+		payload: DeepPartial<Nft>,
+	): Promise<Nft | null>;
 
-  abstract remove(id: Nft['id']): Promise<void>;
+	abstract remove(id: Nft['id']): Promise<void>;
 }

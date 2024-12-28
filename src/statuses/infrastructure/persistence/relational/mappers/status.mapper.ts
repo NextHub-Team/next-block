@@ -3,31 +3,31 @@ import { Status } from '../../../../domain/status';
 import { StatusEntity } from '../entities/status.entity';
 
 export class StatusMapper {
-  static toDomain(raw: StatusEntity): Status {
-    const domainEntity = new Status();
-    domainEntity.name = raw.name;
+	static toDomain(raw: StatusEntity): Status {
+		const domainEntity = new Status();
+		domainEntity.name = raw.name;
 
-    domainEntity.description = raw.description;
+		domainEntity.description = raw.description;
 
-    domainEntity.id = raw.id;
-    domainEntity.createdAt = raw.createdAt;
-    domainEntity.updatedAt = raw.updatedAt;
+		domainEntity.id = raw.id;
+		domainEntity.createdAt = raw.createdAt;
+		domainEntity.updatedAt = raw.updatedAt;
 
-    return domainEntity;
-  }
+		return domainEntity;
+	}
 
-  static toPersistence(domainEntity: Status): StatusEntity {
-    const persistenceEntity = new StatusEntity();
-    persistenceEntity.name = domainEntity.name;
+	static toPersistence(domainEntity: Status): StatusEntity {
+		const persistenceEntity = new StatusEntity();
+		persistenceEntity.name = domainEntity.name;
 
-    persistenceEntity.description = domainEntity.description;
+		persistenceEntity.description = domainEntity.description;
 
-    if (domainEntity.id) {
-      persistenceEntity.id = domainEntity.id;
-    }
-    persistenceEntity.createdAt = domainEntity.createdAt;
-    persistenceEntity.updatedAt = domainEntity.updatedAt;
+		if (domainEntity.id) {
+			persistenceEntity.id = domainEntity.id;
+		}
+		persistenceEntity.createdAt = domainEntity.createdAt;
+		persistenceEntity.updatedAt = domainEntity.updatedAt;
 
-    return persistenceEntity;
-  }
+		return persistenceEntity;
+	}
 }

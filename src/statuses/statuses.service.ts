@@ -7,63 +7,63 @@ import { Status } from './domain/status';
 
 @Injectable()
 export class StatusesService {
-  constructor(
-    // Dependencies here
-    private readonly statusRepository: StatusRepository,
-  ) {}
+	constructor(
+		// Dependencies here
+		private readonly statusRepository: StatusRepository,
+	) {}
 
-  async create(createStatusDto: CreateStatusDto) {
-    // Do not remove comment below.
-    // <creating-property />
+	async create(createStatusDto: CreateStatusDto) {
+		// Do not remove comment below.
+		// <creating-property />
 
-    return this.statusRepository.create({
-      // Do not remove comment below.
-      // <creating-property-payload />
-      name: createStatusDto.name,
+		return this.statusRepository.create({
+			// Do not remove comment below.
+			// <creating-property-payload />
+			name: createStatusDto.name,
 
-      description: createStatusDto.description,
-    });
-  }
+			description: createStatusDto.description,
+		});
+	}
 
-  findAllWithPagination({
-    paginationOptions,
-  }: {
-    paginationOptions: IPaginationOptions;
-  }) {
-    return this.statusRepository.findAllWithPagination({
-      paginationOptions: {
-        page: paginationOptions.page,
-        limit: paginationOptions.limit,
-      },
-    });
-  }
+	findAllWithPagination({
+		paginationOptions,
+	}: {
+		paginationOptions: IPaginationOptions;
+	}) {
+		return this.statusRepository.findAllWithPagination({
+			paginationOptions: {
+				page: paginationOptions.page,
+				limit: paginationOptions.limit,
+			},
+		});
+	}
 
-  findById(id: Status['id']) {
-    return this.statusRepository.findById(id);
-  }
+	findById(id: Status['id']) {
+		return this.statusRepository.findById(id);
+	}
 
-  findByIds(ids: Status['id'][]) {
-    return this.statusRepository.findByIds(ids);
-  }
+	findByIds(ids: Status['id'][]) {
+		return this.statusRepository.findByIds(ids);
+	}
 
-  async update(
-    id: Status['id'],
+	async update(
+		id: Status['id'],
 
-    updateStatusDto: UpdateStatusDto,
-  ) {
-    // Do not remove comment below.
-    // <updating-property />
+		updateStatusDto: UpdateStatusDto,
+	) {
+		// Do not remove comment below.
+		// <updating-property />
 
-    return this.statusRepository.update(id, {
-      // Do not remove comment below.
-      // <updating-property-payload />
-      name: updateStatusDto.name,
+		return this.statusRepository.update(id, {
+			// Do not remove comment below.
+			// <updating-property-payload />
+			name: updateStatusDto.name,
 
-      description: updateStatusDto.description,
-    });
-  }
+			description: updateStatusDto.description,
+		});
+	}
 
-  remove(id: Status['id']) {
-    return this.statusRepository.remove(id);
-  }
+	remove(id: Status['id']) {
+		return this.statusRepository.remove(id);
+	}
 }

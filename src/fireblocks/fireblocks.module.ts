@@ -12,8 +12,8 @@ import { FireblocksService } from './fireblocks.service';
 import { FireblocksController } from './fireblocks.controller';
 
 @Module({
-  controllers: [FireblocksController],
-  providers: [FireblocksService],
-  exports: [FireblocksService],
+	controllers: [FireblocksController],
+	providers: [FireblocksService],
+	exports: [FireblocksService],
 })
 export class FireblocksModule {}

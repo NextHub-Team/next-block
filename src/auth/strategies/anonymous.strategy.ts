@@ -4,11 +4,11 @@ import { PassportStrategy } from '@nestjs/passport';
 
 @Injectable()
 export class AnonymousStrategy extends PassportStrategy(Strategy) {
-  constructor() {
-    super();
-  }
+	constructor() {
+		super();
+	}
 
-  public validate(payload: unknown, request: unknown): unknown {
-    return request;
-  }
+	public validate(payload: unknown, request: unknown): unknown {
+		return request;
+	}
 }

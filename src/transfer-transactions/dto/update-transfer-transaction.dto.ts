@@ -5,5 +5,5 @@ import { PartialType } from '@nestjs/swagger';
 import { CreateTransferTransactionDto } from './create-transfer-transaction.dto';
 
 export class UpdateTransferTransactionDto extends PartialType(
-  CreateTransferTransactionDto,
+	CreateTransferTransactionDto,
 ) {}

@@ -1,9 +1,9 @@
 import { NftsService } from '../nfts/nfts.service';
 import {
-  forwardRef,
-  HttpStatus,
-  Inject,
-  UnprocessableEntityException,
+	forwardRef,
+	HttpStatus,
+	Inject,
+	UnprocessableEntityException,
 } from '@nestjs/common';
 import { Injectable } from '@nestjs/common';
 import { CreateNftTransactionDto } from './dto/create-nft-transaction.dto';
@@ -15,122 +15,122 @@ import { Nft } from '../nfts/domain/nft';
 
 @Injectable()
 export class NftTransactionsService {
-  constructor(
-    @Inject(forwardRef(() => NftsService))
-    private readonly nftService: NftsService,
-    // Dependencies here
-    private readonly nftTransactionRepository: NftTransactionRepository,
-  ) {}
+	constructor(
+		@Inject(forwardRef(() => NftsService))
+		private readonly nftService: NftsService,
+		// Dependencies here
+		private readonly nftTransactionRepository: NftTransactionRepository,
+	) {}
 
-  async create(createNftTransactionDto: CreateNftTransactionDto) {
-    // Do not remove comment below.
-    // <creating-property />
+	async create(createNftTransactionDto: CreateNftTransactionDto) {
+		// Do not remove comment below.
+		// <creating-property />
 
-    let nft: Nft | undefined = undefined;
+		let nft: Nft | undefined = undefined;
 
-    if (createNftTransactionDto.nft) {
-      const nftObject = await this.nftService.findById(
-        createNftTransactionDto.nft.id,
-      );
-      if (!nftObject) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            nft: 'notExists',
-          },
-        });
-      }
-      nft = nftObject;
-    }
-    return this.nftTransactionRepository.create({
-      // Do not remove comment below.
-      // <creating-property-payload />
-      fee: createNftTransactionDto.fee,
+		if (createNftTransactionDto.nft) {
+			const nftObject = await this.nftService.findById(
+				createNftTransactionDto.nft.id,
+			);
+			if (!nftObject) {
+				throw new UnprocessableEntityException({
+					status: HttpStatus.UNPROCESSABLE_ENTITY,
+					errors: {
+						nft: 'notExists',
+					},
+				});
+			}
+			nft = nftObject;
+		}
+		return this.nftTransactionRepository.create({
+			// Do not remove comment below.
+			// <creating-property-payload />
+			fee: createNftTransactionDto.fee,
 
-      transactionHash: createNftTransactionDto.transactionHash,
+			transactionHash: createNftTransactionDto.transactionHash,
 
-      toAddress: createNftTransactionDto.toAddress,
+			toAddress: createNftTransactionDto.toAddress,
 
-      fromAddress: createNftTransactionDto.fromAddress,
+			fromAddress: createNftTransactionDto.fromAddress,
 
-      contractAddress: createNftTransactionDto.contractAddress,
+			contractAddress: createNftTransactionDto.contractAddress,
 
-      blockchain: createNftTransactionDto.blockchain,
+			blockchain: createNftTransactionDto.blockchain,
 
-      wallet: createNftTransactionDto.wallet,
+			wallet: createNftTransactionDto.wallet,
 
-      nft,
-    });
-  }
+			nft,
+		});
+	}
 
-  findAllWithPagination({
-    paginationOptions,
-  }: {
-    paginationOptions: IPaginationOptions;
-  }) {
-    return this.nftTransactionRepository.findAllWithPagination({
-      paginationOptions: {
-        page: paginationOptions.page,
-        limit: paginationOptions.limit,
-      },
-    });
-  }
+	findAllWithPagination({
+		paginationOptions,
+	}: {
+		paginationOptions: IPaginationOptions;
+	}) {
+		return this.nftTransactionRepository.findAllWithPagination({
+			paginationOptions: {
+				page: paginationOptions.page,
+				limit: paginationOptions.limit,
+			},
+		});
+	}
 
-  findById(id: NftTransaction['id']) {
-    return this.nftTransactionRepository.findById(id);
-  }
+	findById(id: NftTransaction['id']) {
+		return this.nftTransactionRepository.findById(id);
+	}
 
-  findByIds(ids: NftTransaction['id'][]) {
-    return this.nftTransactionRepository.findByIds(ids);
-  }
+	findByIds(ids: NftTransaction['id'][]) {
+		return this.nftTransactionRepository.findByIds(ids);
+	}
 
-  async update(
-    id: NftTransaction['id'],
+	async update(
+		id: NftTransaction['id'],
 
-    updateNftTransactionDto: UpdateNftTransactionDto,
-  ) {
-    // Do not remove comment below.
-    // <updating-property />
+		updateNftTransactionDto: UpdateNftTransactionDto,
+	) {
+		// Do not remove comment below.
+		// <updating-property />
 
-    let nft: Nft | undefined = undefined;
+		let nft: Nft | undefined = undefined;
 
-    if (updateNftTransactionDto.nft) {
-      const nftObject = await this.nftService.findById(
-        updateNftTransactionDto.nft.id,
-      );
-      if (!nftObject) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            nft: 'notExists',
-          },
-        });
-      }
-      nft = nftObject;
-    }
+		if (updateNftTransactionDto.nft) {
+			const nftObject = await this.nftService.findById(
+				updateNftTransactionDto.nft.id,
+			);
+			if (!nftObject) {
+				throw new UnprocessableEntityException({
+					status: HttpStatus.UNPROCESSABLE_ENTITY,
+					errors: {
+						nft: 'notExists',
+					},
+				});
+			}
+			nft = nftObject;
+		}
 
-    return this.nftTransactionRepository.update(id, {
-      // Do not remove comment below.
-      // <updating-property-payload />
-      fee: updateNftTransactionDto.fee,
+		return this.nftTransactionRepository.update(id, {
+			// Do not remove comment below.
+			// <updating-property-payload />
+			fee: updateNftTransactionDto.fee,
 
-      transactionHash: updateNftTransactionDto.transactionHash,
+			transactionHash: updateNftTransactionDto.transactionHash,
 
-      toAddress: updateNftTransactionDto.toAddress,
+			toAddress: updateNftTransactionDto.toAddress,
 
-      fromAddress: updateNftTransactionDto.fromAddress,
+			fromAddress: updateNftTransactionDto.fromAddress,
 
-      contractAddress: updateNftTransactionDto.contractAddress,
+			contractAddress: updateNftTransactionDto.contractAddress,
 
-      blockchain: updateNftTransactionDto.blockchain,
+			blockchain: updateNftTransactionDto.blockchain,
 
-      wallet: updateNftTransactionDto.wallet,
+			wallet: updateNftTransactionDto.wallet,
 
-      nft,
-    });
-  }
+			nft,
+		});
+	}
 
-  remove(id: NftTransaction['id']) {
-    return this.nftTransactionRepository.remove(id);
-  }
+	remove(id: NftTransaction['id']) {
+		return this.nftTransactionRepository.remove(id);
+	}
 }

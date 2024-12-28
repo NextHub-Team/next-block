@@ -10,77 +10,77 @@ import { IPaginationOptions } from '../../../../../utils/types/pagination-option
 
 @Injectable()
 export class SupportedAssetRelationalRepository
-  implements SupportedAssetRepository
+	implements SupportedAssetRepository
 {
-  constructor(
-    @InjectRepository(SupportedAssetEntity)
-    private readonly supportedAssetRepository: Repository<SupportedAssetEntity>,
-  ) {}
+	constructor(
+		@InjectRepository(SupportedAssetEntity)
+		private readonly supportedAssetRepository: Repository<SupportedAssetEntity>,
+	) {}
 
-  async create(data: SupportedAsset): Promise<SupportedAsset> {
-    const persistenceModel = SupportedAssetMapper.toPersistence(data);
-    const newEntity = await this.supportedAssetRepository.save(
-      this.supportedAssetRepository.create(persistenceModel),
-    );
-    return SupportedAssetMapper.toDomain(newEntity);
-  }
+	async create(data: SupportedAsset): Promise<SupportedAsset> {
+		const persistenceModel = SupportedAssetMapper.toPersistence(data);
+		const newEntity = await this.supportedAssetRepository.save(
+			this.supportedAssetRepository.create(persistenceModel),
+		);
+		return SupportedAssetMapper.toDomain(newEntity);
+	}
 
-  async findAllWithPagination({
-    paginationOptions,
-  }: {
-    paginationOptions: IPaginationOptions;
-  }): Promise<SupportedAsset[]> {
-    const entities = await this.supportedAssetRepository.find({
-      skip: (paginationOptions.page - 1) * paginationOptions.limit,
-      take: paginationOptions.limit,
-    });
+	async findAllWithPagination({
+		paginationOptions,
+	}: {
+		paginationOptions: IPaginationOptions;
+	}): Promise<SupportedAsset[]> {
+		const entities = await this.supportedAssetRepository.find({
+			skip: (paginationOptions.page - 1) * paginationOptions.limit,
+			take: paginationOptions.limit,
+		});
 
-    return entities.map((entity) => SupportedAssetMapper.toDomain(entity));
-  }
+		return entities.map((entity) => SupportedAssetMapper.toDomain(entity));
+	}
 
-  async findById(
-    id: SupportedAsset['id'],
-  ): Promise<NullableType<SupportedAsset>> {
-    const entity = await this.supportedAssetRepository.findOne({
-      where: { id },
-    });
+	async findById(
+		id: SupportedAsset['id'],
+	): Promise<NullableType<SupportedAsset>> {
+		const entity = await this.supportedAssetRepository.findOne({
+			where: { id },
+		});
 
-    return entity ? SupportedAssetMapper.toDomain(entity) : null;
-  }
+		return entity ? SupportedAssetMapper.toDomain(entity) : null;
+	}
 
-  async findByIds(ids: SupportedAsset['id'][]): Promise<SupportedAsset[]> {
-    const entities = await this.supportedAssetRepository.find({
-      where: { id: In(ids) },
-    });
+	async findByIds(ids: SupportedAsset['id'][]): Promise<SupportedAsset[]> {
+		const entities = await this.supportedAssetRepository.find({
+			where: { id: In(ids) },
+		});
 
-    return entities.map((entity) => SupportedAssetMapper.toDomain(entity));
-  }
+		return entities.map((entity) => SupportedAssetMapper.toDomain(entity));
+	}
 
-  async update(
-    id: SupportedAsset['id'],
-    payload: Partial<SupportedAsset>,
-  ): Promise<SupportedAsset> {
-    const entity = await this.supportedAssetRepository.findOne({
-      where: { id },
-    });
+	async update(
+		id: SupportedAsset['id'],
+		payload: Partial<SupportedAsset>,
+	): Promise<SupportedAsset> {
+		const entity = await this.supportedAssetRepository.findOne({
+			where: { id },
+		});
 
-    if (!entity) {
-      throw new Error('Record not found');
-    }
+		if (!entity) {
+			throw new Error('Record not found');
+		}
 
-    const updatedEntity = await this.supportedAssetRepository.save(
-      this.supportedAssetRepository.create(
-        SupportedAssetMapper.toPersistence({
-          ...SupportedAssetMapper.toDomain(entity),
-          ...payload,
-        }),
-      ),
-    );
+		const updatedEntity = await this.supportedAssetRepository.save(
+			this.supportedAssetRepository.create(
+				SupportedAssetMapper.toPersistence({
+					...SupportedAssetMapper.toDomain(entity),
+					...payload,
+				}),
+			),
+		);
 
-    return SupportedAssetMapper.toDomain(updatedEntity);
-  }
+		return SupportedAssetMapper.toDomain(updatedEntity);
+	}
 
-  async remove(id: SupportedAsset['id']): Promise<void> {
-    await this.supportedAssetRepository.delete(id);
-  }
+	async remove(id: SupportedAsset['id']): Promise<void> {
+		await this.supportedAssetRepository.delete(id);
+	}
 }

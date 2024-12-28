@@ -5,13 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PassphraseEntity } from './entities/passphrase.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([PassphraseEntity])],
-  providers: [
-    {
-      provide: PassphraseRepository,
-      useClass: PassphraseRelationalRepository,
-    },
-  ],
-  exports: [PassphraseRepository],
+	imports: [TypeOrmModule.forFeature([PassphraseEntity])],
+	providers: [
+		{
+			provide: PassphraseRepository,
+			useClass: PassphraseRelationalRepository,
+		},
+	],
+	exports: [PassphraseRepository],
 })
 export class RelationalPassphrasePersistenceModule {}

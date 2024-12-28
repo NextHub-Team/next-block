@@ -1,14 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class Type {
-  @ApiProperty({
-    type: String,
-  })
-  id: string;
+	@ApiProperty({
+		type: String,
+	})
+	id: string;
 
-  @ApiProperty()
-  createdAt: Date;
+	@ApiProperty()
+	createdAt: Date;
 
-  @ApiProperty()
-  updatedAt: Date;
+	@ApiProperty()
+	updatedAt: Date;
 }

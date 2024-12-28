@@ -2,10 +2,10 @@ import { DevicesService } from '../devices/devices.service';
 import { Device } from '../devices/domain/device';
 
 import {
-  forwardRef,
-  HttpStatus,
-  Inject,
-  UnprocessableEntityException,
+	forwardRef,
+	HttpStatus,
+	Inject,
+	UnprocessableEntityException,
 } from '@nestjs/common';
 
 import { Injectable } from '@nestjs/common';
@@ -17,124 +17,124 @@ import { Notification } from './domain/notification';
 
 @Injectable()
 export class NotificationsService {
-  constructor(
-    @Inject(forwardRef(() => DevicesService))
-    private readonly deviceService: DevicesService,
+	constructor(
+		@Inject(forwardRef(() => DevicesService))
+		private readonly deviceService: DevicesService,
 
-    // Dependencies here
-    private readonly notificationRepository: NotificationRepository,
-  ) {}
+		// Dependencies here
+		private readonly notificationRepository: NotificationRepository,
+	) {}
 
-  async create(createNotificationDto: CreateNotificationDto) {
-    // Do not remove comment below.
-    // <creating-property />
+	async create(createNotificationDto: CreateNotificationDto) {
+		// Do not remove comment below.
+		// <creating-property />
 
-    const deviceObject = await this.deviceService.findById(
-      createNotificationDto.device.id,
-    );
-    if (!deviceObject) {
-      throw new UnprocessableEntityException({
-        status: HttpStatus.UNPROCESSABLE_ENTITY,
-        errors: {
-          device: 'notExists',
-        },
-      });
-    }
-    const device = deviceObject;
+		const deviceObject = await this.deviceService.findById(
+			createNotificationDto.device.id,
+		);
+		if (!deviceObject) {
+			throw new UnprocessableEntityException({
+				status: HttpStatus.UNPROCESSABLE_ENTITY,
+				errors: {
+					device: 'notExists',
+				},
+			});
+		}
+		const device = deviceObject;
 
-    return this.notificationRepository.create({
-      // Do not remove comment below.
-      // <creating-property-payload />
-      scheduledAt: createNotificationDto.scheduledAt,
+		return this.notificationRepository.create({
+			// Do not remove comment below.
+			// <creating-property-payload />
+			scheduledAt: createNotificationDto.scheduledAt,
 
-      sentAt: createNotificationDto.sentAt,
+			sentAt: createNotificationDto.sentAt,
 
-      isRead: createNotificationDto.isRead,
+			isRead: createNotificationDto.isRead,
 
-      status: createNotificationDto.status,
+			status: createNotificationDto.status,
 
-      priority: createNotificationDto.priority,
+			priority: createNotificationDto.priority,
 
-      type: createNotificationDto.type,
+			type: createNotificationDto.type,
 
-      device,
+			device,
 
-      message: createNotificationDto.message,
+			message: createNotificationDto.message,
 
-      title: createNotificationDto.title,
-    });
-  }
+			title: createNotificationDto.title,
+		});
+	}
 
-  findAllWithPagination({
-    paginationOptions,
-  }: {
-    paginationOptions: IPaginationOptions;
-  }) {
-    return this.notificationRepository.findAllWithPagination({
-      paginationOptions: {
-        page: paginationOptions.page,
-        limit: paginationOptions.limit,
-      },
-    });
-  }
+	findAllWithPagination({
+		paginationOptions,
+	}: {
+		paginationOptions: IPaginationOptions;
+	}) {
+		return this.notificationRepository.findAllWithPagination({
+			paginationOptions: {
+				page: paginationOptions.page,
+				limit: paginationOptions.limit,
+			},
+		});
+	}
 
-  findById(id: Notification['id']) {
-    return this.notificationRepository.findById(id);
-  }
+	findById(id: Notification['id']) {
+		return this.notificationRepository.findById(id);
+	}
 
-  findByIds(ids: Notification['id'][]) {
-    return this.notificationRepository.findByIds(ids);
-  }
+	findByIds(ids: Notification['id'][]) {
+		return this.notificationRepository.findByIds(ids);
+	}
 
-  async update(
-    id: Notification['id'],
+	async update(
+		id: Notification['id'],
 
-    updateNotificationDto: UpdateNotificationDto,
-  ) {
-    // Do not remove comment below.
-    // <updating-property />
+		updateNotificationDto: UpdateNotificationDto,
+	) {
+		// Do not remove comment below.
+		// <updating-property />
 
-    let device: Device | undefined = undefined;
+		let device: Device | undefined = undefined;
 
-    if (updateNotificationDto.device) {
-      const deviceObject = await this.deviceService.findById(
-        updateNotificationDto.device.id,
-      );
-      if (!deviceObject) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            device: 'notExists',
-          },
-        });
-      }
-      device = deviceObject;
-    }
+		if (updateNotificationDto.device) {
+			const deviceObject = await this.deviceService.findById(
+				updateNotificationDto.device.id,
+			);
+			if (!deviceObject) {
+				throw new UnprocessableEntityException({
+					status: HttpStatus.UNPROCESSABLE_ENTITY,
+					errors: {
+						device: 'notExists',
+					},
+				});
+			}
+			device = deviceObject;
+		}
 
-    return this.notificationRepository.update(id, {
-      // Do not remove comment below.
-      // <updating-property-payload />
-      scheduledAt: updateNotificationDto.scheduledAt,
+		return this.notificationRepository.update(id, {
+			// Do not remove comment below.
+			// <updating-property-payload />
+			scheduledAt: updateNotificationDto.scheduledAt,
 
-      sentAt: updateNotificationDto.sentAt,
+			sentAt: updateNotificationDto.sentAt,
 
-      isRead: updateNotificationDto.isRead,
+			isRead: updateNotificationDto.isRead,
 
-      status: updateNotificationDto.status,
+			status: updateNotificationDto.status,
 
-      priority: updateNotificationDto.priority,
+			priority: updateNotificationDto.priority,
 
-      type: updateNotificationDto.type,
+			type: updateNotificationDto.type,
 
-      device,
+			device,
 
-      message: updateNotificationDto.message,
+			message: updateNotificationDto.message,
 
-      title: updateNotificationDto.title,
-    });
-  }
+			title: updateNotificationDto.title,
+		});
+	}
 
-  remove(id: Notification['id']) {
-    return this.notificationRepository.remove(id);
-  }
+	remove(id: Notification['id']) {
+		return this.notificationRepository.remove(id);
+	}
 }

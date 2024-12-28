@@ -5,13 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RoleEntity } from './entities/role.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([RoleEntity])],
-  providers: [
-    {
-      provide: RoleRepository,
-      useClass: RoleRelationalRepository,
-    },
-  ],
-  exports: [RoleRepository],
+	imports: [TypeOrmModule.forFeature([RoleEntity])],
+	providers: [
+		{
+			provide: RoleRepository,
+			useClass: RoleRelationalRepository,
+		},
+	],
+	exports: [RoleRepository],
 })
 export class RelationalRolePersistenceModule {}

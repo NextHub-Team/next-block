@@ -11,17 +11,17 @@ import { FilesModule } from '../files/files.module';
 const infrastructurePersistenceModule = RelationalUserPersistenceModule;
 
 @Module({
-  imports: [
-    forwardRef(() => AccessControlsModule),
-    forwardRef(() => UserLogsModule),
-    forwardRef(() => MainWalletsModule),
-    forwardRef(() => DevicesModule),
-    // import modules, etc.
-    infrastructurePersistenceModule,
-    FilesModule,
-  ],
-  controllers: [UsersController],
-  providers: [UsersService],
-  exports: [UsersService, infrastructurePersistenceModule],
+	imports: [
+		forwardRef(() => AccessControlsModule),
+		forwardRef(() => UserLogsModule),
+		forwardRef(() => MainWalletsModule),
+		forwardRef(() => DevicesModule),
+		// import modules, etc.
+		infrastructurePersistenceModule,
+		FilesModule,
+	],
+	controllers: [UsersController],
+	providers: [UsersService],
+	exports: [UsersService, infrastructurePersistenceModule],
 })
 export class UsersModule {}

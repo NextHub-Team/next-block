@@ -7,16 +7,16 @@ import { RelationalMainWalletPersistenceModule } from './infrastructure/persiste
 import { PassphrasesModule } from '../passphrases/passphrases.module';
 
 @Module({
-  imports: [
-    WalletsModule,
+	imports: [
+		WalletsModule,
 
-    PassphrasesModule,
-    forwardRef(() => UsersModule),
-    // import modules, etc.
-    RelationalMainWalletPersistenceModule,
-  ],
-  controllers: [MainWalletsController],
-  providers: [MainWalletsService],
-  exports: [MainWalletsService, RelationalMainWalletPersistenceModule],
+		PassphrasesModule,
+		forwardRef(() => UsersModule),
+		// import modules, etc.
+		RelationalMainWalletPersistenceModule,
+	],
+	controllers: [MainWalletsController],
+	providers: [MainWalletsService],
+	exports: [MainWalletsService, RelationalMainWalletPersistenceModule],
 })
 export class MainWalletsModule {}

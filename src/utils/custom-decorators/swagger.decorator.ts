@@ -8,17 +8,17 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
  * @param permissions - JSON object describing permissions for the API
  */
 export function Description(
-  role: 'Admin' | 'Client',
-  description: string,
-  permissions: Record<string, any>,
+	role: 'Admin' | 'Client',
+	description: string,
+	permissions: Record<string, any>,
 ) {
-  // Generate permissions list in Markdown
-  const permissionList = Object.keys(permissions)
-    .map((key) => `- ${key}`)
-    .join('\n');
+	// Generate permissions list in Markdown
+	const permissionList = Object.keys(permissions)
+		.map((key) => `- ${key}`)
+		.join('\n');
 
-  // Styled Markdown description
-  const markdownDescription = `
+	// Styled Markdown description
+	const markdownDescription = `
 **Role:** ${role === 'Admin' ? '**Admin**' : '**Client**'}  
 
 **Description:**  
@@ -28,11 +28,11 @@ ${description.replace(/\n/g, '\n')}
 ${permissionList}
   `;
 
-  return applyDecorators(
-    ApiTags(role), // Add Swagger tag for grouping
-    ApiOperation({
-      description: markdownDescription,
-      summary: `${role.toUpperCase()}`, // Brief summary
-    }),
-  );
+	return applyDecorators(
+		ApiTags(role), // Add Swagger tag for grouping
+		ApiOperation({
+			description: markdownDescription,
+			summary: `${role.toUpperCase()}`, // Brief summary
+		}),
+	);
 }

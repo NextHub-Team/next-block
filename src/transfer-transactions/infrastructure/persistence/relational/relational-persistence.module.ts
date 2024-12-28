@@ -5,13 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { TransferTransactionEntity } from './entities/transfer-transaction.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([TransferTransactionEntity])],
-  providers: [
-    {
-      provide: TransferTransactionRepository,
-      useClass: TransferTransactionRelationalRepository,
-    },
-  ],
-  exports: [TransferTransactionRepository],
+	imports: [TypeOrmModule.forFeature([TransferTransactionEntity])],
+	providers: [
+		{
+			provide: TransferTransactionRepository,
+			useClass: TransferTransactionRelationalRepository,
+		},
+	],
+	exports: [TransferTransactionRepository],
 })
 export class RelationalTransferTransactionPersistenceModule {}

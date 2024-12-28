@@ -5,14 +5,14 @@ import { EventLogsController } from './event-logs.controller';
 import { RelationalEventLogPersistenceModule } from './infrastructure/persistence/relational/relational-persistence.module';
 
 @Module({
-  imports: [
-    UserLogsModule,
+	imports: [
+		UserLogsModule,
 
-    // import modules, etc.
-    RelationalEventLogPersistenceModule,
-  ],
-  controllers: [EventLogsController],
-  providers: [EventLogsService],
-  exports: [EventLogsService, RelationalEventLogPersistenceModule],
+		// import modules, etc.
+		RelationalEventLogPersistenceModule,
+	],
+	controllers: [EventLogsController],
+	providers: [EventLogsService],
+	exports: [EventLogsService, RelationalEventLogPersistenceModule],
 })
 export class EventLogsModule {}

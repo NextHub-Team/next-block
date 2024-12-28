@@ -10,73 +10,73 @@ import { IPaginationOptions } from '../../../../../utils/types/pagination-option
 
 @Injectable()
 export class EventLogRelationalRepository implements EventLogRepository {
-  constructor(
-    @InjectRepository(EventLogEntity)
-    private readonly eventLogRepository: Repository<EventLogEntity>,
-  ) {}
+	constructor(
+		@InjectRepository(EventLogEntity)
+		private readonly eventLogRepository: Repository<EventLogEntity>,
+	) {}
 
-  async create(data: EventLog): Promise<EventLog> {
-    const persistenceModel = EventLogMapper.toPersistence(data);
-    const newEntity = await this.eventLogRepository.save(
-      this.eventLogRepository.create(persistenceModel),
-    );
-    return EventLogMapper.toDomain(newEntity);
-  }
+	async create(data: EventLog): Promise<EventLog> {
+		const persistenceModel = EventLogMapper.toPersistence(data);
+		const newEntity = await this.eventLogRepository.save(
+			this.eventLogRepository.create(persistenceModel),
+		);
+		return EventLogMapper.toDomain(newEntity);
+	}
 
-  async findAllWithPagination({
-    paginationOptions,
-  }: {
-    paginationOptions: IPaginationOptions;
-  }): Promise<EventLog[]> {
-    const entities = await this.eventLogRepository.find({
-      skip: (paginationOptions.page - 1) * paginationOptions.limit,
-      take: paginationOptions.limit,
-    });
+	async findAllWithPagination({
+		paginationOptions,
+	}: {
+		paginationOptions: IPaginationOptions;
+	}): Promise<EventLog[]> {
+		const entities = await this.eventLogRepository.find({
+			skip: (paginationOptions.page - 1) * paginationOptions.limit,
+			take: paginationOptions.limit,
+		});
 
-    return entities.map((entity) => EventLogMapper.toDomain(entity));
-  }
+		return entities.map((entity) => EventLogMapper.toDomain(entity));
+	}
 
-  async findById(id: EventLog['id']): Promise<NullableType<EventLog>> {
-    const entity = await this.eventLogRepository.findOne({
-      where: { id },
-    });
+	async findById(id: EventLog['id']): Promise<NullableType<EventLog>> {
+		const entity = await this.eventLogRepository.findOne({
+			where: { id },
+		});
 
-    return entity ? EventLogMapper.toDomain(entity) : null;
-  }
+		return entity ? EventLogMapper.toDomain(entity) : null;
+	}
 
-  async findByIds(ids: EventLog['id'][]): Promise<EventLog[]> {
-    const entities = await this.eventLogRepository.find({
-      where: { id: In(ids) },
-    });
+	async findByIds(ids: EventLog['id'][]): Promise<EventLog[]> {
+		const entities = await this.eventLogRepository.find({
+			where: { id: In(ids) },
+		});
 
-    return entities.map((entity) => EventLogMapper.toDomain(entity));
-  }
+		return entities.map((entity) => EventLogMapper.toDomain(entity));
+	}
 
-  async update(
-    id: EventLog['id'],
-    payload: Partial<EventLog>,
-  ): Promise<EventLog> {
-    const entity = await this.eventLogRepository.findOne({
-      where: { id },
-    });
+	async update(
+		id: EventLog['id'],
+		payload: Partial<EventLog>,
+	): Promise<EventLog> {
+		const entity = await this.eventLogRepository.findOne({
+			where: { id },
+		});
 
-    if (!entity) {
-      throw new Error('Record not found');
-    }
+		if (!entity) {
+			throw new Error('Record not found');
+		}
 
-    const updatedEntity = await this.eventLogRepository.save(
-      this.eventLogRepository.create(
-        EventLogMapper.toPersistence({
-          ...EventLogMapper.toDomain(entity),
-          ...payload,
-        }),
-      ),
-    );
+		const updatedEntity = await this.eventLogRepository.save(
+			this.eventLogRepository.create(
+				EventLogMapper.toPersistence({
+					...EventLogMapper.toDomain(entity),
+					...payload,
+				}),
+			),
+		);
 
-    return EventLogMapper.toDomain(updatedEntity);
-  }
+		return EventLogMapper.toDomain(updatedEntity);
+	}
 
-  async remove(id: EventLog['id']): Promise<void> {
-    await this.eventLogRepository.delete(id);
-  }
+	async remove(id: EventLog['id']): Promise<void> {
+		await this.eventLogRepository.delete(id);
+	}
 }

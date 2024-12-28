@@ -5,13 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { WhiteListAddressEntity } from './entities/white-list-address.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([WhiteListAddressEntity])],
-  providers: [
-    {
-      provide: WhiteListAddressRepository,
-      useClass: WhiteListAddressRelationalRepository,
-    },
-  ],
-  exports: [WhiteListAddressRepository],
+	imports: [TypeOrmModule.forFeature([WhiteListAddressEntity])],
+	providers: [
+		{
+			provide: WhiteListAddressRepository,
+			useClass: WhiteListAddressRelationalRepository,
+		},
+	],
+	exports: [WhiteListAddressRepository],
 })
 export class RelationalWhiteListAddressPersistenceModule {}

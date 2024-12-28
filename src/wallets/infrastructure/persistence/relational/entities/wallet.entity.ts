@@ -5,68 +5,68 @@ import { NftEntity } from '../../../../../nfts/infrastructure/persistence/relati
 import { MainWalletEntity } from '../../../../../main-wallets/infrastructure/persistence/relational/entities/main-wallet.entity';
 
 import {
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-  ManyToOne,
-  Column,
-  OneToMany,
+	CreateDateColumn,
+	Entity,
+	PrimaryGeneratedColumn,
+	UpdateDateColumn,
+	ManyToOne,
+	Column,
+	OneToMany,
 } from 'typeorm';
 import { EntityRelationalHelper } from '../../../../../utils/relational-entity-helper';
 
 @Entity({
-  name: 'wallet',
+	name: 'wallet',
 })
 export class WalletEntity extends EntityRelationalHelper {
-  @Column({
-    nullable: true,
-    type: String,
-  })
-  details?: string | null;
+	@Column({
+		nullable: true,
+		type: String,
+	})
+	details?: string | null;
 
-  @OneToMany(() => TransactionLogEntity, (childEntity) => childEntity.wallet, {
-    eager: true,
-    nullable: true,
-  })
-  transactionLog?: TransactionLogEntity[] | null;
+	@OneToMany(() => TransactionLogEntity, (childEntity) => childEntity.wallet, {
+		eager: true,
+		nullable: true,
+	})
+	transactionLog?: TransactionLogEntity[] | null;
 
-  @OneToMany(() => NftEntity, (childEntity) => childEntity.wallet, {
-    eager: true,
-    nullable: true,
-  })
-  nfts?: NftEntity[] | null;
+	@OneToMany(() => NftEntity, (childEntity) => childEntity.wallet, {
+		eager: true,
+		nullable: true,
+	})
+	nfts?: NftEntity[] | null;
 
-  @Column({
-    nullable: false,
-    type: String,
-  })
-  legacyAddress: string;
+	@Column({
+		nullable: false,
+		type: String,
+	})
+	legacyAddress: string;
 
-  @Column({
-    nullable: false,
-    type: String,
-  })
-  blockchain: string;
+	@Column({
+		nullable: false,
+		type: String,
+	})
+	blockchain: string;
 
-  @Column({
-    nullable: false,
-    type: String,
-  })
-  address: string;
+	@Column({
+		nullable: false,
+		type: String,
+	})
+	address: string;
 
-  @ManyToOne(() => MainWalletEntity, (parentEntity) => parentEntity.wallets, {
-    eager: false,
-    nullable: false,
-  })
-  mainWallet: MainWalletEntity;
+	@ManyToOne(() => MainWalletEntity, (parentEntity) => parentEntity.wallets, {
+		eager: false,
+		nullable: false,
+	})
+	mainWallet: MainWalletEntity;
 
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+	@PrimaryGeneratedColumn('uuid')
+	id: string;
 
-  @CreateDateColumn()
-  createdAt: Date;
+	@CreateDateColumn()
+	createdAt: Date;
 
-  @UpdateDateColumn()
-  updatedAt: Date;
+	@UpdateDateColumn()
+	updatedAt: Date;
 }

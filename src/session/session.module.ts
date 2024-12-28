@@ -5,8 +5,8 @@ import { SessionService } from './session.service';
 const infrastructurePersistenceModule = RelationalSessionPersistenceModule;
 
 @Module({
-  imports: [infrastructurePersistenceModule],
-  providers: [SessionService],
-  exports: [SessionService, infrastructurePersistenceModule],
+	imports: [infrastructurePersistenceModule],
+	providers: [SessionService],
+	exports: [SessionService, infrastructurePersistenceModule],
 })
 export class SessionModule {}

@@ -4,15 +4,15 @@ import { TransferTransactionsController } from './transfer-transactions.controll
 import { RelationalTransferTransactionPersistenceModule } from './infrastructure/persistence/relational/relational-persistence.module';
 
 @Module({
-  imports: [
-    // import modules, etc.
-    RelationalTransferTransactionPersistenceModule,
-  ],
-  controllers: [TransferTransactionsController],
-  providers: [TransferTransactionsService],
-  exports: [
-    TransferTransactionsService,
-    RelationalTransferTransactionPersistenceModule,
-  ],
+	imports: [
+		// import modules, etc.
+		RelationalTransferTransactionPersistenceModule,
+	],
+	controllers: [TransferTransactionsController],
+	providers: [TransferTransactionsService],
+	exports: [
+		TransferTransactionsService,
+		RelationalTransferTransactionPersistenceModule,
+	],
 })
 export class TransferTransactionsModule {}

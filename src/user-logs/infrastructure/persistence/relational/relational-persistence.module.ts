@@ -5,13 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserLogEntity } from './entities/user-log.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserLogEntity])],
-  providers: [
-    {
-      provide: UserLogRepository,
-      useClass: UserLogRelationalRepository,
-    },
-  ],
-  exports: [UserLogRepository],
+	imports: [TypeOrmModule.forFeature([UserLogEntity])],
+	providers: [
+		{
+			provide: UserLogRepository,
+			useClass: UserLogRelationalRepository,
+		},
+	],
+	exports: [UserLogRepository],
 })
 export class RelationalUserLogPersistenceModule {}

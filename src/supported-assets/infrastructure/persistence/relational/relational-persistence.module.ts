@@ -5,13 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { SupportedAssetEntity } from './entities/supported-asset.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([SupportedAssetEntity])],
-  providers: [
-    {
-      provide: SupportedAssetRepository,
-      useClass: SupportedAssetRelationalRepository,
-    },
-  ],
-  exports: [SupportedAssetRepository],
+	imports: [TypeOrmModule.forFeature([SupportedAssetEntity])],
+	providers: [
+		{
+			provide: SupportedAssetRepository,
+			useClass: SupportedAssetRelationalRepository,
+		},
+	],
+	exports: [SupportedAssetRepository],
 })
 export class RelationalSupportedAssetPersistenceModule {}

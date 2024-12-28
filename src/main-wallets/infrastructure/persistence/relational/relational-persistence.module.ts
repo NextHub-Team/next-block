@@ -5,13 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { MainWalletEntity } from './entities/main-wallet.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([MainWalletEntity])],
-  providers: [
-    {
-      provide: MainWalletRepository,
-      useClass: MainWalletRelationalRepository,
-    },
-  ],
-  exports: [MainWalletRepository],
+	imports: [TypeOrmModule.forFeature([MainWalletEntity])],
+	providers: [
+		{
+			provide: MainWalletRepository,
+			useClass: MainWalletRelationalRepository,
+		},
+	],
+	exports: [MainWalletRepository],
 })
 export class RelationalMainWalletPersistenceModule {}

@@ -5,13 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { NftEntity } from './entities/nft.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([NftEntity])],
-  providers: [
-    {
-      provide: NftRepository,
-      useClass: NftRelationalRepository,
-    },
-  ],
-  exports: [NftRepository],
+	imports: [TypeOrmModule.forFeature([NftEntity])],
+	providers: [
+		{
+			provide: NftRepository,
+			useClass: NftRelationalRepository,
+		},
+	],
+	exports: [NftRepository],
 })
 export class RelationalNftPersistenceModule {}

@@ -10,73 +10,73 @@ import { IPaginationOptions } from '../../../../../utils/types/pagination-option
 
 @Injectable()
 export class PassphraseRelationalRepository implements PassphraseRepository {
-  constructor(
-    @InjectRepository(PassphraseEntity)
-    private readonly passphraseRepository: Repository<PassphraseEntity>,
-  ) {}
+	constructor(
+		@InjectRepository(PassphraseEntity)
+		private readonly passphraseRepository: Repository<PassphraseEntity>,
+	) {}
 
-  async create(data: Passphrase): Promise<Passphrase> {
-    const persistenceModel = PassphraseMapper.toPersistence(data);
-    const newEntity = await this.passphraseRepository.save(
-      this.passphraseRepository.create(persistenceModel),
-    );
-    return PassphraseMapper.toDomain(newEntity);
-  }
+	async create(data: Passphrase): Promise<Passphrase> {
+		const persistenceModel = PassphraseMapper.toPersistence(data);
+		const newEntity = await this.passphraseRepository.save(
+			this.passphraseRepository.create(persistenceModel),
+		);
+		return PassphraseMapper.toDomain(newEntity);
+	}
 
-  async findAllWithPagination({
-    paginationOptions,
-  }: {
-    paginationOptions: IPaginationOptions;
-  }): Promise<Passphrase[]> {
-    const entities = await this.passphraseRepository.find({
-      skip: (paginationOptions.page - 1) * paginationOptions.limit,
-      take: paginationOptions.limit,
-    });
+	async findAllWithPagination({
+		paginationOptions,
+	}: {
+		paginationOptions: IPaginationOptions;
+	}): Promise<Passphrase[]> {
+		const entities = await this.passphraseRepository.find({
+			skip: (paginationOptions.page - 1) * paginationOptions.limit,
+			take: paginationOptions.limit,
+		});
 
-    return entities.map((entity) => PassphraseMapper.toDomain(entity));
-  }
+		return entities.map((entity) => PassphraseMapper.toDomain(entity));
+	}
 
-  async findById(id: Passphrase['id']): Promise<NullableType<Passphrase>> {
-    const entity = await this.passphraseRepository.findOne({
-      where: { id },
-    });
+	async findById(id: Passphrase['id']): Promise<NullableType<Passphrase>> {
+		const entity = await this.passphraseRepository.findOne({
+			where: { id },
+		});
 
-    return entity ? PassphraseMapper.toDomain(entity) : null;
-  }
+		return entity ? PassphraseMapper.toDomain(entity) : null;
+	}
 
-  async findByIds(ids: Passphrase['id'][]): Promise<Passphrase[]> {
-    const entities = await this.passphraseRepository.find({
-      where: { id: In(ids) },
-    });
+	async findByIds(ids: Passphrase['id'][]): Promise<Passphrase[]> {
+		const entities = await this.passphraseRepository.find({
+			where: { id: In(ids) },
+		});
 
-    return entities.map((entity) => PassphraseMapper.toDomain(entity));
-  }
+		return entities.map((entity) => PassphraseMapper.toDomain(entity));
+	}
 
-  async update(
-    id: Passphrase['id'],
-    payload: Partial<Passphrase>,
-  ): Promise<Passphrase> {
-    const entity = await this.passphraseRepository.findOne({
-      where: { id },
-    });
+	async update(
+		id: Passphrase['id'],
+		payload: Partial<Passphrase>,
+	): Promise<Passphrase> {
+		const entity = await this.passphraseRepository.findOne({
+			where: { id },
+		});
 
-    if (!entity) {
-      throw new Error('Record not found');
-    }
+		if (!entity) {
+			throw new Error('Record not found');
+		}
 
-    const updatedEntity = await this.passphraseRepository.save(
-      this.passphraseRepository.create(
-        PassphraseMapper.toPersistence({
-          ...PassphraseMapper.toDomain(entity),
-          ...payload,
-        }),
-      ),
-    );
+		const updatedEntity = await this.passphraseRepository.save(
+			this.passphraseRepository.create(
+				PassphraseMapper.toPersistence({
+					...PassphraseMapper.toDomain(entity),
+					...payload,
+				}),
+			),
+		);
 
-    return PassphraseMapper.toDomain(updatedEntity);
-  }
+		return PassphraseMapper.toDomain(updatedEntity);
+	}
 
-  async remove(id: Passphrase['id']): Promise<void> {
-    await this.passphraseRepository.delete(id);
-  }
+	async remove(id: Passphrase['id']): Promise<void> {
+		await this.passphraseRepository.delete(id);
+	}
 }

@@ -7,87 +7,87 @@ import { OrderTransaction } from './domain/order-transaction';
 
 @Injectable()
 export class OrderTransactionsService {
-  constructor(
-    // Dependencies here
-    private readonly orderTransactionRepository: OrderTransactionRepository,
-  ) {}
+	constructor(
+		// Dependencies here
+		private readonly orderTransactionRepository: OrderTransactionRepository,
+	) {}
 
-  async create(createOrderTransactionDto: CreateOrderTransactionDto) {
-    // Do not remove comment below.
-    // <creating-property />
+	async create(createOrderTransactionDto: CreateOrderTransactionDto) {
+		// Do not remove comment below.
+		// <creating-property />
 
-    return this.orderTransactionRepository.create({
-      // Do not remove comment below.
-      // <creating-property-payload />
-      type: createOrderTransactionDto.type,
+		return this.orderTransactionRepository.create({
+			// Do not remove comment below.
+			// <creating-property-payload />
+			type: createOrderTransactionDto.type,
 
-      fee: createOrderTransactionDto.fee,
+			fee: createOrderTransactionDto.fee,
 
-      paymentMethod: createOrderTransactionDto.paymentMethod,
+			paymentMethod: createOrderTransactionDto.paymentMethod,
 
-      totalValue: createOrderTransactionDto.totalValue,
+			totalValue: createOrderTransactionDto.totalValue,
 
-      price: createOrderTransactionDto.price,
+			price: createOrderTransactionDto.price,
 
-      cryptoAmount: createOrderTransactionDto.cryptoAmount,
+			cryptoAmount: createOrderTransactionDto.cryptoAmount,
 
-      currencyAmount: createOrderTransactionDto.currencyAmount,
+			currencyAmount: createOrderTransactionDto.currencyAmount,
 
-      wallet: createOrderTransactionDto.wallet,
-    });
-  }
+			wallet: createOrderTransactionDto.wallet,
+		});
+	}
 
-  findAllWithPagination({
-    paginationOptions,
-  }: {
-    paginationOptions: IPaginationOptions;
-  }) {
-    return this.orderTransactionRepository.findAllWithPagination({
-      paginationOptions: {
-        page: paginationOptions.page,
-        limit: paginationOptions.limit,
-      },
-    });
-  }
+	findAllWithPagination({
+		paginationOptions,
+	}: {
+		paginationOptions: IPaginationOptions;
+	}) {
+		return this.orderTransactionRepository.findAllWithPagination({
+			paginationOptions: {
+				page: paginationOptions.page,
+				limit: paginationOptions.limit,
+			},
+		});
+	}
 
-  findById(id: OrderTransaction['id']) {
-    return this.orderTransactionRepository.findById(id);
-  }
+	findById(id: OrderTransaction['id']) {
+		return this.orderTransactionRepository.findById(id);
+	}
 
-  findByIds(ids: OrderTransaction['id'][]) {
-    return this.orderTransactionRepository.findByIds(ids);
-  }
+	findByIds(ids: OrderTransaction['id'][]) {
+		return this.orderTransactionRepository.findByIds(ids);
+	}
 
-  async update(
-    id: OrderTransaction['id'],
+	async update(
+		id: OrderTransaction['id'],
 
-    updateOrderTransactionDto: UpdateOrderTransactionDto,
-  ) {
-    // Do not remove comment below.
-    // <updating-property />
+		updateOrderTransactionDto: UpdateOrderTransactionDto,
+	) {
+		// Do not remove comment below.
+		// <updating-property />
 
-    return this.orderTransactionRepository.update(id, {
-      // Do not remove comment below.
-      // <updating-property-payload />
-      type: updateOrderTransactionDto.type,
+		return this.orderTransactionRepository.update(id, {
+			// Do not remove comment below.
+			// <updating-property-payload />
+			type: updateOrderTransactionDto.type,
 
-      fee: updateOrderTransactionDto.fee,
+			fee: updateOrderTransactionDto.fee,
 
-      paymentMethod: updateOrderTransactionDto.paymentMethod,
+			paymentMethod: updateOrderTransactionDto.paymentMethod,
 
-      totalValue: updateOrderTransactionDto.totalValue,
+			totalValue: updateOrderTransactionDto.totalValue,
 
-      price: updateOrderTransactionDto.price,
+			price: updateOrderTransactionDto.price,
 
-      cryptoAmount: updateOrderTransactionDto.cryptoAmount,
+			cryptoAmount: updateOrderTransactionDto.cryptoAmount,
 
-      currencyAmount: updateOrderTransactionDto.currencyAmount,
+			currencyAmount: updateOrderTransactionDto.currencyAmount,
 
-      wallet: updateOrderTransactionDto.wallet,
-    });
-  }
+			wallet: updateOrderTransactionDto.wallet,
+		});
+	}
 
-  remove(id: OrderTransaction['id']) {
-    return this.orderTransactionRepository.remove(id);
-  }
+	remove(id: OrderTransaction['id']) {
+		return this.orderTransactionRepository.remove(id);
+	}
 }

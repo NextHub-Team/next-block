@@ -5,65 +5,65 @@ import { DeviceMapper } from '../../../../../devices/infrastructure/persistence/
 import { NotificationEntity } from '../entities/notification.entity';
 
 export class NotificationMapper {
-  static toDomain(raw: NotificationEntity): Notification {
-    const domainEntity = new Notification();
-    domainEntity.scheduledAt = raw.scheduledAt;
+	static toDomain(raw: NotificationEntity): Notification {
+		const domainEntity = new Notification();
+		domainEntity.scheduledAt = raw.scheduledAt;
 
-    domainEntity.sentAt = raw.sentAt;
+		domainEntity.sentAt = raw.sentAt;
 
-    domainEntity.isRead = raw.isRead;
+		domainEntity.isRead = raw.isRead;
 
-    domainEntity.status = raw.status;
+		domainEntity.status = raw.status;
 
-    domainEntity.priority = raw.priority;
+		domainEntity.priority = raw.priority;
 
-    domainEntity.type = raw.type;
+		domainEntity.type = raw.type;
 
-    if (raw.device) {
-      domainEntity.device = DeviceMapper.toDomain(raw.device);
-    }
+		if (raw.device) {
+			domainEntity.device = DeviceMapper.toDomain(raw.device);
+		}
 
-    domainEntity.message = raw.message;
+		domainEntity.message = raw.message;
 
-    domainEntity.title = raw.title;
+		domainEntity.title = raw.title;
 
-    domainEntity.id = raw.id;
-    domainEntity.createdAt = raw.createdAt;
-    domainEntity.updatedAt = raw.updatedAt;
+		domainEntity.id = raw.id;
+		domainEntity.createdAt = raw.createdAt;
+		domainEntity.updatedAt = raw.updatedAt;
 
-    return domainEntity;
-  }
+		return domainEntity;
+	}
 
-  static toPersistence(domainEntity: Notification): NotificationEntity {
-    const persistenceEntity = new NotificationEntity();
-    persistenceEntity.scheduledAt = domainEntity.scheduledAt;
+	static toPersistence(domainEntity: Notification): NotificationEntity {
+		const persistenceEntity = new NotificationEntity();
+		persistenceEntity.scheduledAt = domainEntity.scheduledAt;
 
-    persistenceEntity.sentAt = domainEntity.sentAt;
+		persistenceEntity.sentAt = domainEntity.sentAt;
 
-    persistenceEntity.isRead = domainEntity.isRead;
+		persistenceEntity.isRead = domainEntity.isRead;
 
-    persistenceEntity.status = domainEntity.status;
+		persistenceEntity.status = domainEntity.status;
 
-    persistenceEntity.priority = domainEntity.priority;
+		persistenceEntity.priority = domainEntity.priority;
 
-    persistenceEntity.type = domainEntity.type;
+		persistenceEntity.type = domainEntity.type;
 
-    if (domainEntity.device) {
-      persistenceEntity.device = DeviceMapper.toPersistence(
-        domainEntity.device,
-      );
-    }
+		if (domainEntity.device) {
+			persistenceEntity.device = DeviceMapper.toPersistence(
+				domainEntity.device,
+			);
+		}
 
-    persistenceEntity.message = domainEntity.message;
+		persistenceEntity.message = domainEntity.message;
 
-    persistenceEntity.title = domainEntity.title;
+		persistenceEntity.title = domainEntity.title;
 
-    if (domainEntity.id) {
-      persistenceEntity.id = domainEntity.id;
-    }
-    persistenceEntity.createdAt = domainEntity.createdAt;
-    persistenceEntity.updatedAt = domainEntity.updatedAt;
+		if (domainEntity.id) {
+			persistenceEntity.id = domainEntity.id;
+		}
+		persistenceEntity.createdAt = domainEntity.createdAt;
+		persistenceEntity.updatedAt = domainEntity.updatedAt;
 
-    return persistenceEntity;
-  }
+		return persistenceEntity;
+	}
 }

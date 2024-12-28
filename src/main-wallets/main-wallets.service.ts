@@ -2,10 +2,10 @@ import { WalletsService } from '../wallets/wallets.service';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/domain/user';
 import {
-  forwardRef,
-  HttpStatus,
-  Inject,
-  UnprocessableEntityException,
+	forwardRef,
+	HttpStatus,
+	Inject,
+	UnprocessableEntityException,
 } from '@nestjs/common';
 import { Injectable } from '@nestjs/common';
 import { CreateMainWalletDto } from './dto/create-main-wallet.dto';
@@ -18,139 +18,139 @@ import { Passphrase } from '../passphrases/domain/passphrase';
 
 @Injectable()
 export class MainWalletsService {
-  constructor(
-    @Inject(forwardRef(() => WalletsService))
-    private readonly walletService: WalletsService,
+	constructor(
+		@Inject(forwardRef(() => WalletsService))
+		private readonly walletService: WalletsService,
 
-    private readonly PassphraseService: PassphrasesService,
-    @Inject(forwardRef(() => UsersService))
-    private readonly userService: UsersService,
-    // Dependencies here
-    private readonly mainWalletRepository: MainWalletRepository,
-  ) {}
+		private readonly PassphraseService: PassphrasesService,
+		@Inject(forwardRef(() => UsersService))
+		private readonly userService: UsersService,
+		// Dependencies here
+		private readonly mainWalletRepository: MainWalletRepository,
+	) {}
 
-  async create(createMainWalletDto: CreateMainWalletDto) {
-    // Do not remove comment below.
-    // <creating-property />
+	async create(createMainWalletDto: CreateMainWalletDto) {
+		// Do not remove comment below.
+		// <creating-property />
 
-    const PassphraseObject = await this.PassphraseService.findById(
-      createMainWalletDto.passphrase.id,
-    );
-    if (!PassphraseObject) {
-      throw new UnprocessableEntityException({
-        status: HttpStatus.UNPROCESSABLE_ENTITY,
-        errors: {
-          Passphrase: 'notExists',
-        },
-      });
-    }
-    const passphrase = PassphraseObject;
+		const PassphraseObject = await this.PassphraseService.findById(
+			createMainWalletDto.passphrase.id,
+		);
+		if (!PassphraseObject) {
+			throw new UnprocessableEntityException({
+				status: HttpStatus.UNPROCESSABLE_ENTITY,
+				errors: {
+					Passphrase: 'notExists',
+				},
+			});
+		}
+		const passphrase = PassphraseObject;
 
-    const userObject = await this.userService.findById(
-      createMainWalletDto.user.id,
-    );
-    if (!userObject) {
-      throw new UnprocessableEntityException({
-        status: HttpStatus.UNPROCESSABLE_ENTITY,
-        errors: {
-          user: 'notExists',
-        },
-      });
-    }
-    const user = userObject;
+		const userObject = await this.userService.findById(
+			createMainWalletDto.user.id,
+		);
+		if (!userObject) {
+			throw new UnprocessableEntityException({
+				status: HttpStatus.UNPROCESSABLE_ENTITY,
+				errors: {
+					user: 'notExists',
+				},
+			});
+		}
+		const user = userObject;
 
-    return this.mainWalletRepository.create({
-      // Do not remove comment below.
-      // <creating-property-payload />
-      type: createMainWalletDto.type,
+		return this.mainWalletRepository.create({
+			// Do not remove comment below.
+			// <creating-property-payload />
+			type: createMainWalletDto.type,
 
-      name: createMainWalletDto.name,
+			name: createMainWalletDto.name,
 
-      address: createMainWalletDto.address,
+			address: createMainWalletDto.address,
 
-      passphrase,
+			passphrase,
 
-      user,
-    });
-  }
+			user,
+		});
+	}
 
-  findAllWithPagination({
-    paginationOptions,
-  }: {
-    paginationOptions: IPaginationOptions;
-  }) {
-    return this.mainWalletRepository.findAllWithPagination({
-      paginationOptions: {
-        page: paginationOptions.page,
-        limit: paginationOptions.limit,
-      },
-    });
-  }
+	findAllWithPagination({
+		paginationOptions,
+	}: {
+		paginationOptions: IPaginationOptions;
+	}) {
+		return this.mainWalletRepository.findAllWithPagination({
+			paginationOptions: {
+				page: paginationOptions.page,
+				limit: paginationOptions.limit,
+			},
+		});
+	}
 
-  findById(id: MainWallet['id']) {
-    return this.mainWalletRepository.findById(id);
-  }
+	findById(id: MainWallet['id']) {
+		return this.mainWalletRepository.findById(id);
+	}
 
-  findByIds(ids: MainWallet['id'][]) {
-    return this.mainWalletRepository.findByIds(ids);
-  }
+	findByIds(ids: MainWallet['id'][]) {
+		return this.mainWalletRepository.findByIds(ids);
+	}
 
-  async update(
-    id: MainWallet['id'],
+	async update(
+		id: MainWallet['id'],
 
-    updateMainWalletDto: UpdateMainWalletDto,
-  ) {
-    // Do not remove comment below.
-    // <updating-property />
+		updateMainWalletDto: UpdateMainWalletDto,
+	) {
+		// Do not remove comment below.
+		// <updating-property />
 
-    let passphrase: Passphrase | undefined = undefined;
+		let passphrase: Passphrase | undefined = undefined;
 
-    if (updateMainWalletDto.passphrase) {
-      const PassphraseObject = await this.PassphraseService.findById(
-        updateMainWalletDto.passphrase.id,
-      );
-      if (!PassphraseObject) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            Passphrase: 'notExists',
-          },
-        });
-      }
-      passphrase = PassphraseObject;
-    }
+		if (updateMainWalletDto.passphrase) {
+			const PassphraseObject = await this.PassphraseService.findById(
+				updateMainWalletDto.passphrase.id,
+			);
+			if (!PassphraseObject) {
+				throw new UnprocessableEntityException({
+					status: HttpStatus.UNPROCESSABLE_ENTITY,
+					errors: {
+						Passphrase: 'notExists',
+					},
+				});
+			}
+			passphrase = PassphraseObject;
+		}
 
-    let user: User | undefined = undefined;
+		let user: User | undefined = undefined;
 
-    if (updateMainWalletDto.user) {
-      const userObject = await this.userService.findById(
-        updateMainWalletDto.user.id,
-      );
-      if (!userObject) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            user: 'notExists',
-          },
-        });
-      }
-      user = userObject;
-    }
+		if (updateMainWalletDto.user) {
+			const userObject = await this.userService.findById(
+				updateMainWalletDto.user.id,
+			);
+			if (!userObject) {
+				throw new UnprocessableEntityException({
+					status: HttpStatus.UNPROCESSABLE_ENTITY,
+					errors: {
+						user: 'notExists',
+					},
+				});
+			}
+			user = userObject;
+		}
 
-    return this.mainWalletRepository.update(id, {
-      // Do not remove comment below.
-      // <updating-property-payload />
-      type: updateMainWalletDto.type,
+		return this.mainWalletRepository.update(id, {
+			// Do not remove comment below.
+			// <updating-property-payload />
+			type: updateMainWalletDto.type,
 
-      name: updateMainWalletDto.name,
+			name: updateMainWalletDto.name,
 
-      address: updateMainWalletDto.address,
-      passphrase,
-      user,
-    });
-  }
+			address: updateMainWalletDto.address,
+			passphrase,
+			user,
+		});
+	}
 
-  remove(id: MainWallet['id']) {
-    return this.mainWalletRepository.remove(id);
-  }
+	remove(id: MainWallet['id']) {
+		return this.mainWalletRepository.remove(id);
+	}
 }
