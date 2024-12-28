@@ -1,12 +1,15 @@
-import { Controller, Get, Post, Body, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, Param } from '@nestjs/common';
 import { FireblocksService } from './fireblocks.service';
 
 import {
+  ApiBadRequestResponse,
   ApiCreatedResponse,
   ApiOkResponse,
+  ApiParam,
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
+import { TransactionRequest, TransactionResponse } from '@fireblocks/ts-sdk';
 
 @ApiTags('Fireblocks')
 @Controller({
@@ -55,7 +58,7 @@ export class FireblocksController {
     return await this.fireblocksService.getVaultPagedAccounts(limit);
   }
 
-  @Post('transaction')
+  @Post('transaction/internal')
   @ApiCreatedResponse({ description: 'Transaction created successfully.' })
   async createTransaction(
     @Body('assetId') assetId: string,
@@ -69,6 +72,91 @@ export class FireblocksController {
       srcId,
       destId,
     );
+  }
+
+  @Post('transaction/external')
+  @ApiCreatedResponse({
+    description: 'Transaction to external address created successfully.',
+  })
+  @ApiBadRequestResponse({ description: 'Invalid request parameters.' })
+  async createTransactionToExternalAddress(
+    @Body('assetId') assetId: string,
+    @Body('amount') amount: string,
+    @Body('srcId') srcId: string,
+    @Body('destinationAddress') destinationAddress: string,
+    @Body('tag') tag?: string,
+    @Body('note') note?: string,
+  ) {
+    if (!assetId || !amount || !srcId || !destinationAddress) {
+      throw new Error(
+        'Missing required fields: assetId, amount, srcId, or destinationAddress',
+      );
+    }
+
+    return await this.fireblocksService.createExternalTransaction(
+      assetId,
+      amount,
+      srcId,
+      destinationAddress,
+      tag,
+      note || 'External transaction',
+    );
+  }
+
+  @Get('transactions/history')
+  @ApiOkResponse({ description: 'Transactions retrieved successfully.' })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'status', required: false, type: String })
+  async getAllTransactions(
+    @Query('limit') limit: number = 10,
+    @Query('status') status?: string,
+  ) {
+    return await this.fireblocksService.getAllTransactions(limit, status);
+  }
+
+  @Get('transaction-detail/:txId')
+  @ApiOkResponse({ description: 'Transaction details retrieved successfully.' })
+  @ApiParam({
+    name: 'txId',
+    required: true,
+    type: String,
+    description: 'Transaction ID to retrieve details for',
+  })
+  async getTransactionDetail(
+    @Param('txId') txId: string,
+  ): Promise<TransactionResponse> {
+    return await this.fireblocksService.getTransactionDetail(txId);
+  }
+
+  @Post('transaction/estimate-fee')
+  @ApiCreatedResponse({
+    description: 'Estimated transaction fee fetched successfully.',
+  })
+  async getTransactionFee(@Body() payload: TransactionRequest) {
+    return await this.fireblocksService.getTransactionFee(payload);
+  }
+
+  @Post('transaction/with-fee-estimation')
+  @ApiCreatedResponse({
+    description: 'Transaction created successfully with fee estimation.',
+  })
+  async createTransactionWithFeeEstimation(
+    @Body() payload: TransactionRequest,
+  ) {
+    return await this.fireblocksService.createTransactionWithFeeEstimation(
+      payload,
+    );
+  }
+
+  @Post('transaction/cancel/:txId')
+  @ApiOkResponse({ description: 'Transaction canceled successfully.' })
+  @ApiParam({
+    name: 'txId',
+    required: true,
+    description: 'The ID of the transaction to cancel.',
+  })
+  async cancelTransaction(@Param('txId') txId: string) {
+    return await this.fireblocksService.cancelTransaction(txId);
   }
 
   @Get('vault-account/balance')
@@ -94,5 +182,13 @@ export class FireblocksController {
       return { message: 'Asset found', asset: result };
     }
     return { message: 'Asset not supported' };
+  }
+
+  @Get('vault-accounts/:vaultAccountId/assets/:assetId')
+  async getVaultAccountAsset(
+    @Param('vaultAccountId') vaultAccountId: string,
+    @Param('assetId') assetId: string,
+  ) {
+    return this.fireblocksService.getVaultAccountAsset(vaultAccountId, assetId);
   }
 }
