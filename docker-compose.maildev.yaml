@@ -1,0 +1,35 @@
+services:
+  maildev:
+    build:
+      context: .
+      dockerfile: maildev.Dockerfile
+    container_name: vault-mailserver
+    hostname: vault-mailserver
+    ports:
+      - ${MAIL_CLIENT_PORT}:1080
+      - ${MAIL_PORT}:1025
+    networks:
+      - vault-network
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vault-api
+    hostname: vault-api
+    ports:
+      - ${APP_PORT}:${APP_PORT}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - vault-network
+
+volumes:
+  vault-db:
+    name: vault-db
+
+networks:
+  vault-network:
+    external: true

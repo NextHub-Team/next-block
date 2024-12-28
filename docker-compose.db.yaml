@@ -1,10 +1,10 @@
 services:
-  vault-backend:
+  api:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: vault-api
-    hostname: vault-api
+    container_name: vault-backend
+    hostname: vault-server
     ports:
       - ${APP_PORT}:${APP_PORT}
     networks:
