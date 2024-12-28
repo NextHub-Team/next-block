@@ -98,6 +98,7 @@ export class NftsService {
   ) {
     // Do not remove comment below.
     // <updating-property />
+
     let wallet: Wallet | undefined = undefined;
 
     if (updateNftDto.wallet) {

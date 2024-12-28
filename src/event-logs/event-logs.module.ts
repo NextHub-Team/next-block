@@ -1,3 +1,4 @@
+import { UserLogsModule } from '../user-logs/user-logs.module';
 import { Module } from '@nestjs/common';
 import { EventLogsService } from './event-logs.service';
 import { EventLogsController } from './event-logs.controller';
@@ -5,6 +6,8 @@ import { RelationalEventLogPersistenceModule } from './infrastructure/persistenc
 
 @Module({
   imports: [
+    UserLogsModule,
+
     // import modules, etc.
     RelationalEventLogPersistenceModule,
   ],

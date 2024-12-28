@@ -23,10 +23,8 @@ import { JwtPayloadType } from './strategies/types/jwt-payload.type';
 import { UsersService } from '../users/users.service';
 import { AllConfigType } from '../config/config.type';
 import { MailService } from '../mail/mail.service';
-import { RoleEnum } from '../roles/roles.enum';
 import { Session } from '../session/domain/session';
 import { SessionService } from '../session/session.service';
-import { StatusEnum } from '../statuses/statuses.enum';
 import { User } from '../users/domain/user';
 
 @Injectable()
@@ -95,7 +93,7 @@ export class AuthService {
 
     const { token, refreshToken, tokenExpires } = await this.getTokensData({
       id: user.id,
-      role: user.role,
+      // role: user.role,
       sessionId: session.id,
       hash,
     });
@@ -135,12 +133,12 @@ export class AuthService {
     } else if (userByEmail) {
       user = userByEmail;
     } else if (socialData.id) {
-      const role = {
-        id: RoleEnum.user,
-      };
-      const status = {
-        id: StatusEnum.active,
-      };
+      // const role = {
+      //   id: RoleEnum.user,
+      // };
+      // const status = {
+      //   id: StatusEnum.active,
+      // };
 
       user = await this.usersService.create({
         email: socialEmail ?? null,
@@ -148,8 +146,8 @@ export class AuthService {
         lastName: socialData.lastName ?? null,
         socialId: socialData.id,
         provider: authProvider,
-        role,
-        status,
+        // role,
+        // status,
       });
 
       user = await this.usersService.findById(user.id);
@@ -180,7 +178,7 @@ export class AuthService {
       tokenExpires,
     } = await this.getTokensData({
       id: user.id,
-      role: user.role,
+      // role: user.role,
       sessionId: session.id,
       hash,
     });
@@ -197,12 +195,12 @@ export class AuthService {
     const user = await this.usersService.create({
       ...dto,
       email: dto.email,
-      role: {
-        id: RoleEnum.user,
-      },
-      status: {
-        id: StatusEnum.inactive,
-      },
+      // role: {
+      //   id: RoleEnum.user,
+      // },
+      // status: {
+      //   id: StatusEnum.inactive,
+      // },
     });
 
     const hash = await this.jwtService.signAsync(
@@ -251,19 +249,20 @@ export class AuthService {
 
     const user = await this.usersService.findById(userId);
 
-    if (
-      !user ||
-      user?.status?.id?.toString() !== StatusEnum.inactive.toString()
-    ) {
+    // if (
+    //   !user ||
+    //   user?.status?.id?.toString() !== StatusEnum.inactive.toString()
+    // )
+    if (!user) {
       throw new NotFoundException({
         status: HttpStatus.NOT_FOUND,
         error: `notFound`,
       });
     }
 
-    user.status = {
-      id: StatusEnum.active,
-    };
+    // user.status = {
+    //   id: StatusEnum.active,
+    // };
 
     await this.usersService.update(user.id, user);
   }
@@ -303,9 +302,9 @@ export class AuthService {
     }
 
     user.email = newEmail;
-    user.status = {
-      id: StatusEnum.active,
-    };
+    // user.status = {
+    //   id: StatusEnum.active,
+    // };
 
     await this.usersService.update(user.id, user);
   }
@@ -486,9 +485,7 @@ export class AuthService {
 
     delete userDto.email;
     delete userDto.oldPassword;
-
     await this.usersService.update(userJwtPayload.id, userDto);
-
     return this.usersService.findById(userJwtPayload.id);
   }
 
@@ -510,11 +507,11 @@ export class AuthService {
       .update(randomStringGenerator())
       .digest('hex');
 
-    const user = await this.usersService.findById(session.user.id);
+    // const user = await this.usersService.findById(session.user.id);
 
-    if (!user?.role) {
-      throw new UnauthorizedException();
-    }
+    // if (!user?.role) {
+    //   throw new UnauthorizedException();
+    // }
 
     await this.sessionService.update(session.id, {
       hash,
@@ -522,9 +519,9 @@ export class AuthService {
 
     const { token, refreshToken, tokenExpires } = await this.getTokensData({
       id: session.user.id,
-      role: {
-        id: user.role.id,
-      },
+      // role: {
+      //   id: user.role.id,
+      // },
       sessionId: session.id,
       hash,
     });
@@ -546,7 +543,7 @@ export class AuthService {
 
   private async getTokensData(data: {
     id: User['id'];
-    role: User['role'];
+    // role: User['role'];
     sessionId: Session['id'];
     hash: Session['hash'];
   }) {
@@ -560,7 +557,7 @@ export class AuthService {
       await this.jwtService.signAsync(
         {
           id: data.id,
-          role: data.role,
+          // role: data.role,
           sessionId: data.sessionId,
         },
         {

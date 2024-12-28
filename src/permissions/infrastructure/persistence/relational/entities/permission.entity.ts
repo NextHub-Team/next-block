@@ -1,11 +1,9 @@
-import { UserEntity } from '../../../../../users/infrastructure/persistence/relational/entities/user.entity';
-
 import {
   CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  ManyToOne,
+  Column,
 } from 'typeorm';
 import { EntityRelationalHelper } from '../../../../../utils/relational-entity-helper';
 
@@ -13,11 +11,17 @@ import { EntityRelationalHelper } from '../../../../../utils/relational-entity-h
   name: 'permission',
 })
 export class PermissionEntity extends EntityRelationalHelper {
-  @ManyToOne(() => UserEntity, (parentEntity) => parentEntity.permissions, {
-    eager: false,
+  @Column({
     nullable: false,
+    type: String,
   })
-  user: UserEntity;
+  names: string;
+
+  @Column({
+    nullable: true,
+    type: String,
+  })
+  description?: string | null;
 
   @PrimaryGeneratedColumn('uuid')
   id: string;

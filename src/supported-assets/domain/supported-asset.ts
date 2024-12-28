@@ -41,7 +41,7 @@ export class SupportedAsset {
     type: () => String,
     nullable: false,
   })
-  chainName: string;
+  blockchain: string;
 
   @ApiProperty({
     type: () => String,

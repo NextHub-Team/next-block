@@ -1,9 +1,6 @@
+import { AccessControlEntity } from '../../../../../access-controls/infrastructure/persistence/relational/entities/access-control.entity';
 import { UserLogEntity } from '../../../../../user-logs/infrastructure/persistence/relational/entities/user-log.entity';
-
 import { MainWalletEntity } from '../../../../../main-wallets/infrastructure/persistence/relational/entities/main-wallet.entity';
-
-import { PermissionEntity } from '../../../../../permissions/infrastructure/persistence/relational/entities/permission.entity';
-
 import { DeviceEntity } from '../../../../../devices/infrastructure/persistence/relational/entities/device.entity';
 
 import {
@@ -12,17 +9,13 @@ import {
   DeleteDateColumn,
   Entity,
   Index,
-  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   JoinColumn,
   OneToOne,
   OneToMany,
 } from 'typeorm';
-import { RoleEntity } from '../../../../../roles/infrastructure/persistence/relational/entities/role.entity';
-import { StatusEntity } from '../../../../../statuses/infrastructure/persistence/relational/entities/status.entity';
 import { FileEntity } from '../../../../../files/infrastructure/persistence/relational/entities/file.entity';
-
 import { AuthProvidersEnum } from '../../../../../auth/auth-providers.enum';
 import { EntityRelationalHelper } from '../../../../../utils/relational-entity-helper';
 
@@ -30,23 +23,21 @@ import { EntityRelationalHelper } from '../../../../../utils/relational-entity-h
   name: 'user',
 })
 export class UserEntity extends EntityRelationalHelper {
+  @OneToOne(() => AccessControlEntity, { eager: true, nullable: true })
+  @JoinColumn()
+  abilities?: AccessControlEntity | null;
+
   @OneToMany(() => UserLogEntity, (childEntity) => childEntity.user, {
-    eager: true,
+    eager: false,
     nullable: true,
   })
   logs?: UserLogEntity[] | null;
 
   @OneToMany(() => MainWalletEntity, (childEntity) => childEntity.user, {
-    eager: true,
+    eager: false,
     nullable: true,
   })
   mainWallets?: MainWalletEntity[] | null;
-
-  @OneToMany(() => PermissionEntity, (childEntity) => childEntity.user, {
-    eager: true,
-    nullable: true,
-  })
-  permissions?: PermissionEntity[] | null;
 
   @Column({
     nullable: true,
@@ -55,7 +46,7 @@ export class UserEntity extends EntityRelationalHelper {
   phone?: string | null;
 
   @OneToMany(() => DeviceEntity, (childEntity) => childEntity.user, {
-    eager: true,
+    eager: false,
     nullable: true,
   })
   devices?: DeviceEntity[] | null;
@@ -91,16 +82,6 @@ export class UserEntity extends EntityRelationalHelper {
   })
   @JoinColumn()
   photo?: FileEntity | null;
-
-  @ManyToOne(() => RoleEntity, {
-    eager: true,
-  })
-  role?: RoleEntity | null;
-
-  @ManyToOne(() => StatusEntity, {
-    eager: true,
-  })
-  status?: StatusEntity;
 
   @CreateDateColumn()
   createdAt: Date;

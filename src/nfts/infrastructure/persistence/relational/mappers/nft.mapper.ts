@@ -46,6 +46,7 @@ export class NftMapper {
 
   static toPersistence(domainEntity: Nft): NftEntity {
     const persistenceEntity = new NftEntity();
+
     persistenceEntity.attributes = domainEntity.attributes;
 
     persistenceEntity.OwnerAddress = domainEntity.OwnerAddress;

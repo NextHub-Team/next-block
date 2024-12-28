@@ -19,19 +19,19 @@ export class SwapTransactionsService {
     return this.swapTransactionRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
-      transaction_fee: createSwapTransactionDto.transaction_fee,
+      fee: createSwapTransactionDto.fee,
 
       dex: createSwapTransactionDto.dex,
 
-      amount_out: createSwapTransactionDto.amount_out,
+      amountOut: createSwapTransactionDto.amountOut,
 
-      amount_in: createSwapTransactionDto.amount_in,
+      amountIn: createSwapTransactionDto.amountIn,
 
-      to_token: createSwapTransactionDto.to_token,
+      toToken: createSwapTransactionDto.toToken,
 
       wallet: createSwapTransactionDto.wallet,
 
-      from_token: createSwapTransactionDto.from_token,
+      fromToken: createSwapTransactionDto.fromToken,
     });
   }
 
@@ -67,19 +67,19 @@ export class SwapTransactionsService {
     return this.swapTransactionRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
-      transaction_fee: updateSwapTransactionDto.transaction_fee,
+      fee: updateSwapTransactionDto.fee,
 
       dex: updateSwapTransactionDto.dex,
 
-      amount_out: updateSwapTransactionDto.amount_out,
+      amountOut: updateSwapTransactionDto.amountOut,
 
-      amount_in: updateSwapTransactionDto.amount_in,
+      amountIn: updateSwapTransactionDto.amountIn,
 
-      to_token: updateSwapTransactionDto.to_token,
+      toToken: updateSwapTransactionDto.toToken,
 
       wallet: updateSwapTransactionDto.wallet,
 
-      from_token: updateSwapTransactionDto.from_token,
+      fromToken: updateSwapTransactionDto.fromToken,
     });
   }
 

@@ -59,12 +59,32 @@ import { NftsModule } from './nfts/nfts.module';
 
 import { TransactionLogsModule } from './transaction-logs/transaction-logs.module';
 
+import { AccessControlsModule } from './access-controls/access-controls.module';
+
+import { TypesModule } from './types/types.module';
+
+import { StatusesModule } from './statuses/statuses.module';
+
+import { RolesModule } from './roles/roles.module';
+
+import { WhiteListAddressesModule } from './white-list-addresses/white-list-addresses.module';
+
+import { NotificationsModule } from './notifications/notifications.module';
+
 import { FireblocksModule } from './fireblocks/fireblocks.module';
 
 import { SwapModule } from './swap/zerox/zerox.module';
 
+
 @Module({
   imports: [
+    NotificationsModule,
+    WhiteListAddressesModule,
+    RolesModule,
+    StatusesModule,
+    TypesModule,
+    PermissionsModule,
+    AccessControlsModule,
     TransactionLogsModule,
     NftsModule,
     EventLogsModule,

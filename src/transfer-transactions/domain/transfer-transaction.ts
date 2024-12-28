@@ -5,19 +5,19 @@ export class TransferTransaction {
     type: () => String,
     nullable: false,
   })
-  from_address: string;
+  fromAddress: string;
 
   @ApiProperty({
     type: () => String,
     nullable: false,
   })
-  to_address: string;
+  toAddress: string;
 
   @ApiProperty({
     type: () => Number,
     nullable: false,
   })
-  transaction_fee: number;
+  fee: number;
 
   @ApiProperty({
     type: () => Number,
@@ -35,7 +35,7 @@ export class TransferTransaction {
     type: () => String,
     nullable: false,
   })
-  transaction_hash: string;
+  transactionHash: string;
 
   @ApiProperty({
     type: () => Number,

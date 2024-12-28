@@ -51,7 +51,7 @@ export class SupportedAssetEntity extends EntityRelationalHelper {
     nullable: false,
     type: String,
   })
-  chainName: string;
+  blockchain: string;
 
   @Column({
     nullable: false,

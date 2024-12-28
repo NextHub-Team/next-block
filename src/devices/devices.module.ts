@@ -1,3 +1,4 @@
+import { NotificationsModule } from '../notifications/notifications.module';
 import { UsersModule } from '../users/users.module';
 import { forwardRef, Module } from '@nestjs/common';
 import { DevicesService } from './devices.service';
@@ -6,6 +7,7 @@ import { RelationalDevicePersistenceModule } from './infrastructure/persistence/
 
 @Module({
   imports: [
+    forwardRef(() => NotificationsModule),
     forwardRef(() => UsersModule),
     // import modules, etc.
     RelationalDevicePersistenceModule,

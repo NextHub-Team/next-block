@@ -1,16 +1,20 @@
+import { AccessControl } from '../../access-controls/domain/access-control';
 import { UserLog } from '../../user-logs/domain/user-log';
 import { MainWallet } from '../../main-wallets/domain/main-wallet';
-import { Permission } from '../../permissions/domain/permission';
 import { Device } from '../../devices/domain/device';
 import { Exclude, Expose } from 'class-transformer';
 import { FileType } from '../../files/domain/file';
-import { Role } from '../../roles/domain/role';
-import { Status } from '../../statuses/domain/status';
 import { ApiProperty } from '@nestjs/swagger';
 
 const idType = Number;
 
 export class User {
+  @ApiProperty({
+    type: () => AccessControl,
+    nullable: true,
+  })
+  abilities?: AccessControl | null;
+
   @ApiProperty({
     type: () => [UserLog],
     nullable: true,
@@ -22,12 +26,6 @@ export class User {
     nullable: true,
   })
   mainWallets?: MainWallet[] | null;
-
-  @ApiProperty({
-    type: () => [Permission],
-    nullable: true,
-  })
-  permissions?: Permission[] | null;
 
   @ApiProperty({
     type: () => String,
@@ -87,16 +85,6 @@ export class User {
     type: () => FileType,
   })
   photo?: FileType | null;
-
-  @ApiProperty({
-    type: () => Role,
-  })
-  role?: Role | null;
-
-  @ApiProperty({
-    type: () => Status,
-  })
-  status?: Status;
 
   @ApiProperty()
   createdAt: Date;

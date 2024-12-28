@@ -1,15 +1,8 @@
-import { UserDto } from '../../users/dto/user.dto';
-
-import {
-  // decorators here
-  Type,
-} from 'class-transformer';
-
 import {
   // decorators here
 
-  ValidateNested,
-  IsNotEmptyObject,
+  IsString,
+  IsOptional,
 } from 'class-validator';
 
 import {
@@ -20,12 +13,18 @@ import {
 export class CreatePermissionDto {
   @ApiProperty({
     required: true,
-    type: () => UserDto,
+    type: () => String,
   })
-  @ValidateNested()
-  @Type(() => UserDto)
-  @IsNotEmptyObject()
-  user: UserDto;
+  @IsString()
+  names: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => String,
+  })
+  @IsOptional()
+  @IsString()
+  description?: string | null;
 
   // Don't forget to use the class-validator decorators in the DTO properties.
 }

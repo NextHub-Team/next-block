@@ -18,7 +18,7 @@ export class NftTransactionEntity extends EntityRelationalHelper {
     nullable: true,
     type: Number,
   })
-  gasFee?: number | null;
+  fee?: number | null;
 
   @Column({
     nullable: false,

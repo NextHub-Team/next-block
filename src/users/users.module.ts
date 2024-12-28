@@ -1,6 +1,6 @@
+import { AccessControlsModule } from '../access-controls/access-controls.module';
 import { UserLogsModule } from '../user-logs/user-logs.module';
 import { MainWalletsModule } from '../main-wallets/main-wallets.module';
-import { PermissionsModule } from '../permissions/permissions.module';
 import { DevicesModule } from '../devices/devices.module';
 import { forwardRef, Module } from '@nestjs/common';
 import { UsersController } from './users.controller';
@@ -12,9 +12,9 @@ const infrastructurePersistenceModule = RelationalUserPersistenceModule;
 
 @Module({
   imports: [
+    forwardRef(() => AccessControlsModule),
     forwardRef(() => UserLogsModule),
     forwardRef(() => MainWalletsModule),
-    forwardRef(() => PermissionsModule),
     forwardRef(() => DevicesModule),
     // import modules, etc.
     infrastructurePersistenceModule,

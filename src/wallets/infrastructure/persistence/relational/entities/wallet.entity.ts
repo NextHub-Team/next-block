@@ -19,6 +19,12 @@ import { EntityRelationalHelper } from '../../../../../utils/relational-entity-h
   name: 'wallet',
 })
 export class WalletEntity extends EntityRelationalHelper {
+  @Column({
+    nullable: true,
+    type: String,
+  })
+  details?: string | null;
+
   @OneToMany(() => TransactionLogEntity, (childEntity) => childEntity.wallet, {
     eager: true,
     nullable: true,

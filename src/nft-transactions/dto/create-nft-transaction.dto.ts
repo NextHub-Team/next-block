@@ -20,7 +20,7 @@ export class CreateNftTransactionDto {
   })
   @IsOptional()
   @IsNumber()
-  gasFee?: number | null;
+  fee?: number | null;
 
   @ApiProperty({
     required: true,
