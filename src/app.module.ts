@@ -22,6 +22,7 @@ import { DataSource, DataSourceOptions } from 'typeorm';
 import { AllConfigType } from './config/config.type';
 import { SessionModule } from './session/session.module';
 import { MailerModule } from './mailer/mailer.module';
+import ZeroxConfig from './swap/zerox/config/zerox.config';
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
@@ -70,6 +71,11 @@ import { WhiteListAddressesModule } from './white-list-addresses/white-list-addr
 
 import { NotificationsModule } from './notifications/notifications.module';
 
+import { FireblocksModule } from './fireblocks/fireblocks.module';
+
+import { SwapModule } from './swap/zerox/zerox.module';
+
+
 @Module({
   imports: [
     NotificationsModule,
@@ -93,6 +99,8 @@ import { NotificationsModule } from './notifications/notifications.module';
     MainWalletsModule,
     PermissionsModule,
     DevicesModule,
+    FireblocksModule,
+    SwapModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [
@@ -103,6 +111,7 @@ import { NotificationsModule } from './notifications/notifications.module';
         fileConfig,
         googleConfig,
         appleConfig,
+        ZeroxConfig,
       ],
       envFilePath: ['.env'],
     }),
