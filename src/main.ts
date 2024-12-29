@@ -16,15 +16,18 @@ import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { existsSync } from 'fs';
+import { getLogLevels } from './utils/helper/logging.helper';
 
 async function bootstrap() {
 	const logger = new Logger('Bootstrap');
 	const app = await NestFactory.create<NestExpressApplication>(AppModule, {
 		cors: true,
 	});
+
 	useContainer(app.select(AppModule), { fallbackOnErrors: true });
 	const configService = app.get(ConfigService<AllConfigType>);
-
+	const LOG_LEVELS = getLogLevels(configService);
+	app.useLogger(LOG_LEVELS);
 	app.enableShutdownHooks();
 	app.setGlobalPrefix(
 		configService.getOrThrow('app.apiPrefix', { infer: true }),
@@ -43,7 +46,7 @@ async function bootstrap() {
 
 	// Generate Swagger JSON
 	const options = new DocumentBuilder()
-		.setTitle('API')
+		.setTitle('Next-Block API')
 		.setDescription('API docs')
 		.setVersion('1.0')
 		.addBearerAuth()
