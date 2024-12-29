@@ -4,13 +4,13 @@ import { RoleEntity } from '../../../../../roles/infrastructure/persistence/rela
 import { UserEntity } from '../../../../../users/infrastructure/persistence/relational/entities/user.entity';
 
 import {
+	Column,
 	CreateDateColumn,
 	Entity,
-	PrimaryGeneratedColumn,
-	UpdateDateColumn,
 	JoinColumn,
 	OneToOne,
-	Column,
+	PrimaryGeneratedColumn,
+	UpdateDateColumn,
 } from 'typeorm';
 import { EntityRelationalHelper } from '../../../../../utils/relational-entity-helper';
 
@@ -36,7 +36,7 @@ export class AccessControlEntity extends EntityRelationalHelper {
 	@JoinColumn()
 	role: RoleEntity;
 
-	@OneToOne(() => UserEntity, { eager: true, nullable: false })
+	@OneToOne(() => UserEntity, { eager: false, nullable: false })
 	@JoinColumn()
 	user: UserEntity;
 

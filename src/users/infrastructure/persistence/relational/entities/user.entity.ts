@@ -9,11 +9,11 @@ import {
 	DeleteDateColumn,
 	Entity,
 	Index,
+	JoinColumn,
+	OneToMany,
+	OneToOne,
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
-	JoinColumn,
-	OneToOne,
-	OneToMany,
 } from 'typeorm';
 import { FileEntity } from '../../../../../files/infrastructure/persistence/relational/entities/file.entity';
 import { AuthProvidersEnum } from '../../../../../auth/auth-providers.enum';
@@ -23,7 +23,7 @@ import { EntityRelationalHelper } from '../../../../../utils/relational-entity-h
 	name: 'user',
 })
 export class UserEntity extends EntityRelationalHelper {
-	@OneToOne(() => AccessControlEntity, { eager: true, nullable: true })
+	@OneToOne(() => AccessControlEntity, { eager: false, nullable: true })
 	@JoinColumn()
 	abilities?: AccessControlEntity | null;
 
