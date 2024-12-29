@@ -9,6 +9,7 @@ import { AllConfigType } from '../config/config.type';
 export class MailerService {
 	private readonly transporter: nodemailer.Transporter;
 	private readonly logger = new Logger(MailerService.name);
+	private isConnected = false;
 
 	constructor(private readonly configService: ConfigService<AllConfigType>) {
 		this.transporter = nodemailer.createTransport({
@@ -23,12 +24,46 @@ export class MailerService {
 			},
 		});
 
-		// Verify the connection to the mail server on startup
-		this.verifyConnection().catch((error) => {
+		// Log connection and disconnection events
+		this.setupConnectionListeners();
+
+		// Verify connection on service initialization
+		this.verifyConnection().catch((err) =>
 			this.logger.warn(
-				`Mail server is not available or connection failed: ${error.message}`,
-			);
+				`Initial connection verification failed: ${err.message}`,
+			),
+		);
+	}
+
+	private setupConnectionListeners(): void {
+		// Listen for transport connection events (not native in nodemailer)
+		this.transporter.on('idle', () => {
+			if (!this.isConnected) {
+				this.isConnected = true;
+				this.logger.log('Connected to mail server.');
+			}
 		});
+
+		this.transporter.on('error', (error) => {
+			this.isConnected = false;
+			this.logger.error(`Mail server error: ${error.message}`);
+			this.logger.warn('Disconnected from mail server.');
+		});
+	}
+
+	private async verifyConnection(): Promise<void> {
+		try {
+			this.logger.log('Verifying connection to the mail server...');
+			await this.transporter.verify();
+			this.isConnected = true;
+			this.logger.log('Mail server is ready to accept messages.');
+		} catch (error) {
+			this.isConnected = false;
+			this.logger.warn(
+				`Mail server verification failed: ${error.message}. Reconnecting...`,
+			);
+			throw new Error(`SMTP server verification failed: ${error.message}`);
+		}
 	}
 
 	async sendMail({
@@ -88,24 +123,12 @@ export class MailerService {
 			);
 
 			// Warn about potential mail server issues
-			this.logger.warn(
-				`Mail server might not be connected or available. Check mail server settings or network connectivity.`,
-			);
+			if (error.code === 'ECONNECTION') {
+				this.logger.warn('Mail server is unreachable. Reconnecting...');
+				this.isConnected = false; // Mark as disconnected
+			}
 
 			throw new Error(`Error sending email: ${error.message}`);
-		}
-	}
-
-	async verifyConnection(): Promise<void> {
-		try {
-			this.logger.log('Verifying connection to the mail server...');
-			await this.transporter.verify();
-			this.logger.log('Mail server is ready to accept messages.');
-		} catch (error) {
-			this.logger.warn(
-				`Mail server is not available or connection failed: ${error.message}`,
-			);
-			throw new Error(`SMTP server verification failed: ${error.message}`);
 		}
 	}
 }
