@@ -9,6 +9,7 @@ import mailConfig from './mail/config/mail.config';
 import fileConfig from './files/config/file.config';
 import googleConfig from './auth-google/config/google.config';
 import appleConfig from './auth-apple/config/apple.config';
+import veroConfig from './auth-vero/config/vero.config';
 import path from 'path';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -22,6 +23,7 @@ import { DataSource, DataSourceOptions } from 'typeorm';
 import { AllConfigType } from './config/config.type';
 import { SessionModule } from './session/session.module';
 import { MailerModule } from './mailer/mailer.module';
+import { AuthVeroModule } from './auth-vero/auth-vero.module';
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
@@ -42,6 +44,7 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
         fileConfig,
         googleConfig,
         appleConfig,
+        veroConfig,
       ],
       envFilePath: ['.env'],
     }),
@@ -74,6 +77,7 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
     AuthModule,
     AuthGoogleModule,
     AuthAppleModule,
+    AuthVeroModule,
     SessionModule,
     MailModule,
     MailerModule,
