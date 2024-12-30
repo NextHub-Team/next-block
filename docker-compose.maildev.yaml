@@ -1,0 +1,17 @@
+services:
+  maildev:
+    build:
+      context: .
+      dockerfile: maildev.Dockerfile
+    container_name: vault-mailserver
+    hostname: vault-mailserver
+    env_file:
+      - .env
+    ports:
+      - ${MAIL_CLIENT_PORT}:1080
+      - ${MAIL_PORT}:1025
+    networks:
+      - vault-network
+networks:
+  vault-network:
+    external: true
