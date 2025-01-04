@@ -24,6 +24,7 @@ import { AllConfigType } from './config/config.type';
 import { SessionModule } from './session/session.module';
 import { MailerModule } from './mailer/mailer.module';
 import { AuthVeroModule } from './auth-vero/auth-vero.module';
+import { FireblocksModule } from './fireblocks/fireblocks.module';
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
@@ -82,6 +83,7 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
     MailModule,
     MailerModule,
     HomeModule,
+    FireblocksModule,
   ],
 })
-export class AppModule {}
+export class AppModule { }
