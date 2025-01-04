@@ -10,6 +10,7 @@ import fileConfig from './files/config/file.config';
 import googleConfig from './auth-google/config/google.config';
 import appleConfig from './auth-apple/config/apple.config';
 import veroConfig from './auth-vero/config/vero.config';
+import ZeroxConfig from './swap/zerox/config/zerox.config';
 import path from 'path';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -25,6 +26,7 @@ import { SessionModule } from './session/session.module';
 import { MailerModule } from './mailer/mailer.module';
 import { AuthVeroModule } from './auth-vero/auth-vero.module';
 import { FireblocksModule } from './fireblocks/fireblocks.module';
+import { SwapModule } from './swap/zerox/zerox.module';
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
@@ -46,6 +48,7 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
         googleConfig,
         appleConfig,
         veroConfig,
+        ZeroxConfig,
       ],
       envFilePath: ['.env'],
     }),
@@ -84,6 +87,7 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
     MailerModule,
     HomeModule,
     FireblocksModule,
+    SwapModule,
   ],
 })
-export class AppModule { }
+export class AppModule {}
