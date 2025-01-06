@@ -30,4 +30,23 @@ const validationOptions: ValidationPipeOptions = {
   },
 };
 
+/**
+ * Validates a given value against a target value and returns the default value if they do not match.
+ *
+ * @template T - The type of the value to validate.
+ * @param value - The value to validate.
+ * @param target - The target value to compare against.
+ * @param defaultValue - The default value to return if `value` does not match `target`.
+ * @returns The `value` if it matches the `target`; otherwise, the `defaultValue`.
+ *
+ * @example
+ * ```typescript
+ * const result = validateValue(10, 10, 0); // result: 10
+ * const result2 = validateValue(5, 10, 0); // result: 0
+ * ```
+ */
+export const validateValue = <T>(value: T, target: T, defaultValue: T): T => {
+  return value === target ? value : defaultValue;
+};
+
 export default validationOptions;
