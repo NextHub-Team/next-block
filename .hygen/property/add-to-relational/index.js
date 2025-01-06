@@ -199,12 +199,16 @@ module.exports = {
         }),
       );
 
+    if (!result.propertyInReference) {
+      result.propertyInReference = '';
+    }
+
     if (
       (result.kind === 'reference' || result.kind === 'duplication') &&
       result.referenceType === 'oneToMany'
     ) {
       execSync(
-        `npm run add:property:to-relational -- --name=${result.type} --property=${result.propertyInReference} --propertyInReference=${result.property} --kind=${result.kind} --type=${result.name} --referenceType=manyToOne --isAddToDto=${result.isAddToDto} --isOptional=false --isNullable=false`,
+        `npm run add:property:to-relational -- --name ${result.type} --property ${result.propertyInReference} --propertyInReference ${result.property} --kind ${result.kind} --type ${result.name} --referenceType manyToOne --isAddToDto ${result.isAddToDto} --isOptional false --isNullable false`,
         {
           stdio: 'inherit',
         },
