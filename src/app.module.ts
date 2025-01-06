@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
 import { UsersModule } from './users/users.module';
 import { FilesModule } from './files/files.module';
 import { AuthModule } from './auth/auth.module';
@@ -10,7 +10,6 @@ import fileConfig from './files/config/file.config';
 import googleConfig from './auth-google/config/google.config';
 import appleConfig from './auth-apple/config/apple.config';
 import veroConfig from './auth-vero/config/vero.config';
-import ZeroxConfig from './swap/zerox/config/zerox.config';
 import path from 'path';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -25,8 +24,9 @@ import { AllConfigType } from './config/config.type';
 import { SessionModule } from './session/session.module';
 import { MailerModule } from './mailer/mailer.module';
 import { AuthVeroModule } from './auth-vero/auth-vero.module';
-import { FireblocksModule } from './fireblocks/fireblocks.module';
-import { SwapModule } from './swap/zerox/zerox.module';
+import { FireblocksModule } from './providers/fireblocks/fireblocks.module';
+import { SecretModule } from './secret/secret.module';
+import fireblocksConfig from './providers/fireblocks/config/fireblocks.config';
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
@@ -48,7 +48,7 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
         googleConfig,
         appleConfig,
         veroConfig,
-        ZeroxConfig,
+        fireblocksConfig,
       ],
       envFilePath: ['.env'],
     }),
@@ -87,7 +87,14 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
     MailerModule,
     HomeModule,
     FireblocksModule,
-    SwapModule,
+    SecretModule,
   ],
 })
-export class AppModule {}
+export class AppModule implements OnModuleInit {
+  constructor(private readonly configService: ConfigService) {}
+
+  onModuleInit() {
+    // Attach ConfigService to global metadata
+    Reflect.defineMetadata('configService', this.configService, AppModule);
+  }
+}
