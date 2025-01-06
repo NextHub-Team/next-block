@@ -1,4 +1,3 @@
-// auth-vero.service.ts
 import {
   ForbiddenException,
   Injectable,
@@ -10,22 +9,29 @@ import jwksRsa, { JwksClient, RsaSigningKey } from 'jwks-rsa';
 import { AuthVeroLoginDto } from './dto/auth-vero-login.dto';
 import { SocialInterface } from '../social/interfaces/social.interface';
 import { VeroPayloadMapper } from './infrastructure/persistence/relational/mappers/vero.mapper';
+import { AllConfigType } from '../config/config.type';
+import {
+  BASE_VALUE_JWKS_URL,
+  DEFAULT_JWKS_CACHE_MAX_AGE,
+} from './types/vero-const.type';
 
 @Injectable()
 export class AuthVeroService {
   private jwksClient: JwksClient;
 
   constructor(
-    private configService: ConfigService,
+    private readonly configService: ConfigService<AllConfigType>,
     private jwtService: JwtService,
     private veroMapper: VeroPayloadMapper,
   ) {
     const jwksUri =
-      this.configService.get<string>('vero.jwksUri', { infer: true }) ||
-      'https://gateway.veroapi.com/veritas/jwks';
+      this.configService.get('vero.jwksUri', {
+        infer: true,
+      }) || BASE_VALUE_JWKS_URL;
     const cacheMaxAge =
-      this.configService.get<number>('vero.cacheMaxAge', { infer: true }) ||
-      36000; // 1 hour default
+      this.configService.get('vero.jwksUriCacheMaxAge', {
+        infer: true,
+      }) || DEFAULT_JWKS_CACHE_MAX_AGE; // 1 hour default
 
     this.jwksClient = jwksRsa({
       jwksUri,

@@ -1,3 +1,4 @@
 export type VeroConfig = {
-  jwksUrl?: string;
+  jwksUri?: string;
+  jwksUriCacheMaxAge: number;
 };

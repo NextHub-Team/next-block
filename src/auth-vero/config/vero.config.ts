@@ -1,18 +1,19 @@
 import { registerAs } from '@nestjs/config';
-import { IsOptional, IsString, IsNumber } from 'class-validator';
+import { IsOptional, IsString, IsInt, Min, Max } from 'class-validator';
 import validateConfig from '../../utils/validate-config';
 import { VeroConfig } from './vero-config.type';
-
+import {
+  BASE_VALUE_JWKS_URL,
+  DEFAULT_JWKS_CACHE_MAX_AGE,
+} from '../types/vero-const.type';
 class EnvironmentVariablesValidator {
-  static BASE_VALUE_JWKS_URL: string =
-    'https://gateway.veroapi.com/veritas/jwks';
-  static DEFAULT_CACHE_MAX_AGE: number = 3600000; // Default 1 hour in ms
-
   @IsString()
   @IsOptional()
   VERO_JWKS_URL: string;
 
-  @IsNumber()
+  @IsInt()
+  @Min(3600000)
+  @Max(1800000)
   @IsOptional()
   VERO_CACHE_MAX_AGE: number;
 }
@@ -20,16 +21,16 @@ class EnvironmentVariablesValidator {
 export default registerAs<VeroConfig>('vero', () => {
   validateConfig(process.env, EnvironmentVariablesValidator);
 
-  const jwksUrl = process.env.VERO_JWKS_URL
+  const jwksUri = process.env.VERO_JWKS_URL
     ? process.env.VERO_JWKS_URL
-    : EnvironmentVariablesValidator.BASE_VALUE_JWKS_URL;
+    : BASE_VALUE_JWKS_URL;
 
-  const cacheMaxAge = process.env.VERO_CACHE_MAX_AGE
+  const jwksUriCacheMaxAge = process.env.VERO_CACHE_MAX_AGE
     ? Number(process.env.VERO_CACHE_MAX_AGE)
-    : EnvironmentVariablesValidator.DEFAULT_CACHE_MAX_AGE;
+    : DEFAULT_JWKS_CACHE_MAX_AGE;
 
   return {
-    jwksUrl,
-    cacheMaxAge,
+    jwksUri,
+    jwksUriCacheMaxAge,
   };
 });
