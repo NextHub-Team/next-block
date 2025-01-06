@@ -19,6 +19,20 @@ services:
       timeout: 5s
       retries: 5
 
+  maildev:
+    build:
+      context: .
+      dockerfile: maildev.Dockerfile
+    container_name: vault-mailserver
+    hostname: vault-mailserver
+    env_file:
+      - .env
+    ports:
+      - ${MAIL_CLIENT_PORT}:1080
+      - ${MAIL_PORT}:1025
+    networks:
+      - vault-network
+
   redis:
     image: redis:7-alpine
     container_name: vault-redis
