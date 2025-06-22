@@ -50,8 +50,11 @@ import { MessagesModule } from './messages/messages.module';
 
 import { AddressBooksModule } from './address-books/address-books.module';
 
+import { CustodialWalletsModule } from './custodial-wallets/custodial-wallets.module';
+
 @Module({
   imports: [
+    CustodialWalletsModule,
     MessagesModule,
     PassphrasesModule,
     AddressBooksModule,

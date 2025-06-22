@@ -285,4 +285,9 @@ export class UsersService {
   async remove(id: User['id']): Promise<void> {
     await this.usersRepository.remove(id);
   }
+
+  async findBySub(sub: string): Promise<User | null> {
+  return this.usersRepository.findBySocialId(sub);
+}
+
 }
