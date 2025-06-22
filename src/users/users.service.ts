@@ -287,7 +287,6 @@ export class UsersService {
   }
 
   async findBySub(sub: string): Promise<User | null> {
-  return this.usersRepository.findBySocialId(sub);
-}
-
+    return this.usersRepository.findBySocialId(sub);
+  }
 }

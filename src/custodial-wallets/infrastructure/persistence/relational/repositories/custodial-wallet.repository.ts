@@ -84,35 +84,40 @@ export class CustodialWalletRelationalRepository
     await this.custodialWalletRepository.delete(id);
   }
 
-async findByName(name: string): Promise<NullableType<CustodialWallet>> {
-  const entity = await this.custodialWalletRepository.findOne({
-    where: { name },
-    relations: ['user'],
-  });
+  async findByName(name: string): Promise<NullableType<CustodialWallet>> {
+    const entity = await this.custodialWalletRepository.findOne({
+      where: { name },
+      relations: ['user'],
+    });
 
-  return entity ? CustodialWalletMapper.toDomain(entity) : null;
-}
+    return entity ? CustodialWalletMapper.toDomain(entity) : null;
+  }
 
+  async findByNames(names: string[]): Promise<CustodialWallet[]> {
+    const entities = await this.custodialWalletRepository.find({
+      where: {
+        name: In(names),
+      },
+      relations: ['user'],
+    });
 
+    return entities.map(CustodialWalletMapper.toDomain);
+  }
 
-async findByNames(names: string[]): Promise<CustodialWallet[]> {
-  const entities = await this.custodialWalletRepository.find({
-    where: {
-      name: In(names),
-    },
-    relations: ['user'],
-  });
+  async findByUserId(userId: number): Promise<NullableType<CustodialWallet>> {
+    const entity = await this.custodialWalletRepository.findOne({
+      where: { user: { id: userId } },
+      relations: ['user'],
+    });
 
-  return entities.map(CustodialWalletMapper.toDomain);
-}
+    return entity ? CustodialWalletMapper.toDomain(entity) : null;
+  }
 
-async findByUserId(userId: number): Promise<NullableType<CustodialWallet>> {
-  const entity = await this.custodialWalletRepository.findOne({
-    where: { user: { id: userId } },
-    relations: ['user'],
-  });
-
-  return entity ? CustodialWalletMapper.toDomain(entity) : null;
-}
-
+  async findByUserIds(userId: number): Promise<CustodialWallet[]> {
+    const entities = await this.custodialWalletRepository.find({
+      where: { user: { id: userId } },
+      relations: ['user'],
+    });
+    return entities.map(CustodialWalletMapper.toDomain);
+  }
 }

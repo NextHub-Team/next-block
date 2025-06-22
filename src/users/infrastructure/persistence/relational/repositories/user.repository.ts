@@ -125,11 +125,10 @@ export class UsersRelationalRepository implements UserRepository {
   }
 
   async findBySocialId(socialId: string): Promise<NullableType<User>> {
-  const entity = await this.usersRepository.findOne({
-    where: { socialId },
-  });
+    const entity = await this.usersRepository.findOne({
+      where: { socialId },
+    });
 
-  return entity ? UserMapper.toDomain(entity) : null;
-}
-
+    return entity ? UserMapper.toDomain(entity) : null;
+  }
 }

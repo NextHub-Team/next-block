@@ -1,4 +1,4 @@
-import { Fireblocks, BasePath } from "@fireblocks/ts-sdk";
+import { Fireblocks, BasePath } from '@fireblocks/ts-sdk';
 
 class FireblocksSingleton {
   private static instance: Fireblocks;
@@ -12,13 +12,13 @@ class FireblocksSingleton {
 
       if (!apiKey || !secret) {
         throw new Error(
-          "Missing FIREBLOCKS_CW_API_KEY_ADMIN or FIREBLOCKS_CW_SECRET_KEY in env",
+          'Missing FIREBLOCKS_CW_API_KEY_ADMIN or FIREBLOCKS_CW_SECRET_KEY in env',
         );
       }
 
       FireblocksSingleton.instance = new Fireblocks({
         apiKey,
-        secretKey: secret.replace(/\\n/g, "\n"),
+        secretKey: secret.replace(/\\n/g, '\n'),
         basePath: FireblocksSingleton.resolveBasePath(),
       });
     }
@@ -30,13 +30,13 @@ class FireblocksSingleton {
     const envType = process.env.FIREBLOCKS_CW_API_BASE_URL_TYPE;
 
     switch (envType) {
-      case "US":
+      case 'US':
         return BasePath.US;
-      case "EU":
+      case 'EU':
         return BasePath.EU;
-      case "EU2":
+      case 'EU2':
         return BasePath.EU2;
-      case "Sandbox":
+      case 'Sandbox':
       default:
         return BasePath.Sandbox;
     }

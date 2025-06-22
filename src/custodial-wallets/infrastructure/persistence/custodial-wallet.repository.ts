@@ -29,7 +29,5 @@ export abstract class CustodialWalletRepository {
   abstract findByName(name: string): Promise<NullableType<CustodialWallet>>;
   abstract findByNames(names: string[]): Promise<CustodialWallet[]>;
   abstract findByUserId(userId: number): Promise<NullableType<CustodialWallet>>;
-
-
-  
+  abstract findByUserIds(userId: number): Promise<CustodialWallet[]>;
 }

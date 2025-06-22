@@ -36,7 +36,7 @@ export class CreateCustodialWalletDto {
   name: string;
 
   @ApiProperty({
-    required: true,
+    required: false,
     type: () => String,
   })
   @IsString()

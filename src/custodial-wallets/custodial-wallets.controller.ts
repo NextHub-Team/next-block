@@ -8,6 +8,9 @@ import {
   Delete,
   UseGuards,
   Query,
+  HttpCode,
+  HttpStatus,
+  Request,
 } from '@nestjs/common';
 import { CustodialWalletsService } from './custodial-wallets.service';
 import { CreateCustodialWalletDto } from './dto/create-custodial-wallet.dto';
@@ -15,6 +18,7 @@ import { UpdateCustodialWalletDto } from './dto/update-custodial-wallet.dto';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiParam,
   ApiTags,
@@ -27,6 +31,7 @@ import {
 } from '../utils/dto/infinity-pagination-response.dto';
 import { infinityPagination } from '../utils/infinity-pagination';
 import { FindAllCustodialWalletsDto } from './dto/find-all-custodial-wallets.dto';
+import { CreateCustodialWalletUserDto } from './dto/create-custodial-wallet-user.dto';
 
 @ApiTags('Custodialwallets')
 @ApiBearerAuth()
@@ -72,19 +77,42 @@ export class CustodialWalletsController {
     );
   }
 
-@Get('by-name')
-@ApiOkResponse({ type: CustodialWallet })
-getVaultByName(@Query('name') name: string) {
-  return this.custodialWalletsService.getVaultByName(name);
-}
+  @Get('by-name')
+  @ApiOkResponse({ type: CustodialWallet })
+  getVaultByName(@Query('name') name: string) {
+    return this.custodialWalletsService.getVaultByName(name);
+  }
 
+  @Get('by-names')
+  @ApiOkResponse({ isArray: true })
+  getVaultsByNames(@Query('names') names: string) {
+    const nameList = names.split(',');
+    return this.custodialWalletsService.getVaultsByNames(nameList);
+  }
 
-@Get('by-names')
-@ApiOkResponse({ isArray: true })
-getVaultsByNames(@Query('names') names: string) {
-  const nameList = names.split(',');
-  return this.custodialWalletsService.getVaultsByNames(nameList);
-}
+  @Post('me')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiCreatedResponse({ type: CustodialWallet })
+  async createByUser(
+    @Request() request,
+    @Body() dto: CreateCustodialWalletUserDto,
+  ) {
+    return this.custodialWalletsService.createByUser(dto, request.user);
+  }
+
+  @Get('me')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    type: CustodialWallet,
+    isArray: true,
+    description: 'Returns custodial wallets for current user',
+  })
+  @ApiNotFoundResponse({
+    description: 'No custodial wallets found for this user',
+  })
+  async findAllByMe(@Request() request): Promise<CustodialWallet[]> {
+    return this.custodialWalletsService.findByMe(request.user);
+  }
 
   @Get(':id')
   @ApiParam({
@@ -124,7 +152,4 @@ getVaultsByNames(@Query('names') names: string) {
   remove(@Param('id') id: string) {
     return this.custodialWalletsService.remove(id);
   }
-
-
-
 }
