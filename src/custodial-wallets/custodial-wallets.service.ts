@@ -214,6 +214,25 @@ export class CustodialWalletsService {
     ).data;
   }
 
+  async getAddressesByVaultIds(vaultIds: string[]) {
+    const results: { vaultId: string; address: string | null }[] = [];
+
+    for (const vaultId of vaultIds) {
+      try {
+        const address = await this.fetchVaultAddress(vaultId);
+        results.push({ vaultId, address: address ?? null });
+      } catch (err) {
+        console.warn(
+          `Failed to fetch address for vaultId=${vaultId}`,
+          err.message,
+        );
+        results.push({ vaultId, address: null });
+      }
+    }
+
+    return results;
+  }
+
   private async fetchVaultAddress(vaultId: string) {
     try {
       const res =

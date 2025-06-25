@@ -90,6 +90,14 @@ export class CustodialWalletsController {
     return this.custodialWalletsService.getVaultsByNames(nameList);
   }
 
+  @Get('addresses')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ description: 'Addresses by Vault IDs' })
+  async getAddressesByVaultIds(@Query('vaultIds') vaultIds: string) {
+    const ids = vaultIds.split(',').map((id) => id.trim());
+    return this.custodialWalletsService.getAddressesByVaultIds(ids);
+  }
+
   @Post('me')
   @HttpCode(HttpStatus.CREATED)
   @ApiCreatedResponse({ type: CustodialWallet })
