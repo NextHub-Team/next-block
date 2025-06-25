@@ -51,6 +51,8 @@ import { MessagesModule } from './messages/messages.module';
 import { AddressBooksModule } from './address-books/address-books.module';
 
 import { CustodialWalletsModule } from './custodial-wallets/custodial-wallets.module';
+import { PinataModule } from './providers/pinata/pinata.module';
+import { pinataConfig } from './providers/pinata/config/pinata.config';
 
 @Module({
   imports: [
@@ -74,6 +76,7 @@ import { CustodialWalletsModule } from './custodial-wallets/custodial-wallets.mo
         gorushConfig,
         rabbitmqConfig,
         minioConfig,
+        pinataConfig,
       ],
       envFilePath: ['.env'],
     }),
@@ -116,6 +119,7 @@ import { CustodialWalletsModule } from './custodial-wallets/custodial-wallets.mo
     MinioModule,
     LoggerModule,
     SocketIoModule,
+    PinataModule,
   ],
   providers: [RabbitMQService],
 })
