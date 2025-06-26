@@ -18,11 +18,13 @@ import { CustodialWallet } from './domain/custodial-wallet';
 import { fireblocks } from '../common/fireblocks/fireblocks.cw';
 import { JwtPayloadType } from '../auth/strategies/types/jwt-payload.type';
 import { CreateCustodialWalletUserDto } from './dto/create-custodial-wallet-user.dto';
+import { UserRepository } from '../users/infrastructure/persistence/user.repository';
 
 @Injectable()
 export class CustodialWalletsService {
   constructor(
     private readonly userService: UsersService,
+    private readonly userrepo: UserRepository,
 
     // Dependencies here
     private readonly custodialWalletRepository: CustodialWalletRepository,
@@ -99,8 +101,6 @@ export class CustodialWalletsService {
 
     updateCustodialWalletDto: UpdateCustodialWalletDto,
   ) {
-    // Do not remove comment below.
-    // <updating-property />
     let user: User | undefined = undefined;
 
     if (updateCustodialWalletDto.user) {
@@ -119,8 +119,6 @@ export class CustodialWalletsService {
     }
 
     return this.custodialWalletRepository.update(id, {
-      // Do not remove comment below.
-      // <updating-property-payload />
       user,
 
       name: updateCustodialWalletDto.name,
@@ -178,7 +176,6 @@ export class CustodialWalletsService {
           });
         }
       } catch (error) {
-        // فقط warning بده اما process رو متوقف نکن
         console.warn(`[VaultFetch] Failed for "${name}":`, error?.message);
       }
     }
@@ -290,5 +287,32 @@ export class CustodialWalletsService {
     }
 
     return wallets;
+  }
+
+  async resolveAddressBySocialId(
+    socialId: string,
+  ): Promise<{ vaultId: string; address: string }> {
+    const wallet =
+      await this.custodialWalletRepository.findByUserSocialId(socialId);
+    if (!wallet) {
+      throw new NotFoundException(`Wallet for socialId ${socialId} not found`);
+    }
+
+    const res = await fireblocks.vaults.getVaultAccountAssetAddressesPaginated({
+      vaultAccountId: wallet.vaultId,
+      assetId: 'ETH_TEST5',
+    });
+
+    const address = res.data.addresses?.[0]?.address;
+    if (!address) {
+      throw new NotFoundException(
+        `No address found for vault ${wallet.vaultId}`,
+      );
+    }
+
+    return {
+      vaultId: wallet.vaultId,
+      address,
+    };
   }
 }

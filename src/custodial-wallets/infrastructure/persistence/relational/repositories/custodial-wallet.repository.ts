@@ -120,4 +120,19 @@ export class CustodialWalletRelationalRepository
     });
     return entities.map(CustodialWalletMapper.toDomain);
   }
+
+  async findByUserSocialId(
+    socialId: string,
+  ): Promise<NullableType<CustodialWallet>> {
+    const entity = await this.custodialWalletRepository.findOne({
+      where: {
+        user: {
+          socialId,
+        },
+      },
+      relations: ['user'],
+    });
+
+    return entity ? CustodialWalletMapper.toDomain(entity) : null;
+  }
 }

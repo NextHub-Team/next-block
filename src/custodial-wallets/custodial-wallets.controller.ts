@@ -98,6 +98,15 @@ export class CustodialWalletsController {
     return this.custodialWalletsService.getAddressesByVaultIds(ids);
   }
 
+  @Get('resolve-address/:socialId')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description: 'Resolved address from Fireblocks using socialId',
+  })
+  async resolveAddressBySocialId(@Param('socialId') socialId: string) {
+    return this.custodialWalletsService.resolveAddressBySocialId(socialId);
+  }
+
   @Post('me')
   @HttpCode(HttpStatus.CREATED)
   @ApiCreatedResponse({ type: CustodialWallet })

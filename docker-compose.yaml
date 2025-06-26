@@ -1,47 +1,95 @@
 services:
   postgres:
-    image: postgres:17.4-alpine
+    image: postgres:17.0-alpine
+    container_name: vault-postgres
+    hostname: vault-postgres
     ports:
       - ${DATABASE_PORT}:5432
     volumes:
-      - app-db:/var/lib/postgresql/data
+      - vault-db:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: ${DATABASE_USERNAME}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       POSTGRES_DB: ${DATABASE_NAME}
+    networks:
+      - vault-network
+    # healthcheck:
+    #   test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USERNAME}"]
+    #   interval: 20s
+    #   timeout: 5s
+    #   retries: 5
+    profiles:
+      - dbs
 
   maildev:
-    image: maildev/maildev:2.0.5
+    build:
+      context: .
+      dockerfile: maildev.Dockerfile
+    container_name: vault-maildev
+    hostname: vault-maildev
     ports:
       - ${MAIL_CLIENT_PORT}:1080
       - ${MAIL_PORT}:1025
-
-  adminer:
-    image: dpage/pgadmin4
-    container_name: pgadmin4_container
-    restart: always
-    ports:
-      - "8888:80"
-    environment:
-      PGADMIN_DEFAULT_EMAIL: user-name@domain-name.com
-      PGADMIN_DEFAULT_PASSWORD: strong-password
-    volumes:
-        - pgadmin-data:/var/lib/pgadmin
-
-
+    networks:
+      - vault-network
+    profiles:
+      - apps
 
   redis:
     image: redis:7-alpine
+    container_name: vault-redis
+    hostname: vault-redis
     ports:
       - 6379:6379
+    networks:
+      - vault-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    profiles:
+      - dbs
 
-  app:
+  api:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: vault-api
+    hostname: vault-api
     ports:
       - ${APP_PORT}:${APP_PORT}
+    depends_on:
+      - postgres
+      - redis
+      # postgres:
+      #   condition: service_healthy
+      # redis:
+      #   condition: service_healthy
+    networks:
+      - vault-network
+    profiles:
+      - apps
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: vault-rabbitmq
+    hostname: rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    environment:
+      RABBITMQ_DEFAULT_USER: UYashwq2dsafrEs
+      RABBITMQ_DEFAULT_PASS: yourpassword
+    networks:
+      - vault-network
+    profiles:
+      - dbs
+
 
 volumes:
-  app-db:
-  pgadmin-data:
+  vault-db:
+    name: vault-db
+
+networks:
+  vault-network:
+    external: true

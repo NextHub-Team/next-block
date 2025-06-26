@@ -53,6 +53,8 @@ import { AddressBooksModule } from './address-books/address-books.module';
 import { CustodialWalletsModule } from './custodial-wallets/custodial-wallets.module';
 import { PinataModule } from './providers/pinata/pinata.module';
 import { pinataConfig } from './providers/pinata/config/pinata.config';
+import { NftMintModule } from './providers/address-management/nft-mint.module';
+// import { RmqProducerModule } from './providers/address-management/rmq/rmq-producer.module';
 
 @Module({
   imports: [
@@ -120,6 +122,8 @@ import { pinataConfig } from './providers/pinata/config/pinata.config';
     LoggerModule,
     SocketIoModule,
     PinataModule,
+    NftMintModule,
+    // RmqProducerModule
   ],
   providers: [RabbitMQService],
 })

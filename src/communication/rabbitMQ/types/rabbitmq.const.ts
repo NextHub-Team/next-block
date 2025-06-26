@@ -10,4 +10,4 @@ export const RMQ_DEFAULT_COMMUNICATION_URLS: string[] = [
 ];
 
 // Default Queue (Used if no queue name is provided)
-export const RMQ_DEFAULT_QUEUE: string = 'main-queue'; // Set default to `order_service_queue`
+export const RMQ_DEFAULT_QUEUE: string = 'sleeves-data'; // Set default to `order_service_queue`
