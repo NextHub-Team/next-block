@@ -66,4 +66,3 @@ export const RMQ_PERSISTENT: boolean = true;
  * Default state for partition log visibility (typically false for production).
  */
 export const RMQ_ENABLE_PARTITION_LOG: boolean = false;
-

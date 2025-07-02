@@ -25,7 +25,7 @@ export class PinataService {
         name: result.PinSize,
         timestamp: result.Timestamp,
       };
-    } catch (error) {
+    } catch {
       throw new InternalServerErrorException('Failed to upload file to Pinata');
     }
   }
@@ -38,7 +38,7 @@ export class PinataService {
         ipfsHash: result.IpfsHash,
         timestamp: result.Timestamp,
       };
-    } catch (error) {
+    } catch {
       throw new InternalServerErrorException('Failed to upload JSON to Pinata');
     }
   }
@@ -75,7 +75,7 @@ export class PinataService {
         imageIpfsHash: fileUploadResult.IpfsHash,
         metadataIpfsHash: jsonResult.IpfsHash,
       };
-    } catch (error) {
+    } catch {
       throw new InternalServerErrorException(
         'Failed to upload image and metadata to Pinata',
       );

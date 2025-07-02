@@ -14,17 +14,17 @@ const CONTRACT_ADDRESS = '0xf4c0840e8c0aa6c8e85b4bcdf9a2411f30022fc1';
 const RPC_URL = process.env.SEPOLIA_RPC_URL!;
 const PRIVATE_KEY = process.env.TREASURY_PRIVATE_KEY!;
 
-function detectAssetType(
-  url: string,
-): 'image' | 'audio' | 'video' | 'document' | 'other' {
-  const ext = url.split('.').pop()?.toLowerCase() || '';
-  if (['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'].includes(ext))
-    return 'image';
-  if (['mp3', 'wav', 'ogg'].includes(ext)) return 'audio';
-  if (['mp4', 'avi', 'mov', 'webm'].includes(ext)) return 'video';
-  if (['pdf', 'doc', 'docx', 'ppt', 'pptx'].includes(ext)) return 'document';
-  return 'other';
-}
+// function detectAssetType(
+//   url: string,
+// ): 'image' | 'audio' | 'video' | 'document' | 'other' {
+//   const ext = url.split('.').pop()?.toLowerCase() || '';
+//   if (['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'].includes(ext))
+//     return 'image';
+//   if (['mp3', 'wav', 'ogg'].includes(ext)) return 'audio';
+//   if (['mp4', 'avi', 'mov', 'webm'].includes(ext)) return 'video';
+//   if (['pdf', 'doc', 'docx', 'ppt', 'pptx'].includes(ext)) return 'document';
+//   return 'other';
+// }
 
 @Controller()
 export class NftMintConsumer implements OnModuleInit {

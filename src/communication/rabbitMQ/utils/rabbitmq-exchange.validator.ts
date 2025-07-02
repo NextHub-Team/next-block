@@ -17,6 +17,7 @@ export function IsAllowedExchange(validationOptions?: ValidationOptions) {
       propertyName,
       options: validationOptions,
       validator: {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         validate(exchange: string, args: ValidationArguments) {
           return exchanges.includes(exchange);
         },

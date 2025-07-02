@@ -5,18 +5,15 @@ import {
   Logger,
   Param,
   Post,
-  UseGuards,
   HttpStatus,
 } from '@nestjs/common';
 import {
-  ApiBearerAuth,
   ApiBadRequestResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
 import { RMQExchangeDto, RMQMessageDto } from '../dto/message.dto';
 import { ProducerService } from './producer.service';
 

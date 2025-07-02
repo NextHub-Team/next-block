@@ -6,7 +6,7 @@ const PRIVATE_KEY =
   'd5a22e0c13a0c19a4e2f4f4305d079bcc41a92256cc5ea597499a601a84dc343';
 const RPC_URL = 'https://sepolia.infura.io/v3/50bfbcb5b1a1468b82d8a5ac3ad42df3';
 
-async function main() {
+async function main(): Promise<void> {
   const abi = toJson(
     'function mint(uris: string[], datas: string[], royaltyWallets: address[], royaltyPercentages: uint256[], paymentMethodName: string):() payable',
   );
@@ -40,4 +40,4 @@ async function main() {
   }
 }
 
-main();
+void main();

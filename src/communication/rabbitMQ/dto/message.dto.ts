@@ -1,5 +1,4 @@
 import { IsNotEmpty, IsObject, IsOptional, IsString } from 'class-validator';
-import { IsAllowedExchange } from '../utils/rabbitmq-exchange.validator';
 
 export class RMQMessageDto {
   /**
@@ -24,6 +23,5 @@ export class RMQExchangeDto {
    */
   @IsString()
   @IsNotEmpty()
-  // @IsAllowedExchange({ message: 'Exchange is not registered or allowed.' })
   exchange: string;
 }
