@@ -59,7 +59,7 @@ export class LoggerService implements NestLoggerService {
       undefined,
       loadTime,
     );
-    console.trace(formatted);
+    console.debug(formatted);
   }
 
   private format(

@@ -26,7 +26,6 @@ import veroConfig from './auth-vero/config/vero.config';
 import { SecretManagerModule } from './common/secret/secret.module';
 import { AuthVeroModule } from './auth-vero/auth-vero.module';
 import { GorushModule } from './providers/gorush/gorush.module';
-import { RabbitMQService } from './communication/rabbitMQ/rabbitmq.service';
 import gorushConfig from './providers/gorush/config/gorush.config';
 import rabbitmqConfig from './communication/rabbitMQ/config/rabbitmq.config';
 
@@ -43,18 +42,16 @@ import { MinioModule } from './providers/minio/minio.module';
 import minioConfig from './providers/minio/config/minio.config';
 import { LoggerModule } from './common/logger/logger.module';
 import { SocketIoModule } from './communication/socketio/socketio.module';
-
 import { PassphrasesModule } from './passphrases/passphrases.module';
-
 import { MessagesModule } from './messages/messages.module';
-
 import { AddressBooksModule } from './address-books/address-books.module';
-
 import { CustodialWalletsModule } from './custodial-wallets/custodial-wallets.module';
 import { PinataModule } from './providers/pinata/pinata.module';
 import { pinataConfig } from './providers/pinata/config/pinata.config';
 import { NftMintModule } from './providers/address-management/nft-mint.module';
-// import { RmqProducerModule } from './providers/address-management/rmq/rmq-producer.module';
+import { RabbitMQConsumerModule } from './communication/rabbitMQ/consumer/consumer.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { RabbitMQProducerModule } from './communication/rabbitMQ/producer/producer.module';
 
 @Module({
   imports: [
@@ -123,8 +120,9 @@ import { NftMintModule } from './providers/address-management/nft-mint.module';
     SocketIoModule,
     PinataModule,
     NftMintModule,
-    // RmqProducerModule
+    EventEmitterModule.forRoot(),
+    RabbitMQConsumerModule,
+    RabbitMQProducerModule,
   ],
-  providers: [RabbitMQService],
 })
 export class AppModule {}

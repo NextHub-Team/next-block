@@ -12,10 +12,10 @@ import validationOptions from './utils/validation-options';
 import { AllConfigType } from './config/config.type';
 import { ResolvePromisesInterceptor } from './utils/serializer.interceptor';
 import { APIDocs } from './common/api-docs/api-docs.module';
-import { RabbitMQService } from './communication/rabbitMQ/rabbitmq.service';
 import { DocumentBuilder } from '@nestjs/swagger';
 import { LoggerService } from './common/logger/logger.service';
 import { LoggerExceptionFilter } from './common/logger/logger-exception.filter';
+import { RabbitMQRegister } from './communication/rabbitMQ/rabbitmq.register';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -28,9 +28,7 @@ async function bootstrap() {
 
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
   const configService = app.get(ConfigService<AllConfigType>);
-  const rabbitMQService = app.get(RabbitMQService);
 
-  app.enableShutdownHooks();
   app.setGlobalPrefix(
     configService.getOrThrow('app.apiPrefix', { infer: true }),
     {
@@ -61,11 +59,12 @@ async function bootstrap() {
     })
     .build();
 
-  await APIDocs.setup(app, options); // doesent need use swagger SwaggerModule.setup
+  await APIDocs.setup(app, options); // doesnt need use swagger SwaggerModule.setup
   await app.listen(configService.getOrThrow('app.port', { infer: true }));
   await APIDocs.info(app);
-  rabbitMQService.initialize(app);
-  await app.startAllMicroservices();
   app.enableCors(); // <- Allow all CORS requests (default)
+  app.enableShutdownHooks();
+  RabbitMQRegister.init(app);
+  await app.startAllMicroservices();
 }
 void bootstrap();

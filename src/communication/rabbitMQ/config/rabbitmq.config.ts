@@ -8,76 +8,122 @@ import {
   RMQ_NO_ACK,
   RMQ_PERSISTENT,
   RMQ_DEFAULT_COMMUNICATION_URLS,
-} from '../types/rabbitmq.const';
+  RMQ_USERNAME,
+  RMQ_PASSWORD,
+  RMQ_VHOST,
+  RMQ_QUEUE,
+  RMQ_EXCHANGE,
+  RMQ_RECONNECT,
+  RMQ_ENABLE_PARTITION_LOG,
+  RMQ_ENABLE,
+} from '../types/rabbitmq-const.type';
+import { parseBoolean } from '../../../utils/helpers/parser.helper';
 
 // Validator class for environment variables
 class EnvironmentVariablesValidator {
-  /**
-   * Enable or disable RabbitMQ.
-   * Default: false
-   */
+  @IsString()
+  @IsOptional()
+  COMMUNICATION_RABBITMQ_USERNAME?: string;
+
+  @IsString()
+  @IsOptional()
+  COMMUNICATION_RABBITMQ_PASSWORD?: string;
+
+  @IsString()
+  @IsOptional()
+  COMMUNICATION_RABBITMQ_VHOST?: string;
+
   @IsBoolean()
   @IsOptional()
   COMMUNICATION_ENABLE_RABBITMQ?: boolean;
 
+  @IsString()
+  @IsOptional()
+  COMMUNICATION_RABBITMQ_QUEUE?: string;
+
+  @IsString()
+  @IsOptional()
   /**
-   * RabbitMQ connection URLs (comma-separated).
+   * Comma-separated list of exchanges.
    */
+  COMMUNICATION_RABBITMQ_EXCHANGES?: string[];
+
+  @IsBoolean()
+  @IsOptional()
+  COMMUNICATION_RABBITMQ_RECONNECT?: boolean;
+
   @IsString()
   @IsOptional()
   COMMUNICATION_RABBITMQ_URLS?: string;
 
-  /**
-   * RabbitMQ prefetch count (number of messages to fetch at a time)
-   */
-  @IsInt()
-  @IsOptional()
-  COMMUNICATION_RABBITMQ_PREFETCH_COUNT?: number;
-
-  /**
-   * RabbitMQ acknowledgment mode (true = auto-ack)
-   */
-  @IsBoolean()
-  @IsOptional()
-  COMMUNICATION_RABBITMQ_NO_ACK?: boolean;
-
-  /**
-   * RabbitMQ queue durability
-   */
   @IsBoolean()
   @IsOptional()
   COMMUNICATION_RABBITMQ_QUEUE_DURABLE?: boolean;
 
-  /**
-   * RabbitMQ message persistence (false = messages are not persisted)
-   */
+  @IsInt()
+  @IsOptional()
+  COMMUNICATION_RABBITMQ_PREFETCH_COUNT?: number;
+
+  @IsBoolean()
+  @IsOptional()
+  COMMUNICATION_RABBITMQ_NO_ACK?: boolean;
+
   @IsBoolean()
   @IsOptional()
   COMMUNICATION_RABBITMQ_PERSISTENT?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  COMMUNICATION_RABBITMQ_ENABLE_PARTITION_LOG?: boolean;
 }
 
 export default registerAs<RabbitMQConfig>('rabbitMQ', () => {
-  // Validate the environment variables using the defined validator
   validateConfig(process.env, EnvironmentVariablesValidator);
 
   return {
-    enableRabbitMQ:
-      process.env.COMMUNICATION_ENABLE_RABBITMQ?.toLowerCase() === 'true', // Convert string to boolean
-    rabbitmqUrls: process.env.COMMUNICATION_RABBITMQ_URLS
-      ? process.env.COMMUNICATION_RABBITMQ_URLS.split(',')
-      : RMQ_DEFAULT_COMMUNICATION_URLS, // Default if not set
-    rabbitmqPrefetchCount: process.env.COMMUNICATION_RABBITMQ_PREFETCH_COUNT
-      ? Number(process.env.COMMUNICATION_RABBITMQ_PREFETCH_COUNT) // Convert to number
+    username: process.env.COMMUNICATION_RABBITMQ_USERNAME || RMQ_USERNAME,
+    password: process.env.COMMUNICATION_RABBITMQ_PASSWORD || RMQ_PASSWORD,
+    vhost: process.env.COMMUNICATION_RABBITMQ_VHOST || RMQ_VHOST,
+
+    enable: parseBoolean(process.env.COMMUNICATION_ENABLE_RABBITMQ, RMQ_ENABLE),
+
+    queue: process.env.COMMUNICATION_RABBITMQ_QUEUE || RMQ_QUEUE,
+    exchanges: process.env.COMMUNICATION_RABBITMQ_EXCHANGES
+      ? process.env.COMMUNICATION_RABBITMQ_EXCHANGES.split(',').map((e) =>
+          e.trim(),
+        )
+      : [RMQ_EXCHANGE],
+
+    reconnect: parseBoolean(
+      process.env.COMMUNICATION_RABBITMQ_RECONNECT,
+      RMQ_RECONNECT,
+    ),
+
+    urls: process.env.COMMUNICATION_RABBITMQ_URLS
+      ? process.env.COMMUNICATION_RABBITMQ_URLS.split(',').map((url) =>
+          url.trim(),
+        )
+      : RMQ_DEFAULT_COMMUNICATION_URLS,
+
+    queueDurable: parseBoolean(
+      process.env.COMMUNICATION_RABBITMQ_QUEUE_DURABLE,
+      RMQ_QUEUE_DURABLE,
+    ),
+
+    prefetchCount: process.env.COMMUNICATION_RABBITMQ_PREFETCH_COUNT
+      ? Number(process.env.COMMUNICATION_RABBITMQ_PREFETCH_COUNT)
       : RMQ_PREFETCH_COUNT,
-    rabbitmqNoAck: process.env.COMMUNICATION_RABBITMQ_NO_ACK
-      ? process.env.COMMUNICATION_RABBITMQ_NO_ACK.toLowerCase() === 'true' // Convert to boolean
-      : RMQ_NO_ACK,
-    rabbitmqQueueDurable: process.env.COMMUNICATION_RABBITMQ_QUEUE_DURABLE
-      ? process.env.COMMUNICATION_RABBITMQ_QUEUE_DURABLE.toLowerCase() ===
-        'true' // Convert to boolean
-      : RMQ_QUEUE_DURABLE,
-    rabbitmqPersistent: process.env.COMMUNICATION_RABBITMQ_PERSISTENT
-      ? process.env.COMMUNICATION_RABBITMQ_PERSISTENT.toLowerCase() === 'true' // Convert to boolean
-      : RMQ_PERSISTENT,
+
+    noAck: parseBoolean(process.env.COMMUNICATION_RABBITMQ_NO_ACK, RMQ_NO_ACK),
+
+    persistent: parseBoolean(
+      process.env.COMMUNICATION_RABBITMQ_PERSISTENT,
+      RMQ_PERSISTENT,
+    ),
+
+    enablePartitionLog: parseBoolean(
+      process.env.COMMUNICATION_RABBITMQ_ENABLE_PARTITION_LOG,
+      RMQ_ENABLE_PARTITION_LOG,
+    ),
   };
 });
