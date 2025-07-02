@@ -12,7 +12,7 @@ export class CustodialWallet {
     type: () => String,
     nullable: false,
   })
-  name: string;
+  custodialAddress: string;
 
   @ApiProperty({
     type: () => String,

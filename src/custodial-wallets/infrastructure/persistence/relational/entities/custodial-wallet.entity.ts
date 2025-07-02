@@ -23,7 +23,7 @@ export class CustodialWalletEntity extends EntityRelationalHelper {
     nullable: false,
     type: String,
   })
-  name: string;
+  custodialAddress: string;
 
   @Column({
     nullable: false,

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In } from 'typeorm';
+import { DeepPartial, In, Repository } from 'typeorm';
 import { CustodialWalletEntity } from '../entities/custodial-wallet.entity';
 import { NullableType } from '../../../../../utils/types/nullable.type';
 import { CustodialWallet } from '../../../../domain/custodial-wallet';
@@ -14,15 +14,17 @@ export class CustodialWalletRelationalRepository
 {
   constructor(
     @InjectRepository(CustodialWalletEntity)
-    private readonly custodialWalletRepository: Repository<CustodialWalletEntity>,
+    private readonly repo: Repository<CustodialWalletEntity>,
   ) {}
 
-  async create(data: CustodialWallet): Promise<CustodialWallet> {
-    const persistenceModel = CustodialWalletMapper.toPersistence(data);
-    const newEntity = await this.custodialWalletRepository.save(
-      this.custodialWalletRepository.create(persistenceModel),
+  async create(
+    data: Omit<CustodialWallet, 'id' | 'createdAt' | 'updatedAt'>,
+  ): Promise<CustodialWallet> {
+    const entity = this.repo.create(
+      CustodialWalletMapper.toPersistence(data as CustodialWallet),
     );
-    return CustodialWalletMapper.toDomain(newEntity);
+    const saved = await this.repo.save(entity);
+    return CustodialWalletMapper.toDomain(saved);
   }
 
   async findAllWithPagination({
@@ -30,91 +32,57 @@ export class CustodialWalletRelationalRepository
   }: {
     paginationOptions: IPaginationOptions;
   }): Promise<CustodialWallet[]> {
-    const entities = await this.custodialWalletRepository.find({
+    const entities = await this.repo.find({
       skip: (paginationOptions.page - 1) * paginationOptions.limit,
       take: paginationOptions.limit,
+      relations: ['user'],
     });
-
-    return entities.map((entity) => CustodialWalletMapper.toDomain(entity));
+    return entities.map(CustodialWalletMapper.toDomain);
   }
 
   async findById(
     id: CustodialWallet['id'],
   ): Promise<NullableType<CustodialWallet>> {
-    const entity = await this.custodialWalletRepository.findOne({
+    const entity = await this.repo.findOne({
       where: { id },
+      relations: ['user'],
     });
-
     return entity ? CustodialWalletMapper.toDomain(entity) : null;
   }
 
   async findByIds(ids: CustodialWallet['id'][]): Promise<CustodialWallet[]> {
-    const entities = await this.custodialWalletRepository.find({
+    const entities = await this.repo.find({
       where: { id: In(ids) },
+      relations: ['user'],
     });
-
-    return entities.map((entity) => CustodialWalletMapper.toDomain(entity));
+    return entities.map(CustodialWalletMapper.toDomain);
   }
 
   async update(
     id: CustodialWallet['id'],
-    payload: Partial<CustodialWallet>,
-  ): Promise<CustodialWallet> {
-    const entity = await this.custodialWalletRepository.findOne({
-      where: { id },
-    });
-
-    if (!entity) {
-      throw new Error('Record not found');
-    }
-
-    const updatedEntity = await this.custodialWalletRepository.save(
-      this.custodialWalletRepository.create(
-        CustodialWalletMapper.toPersistence({
-          ...CustodialWalletMapper.toDomain(entity),
-          ...payload,
-        }),
-      ),
+    payload: DeepPartial<CustodialWallet>,
+  ): Promise<CustodialWallet | null> {
+    await this.repo.update(
+      id,
+      CustodialWalletMapper.toPersistence(payload as CustodialWallet),
     );
-
-    return CustodialWalletMapper.toDomain(updatedEntity);
+    return this.findById(id);
   }
 
   async remove(id: CustodialWallet['id']): Promise<void> {
-    await this.custodialWalletRepository.delete(id);
-  }
-
-  async findByName(name: string): Promise<NullableType<CustodialWallet>> {
-    const entity = await this.custodialWalletRepository.findOne({
-      where: { name },
-      relations: ['user'],
-    });
-
-    return entity ? CustodialWalletMapper.toDomain(entity) : null;
-  }
-
-  async findByNames(names: string[]): Promise<CustodialWallet[]> {
-    const entities = await this.custodialWalletRepository.find({
-      where: {
-        name: In(names),
-      },
-      relations: ['user'],
-    });
-
-    return entities.map(CustodialWalletMapper.toDomain);
+    await this.repo.delete(id);
   }
 
   async findByUserId(userId: number): Promise<NullableType<CustodialWallet>> {
-    const entity = await this.custodialWalletRepository.findOne({
+    const entity = await this.repo.findOne({
       where: { user: { id: userId } },
       relations: ['user'],
     });
-
     return entity ? CustodialWalletMapper.toDomain(entity) : null;
   }
 
   async findByUserIds(userId: number): Promise<CustodialWallet[]> {
-    const entities = await this.custodialWalletRepository.find({
+    const entities = await this.repo.find({
       where: { user: { id: userId } },
       relations: ['user'],
     });
@@ -124,15 +92,10 @@ export class CustodialWalletRelationalRepository
   async findByUserSocialId(
     socialId: string,
   ): Promise<NullableType<CustodialWallet>> {
-    const entity = await this.custodialWalletRepository.findOne({
-      where: {
-        user: {
-          socialId,
-        },
-      },
+    const entity = await this.repo.findOne({
+      where: { user: { socialId } },
       relations: ['user'],
     });
-
     return entity ? CustodialWalletMapper.toDomain(entity) : null;
   }
 }

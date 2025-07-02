@@ -1,283 +1,104 @@
-import { UsersService } from '../users/users.service';
-import { User } from '../users/domain/user';
-
 import {
-  // common
   Injectable,
-  HttpStatus,
-  UnprocessableEntityException,
   NotFoundException,
-  InternalServerErrorException,
-  ConflictException,
+  UnprocessableEntityException,
+  HttpStatus,
 } from '@nestjs/common';
-import { CreateCustodialWalletDto } from './dto/create-custodial-wallet.dto';
-import { UpdateCustodialWalletDto } from './dto/update-custodial-wallet.dto';
 import { CustodialWalletRepository } from './infrastructure/persistence/custodial-wallet.repository';
-import { IPaginationOptions } from '../utils/types/pagination-options';
-import { CustodialWallet } from './domain/custodial-wallet';
 import { fireblocks } from '../common/fireblocks/fireblocks.cw';
+import { CustodialWallet } from './domain/custodial-wallet';
 import { JwtPayloadType } from '../auth/strategies/types/jwt-payload.type';
-import { CreateCustodialWalletUserDto } from './dto/create-custodial-wallet-user.dto';
-import { UserRepository } from '../users/infrastructure/persistence/user.repository';
 
 @Injectable()
 export class CustodialWalletsService {
   constructor(
-    private readonly userService: UsersService,
-    private readonly userrepo: UserRepository,
-
-    // Dependencies here
     private readonly custodialWalletRepository: CustodialWalletRepository,
   ) {}
 
-  async create(createCustodialWalletDto: CreateCustodialWalletDto) {
-    const userObject = await this.userService.findById(
-      createCustodialWalletDto.user.id,
+  async createOrGetWallet(userId: string) {
+    const existingWallet = await this.custodialWalletRepository.findByUserId(
+      Number(userId),
     );
+    if (existingWallet) {
+      return {
+        message: 'Wallet already exists in database',
+        wallet: existingWallet,
+      };
+    }
 
-    if (!userObject) {
-      throw new UnprocessableEntityException({
-        status: HttpStatus.UNPROCESSABLE_ENTITY,
-        errors: {
-          user: 'notExists',
-        },
+    const vaultFromFB = await this.findVaultInFireblocks(userId);
+    if (vaultFromFB) {
+      const savedWallet = await this.custodialWalletRepository.create({
+        user: { id: userId } as any,
+        vaultId: vaultFromFB.vaultId,
+        custodialAddress: vaultFromFB.address,
       });
+      return {
+        message: 'Wallet imported from Fireblocks',
+        wallet: savedWallet,
+      };
     }
 
-    const user = userObject;
-
-    const existing = await this.custodialWalletRepository.findByUserId(
-      Number(user.id),
-    );
-    if (existing) {
-      throw new ConflictException({
-        status: HttpStatus.CONFLICT,
-        message: `User with ID ${user.id} already has a custodial wallet.`,
-      });
-    }
-
-    let vaultId: string;
-    try {
-      vaultId = await this.createVaultInFireblocks(
-        createCustodialWalletDto.name,
-      );
-    } catch (error) {
-      throw new InternalServerErrorException({
-        message: 'Failed to create vault in Fireblocks',
-        detail: error?.message,
-      });
-    }
-
-    return this.custodialWalletRepository.create({
-      user,
-      name: createCustodialWalletDto.name,
-      vaultId,
+    const created = await this.createVaultInFireblocks(userId);
+    const savedWallet = await this.custodialWalletRepository.create({
+      user: { id: userId } as any,
+      vaultId: created.vaultId,
+      custodialAddress: created.address,
     });
-  }
-
-  findAllWithPagination({
-    paginationOptions,
-  }: {
-    paginationOptions: IPaginationOptions;
-  }) {
-    return this.custodialWalletRepository.findAllWithPagination({
-      paginationOptions: {
-        page: paginationOptions.page,
-        limit: paginationOptions.limit,
-      },
-    });
-  }
-
-  findById(id: CustodialWallet['id']) {
-    return this.custodialWalletRepository.findById(id);
-  }
-
-  findByIds(ids: CustodialWallet['id'][]) {
-    return this.custodialWalletRepository.findByIds(ids);
-  }
-
-  async update(
-    id: CustodialWallet['id'],
-
-    updateCustodialWalletDto: UpdateCustodialWalletDto,
-  ) {
-    let user: User | undefined = undefined;
-
-    if (updateCustodialWalletDto.user) {
-      const userObject = await this.userService.findById(
-        updateCustodialWalletDto.user.id,
-      );
-      if (!userObject) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            user: 'notExists',
-          },
-        });
-      }
-      user = userObject;
-    }
-
-    return this.custodialWalletRepository.update(id, {
-      user,
-
-      name: updateCustodialWalletDto.name,
-
-      vaultId: updateCustodialWalletDto.vaultId,
-    });
-  }
-
-  remove(id: CustodialWallet['id']) {
-    return this.custodialWalletRepository.remove(id);
-  }
-
-  async getVaultByName(name: string) {
-    const vault = await this.custodialWalletRepository.findByName(name);
-
-    if (!vault) {
-      throw new NotFoundException(`Vault not found for name "${name}"`);
-    }
 
     return {
-      vaultId: vault.vaultId,
-      vaultName: vault.name,
-      asset: await this.fetchAssetInfo(vault.vaultId),
-      address: await this.fetchVaultAddress(vault.vaultId),
+      message: 'New wallet created',
+      wallet: savedWallet,
     };
   }
 
-  async getVaultsByNames(names: string[]): Promise<
-    {
-      name: string;
-      vaultId: string;
-      vaultName: string;
-      asset: any;
-      address?: string;
-    }[]
-  > {
-    const results: {
-      name: string;
-      vaultId: string;
-      vaultName: string;
-      asset: any;
-      address?: string;
-    }[] = [];
-
-    for (const name of names) {
-      try {
-        const vaultInfo = await this.getVaultByName(name);
-        if (vaultInfo) {
-          results.push({
-            name,
-            vaultId: vaultInfo.vaultId,
-            vaultName: vaultInfo.vaultName,
-            asset: vaultInfo.asset,
-            address: vaultInfo.address,
-          });
-        }
-      } catch (error) {
-        console.warn(`[VaultFetch] Failed for "${name}":`, error?.message);
-      }
-    }
-
-    return results;
-  }
-
-  private async createVaultInFireblocks(name: string): Promise<string> {
-    const result = await fireblocks.vaults.createVaultAccount({
-      createVaultAccountRequest: {
-        name,
-        hiddenOnUI: false,
-        autoFuel: true,
-      },
-    });
-
-    if (!result?.data?.id) throw new Error('Vault creation failed');
-
-    await fireblocks.vaults.createVaultAccountAsset({
-      vaultAccountId: result.data.id,
-      assetId: 'ETH_TEST5',
-    });
-
-    return result.data.id;
-  }
-
-  private async fetchAssetInfo(vaultId: string) {
-    return (
-      await fireblocks.vaults.getVaultAccountAsset({
-        vaultAccountId: vaultId,
-        assetId: 'ETH_TEST5',
-      })
-    ).data;
-  }
-
-  async getAddressesByVaultIds(vaultIds: string[]) {
-    const results: { vaultId: string; address: string | null }[] = [];
-
-    for (const vaultId of vaultIds) {
-      try {
-        const address = await this.fetchVaultAddress(vaultId);
-        results.push({ vaultId, address: address ?? null });
-      } catch (err) {
-        console.warn(
-          `Failed to fetch address for vaultId=${vaultId}`,
-          err.message,
-        );
-        results.push({ vaultId, address: null });
-      }
-    }
-
-    return results;
-  }
-
-  private async fetchVaultAddress(vaultId: string) {
+  private async findVaultInFireblocks(
+    userId: string,
+  ): Promise<{ vaultId: string; address: string } | null> {
     try {
-      const res =
-        await fireblocks.vaults.getVaultAccountAssetAddressesPaginated({
-          vaultAccountId: vaultId,
-          assetId: 'ETH_TEST5',
-        });
-      return res.data.addresses?.[0]?.address;
-    } catch {
-      return undefined;
-    }
-  }
+      const vaultName = `user_${userId}`;
+      const fb = fireblocks;
 
-  async createByUser(
-    dto: CreateCustodialWalletUserDto,
-    userJwtPayload: JwtPayloadType,
-  ) {
-    const user = await this.userService.findById(userJwtPayload.id);
-    if (!user) {
-      throw new UnprocessableEntityException({
-        status: HttpStatus.UNPROCESSABLE_ENTITY,
-        errors: {
-          user: 'User does not exist',
-        },
+      const vaultRes = await fb.vaults.getPagedVaultAccounts({
+        namePrefix: vaultName,
       });
-    }
 
-    const existing = await this.custodialWalletRepository.findByUserIds(
-      Number(user.id),
-    );
-    if (existing && existing.length > 0) {
-      throw new ConflictException({
-        status: HttpStatus.CONFLICT,
-        message: `User with ID ${user.id} already has a custodial wallet.`,
-      });
-    }
+      const vault = vaultRes.data?.accounts?.find((v) => v.name === vaultName);
+      if (!vault || !vault.id) {
+        console.warn(`No vault or vault without ID found for ${vaultName}`);
+        return null;
+      }
 
-    return this.custodialWalletRepository.create({
-      user,
-      name: dto.name,
-      vaultId: await this.createVaultInFireblocks(dto.name),
-    });
+      const address = await this.fetchVaultAddress(vault.id);
+      if (!address) {
+        console.warn(`No address found for vault ID ${vault.id}`);
+        return null;
+      }
+
+      return {
+        vaultId: vault.id,
+        address,
+      };
+    } catch (err) {
+      console.warn(
+        `Error checking vault in Fireblocks:`,
+        err?.response?.data || err?.message,
+      );
+      return null;
+    }
   }
 
   async findByMe(userJwtPayload: JwtPayloadType): Promise<CustodialWallet[]> {
-    const wallets = await this.custodialWalletRepository.findByUserIds(
-      Number(userJwtPayload.id),
-    );
+    const userId =
+      typeof userJwtPayload === 'object'
+        ? Number(userJwtPayload.id)
+        : Number(userJwtPayload);
+
+    if (isNaN(userId)) {
+      throw new UnprocessableEntityException('Invalid user ID in token');
+    }
+
+    const wallets = await this.custodialWalletRepository.findByUserIds(userId);
 
     if (!wallets?.length) {
       throw new NotFoundException({
@@ -289,7 +110,33 @@ export class CustodialWalletsService {
     return wallets;
   }
 
+  findById(id: CustodialWallet['id']) {
+    return this.custodialWalletRepository.findById(id);
+  }
+
+  remove(id: CustodialWallet['id']) {
+    return this.custodialWalletRepository.remove(id);
+  }
+
   async resolveAddressBySocialId(
+    socialId: string | string[],
+  ): Promise<
+    | { vaultId: string; address: string }
+    | { vaultId: string; address: string }[]
+  > {
+    if (Array.isArray(socialId)) {
+      const results: { vaultId: string; address: string }[] = [];
+      for (const id of socialId) {
+        const result = await this.resolveSingleAddress(id);
+        results.push(result);
+      }
+      return results;
+    } else {
+      return this.resolveSingleAddress(socialId);
+    }
+  }
+
+  private async resolveSingleAddress(
     socialId: string,
   ): Promise<{ vaultId: string; address: string }> {
     const wallet =
@@ -298,12 +145,7 @@ export class CustodialWalletsService {
       throw new NotFoundException(`Wallet for socialId ${socialId} not found`);
     }
 
-    const res = await fireblocks.vaults.getVaultAccountAssetAddressesPaginated({
-      vaultAccountId: wallet.vaultId,
-      assetId: 'ETH_TEST5',
-    });
-
-    const address = res.data.addresses?.[0]?.address;
+    const address = await this.fetchVaultAddress(wallet.vaultId);
     if (!address) {
       throw new NotFoundException(
         `No address found for vault ${wallet.vaultId}`,
@@ -314,5 +156,46 @@ export class CustodialWalletsService {
       vaultId: wallet.vaultId,
       address,
     };
+  }
+
+  // helpers
+  private async createVaultInFireblocks(
+    name: string,
+  ): Promise<{ vaultId: string; address: string }> {
+    const vaultRes = await fireblocks.vaults.createVaultAccount({
+      createVaultAccountRequest: {
+        name,
+        hiddenOnUI: false,
+        autoFuel: true,
+      },
+    });
+
+    const vaultId = vaultRes.data?.id;
+    if (!vaultId) throw new Error('Vault creation failed');
+
+    await fireblocks.vaults.createVaultAccountAsset({
+      vaultAccountId: vaultId,
+      assetId: 'ETH_TEST5',
+    });
+
+    const address = await this.fetchVaultAddress(vaultId);
+    if (!address) throw new Error('Address generation failed');
+
+    return { vaultId, address };
+  }
+
+  private async fetchVaultAddress(
+    vaultId: string,
+  ): Promise<string | undefined> {
+    try {
+      const res =
+        await fireblocks.vaults.getVaultAccountAssetAddressesPaginated({
+          vaultAccountId: vaultId,
+          assetId: 'ETH_TEST5',
+        });
+      return res.data.addresses?.[0]?.address;
+    } catch {
+      return undefined;
+    }
   }
 }
