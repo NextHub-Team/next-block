@@ -48,10 +48,11 @@ import { AddressBooksModule } from './address-books/address-books.module';
 import { CustodialWalletsModule } from './custodial-wallets/custodial-wallets.module';
 import { PinataModule } from './providers/pinata/pinata.module';
 import { pinataConfig } from './providers/pinata/config/pinata.config';
-import { NftMintModule } from './providers/address-management/nft-mint.module';
+
 import { RabbitMQConsumerModule } from './communication/rabbitMQ/consumer/consumer.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { RabbitMQProducerModule } from './communication/rabbitMQ/producer/producer.module';
+import { NftMintModule } from './communication-services/nft-minter/nft-mint.module';
 
 @Module({
   imports: [

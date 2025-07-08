@@ -118,14 +118,54 @@ export class CustodialWalletsService {
     return this.custodialWalletRepository.remove(id);
   }
 
+  // async resolveAddressBySocialId(
+  //   socialId: string | string[],
+  // ): Promise<
+  //   | { vaultId: string; address: string }
+  //   | { vaultId: string; address: string }[]
+  // > {
+  //   if (Array.isArray(socialId)) {
+  //     const results: { vaultId: string; address: string }[] = [];
+  //     for (const id of socialId) {
+  //       const result = await this.resolveSingleAddress(id);
+  //       results.push(result);
+  //     }
+  //     return results;
+  //   } else {
+  //     return this.resolveSingleAddress(socialId);
+  //   }
+  // }
+
+  // private async resolveSingleAddress(
+  //   socialId: string,
+  // ): Promise<{ vaultId: string; address: string }> {
+  //   const wallet =
+  //     await this.custodialWalletRepository.findByUserSocialId(socialId);
+  //   if (!wallet) {
+  //     throw new NotFoundException(`Wallet for socialId ${socialId} not found`);
+  //   }
+
+  //   const address = await this.fetchVaultAddress(wallet.vaultId);
+  //   if (!address) {
+  //     throw new NotFoundException(
+  //       `No address found for vault ${wallet.vaultId}`,
+  //     );
+  //   }
+
+  //   return {
+  //     vaultId: wallet.vaultId,
+  //     address,
+  //   };
+  // }
+
   async resolveAddressBySocialId(
     socialId: string | string[],
   ): Promise<
-    | { vaultId: string; address: string }
-    | { vaultId: string; address: string }[]
+    | { uid: string; vaultId: string; address: string }
+    | { uid: string; vaultId: string; address: string }[]
   > {
     if (Array.isArray(socialId)) {
-      const results: { vaultId: string; address: string }[] = [];
+      const results: { uid: string; vaultId: string; address: string }[] = [];
       for (const id of socialId) {
         const result = await this.resolveSingleAddress(id);
         results.push(result);
@@ -138,7 +178,7 @@ export class CustodialWalletsService {
 
   private async resolveSingleAddress(
     socialId: string,
-  ): Promise<{ vaultId: string; address: string }> {
+  ): Promise<{ uid: string; vaultId: string; address: string }> {
     const wallet =
       await this.custodialWalletRepository.findByUserSocialId(socialId);
     if (!wallet) {
@@ -153,6 +193,7 @@ export class CustodialWalletsService {
     }
 
     return {
+      uid: socialId, // اضافه شد
       vaultId: wallet.vaultId,
       address,
     };
