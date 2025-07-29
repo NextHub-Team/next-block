@@ -50,17 +50,20 @@ import { MessagesModule } from './messages/messages.module';
 
 import { AddressBooksModule } from './address-books/address-books.module';
 
-import { WalletsModule } from './wallets/wallets.module';
+// import { WalletsModule } from './wallets/wallets.module';
 
-import { FireblocksCwWalletsModule } from './fireblocks-cw-wallets/fireblocks-cw-wallets.module';
+// import { FireblocksCwWalletsModule } from './fireblocks-cw-wallets/fireblocks-cw-wallets.module';
 
-import { FireblocksNcwWalletsModule } from './fireblocks-ncw-wallets/fireblocks-ncw-wallets.module';
+// import { FireblocksNcwWalletsModule } from './fireblocks-ncw-wallets/fireblocks-ncw-wallets.module';
+
+import { SwapsModule } from './swaps/swaps.module';
 
 @Module({
   imports: [
-    FireblocksNcwWalletsModule,
-    FireblocksCwWalletsModule,
-    WalletsModule,
+    SwapsModule,
+    // FireblocksNcwWalletsModule,
+    // FireblocksCwWalletsModule,
+    // WalletsModule,
     MessagesModule,
     PassphrasesModule,
     AddressBooksModule,
