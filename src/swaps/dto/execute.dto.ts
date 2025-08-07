@@ -4,7 +4,10 @@ import { ApiProperty } from '@nestjs/swagger';
 import { TransactionDto } from './transaction.dto';
 
 export class ExecuteSwapDto {
-  @ApiProperty({ example: '0xefe7a854226dd49d700a881a', description: 'ZeroEx quote ID (zid)' })
+  @ApiProperty({
+    example: '0xefe7a854226dd49d700a881a',
+    description: 'ZeroEx quote ID (zid)',
+  })
   @IsString()
   zid: string;
 
@@ -12,7 +15,10 @@ export class ExecuteSwapDto {
   @IsNumber()
   chainId: number;
 
-  @ApiProperty({ type: TransactionDto, description: 'Transaction object from 0x response' })
+  @ApiProperty({
+    type: TransactionDto,
+    description: 'Transaction object from 0x response',
+  })
   @ValidateNested()
   @Type(() => TransactionDto)
   transaction: TransactionDto;

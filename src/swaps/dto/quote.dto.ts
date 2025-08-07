@@ -19,7 +19,8 @@ export class SwapQuoteDto {
 
   @ApiProperty({
     example: '1000000',
-    description: 'Amount of token to sell in base units (e.g. 6 decimals for USDC)',
+    description:
+      'Amount of token to sell in base units (e.g. 6 decimals for USDC)',
   })
   @IsString()
   sellAmount: string;

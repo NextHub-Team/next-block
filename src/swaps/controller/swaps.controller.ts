@@ -1,4 +1,4 @@
-import { Controller, Get, Query,Body, Post  } from '@nestjs/common';
+import { Controller, Get, Query, Body, Post } from '@nestjs/common';
 import { SwapsService } from '../application/swaps.service';
 import { SwapPriceDto } from '../dto/price.dto';
 import { SwapQuoteDto } from '../dto/quote.dto';
@@ -33,8 +33,8 @@ export class SwapsController {
     return this.service.getChains();
   }
 
-@Post('execute')
-executeSwap(@Body() body: ExecuteSwapDto) {
-  return this.service.executeSwap(body);
-}
+  @Post('execute')
+  executeSwap(@Body() body: ExecuteSwapDto) {
+    return this.service.executeSwap(body);
+  }
 }

@@ -27,15 +27,14 @@ export class ZeroXService {
   }
 
   executeSwap(body: ExecuteSwapDto) {
-  // TODO: Fireblocks logic must impemented here
-  return {
-    message: 'Swap execution simulation (Fireblocks integration pending)',
-    data: {
-      zid: body.zid,
-      chainId: body.chainId,
-      transaction: body.transaction,
-    },
-  };
-}
-
+    // TODO: Fireblocks logic must impemented here
+    return {
+      message: 'Swap execution simulation (Fireblocks integration pending)',
+      data: {
+        zid: body.zid,
+        chainId: body.chainId,
+        transaction: body.transaction,
+      },
+    };
+  }
 }

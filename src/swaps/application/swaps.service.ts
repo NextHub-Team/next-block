@@ -27,6 +27,6 @@ export class SwapsService {
   }
 
   executeSwap(body: ExecuteSwapDto) {
-  return this.zerox.executeSwap(body);
-}
+    return this.zerox.executeSwap(body);
+  }
 }

@@ -18,21 +18,21 @@ export class ZeroXClient {
     });
   }
 
-private async get(path: string, params: any) {
-  try {
-    const res = await this.api.get(path, { params });
-    return res.data;
-  } catch (e) {
-    console.error('[ZeroXClient ERROR]', {
-      path,
-      params,
-      response: e?.response?.data,
-      status: e?.response?.status,
-      details: e?.response?.data?.data?.details, 
-    });
-    throw new Error(e?.response?.data?.message || 'ZeroX API error');
+  private async get(path: string, params: any) {
+    try {
+      const res = await this.api.get(path, { params });
+      return res.data;
+    } catch (e) {
+      console.error('[ZeroXClient ERROR]', {
+        path,
+        params,
+        response: e?.response?.data,
+        status: e?.response?.status,
+        details: e?.response?.data?.data?.details,
+      });
+      throw new Error(e?.response?.data?.message || 'ZeroX API error');
+    }
   }
-}
 
   getPermit2Price(params: any) {
     return this.get('/swap/permit2/price', params);
