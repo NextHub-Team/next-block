@@ -1,0 +1,10 @@
+export const APP_DEFAULT_NAME: string = 'the next-block';
+export const APP_DEFAULT_PORT: number = 3000;
+export const APP_DEFAULT_BACKEND_DOMAIN: string = 'http://localhost';
+export const APP_DEFAULT_API_PREFIX: string = 'api';
+export const APP_DEFAULT_FALLBACK_LANGUAGE: string = 'en';
+export const APP_DEFAULT_HEADER_LANGUAGE: string = 'x-custom-lang';
+export const APP_DEFAULT_DB_TYPE: string = 'postgres';
+export const APP_DEFAULT_MONITOR_SAMPLE_MS: number = 10000;
+export const APP_DEFAULT_DOCS_HOST: string = 'http://localhost';
+export const APP_DEFAULT_DOCS_PATH: string = '/apps/docs';

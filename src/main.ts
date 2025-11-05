@@ -21,6 +21,12 @@ import { SwaggerTagRegistry } from './common/api-docs/swagger-tag.registry';
 import { registerTestWebhookListeners } from './webhooks/register-test-webhooks';
 // import { bootstrapSocketIoRedis } from './communication/socketio/adapters/socketio-redis.boostrap';
 import { StandardResponseInterceptor } from './utils/interceptors/message-response.interceptor';
+import {
+  APP_DEFAULT_DOCS_HOST,
+  APP_DEFAULT_DOCS_PATH,
+  APP_DEFAULT_HEADER_LANGUAGE,
+  APP_DEFAULT_PORT,
+} from './config/types/app-const.type';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -71,7 +77,7 @@ async function bootstrap() {
       'Documentation',
       configService.get(
         'app.docsUrl',
-        `http://localhost:${APP.port}/apps/docs`,
+        `${APP_DEFAULT_DOCS_HOST}:${APP.port}${APP_DEFAULT_DOCS_PATH}`,
         {
           infer: true,
         },
@@ -82,9 +88,13 @@ async function bootstrap() {
     .addGlobalParameters({
       in: 'header',
       required: false,
-      name: configService.getOrThrow('app.headerLanguage', 'x-custom-lang', {
-        infer: true,
-      }),
+      name: configService.getOrThrow(
+        'app.headerLanguage',
+        APP_DEFAULT_HEADER_LANGUAGE,
+        {
+          infer: true,
+        },
+      ),
       schema: {
         example: 'en',
       },
@@ -94,7 +104,7 @@ async function bootstrap() {
     .build();
   await APIDocs.setup(app, options); // doesn't need use swagger SwaggerModule.setup
   await app.listen(
-    configService.getOrThrow('app.port', { infer: true }),
+    configService.getOrThrow('app.port', APP_DEFAULT_PORT, { infer: true }),
     '0.0.0.0',
   );
   await APIDocs.info(app);
