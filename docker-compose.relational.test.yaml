@@ -28,6 +28,9 @@ services:
       dockerfile: relational.test.Dockerfile
     env_file:
       - env-example-relational
+    expose:
+      - 3000
+      - 4000
     volumes:
       - ./src:/usr/src/app/src
       - ./test:/usr/src/app/test
