@@ -93,7 +93,10 @@ async function bootstrap() {
     .registerToBuilder(builder)
     .build();
   await APIDocs.setup(app, options); // doesn't need use swagger SwaggerModule.setup
-  await app.listen(configService.getOrThrow('app.port', { infer: true }));
+  await app.listen(
+    configService.getOrThrow('app.port', { infer: true }),
+    '0.0.0.0',
+  );
   await APIDocs.info(app);
 
   registerTestWebhookListeners(app);
