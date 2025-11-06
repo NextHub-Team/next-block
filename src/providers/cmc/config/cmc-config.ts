@@ -80,41 +80,39 @@ function normalizeSymbols(raw?: string): string {
   return defaults.defaultSymbols;
 }
 
-export default createToggleableConfig<CmcConfig, CmcEnvironmentVariablesValidator>(
-  'cmc',
-  CmcEnvironmentVariablesValidator,
-  defaults,
-  {
-    enableKey: 'enable',
-    enableEnvKey: 'CMC_ENABLE',
-    mapEnabledConfig: (env) => {
-      const ttlMs = env.CMC_TTL_MS ?? defaults.ttlMs;
-      const requestTimeoutMs =
-        env.CMC_REQUEST_TIMEOUT_MS ?? defaults.requestTimeoutMs;
-      const maxRetries = env.CMC_MAX_RETRIES ?? defaults.maxRetries;
+export default createToggleableConfig<
+  CmcConfig,
+  CmcEnvironmentVariablesValidator
+>('cmc', CmcEnvironmentVariablesValidator, defaults, {
+  enableKey: 'enable',
+  enableEnvKey: 'CMC_ENABLE',
+  mapEnabledConfig: (env) => {
+    const ttlMs = env.CMC_TTL_MS ?? defaults.ttlMs;
+    const requestTimeoutMs =
+      env.CMC_REQUEST_TIMEOUT_MS ?? defaults.requestTimeoutMs;
+    const maxRetries = env.CMC_MAX_RETRIES ?? defaults.maxRetries;
 
-      const envType = mapEnvType<CmcEnvironmenType>(
-        env.CMC_ENV_TYPE,
-        {
-          prod: CmcEnvironmenType.PRODUCTION,
-          production: CmcEnvironmenType.PRODUCTION,
-          sandbox: CmcEnvironmenType.SANDBOX,
-          dev: CmcEnvironmenType.SANDBOX,
-          development: CmcEnvironmenType.SANDBOX,
-        },
-        defaults.envType,
-      );
+    const envType = mapEnvType<CmcEnvironmenType>(
+      env.CMC_ENV_TYPE,
+      {
+        prod: CmcEnvironmenType.PRODUCTION,
+        production: CmcEnvironmenType.PRODUCTION,
+        sandbox: CmcEnvironmenType.SANDBOX,
+        dev: CmcEnvironmenType.SANDBOX,
+        development: CmcEnvironmenType.SANDBOX,
+      },
+      defaults.envType,
+    );
 
-      return {
-        apiKey: env.CMC_API_KEY,
-        envType,
-        ttlMs,
-        requestTimeoutMs,
-        maxRetries,
-        defaultFiatCurrency:
-          env.CMC_DEFAULT_FIAT_CURRENCY || defaults.defaultFiatCurrency,
-        defaultSymbols: normalizeSymbols(env.CMC_DEFAULT_SYMBOLS),
-      } satisfies Partial<CmcConfig>;
-    },
+    return {
+      apiKey: env.CMC_API_KEY,
+      envType,
+      ttlMs,
+      requestTimeoutMs,
+      maxRetries,
+      defaultFiatCurrency:
+        env.CMC_DEFAULT_FIAT_CURRENCY || defaults.defaultFiatCurrency,
+      defaultSymbols: normalizeSymbols(env.CMC_DEFAULT_SYMBOLS),
+    } satisfies Partial<CmcConfig>;
   },
-);
+});

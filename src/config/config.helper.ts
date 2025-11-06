@@ -3,7 +3,10 @@ import validateConfig from 'src/utils/validate-config';
 import { registerAs, ConfigObject } from '@nestjs/config';
 import { ClassConstructor } from 'class-transformer';
 
-export interface ToggleableConfigOptions<T extends ConfigObject, V extends object> {
+export interface ToggleableConfigOptions<
+  T extends ConfigObject,
+  V extends object,
+> {
   enableKey: keyof T;
   enableEnvKey: string;
   mapEnabledConfig?: (env: V) => Partial<T>;
@@ -19,14 +22,12 @@ export function createToggleableConfig<
   defaults: T,
   options: ToggleableConfigOptions<T, V>,
 ) {
-  const { enableKey, enableEnvKey, mapEnabledConfig, mapDisabledConfig } = options;
+  const { enableKey, enableEnvKey, mapEnabledConfig, mapDisabledConfig } =
+    options;
 
   return registerAs<T>(namespace, () => {
     const defaultEnabled = Boolean(defaults[enableKey]);
-    const isEnabled = parseBool(
-      process.env[enableEnvKey],
-      defaultEnabled,
-    );
+    const isEnabled = parseBool(process.env[enableEnvKey], defaultEnabled);
 
     if (!isEnabled) {
       const disabledOverrides = mapDisabledConfig ? mapDisabledConfig() : {};

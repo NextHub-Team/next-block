@@ -32,7 +32,10 @@ import { User } from '../../users/domain/user';
 import { BaseToggleableService } from '../../common/base/base-toggleable.service';
 import { ConfigService } from '@nestjs/config';
 import { AllConfigType } from '../../config/config.type';
-import { SOCKETIO_DEFAULT_ENABLE, SOCKETIO_DEFAULT_NAMESPACE } from './types/socketio-const.type';
+import {
+  SOCKETIO_DEFAULT_ENABLE,
+  SOCKETIO_DEFAULT_NAMESPACE,
+} from './types/socketio-const.type';
 
 @Injectable()
 export class SocketIoService extends BaseToggleableService {
