@@ -20,7 +20,7 @@ class EnvironmentVariablesValidator {
   GORUSH_REQUEST_TIMEOUT: number;
 }
 
-export default createToggleableConfig<GorushConfig>(
+export default createToggleableConfig<GorushConfig, EnvironmentVariablesValidator>(
   'gorush',
   EnvironmentVariablesValidator,
   {
@@ -28,6 +28,12 @@ export default createToggleableConfig<GorushConfig>(
     requestTimeOut: GORUSH_TIMEOUT_INTERVAL,
     enable: GORUSH_ENABLE,
   },
-  'enable',
-  'GORUSH_ENABLE',
+  {
+    enableKey: 'enable',
+    enableEnvKey: 'GORUSH_ENABLE',
+    mapEnabledConfig: (env) => ({
+      baseUrl: env.GORUSH_URL,
+      requestTimeOut: env.GORUSH_REQUEST_TIMEOUT,
+    }),
+  },
 );
