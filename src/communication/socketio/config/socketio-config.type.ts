@@ -1,4 +1,5 @@
 export interface SocketIOConfig {
+  enable: boolean;
   pingInterval: number;
   pingTimeout: number;
   maxHttpBufferSize: number;

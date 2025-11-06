@@ -1,5 +1,7 @@
 import { registerAs } from '@nestjs/config';
+import { parseBool } from '../../../config/config.helper';
 import {
+  SOCKETIO_DEFAULT_ENABLE,
   SOCKETIO_DEFAULT_PING_INTERVAL,
   SOCKETIO_DEFAULT_PING_TIMEOUT,
   SOCKETIO_DEFAULT_MAX_HTTP_BUFFER_SIZE,
@@ -14,6 +16,7 @@ const intFromEnv = (key: string, fallback: number): number => {
 };
 
 export default registerAs('socketIO', () => ({
+  enable: parseBool(process.env.SOCKETIO_ENABLE, SOCKETIO_DEFAULT_ENABLE),
   pingInterval: intFromEnv(
     'SOCKETIO_PING_INTERVAL',
     SOCKETIO_DEFAULT_PING_INTERVAL,

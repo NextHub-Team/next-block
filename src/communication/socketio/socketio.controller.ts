@@ -41,14 +41,21 @@ import {
 } from './dto/response-socketio.dto';
 import { RegisterApiTag } from '../../common/api-docs/decorators/register-api-tag.decorator';
 import { UserPresenceDto } from './dto/user-socketio.dto';
+import { EnableGuard } from '../../common/guards/service-enabled.guard';
+import {
+  RequireEnabled,
+  RequireServiceReady,
+} from '../../utils/decorators/service-toggleable.decorators';
 
 @RegisterApiTag(
   'SocketIO',
   'A Realtime gateway in NestJS for handling real-time WebSocket events,Base on Http Controller.',
   'https://docs.nestjs.com/websockets/gateways',
 )
+@RequireEnabled('socketIO.enable')
+@RequireServiceReady(SocketIoService)
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+@UseGuards(AuthGuard('jwt'), RolesGuard, EnableGuard)
 @Roles(RoleEnum.admin)
 @Controller({ path: 'socketio', version: '1' })
 export class SocketIoController {

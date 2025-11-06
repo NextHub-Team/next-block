@@ -64,3 +64,6 @@ GORUSH_REQUEST_TIMEOUT=5000
 GORUSH_URL=http://example.com:8088
 GORUSH_GRPC_PORT=9000
 GORUSH_ENABLE=true
+
+# Socket.IO communication layer
+SOCKETIO_ENABLE=false
