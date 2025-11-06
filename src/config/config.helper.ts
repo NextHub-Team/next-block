@@ -3,59 +3,49 @@ import validateConfig from 'src/utils/validate-config';
 import { registerAs, ConfigObject } from '@nestjs/config';
 import { ClassConstructor } from 'class-transformer';
 
-export function createToggleableConfig<T extends ConfigObject>(
+export interface ToggleableConfigOptions<T extends ConfigObject, V extends object> {
+  enableKey: keyof T;
+  enableEnvKey: string;
+  mapEnabledConfig?: (env: V) => Partial<T>;
+  mapDisabledConfig?: () => Partial<T>;
+}
+
+export function createToggleableConfig<
+  T extends ConfigObject,
+  V extends object,
+>(
   namespace: string,
-  validator: ClassConstructor<any>,
+  validator: ClassConstructor<V>,
   defaults: T,
-  enableKey: keyof T,
-  enableEnvKey: string,
+  options: ToggleableConfigOptions<T, V>,
 ) {
+  const { enableKey, enableEnvKey, mapEnabledConfig, mapDisabledConfig } = options;
+
   return registerAs<T>(namespace, () => {
-    const enableEnvValue = (process.env[enableEnvKey] ?? '').toLowerCase();
-    const isEnabled = enableEnvValue === 'true';
+    const defaultEnabled = Boolean(defaults[enableKey]);
+    const isEnabled = parseBool(
+      process.env[enableEnvKey],
+      defaultEnabled,
+    );
 
     if (!isEnabled) {
+      const disabledOverrides = mapDisabledConfig ? mapDisabledConfig() : {};
       return {
         ...defaults,
-        [enableKey]: false,
+        ...disabledOverrides,
+        [enableKey]: false as T[keyof T],
       };
     }
 
-    validateConfig(process.env, validator);
+    const env = validateConfig(process.env, validator) as V;
+    const enabledOverrides = mapEnabledConfig ? mapEnabledConfig(env) : {};
 
     return {
       ...defaults,
-      ...loadEnvOverrides(defaults),
-      [enableKey]: true,
+      ...enabledOverrides,
+      [enableKey]: true as T[keyof T],
     };
   });
-}
-
-// Optional: helper to load overrides dynamically
-function loadEnvOverrides<T>(defaults: T): Partial<T> {
-  const overrides: Partial<T> = {};
-  for (const key of Object.keys(defaults as object)) {
-    const envKey = key.toUpperCase();
-    if (process.env[envKey] !== undefined) {
-      const value = process.env[envKey];
-      overrides[key as keyof T] = parseEnvValue(
-        defaults[key as keyof T],
-        value,
-      ) as unknown as T[keyof T];
-    }
-  }
-  return overrides;
-}
-
-// Small type converter
-function parseEnvValue(originalValue: any, envValue: string) {
-  if (typeof originalValue === 'boolean') {
-    return envValue.toLowerCase() === 'true';
-  }
-  if (typeof originalValue === 'number') {
-    return parseInt(envValue, 10);
-  }
-  return envValue;
 }
 
 // Helper: parse a string into a boolean
