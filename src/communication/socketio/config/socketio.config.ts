@@ -53,21 +53,16 @@ const defaults: SocketIOConfig = {
 export default createToggleableConfig<
   SocketIOConfig,
   SocketIoEnvironmentVariablesValidator
->(
-  'socketIO',
-  SocketIoEnvironmentVariablesValidator,
-  defaults,
-  {
-    enableKey: 'enable',
-    enableEnvKey: 'SOCKETIO_ENABLE',
-    mapEnabledConfig: (env) => ({
-      pingInterval: env.SOCKETIO_PING_INTERVAL ?? defaults.pingInterval,
-      pingTimeout: env.SOCKETIO_PING_TIMEOUT ?? defaults.pingTimeout,
-      maxHttpBufferSize:
-        env.SOCKETIO_MAX_HTTP_BUFFER_SIZE ?? defaults.maxHttpBufferSize,
-      defaultReauthGraceMs:
-        env.SOCKETIO_DEFAULT_REAUTH_GRACE_MS ?? defaults.defaultReauthGraceMs,
-      maxReauthTries: env.SOCKETIO_MAX_REAUTH_TRIES ?? defaults.maxReauthTries,
-    }),
-  },
-);
+>('socketIO', SocketIoEnvironmentVariablesValidator, defaults, {
+  enableKey: 'enable',
+  enableEnvKey: 'SOCKETIO_ENABLE',
+  mapEnabledConfig: (env) => ({
+    pingInterval: env.SOCKETIO_PING_INTERVAL ?? defaults.pingInterval,
+    pingTimeout: env.SOCKETIO_PING_TIMEOUT ?? defaults.pingTimeout,
+    maxHttpBufferSize:
+      env.SOCKETIO_MAX_HTTP_BUFFER_SIZE ?? defaults.maxHttpBufferSize,
+    defaultReauthGraceMs:
+      env.SOCKETIO_DEFAULT_REAUTH_GRACE_MS ?? defaults.defaultReauthGraceMs,
+    maxReauthTries: env.SOCKETIO_MAX_REAUTH_TRIES ?? defaults.maxReauthTries,
+  }),
+});

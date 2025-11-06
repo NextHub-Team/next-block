@@ -82,8 +82,7 @@ export default registerAs<AppConfig>('app', () => {
     version: process.env.APP_VERSION || (appPkg as any).version,
     workingDirectory: process.env.PWD || process.cwd(),
     frontendDomain: process.env.FRONTEND_DOMAIN,
-    backendDomain:
-      process.env.BACKEND_DOMAIN ?? APP_DEFAULT_BACKEND_DOMAIN,
+    backendDomain: process.env.BACKEND_DOMAIN ?? APP_DEFAULT_BACKEND_DOMAIN,
     port: _port,
     apiPrefix: process.env.API_PREFIX || APP_DEFAULT_API_PREFIX,
     fallbackLanguage:

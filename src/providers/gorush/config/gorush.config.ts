@@ -26,16 +26,14 @@ const defaults: GorushConfig = {
   enable: GORUSH_ENABLE,
 };
 
-export default createToggleableConfig<GorushConfig, EnvironmentVariablesValidator>(
-  'gorush',
-  EnvironmentVariablesValidator,
-  defaults,
-  {
-    enableKey: 'enable',
-    enableEnvKey: 'GORUSH_ENABLE',
-    mapEnabledConfig: (env) => ({
-      baseUrl: env.GORUSH_URL ?? defaults.baseUrl,
-      requestTimeOut: env.GORUSH_REQUEST_TIMEOUT ?? defaults.requestTimeOut,
-    }),
-  },
-);
+export default createToggleableConfig<
+  GorushConfig,
+  EnvironmentVariablesValidator
+>('gorush', EnvironmentVariablesValidator, defaults, {
+  enableKey: 'enable',
+  enableEnvKey: 'GORUSH_ENABLE',
+  mapEnabledConfig: (env) => ({
+    baseUrl: env.GORUSH_URL ?? defaults.baseUrl,
+    requestTimeOut: env.GORUSH_REQUEST_TIMEOUT ?? defaults.requestTimeOut,
+  }),
+});
