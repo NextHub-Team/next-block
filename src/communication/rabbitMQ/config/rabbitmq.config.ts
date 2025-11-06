@@ -18,42 +18,42 @@ class EnvironmentVariablesValidator {
    */
   @IsBoolean()
   @IsOptional()
-  COMMUNICATION_ENABLE_RABBITMQ?: boolean;
+  RABBITMQ_ENABLE?: boolean;
 
   /**
    * RabbitMQ connection URLs (comma-separated).
    */
   @IsString()
   @IsOptional()
-  COMMUNICATION_RABBITMQ_URLS?: string;
+  RABBITMQ_URLS?: string;
 
   /**
    * RabbitMQ prefetch count (number of messages to fetch at a time)
    */
   @IsInt()
   @IsOptional()
-  COMMUNICATION_RABBITMQ_PREFETCH_COUNT?: number;
+  RABBITMQ_PREFETCH_COUNT?: number;
 
   /**
    * RabbitMQ acknowledgment mode (true = auto-ack)
    */
   @IsBoolean()
   @IsOptional()
-  COMMUNICATION_RABBITMQ_NO_ACK?: boolean;
+  RABBITMQ_NO_ACK?: boolean;
 
   /**
    * RabbitMQ queue durability
    */
   @IsBoolean()
   @IsOptional()
-  COMMUNICATION_RABBITMQ_QUEUE_DURABLE?: boolean;
+  RABBITMQ_QUEUE_DURABLE?: boolean;
 
   /**
    * RabbitMQ message persistence (false = messages are not persisted)
    */
   @IsBoolean()
   @IsOptional()
-  COMMUNICATION_RABBITMQ_PERSISTENT?: boolean;
+  RABBITMQ_PERSISTENT?: boolean;
 }
 
 export default registerAs<RabbitMQConfig>('rabbitMQ', () => {
@@ -62,22 +62,22 @@ export default registerAs<RabbitMQConfig>('rabbitMQ', () => {
 
   return {
     enableRabbitMQ:
-      process.env.COMMUNICATION_ENABLE_RABBITMQ?.toLowerCase() === 'true', // Convert string to boolean
-    rabbitmqUrls: process.env.COMMUNICATION_RABBITMQ_URLS
-      ? process.env.COMMUNICATION_RABBITMQ_URLS.split(',')
+      process.env.RABBITMQ_ENABLE?.toLowerCase() === 'true', // Convert string to boolean
+    rabbitmqUrls: process.env.RABBITMQ_URLS
+      ? process.env.RABBITMQ_URLS.split(',')
       : RMQ_DEFAULT_COMMUNICATION_URLS, // Default if not set
-    rabbitmqPrefetchCount: process.env.COMMUNICATION_RABBITMQ_PREFETCH_COUNT
-      ? Number(process.env.COMMUNICATION_RABBITMQ_PREFETCH_COUNT) // Convert to number
+    rabbitmqPrefetchCount: process.env.RABBITMQ_PREFETCH_COUNT
+      ? Number(process.env.RABBITMQ_PREFETCH_COUNT) // Convert to number
       : RMQ_PREFETCH_COUNT,
-    rabbitmqNoAck: process.env.COMMUNICATION_RABBITMQ_NO_ACK
-      ? process.env.COMMUNICATION_RABBITMQ_NO_ACK.toLowerCase() === 'true' // Convert to boolean
+    rabbitmqNoAck: process.env.RABBITMQ_NO_ACK
+      ? process.env.RABBITMQ_NO_ACK.toLowerCase() === 'true' // Convert to boolean
       : RMQ_NO_ACK,
-    rabbitmqQueueDurable: process.env.COMMUNICATION_RABBITMQ_QUEUE_DURABLE
-      ? process.env.COMMUNICATION_RABBITMQ_QUEUE_DURABLE.toLowerCase() ===
+    rabbitmqQueueDurable: process.env.RABBITMQ_QUEUE_DURABLE
+      ? process.env.RABBITMQ_QUEUE_DURABLE.toLowerCase() ===
         'true' // Convert to boolean
       : RMQ_QUEUE_DURABLE,
-    rabbitmqPersistent: process.env.COMMUNICATION_RABBITMQ_PERSISTENT
-      ? process.env.COMMUNICATION_RABBITMQ_PERSISTENT.toLowerCase() === 'true' // Convert to boolean
+    rabbitmqPersistent: process.env.RABBITMQ_PERSISTENT
+      ? process.env.RABBITMQ_PERSISTENT.toLowerCase() === 'true' // Convert to boolean
       : RMQ_PERSISTENT,
   };
 });
