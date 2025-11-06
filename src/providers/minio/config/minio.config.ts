@@ -28,26 +28,28 @@ class MinioEnvValidator {
   MINIO_PORT: number;
 }
 
+const defaults: MinIOConfig = {
+  host: MINIO_S3_HOST,
+  accessKey: '',
+  secretKey: '',
+  useSSL: MINIO_USE_SSL,
+  enable: MINIO_ENABLE,
+  port: MINIO_PORT,
+};
+
 export default createToggleableConfig<MinIOConfig, MinioEnvValidator>(
   'minIO',
   MinioEnvValidator,
-  {
-    host: MINIO_S3_HOST,
-    accessKey: '',
-    secretKey: '',
-    useSSL: MINIO_USE_SSL,
-    enable: MINIO_ENABLE,
-    port: MINIO_PORT,
-  },
+  defaults,
   {
     enableKey: 'enable',
     enableEnvKey: 'MINIO_ENABLE',
     mapEnabledConfig: (env) => ({
-      host: env.MINIO_S3_HOST,
-      accessKey: env.MINIO_ACCESS_KEY,
-      secretKey: env.MINIO_SECRET_KEY,
-      useSSL: env.MINIO_USE_SSL,
-      port: env.MINIO_PORT,
+      host: env.MINIO_S3_HOST ?? defaults.host,
+      accessKey: env.MINIO_ACCESS_KEY ?? defaults.accessKey,
+      secretKey: env.MINIO_SECRET_KEY ?? defaults.secretKey,
+      useSSL: env.MINIO_USE_SSL ?? defaults.useSSL,
+      port: env.MINIO_PORT ?? defaults.port,
     }),
   },
 );

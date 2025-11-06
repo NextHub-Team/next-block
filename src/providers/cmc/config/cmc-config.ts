@@ -57,18 +57,6 @@ function getDefaultSymbols(): string {
     : String(CMC_DEFAULT_SYMBOLS).toUpperCase();
 }
 
-function normalizeSymbols(raw?: string): string {
-  if (raw && raw.length > 0) {
-    return raw
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean)
-      .map((s) => s.toUpperCase())
-      .join(',');
-  }
-  return getDefaultSymbols();
-}
-
 const defaults: CmcConfig = {
   enable: CMC_ENABLE,
   apiKey: '',
@@ -80,6 +68,18 @@ const defaults: CmcConfig = {
   defaultSymbols: getDefaultSymbols(),
 };
 
+function normalizeSymbols(raw?: string): string {
+  if (raw && raw.length > 0) {
+    return raw
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .map((s) => s.toUpperCase())
+      .join(',');
+  }
+  return defaults.defaultSymbols;
+}
+
 export default createToggleableConfig<CmcConfig, CmcEnvironmentVariablesValidator>(
   'cmc',
   CmcEnvironmentVariablesValidator,
@@ -88,10 +88,10 @@ export default createToggleableConfig<CmcConfig, CmcEnvironmentVariablesValidato
     enableKey: 'enable',
     enableEnvKey: 'CMC_ENABLE',
     mapEnabledConfig: (env) => {
-      const ttlMs = env.CMC_TTL_MS ?? CMC_TTL_MS;
+      const ttlMs = env.CMC_TTL_MS ?? defaults.ttlMs;
       const requestTimeoutMs =
-        env.CMC_REQUEST_TIMEOUT_MS ?? CMC_REQUEST_TIMEOUT_MS;
-      const maxRetries = env.CMC_MAX_RETRIES ?? CMC_MAX_RETRIES;
+        env.CMC_REQUEST_TIMEOUT_MS ?? defaults.requestTimeoutMs;
+      const maxRetries = env.CMC_MAX_RETRIES ?? defaults.maxRetries;
 
       const envType = mapEnvType<CmcEnvironmenType>(
         env.CMC_ENV_TYPE,
@@ -102,7 +102,7 @@ export default createToggleableConfig<CmcConfig, CmcEnvironmentVariablesValidato
           dev: CmcEnvironmenType.SANDBOX,
           development: CmcEnvironmenType.SANDBOX,
         },
-        CMC_ENV_TYPE,
+        defaults.envType,
       );
 
       return {
@@ -112,7 +112,7 @@ export default createToggleableConfig<CmcConfig, CmcEnvironmentVariablesValidato
         requestTimeoutMs,
         maxRetries,
         defaultFiatCurrency:
-          env.CMC_DEFAULT_FIAT_CURRENCY || CMC_DEFAULT_FIAT_CURRENCY,
+          env.CMC_DEFAULT_FIAT_CURRENCY || defaults.defaultFiatCurrency,
         defaultSymbols: normalizeSymbols(env.CMC_DEFAULT_SYMBOLS),
       } satisfies Partial<CmcConfig>;
     },
