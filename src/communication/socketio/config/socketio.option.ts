@@ -1,9 +1,13 @@
 import { ConfigService } from '@nestjs/config';
 import { SocketIOConfig } from './socketio-config.type';
+import { SOCKETIO_DEFAULT_ENABLE } from '../types/socketio-const.type';
 
 export const socketIoOptionsFactory = (
   configService: ConfigService,
 ): SocketIOConfig => ({
+  enable:
+    configService.get<boolean>('socketIO.enable', { infer: true }) ??
+    SOCKETIO_DEFAULT_ENABLE,
   pingInterval: configService.get<number>('socketIO.pingInterval', {
     infer: true,
   }),
