@@ -3,46 +3,63 @@ import validateConfig from 'src/utils/validate-config';
 import { registerAs, ConfigObject } from '@nestjs/config';
 import { ClassConstructor } from 'class-transformer';
 
+type EnvKeyOverrides<T> = Partial<Record<keyof T, string>>;
+
+function toEnvKey(propertyKey: string): string {
+  return propertyKey
+    .replace(/([a-z\d])([A-Z])/g, '$1_$2')
+    .replace(/[-\s]+/g, '_')
+    .toUpperCase();
+}
+
 export function createToggleableConfig<T extends ConfigObject>(
   namespace: string,
   validator: ClassConstructor<any>,
   defaults: T,
   enableKey: keyof T,
   enableEnvKey: string,
+  envKeyOverrides: EnvKeyOverrides<T> = {},
+  postProcess?: (resolved: T) => T,
 ) {
   return registerAs<T>(namespace, () => {
-    const enableEnvValue = (process.env[enableEnvKey] ?? '').toLowerCase();
-    const isEnabled = enableEnvValue === 'true';
+    const enableEnvValue = process.env[enableEnvKey];
+    const defaultEnabled = Boolean(defaults[enableKey]);
+    const isEnabled = parseBool(enableEnvValue, defaultEnabled);
 
-    if (!isEnabled) {
-      return {
-        ...defaults,
-        [enableKey]: false,
-      };
+    const resolved = {
+      ...defaults,
+      ...loadEnvOverrides(defaults, enableKey, envKeyOverrides),
+      [enableKey]: isEnabled,
+    } as T;
+
+    if (isEnabled) {
+      validateConfig(process.env, validator);
     }
 
-    validateConfig(process.env, validator);
-
-    return {
-      ...defaults,
-      ...loadEnvOverrides(defaults),
-      [enableKey]: true,
-    };
+    return postProcess ? postProcess(resolved) : resolved;
   });
 }
 
 // Optional: helper to load overrides dynamically
-function loadEnvOverrides<T>(defaults: T): Partial<T> {
+function loadEnvOverrides<T>(
+  defaults: T,
+  enableKey: keyof T,
+  envKeyOverrides: EnvKeyOverrides<T>,
+): Partial<T> {
   const overrides: Partial<T> = {};
-  for (const key of Object.keys(defaults as object)) {
-    const envKey = key.toUpperCase();
-    if (process.env[envKey] !== undefined) {
-      const value = process.env[envKey];
-      overrides[key as keyof T] = parseEnvValue(
-        defaults[key as keyof T],
-        value,
-      ) as unknown as T[keyof T];
+  for (const key of Object.keys(defaults as object) as Array<keyof T>) {
+    if (key === enableKey) {
+      continue;
     }
+
+    const envKey = envKeyOverrides[key] ?? toEnvKey(String(key));
+    const rawValue = envKey ? process.env[envKey] : undefined;
+
+    if (rawValue === undefined) {
+      continue;
+    }
+
+    overrides[key] = parseEnvValue(defaults[key], rawValue) as T[keyof T];
   }
   return overrides;
 }
@@ -50,10 +67,11 @@ function loadEnvOverrides<T>(defaults: T): Partial<T> {
 // Small type converter
 function parseEnvValue(originalValue: any, envValue: string) {
   if (typeof originalValue === 'boolean') {
-    return envValue.toLowerCase() === 'true';
+    return parseBool(envValue, originalValue);
   }
   if (typeof originalValue === 'number') {
-    return parseInt(envValue, 10);
+    const parsed = Number(envValue);
+    return Number.isFinite(parsed) ? parsed : originalValue;
   }
   return envValue;
 }

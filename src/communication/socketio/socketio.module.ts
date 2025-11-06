@@ -8,6 +8,7 @@ import { SocketIoRoleGuard } from './guards/socketio-role.guard';
 import { SocketServerProvider } from './utils/socketio.provider';
 import { SocketIoController } from './socketio.controller';
 import { SocketIoService } from './socketio.service';
+import { EnableGuard } from '../../common/guards/service-enabled.guard';
 
 @Global()
 @Module({
@@ -18,6 +19,7 @@ import { SocketIoService } from './socketio.service';
     SocketIoRoleGuard,
     SocketServerProvider,
     SocketIoService,
+    EnableGuard,
   ],
   controllers: [SocketIoController],
   exports: [SocketServerProvider, SocketIoService],

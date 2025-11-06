@@ -1,7 +1,11 @@
-// src/providers/cmc/config/cmc-config.ts
-import { registerAs } from '@nestjs/config';
-import { IsBoolean, IsInt, IsOptional, IsString, Min } from 'class-validator';
-import validateConfig from '../../../utils/validate-config';
+import {
+  IsBoolean,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Min,
+} from 'class-validator';
 import { CmcConfig } from './cmc-config.type';
 import {
   CMC_DEFAULT_FIAT_CURRENCY,
@@ -13,11 +17,12 @@ import {
   CMC_TTL_MS,
 } from '../types/cmc-const.type';
 import { CmcEnvironmenType } from '../types/cmc-enum.type';
-import { parseBool } from '../../../config/config.helper';
+import { createToggleableConfig } from '../../../config/config.helper';
 import { mapEnvType } from '../../../utils/helpers/env.helper';
 
 class EnvironmentVariablesValidator {
   @IsString()
+  @IsNotEmpty()
   CMC_API_KEY: string;
 
   @IsString()
@@ -53,65 +58,84 @@ class EnvironmentVariablesValidator {
   CMC_DEFAULT_SYMBOLS?: string;
 }
 
-export default registerAs<CmcConfig>('cmc', () => {
-  validateConfig(process.env, EnvironmentVariablesValidator);
+const FALLBACK_SYMBOLS = toSymbolList(CMC_DEFAULT_SYMBOLS);
 
-  const apiKey = process.env.CMC_API_KEY as string; // validated as non-empty
+export default createToggleableConfig<CmcConfig>(
+  'cmc',
+  EnvironmentVariablesValidator,
+  {
+    enable: CMC_ENABLE,
+    apiKey: '',
+    envType: CMC_ENV_TYPE,
+    ttlMs: CMC_TTL_MS,
+    requestTimeoutMs: CMC_REQUEST_TIMEOUT_MS,
+    maxRetries: CMC_MAX_RETRIES,
+    defaultFiatCurrency: CMC_DEFAULT_FIAT_CURRENCY,
+    defaultSymbols: FALLBACK_SYMBOLS,
+  },
+  'enable',
+  'CMC_ENABLE',
+  {
+    apiKey: 'CMC_API_KEY',
+    envType: 'CMC_ENV_TYPE',
+    ttlMs: 'CMC_TTL_MS',
+    requestTimeoutMs: 'CMC_REQUEST_TIMEOUT_MS',
+    maxRetries: 'CMC_MAX_RETRIES',
+    defaultFiatCurrency: 'CMC_DEFAULT_FIAT_CURRENCY',
+    defaultSymbols: 'CMC_DEFAULT_SYMBOLS',
+  },
+  (resolved) => {
+    const envType = mapEnvType<CmcEnvironmenType>(
+      typeof resolved.envType === 'string'
+        ? resolved.envType
+        : String(resolved.envType ?? ''),
+      {
+        prod: CmcEnvironmenType.PRODUCTION,
+        production: CmcEnvironmenType.PRODUCTION,
+        sandbox: CmcEnvironmenType.SANDBOX,
+        dev: CmcEnvironmenType.SANDBOX,
+        development: CmcEnvironmenType.SANDBOX,
+      },
+      CMC_ENV_TYPE,
+    );
 
-  // Normalize enable flag from string envs ("true"/"false", "1"/"0", etc.) with const fallback
-  const enable = parseBool(process.env.CMC_ENABLE, CMC_ENABLE);
+    const defaultSymbols = normalizeSymbols(resolved.defaultSymbols);
+    const defaultFiat = normalizeFiat(resolved.defaultFiatCurrency);
 
-  // Normalize numeric values with safe fallbacks
-  const ttlMs = process.env.CMC_TTL_MS
-    ? parseInt(process.env.CMC_TTL_MS, 10)
-    : CMC_TTL_MS;
-  const requestTimeoutMs = process.env.CMC_REQUEST_TIMEOUT_MS
-    ? parseInt(process.env.CMC_REQUEST_TIMEOUT_MS, 10)
-    : CMC_REQUEST_TIMEOUT_MS;
-  const maxRetries = process.env.CMC_MAX_RETRIES
-    ? parseInt(process.env.CMC_MAX_RETRIES, 10)
-    : CMC_MAX_RETRIES;
+    return {
+      ...resolved,
+      apiKey: resolved.apiKey?.trim?.() ?? '',
+      envType,
+      defaultSymbols,
+      defaultFiatCurrency: defaultFiat,
+    };
+  },
+);
 
-  // Map env type to enum
+function toSymbolList(value: string | string[]): string {
+  if (Array.isArray(value)) {
+    return value.map((s) => String(s).toUpperCase()).join(',');
+  }
+  return String(value).toUpperCase();
+}
 
-  const envType = mapEnvType<CmcEnvironmenType>(
-    process.env.CMC_ENV_TYPE,
-    {
-      prod: CmcEnvironmenType.PRODUCTION,
-      production: CmcEnvironmenType.PRODUCTION,
-      sandbox: CmcEnvironmenType.SANDBOX,
-      dev: CmcEnvironmenType.SANDBOX,
-      development: CmcEnvironmenType.SANDBOX,
-    },
-    CMC_ENV_TYPE,
-  );
+function normalizeSymbols(value?: string): string {
+  const raw = value?.trim();
+  if (raw) {
+    return raw
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .map((s) => s.toUpperCase())
+      .join(',');
+  }
+  return FALLBACK_SYMBOLS;
+}
 
-  // Normalize symbols: split, trim, uppercase, remove empties, join back
-  const defaultSymbols = (() => {
-    const raw = process.env.CMC_DEFAULT_SYMBOLS;
-    if (raw && raw.length > 0) {
-      return raw
-        .split(',')
-        .map((s) => s.trim())
-        .filter(Boolean)
-        .map((s) => s.toUpperCase())
-        .join(',');
-    }
-    // Fallback to constant (string or string[])
-    return Array.isArray(CMC_DEFAULT_SYMBOLS)
-      ? CMC_DEFAULT_SYMBOLS.map((s) => String(s).toUpperCase()).join(',')
-      : String(CMC_DEFAULT_SYMBOLS).toUpperCase();
-  })();
-
-  return {
-    apiKey,
-    envType,
-    enable,
-    ttlMs,
-    requestTimeoutMs,
-    maxRetries,
-    defaultFiatCurrency:
-      process.env.CMC_DEFAULT_FIAT_CURRENCY || CMC_DEFAULT_FIAT_CURRENCY,
-    defaultSymbols,
-  };
-});
+function normalizeFiat(value?: string): string {
+  const normalized = value?.trim();
+  if (normalized && normalized.length > 0) {
+    return normalized.toUpperCase();
+  }
+  return CMC_DEFAULT_FIAT_CURRENCY;
+}

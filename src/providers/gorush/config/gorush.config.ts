@@ -30,4 +30,8 @@ export default createToggleableConfig<GorushConfig>(
   },
   'enable',
   'GORUSH_ENABLE',
+  {
+    baseUrl: 'GORUSH_URL',
+    requestTimeOut: 'GORUSH_REQUEST_TIMEOUT',
+  },
 );

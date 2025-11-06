@@ -2,6 +2,7 @@ import {
   Injectable,
   HttpStatus,
   UnprocessableEntityException,
+  ServiceUnavailableException,
 } from '@nestjs/common';
 import type { Namespace, Server } from 'socket.io';
 import { isSocketIoRedisBootstrapped } from './adapters/socketio-redis.boostrap';
@@ -28,23 +29,73 @@ import { QueryNamespaceDto } from './dto/query-socketio.dto';
 import { UserPresenceDto, PresenceSocketDto } from './dto/user-socketio.dto';
 import { UsersService } from '../../users/users.service';
 import { User } from '../../users/domain/user';
+import { BaseToggleableService } from '../../common/base/base-toggleable.service';
+import { ConfigService } from '@nestjs/config';
+import { AllConfigType } from '../../config/config.type';
+import { SOCKETIO_DEFAULT_ENABLE, SOCKETIO_DEFAULT_NAMESPACE } from './types/socketio-const.type';
 
 @Injectable()
-export class SocketIoService {
+export class SocketIoService extends BaseToggleableService {
   constructor(
     private readonly serverRef: SocketServerProvider,
     private readonly usersService: UsersService,
-  ) {}
+    configService: ConfigService<AllConfigType>,
+  ) {
+    super(
+      SocketIoService.name,
+      configService.get('socketIO.enable', { infer: true }) ??
+        SOCKETIO_DEFAULT_ENABLE,
+    );
+  }
+
+  /** Enable the service explicitly. */
+  enable(): void {
+    this.logger.log('Enabling Socket.IO service.');
+    this.setEnabled(true);
+  }
+
+  /** Disable the service explicitly (e.g., if another transport is active). */
+  disable(reason?: string): void {
+    if (reason) {
+      this.logger.warn(`Disabling Socket.IO service: ${reason}`);
+    } else {
+      this.logger.warn('Disabling Socket.IO service by request.');
+    }
+    this.setEnabled(false);
+  }
+
+  /** Guard helper for controllers/consumers. */
+  ensureReady(): void {
+    this.ensureServiceEnabled();
+
+    if (!this.serverRef.isReady) {
+      this.logger.warn('Socket.IO server instance is not ready.');
+      throw new ServiceUnavailableException(
+        'SocketIO sub-service is disabled.',
+      );
+    }
+  }
+
+  /** Throws when the service has been toggled off. */
+  private ensureServiceEnabled(): void {
+    if (!this.isEnabled) {
+      this.logger.warn('Socket.IO service is disabled. Request blocked.');
+      throw new ServiceUnavailableException(
+        'SocketIO sub-service is disabled.',
+      );
+    }
+  }
 
   /** Ensure namespace has a leading slash and fallback to /ws */
   private normalizeNs(namespace?: string): string {
     const raw = (namespace ?? '').trim();
-    if (!raw) return '/ws';
+    if (!raw) return SOCKETIO_DEFAULT_NAMESPACE;
     return raw.startsWith('/') ? raw : `/${raw}`;
   }
 
   /** Resolve a namespace (defaults to `/ws`) */
   private nsp(namespace?: string): Namespace {
+    this.ensureReady();
     const ns = this.normalizeNs(namespace);
     const ref: any = this.serverRef.server as any;
 
@@ -72,6 +123,7 @@ export class SocketIoService {
 
   /** Basic health/status + list of namespaces */
   health(): HealthDto {
+    this.ensureReady();
     const io: Server = this.serverRef.server;
     const namespaces = Array.from(
       (io as any)._nsps?.keys?.() ?? io.of('/').server?._nsps?.keys?.() ?? [],
@@ -90,6 +142,7 @@ export class SocketIoService {
 
   /** List namespaces */
   namespaces(): NamespacesDto {
+    this.ensureReady();
     const io: Server = this.serverRef.server;
     const namespaces = Array.from(
       (io as any)._nsps?.keys?.() ?? io.of('/').server?._nsps?.keys?.() ?? [],
@@ -144,6 +197,7 @@ export class SocketIoService {
 
   /** Broadcast event to a namespace */
   broadcast(dto: EmitBroadcastDto): EmitNamespaceResultDto {
+    this.ensureReady();
     const namespace = this.normalizeNs(dto.namespace);
 
     if (!dto.event?.trim()) {
@@ -166,6 +220,7 @@ export class SocketIoService {
 
   /** Emit to a room */
   emitToRoom(dto: EmitRoomDto): EmitRoomResultDto {
+    this.ensureReady();
     const namespace = this.normalizeNs(dto.namespace);
 
     if (!dto.room?.trim()) {
@@ -198,6 +253,7 @@ export class SocketIoService {
 
   /** Emit to a user's personal room (user:{id}) */
   emitToUser(dto: EmitUserDto): EmitUserResultDto {
+    this.ensureReady();
     if (!dto.userId?.trim()) {
       throw new UnprocessableEntityException({
         status: HttpStatus.UNPROCESSABLE_ENTITY,
@@ -229,6 +285,7 @@ export class SocketIoService {
 
   /** Disconnect a socket by ID */
   async disconnectSocket(id: string, query: QueryNamespaceDto): Promise<void> {
+    this.ensureReady();
     if (!id?.trim()) {
       throw new UnprocessableEntityException({
         status: HttpStatus.UNPROCESSABLE_ENTITY,
@@ -248,6 +305,7 @@ export class SocketIoService {
 
   /** Kick a user: disconnect all sockets in user:{id} */
   async kickUser(userId: string, query: QueryNamespaceDto): Promise<void> {
+    this.ensureReady();
     if (!userId?.trim()) {
       throw new UnprocessableEntityException({
         status: HttpStatus.UNPROCESSABLE_ENTITY,
@@ -273,6 +331,7 @@ export class SocketIoService {
     userId: string,
     query: QueryNamespaceDto,
   ): Promise<UserPresenceDto> {
+    this.ensureReady();
     try {
       if (!userId?.trim()) {
         throw new UnprocessableEntityException({

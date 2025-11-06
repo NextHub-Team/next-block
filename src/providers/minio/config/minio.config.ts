@@ -41,4 +41,11 @@ export default createToggleableConfig<MinIOConfig>(
   },
   'enable',
   'MINIO_ENABLE',
+  {
+    host: 'MINIO_S3_HOST',
+    accessKey: 'MINIO_ACCESS_KEY',
+    secretKey: 'MINIO_SECRET_KEY',
+    useSSL: 'MINIO_USE_SSL',
+    port: 'MINIO_PORT',
+  },
 );
