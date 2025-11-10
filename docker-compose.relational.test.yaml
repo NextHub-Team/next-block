@@ -3,34 +3,40 @@ services:
     image: postgres:17.6-alpine
     expose:
       - 5432
-    environment:
-      POSTGRES_USER: ${DATABASE_USERNAME}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-      POSTGRES_DB: ${DATABASE_NAME}
+    env_file:
+      - env-example-relational
+    # environment:
+    #   POSTGRES_USER: ${DATABASE_USERNAME}
+    #   POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    #   POSTGRES_DB: ${DATABASE_NAME}
 
   maildev:
     build:
       context: .
       dockerfile: maildev.Dockerfile
+    env_file:
+      - env-example-relational
     expose:
       - 1080
       - 1025
 
-  # Uncomment to use redis
-  # redis:
-  #   image: redis:7-alpine
-  #   expose:
-  #     - 6379
+  #  Uncomment to use redis
+  redis:
+    image: redis:7-alpine
+    env_file:
+      - env-example-relational
+    expose:
+      - 6379
 
   api:
     build:
       context: .
       dockerfile: relational.test.Dockerfile
-    env_file:
-      - env-example-relational
     expose:
       - 3000
       - 4000
+    env_file:
+      - env-example-relational
     volumes:
       - ./src:/usr/src/app/src
       - ./test:/usr/src/app/test
