@@ -95,7 +95,7 @@ import { ProvidersModule } from './providers/providers.module';
         fallbackLanguage: configService.getOrThrow('app.fallbackLanguage', {
           infer: true,
         }),
-        loaderOptions: { path: path.join(__dirname, '/i18n/'), watch: true },
+        loaderOptions: { path: path.join(__dirname, '../i18n/'), watch: true },
       }),
       resolvers: [
         {
