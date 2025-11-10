@@ -65,7 +65,7 @@ const infrastructureDatabaseModule = (databaseConfig() as DatabaseConfig)
           infer: true,
         }),
         loaderOptions: {
-          path: path.join(__dirname, '/i18n/'),
+          path: path.join(__dirname, '../i18n/'),
           watch: true,
         },
       }),
