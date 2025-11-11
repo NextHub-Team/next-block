@@ -13,7 +13,11 @@ services:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-secret}
       POSTGRES_DB: ${DATABASE_NAME:-api}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USERNAME:-root}"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\"",
+        ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -41,6 +45,11 @@ services:
       - env-example-relational
     expose:
       - 6379
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   api:
     build:
@@ -54,7 +63,7 @@ services:
       maildev:
         condition: service_started
       redis:
-        condition: service_started
+        condition: service_healthy
     expose:
       - 3000
       - 4000
