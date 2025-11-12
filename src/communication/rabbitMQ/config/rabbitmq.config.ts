@@ -61,8 +61,7 @@ export default registerAs<RabbitMQConfig>('rabbitMQ', () => {
   validateConfig(process.env, EnvironmentVariablesValidator);
 
   return {
-    enableRabbitMQ:
-      process.env.RABBITMQ_ENABLE?.toLowerCase() === 'true', // Convert string to boolean
+    enableRabbitMQ: process.env.RABBITMQ_ENABLE?.toLowerCase() === 'true', // Convert string to boolean
     rabbitmqUrls: process.env.RABBITMQ_URLS
       ? process.env.RABBITMQ_URLS.split(',')
       : RMQ_DEFAULT_COMMUNICATION_URLS, // Default if not set
@@ -73,8 +72,7 @@ export default registerAs<RabbitMQConfig>('rabbitMQ', () => {
       ? process.env.RABBITMQ_NO_ACK.toLowerCase() === 'true' // Convert to boolean
       : RMQ_NO_ACK,
     rabbitmqQueueDurable: process.env.RABBITMQ_QUEUE_DURABLE
-      ? process.env.RABBITMQ_QUEUE_DURABLE.toLowerCase() ===
-        'true' // Convert to boolean
+      ? process.env.RABBITMQ_QUEUE_DURABLE.toLowerCase() === 'true' // Convert to boolean
       : RMQ_QUEUE_DURABLE,
     rabbitmqPersistent: process.env.RABBITMQ_PERSISTENT
       ? process.env.RABBITMQ_PERSISTENT.toLowerCase() === 'true' // Convert to boolean
