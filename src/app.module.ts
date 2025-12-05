@@ -29,6 +29,22 @@ import { GorushModule } from './providers/gorush/gorush.module';
 import { RabbitMQService } from './communication/rabbitMQ/rabbitmq.service';
 import gorushConfig from './providers/gorush/config/gorush.config';
 import rabbitmqConfig from './communication/rabbitMQ/config/rabbitmq.config';
+import { NotificationsModule } from './notifications/notifications.module';
+import { DevicesModule } from './devices/devices.module';
+import { MinioModule } from './providers/minio/minio.module';
+import minioConfig from './providers/minio/config/minio.config';
+import { LoggerModule } from './common/logger/logger.module';
+import { SocketIoModule } from './communication/socketio/socketio.module';
+import { PassphrasesModule } from './passphrases/passphrases.module';
+import { MessagesModule } from './messages/messages.module';
+import { AddressBooksModule } from './address-books/address-books.module';
+import { WalletsModule } from './wallets/wallets.module';
+import { FireblocksCwWalletsModule } from './fireblocks-cw-wallets/fireblocks-cw-wallets.module';
+import { FireblocksNcwWalletsModule } from './fireblocks-ncw-wallets/fireblocks-ncw-wallets.module';
+import { WebhooksModule } from './webhooks/webhooks.module';
+import { CmcModule } from './providers/cmc/cmc.module';
+import cmcConfig from './providers/cmc/config/cmc-config';
+import { ProvidersModule } from './providers/providers.module';
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
@@ -36,29 +52,6 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
     return new DataSource(options).initialize();
   },
 });
-
-import { NotificationsModule } from './notifications/notifications.module';
-import { DevicesModule } from './devices/devices.module';
-import { MinioModule } from './providers/minio/minio.module';
-import minioConfig from './providers/minio/config/minio.config';
-import { LoggerModule } from './common/logger/logger.module';
-import { SocketIoModule } from './communication/socketio/socketio.module';
-
-import { PassphrasesModule } from './passphrases/passphrases.module';
-
-import { MessagesModule } from './messages/messages.module';
-
-import { AddressBooksModule } from './address-books/address-books.module';
-
-import { WalletsModule } from './wallets/wallets.module';
-
-import { FireblocksCwWalletsModule } from './fireblocks-cw-wallets/fireblocks-cw-wallets.module';
-
-import { FireblocksNcwWalletsModule } from './fireblocks-ncw-wallets/fireblocks-ncw-wallets.module';
-import { WebhooksModule } from './webhooks/webhooks.module';
-import { CmcModule } from './providers/cmc/cmc.module';
-import cmcConfig from './providers/cmc/config/cmc-config';
-import { ProvidersModule } from './providers/providers.module';
 
 @Module({
   imports: [
