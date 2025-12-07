@@ -1,47 +1,82 @@
 services:
   postgres:
     image: postgres:17.6-alpine
+    container_name: next-block-postgres
+    hostname: postgres
+    restart: unless-stopped
     ports:
-      - ${DATABASE_PORT}:5432
-    volumes:
-      - app-db:/var/lib/postgresql/data
+      - "${DATABASE_PORT:-5432}:5432"
     environment:
-      POSTGRES_USER: ${DATABASE_USERNAME}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-postgres}
+      POSTGRES_DB: ${DATABASE_NAME:-app}
+    volumes:
+      - next-block-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB -h 127.0.0.1 || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
 
   maildev:
     image: maildev/maildev:2.0.5
+    container_name: next-block-maildev
+    hostname: maildev
+    restart: unless-stopped
     ports:
-      - ${MAIL_CLIENT_PORT}:1080
-      - ${MAIL_PORT}:1025
+      - "${MAIL_CLIENT_PORT:-1080}:1080"
+      - "${MAIL_PORT:-1025}:1025"
 
-  adminer:
-    image: dpage/pgadmin4
-    container_name: pgadmin4_container
-    restart: always
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: next-block-pgadmin
+    hostname: pgadmin
+    restart: unless-stopped
     ports:
-      - "8888:80"
+      - "${PGADMIN_PORT:-8080}:80"
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@example.com
-      PGADMIN_DEFAULT_PASSWORD: n6nK06QqUVLf
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@example.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
     volumes:
-        - pgadmin-data:/var/lib/pgadmin
-
+      - next-block-pgadmin-data:/var/lib/pgadmin
+    depends_on:
+      postgres:
+        condition: service_healthy
 
 
   redis:
     image: redis:7-alpine
+    container_name: next-block-redis
+    hostname: redis
+    restart: unless-stopped
     ports:
-      - 6379:6379
+      - "${REDIS_PORT:-6379}:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - next-block-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
 
   app:
+    container_name: next-block-app
+    hostname: app
     build:
       context: .
       dockerfile: Dockerfile
+    restart: unless-stopped
     ports:
-      - ${APP_PORT}:${APP_PORT}
+      - "${APP_PORT:-3000}:${APP_PORT:-3000}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
 volumes:
-  app-db:
-  pgadmin-data:
+  next-block-postgres-data:
+  next-block-redis-data:
+  next-block-pgadmin-data:
