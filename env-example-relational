@@ -71,9 +71,13 @@ GOOGLE_CLIENT_SECRET=
 APPLE_APP_AUDIENCE=[]
 
 ########################################
-# Background workers
+# Redis
 ########################################
-WORKER_HOST=redis://redis:6379/1
+REDIS_CACHE_URL=redis://redis:6379/0
+REDIS_SESSION_URL=redis://redis:6379/1
+REDIS_RATE_LIMIT_URL=redis://redis:6379/2
+REDIS_MSQ_URL=redis://redis:6379/3
+REDIS_WORKER_URL=redis://redis:6379/4
 
 ########################################
 # Secret manager (default:src/config/secrets)
@@ -121,7 +125,7 @@ MINIO_USE_SSL=false
 MINIO_PORT=9000
 
 ########################################
-# Socket.IO communication layer
+# Socket.IO - ws communication layer
 ########################################
 SOCKETIO_ENABLE=false
 SOCKETIO_PING_INTERVAL=25000
