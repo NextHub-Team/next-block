@@ -1,15 +1,17 @@
 services:
   postgres:
-    image: postgres:latest
+    image: postgres:17.6-alpine
+    container_name: next-block-postgres
+    hostname: postgres
     restart: unless-stopped
     ports:
-      - "5432:5432"
+      - "${DATABASE_PORT:-5432}:5432"
     environment:
       POSTGRES_USER: ${DATABASE_USERNAME:-postgres}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-postgres}
       POSTGRES_DB: ${DATABASE_NAME:-app}
     volumes:
-      - nestjs-app-db:/var/lib/postgresql/data
+      - next-block-postgres-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB -h 127.0.0.1 || exit 1"]
       interval: 5s
@@ -18,31 +20,40 @@ services:
 
   maildev:
     image: maildev/maildev:2.0.5
-    container_name: nestjs-app-maildev
+    container_name: next-block-maildev
+    hostname: maildev
+    restart: unless-stopped
     ports:
-      - ${MAIL_CLIENT_PORT}:1080
-      - ${MAIL_PORT}:1025
+      - "${MAIL_CLIENT_PORT:-1080}:1080"
+      - "${MAIL_PORT:-1025}:1025"
 
   pgadmin:
     image: dpage/pgadmin4:latest
+    container_name: next-block-pgadmin
+    hostname: pgadmin
     restart: unless-stopped
     ports:
-      - "8080:80"
+      - "${PGADMIN_PORT:-8080}:80"
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@example.com}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
     volumes:
-      - nestjs-pgadmin-data:/var/lib/pgadmin
+      - next-block-pgadmin-data:/var/lib/pgadmin
     depends_on:
       postgres:
         condition: service_healthy
 
 
   redis:
-    image: redis:latest
+    image: redis:7-alpine
+    container_name: next-block-redis
+    hostname: redis
     restart: unless-stopped
     ports:
-      - "127.0.0.1:${REDIS_PORT:-6379}:6379"
+      - "${REDIS_PORT:-6379}:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - next-block-redis-data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -51,12 +62,14 @@ services:
 
 
   app:
+    container_name: next-block-app
+    hostname: app
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: nestjs-app
+    restart: unless-stopped
     ports:
-      - ${APP_PORT}:${APP_PORT}
+      - "${APP_PORT:-3000}:${APP_PORT:-3000}"
     depends_on:
       postgres:
         condition: service_healthy
@@ -64,5 +77,6 @@ services:
         condition: service_healthy
 
 volumes:
-  nestjs-app-db:
-  nestjs-pgadmin-data:
+  next-block-postgres-data:
+  next-block-redis-data:
+  next-block-pgadmin-data:
