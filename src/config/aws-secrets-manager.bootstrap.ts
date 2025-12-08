@@ -1,11 +1,11 @@
 import { SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
 import { Logger } from '@nestjs/common';
-import {
-  AWSSecretsManagerModuleOptions,
-  AWSSecretsService,
-} from 'nestjs-aws-secrets-manager';
 import { NodeEnv } from 'src/utils/types/gobal.type';
 import { buildAwsSecretsOptionsFromEnv } from './aws-secrets-manager.config';
+import {
+  AwsSecretsManagerClient,
+  AwsSecretsManagerOptions,
+} from 'src/common/secret/aws-secrets-manager.client';
 
 export async function bootstrapAwsSecrets(): Promise<void> {
   const logger = new Logger('AwsSecretsBootstrap');
@@ -37,7 +37,7 @@ export async function bootstrapAwsSecrets(): Promise<void> {
     return;
   }
 
-  const options: AWSSecretsManagerModuleOptions = {
+  const options: AwsSecretsManagerOptions = {
     secretsManager: new SecretsManagerClient({ region: config.region }),
     isSetToEnv: config.setToEnv,
     secretsSource: source,
@@ -49,8 +49,8 @@ export async function bootstrapAwsSecrets(): Promise<void> {
   );
 
   try {
-    const secretsService = new AWSSecretsService(options);
-    await secretsService.setAllSecrectToEnv();
+    const secretsService = new AwsSecretsManagerClient(options);
+    await secretsService.setAllSecretsToEnv();
     logger.log('AWS secrets loaded into environment variables.');
   } catch (error) {
     logger.error(`Failed to preload AWS secrets: ${(error as Error).message}`);
