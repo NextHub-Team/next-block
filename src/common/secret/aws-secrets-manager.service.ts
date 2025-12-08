@@ -1,12 +1,12 @@
 import { SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import {
-  AWSSecretsManagerModuleOptions,
-  AWSSecretsService,
-} from 'nestjs-aws-secrets-manager';
 import { AllConfigType } from 'src/config/config.type';
 import { AwsSecretsManagerConfig } from 'src/config/types/aws-secrets-manager-config.type';
+import {
+  AwsSecretsManagerClient,
+  AwsSecretsManagerOptions,
+} from './aws-secrets-manager.client';
 import { BaseToggleableService } from '../base/base-toggleable.service';
 import { buildAwsSecretsOptionsFromEnv } from 'src/config/aws-secrets-manager.config';
 
@@ -66,10 +66,10 @@ export class AwsSecretsManagerService
       )}) to populate environment variables...`,
     );
 
-    try {
-      const secretsService = new AWSSecretsService(options);
-      await secretsService.setAllSecrectToEnv();
+    const secretsService = new AwsSecretsManagerClient(options);
 
+    try {
+      await secretsService.setAllSecretsToEnv();
       this.logger.log(
         `${context}: AWS secrets loaded into process.env and ready for ConfigService consumers.`,
       );
@@ -103,7 +103,7 @@ export class AwsSecretsManagerService
       this.logger.log(
         `Fetching AWS secret "${secretId}" using region ${this.secretsConfig.region}...`,
       );
-      const secretsService = new AWSSecretsService(options);
+      const secretsService = new AwsSecretsManagerClient(options);
       const secret = await secretsService.getSecretsByID<T>(secretId);
       this.logger.log(`AWS secret "${secretId}" successfully retrieved.`);
       return secret;
@@ -116,7 +116,7 @@ export class AwsSecretsManagerService
     }
   }
 
-  private buildOptions(): AWSSecretsManagerModuleOptions {
+  private buildOptions(): AwsSecretsManagerOptions {
     const secretsSource =
       this.secretsConfig.secretIds.length === 1
         ? this.secretsConfig.secretIds[0]
