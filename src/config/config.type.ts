@@ -11,6 +11,7 @@ import { RabbitMQConfig } from 'src/communication/rabbitMQ/config/rabbitmq-confi
 import { MinIOConfig } from '../providers/minio/config/minio-config.type';
 import { SocketIOConfig } from '../communication/socketio/config/socketio-config.type';
 import { CmcConfig } from '../providers/cmc/config/cmc-config.type';
+import { AwsSecretsManagerConfig } from './types/aws-secrets-manager-config.type';
 
 export type AllConfigType = {
   app: AppConfig;
@@ -26,4 +27,5 @@ export type AllConfigType = {
   minIO: MinIOConfig;
   socketIO: SocketIOConfig;
   cmc: CmcConfig;
+  awsSecretsManager: AwsSecretsManagerConfig;
 };
