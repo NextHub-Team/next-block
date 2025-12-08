@@ -11,14 +11,17 @@ export async function bootstrapAwsSecrets(): Promise<void> {
   const logger = new Logger('AwsSecretsBootstrap');
   const config = buildAwsSecretsOptionsFromEnv();
   const nodeEnv = process.env.NODE_ENV || NodeEnv.DEVELOPMENT;
+  const allowedEnvironments = [NodeEnv.PRODUCTION, NodeEnv.SANDBOX];
 
   if (!config.enable) {
     logger.log('AWS Secrets Manager bootstrap disabled.');
     return;
   }
 
-  if (nodeEnv !== NodeEnv.PRODUCTION) {
-    logger.log(`AWS Secrets Manager bootstrap skipped for ${nodeEnv} environment.`);
+  if (!allowedEnvironments.includes(nodeEnv as NodeEnv)) {
+    logger.log(
+      `AWS Secrets Manager bootstrap skipped for ${nodeEnv} environment. Allowed environments: ${allowedEnvironments.join(', ')}.`,
+    );
     return;
   }
 
