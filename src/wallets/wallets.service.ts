@@ -18,12 +18,14 @@ import {
   GroupPlainToInstance,
   GroupPlainToInstances,
 } from '../utils/transformers/class.transformer';
+import { WalletProviderFactory } from './provider-registry/wallet-provider.factory';
 
 @Injectable()
 export class WalletsService {
   constructor(
     private readonly userService: UsersService,
     private readonly walletRepository: WalletRepository,
+    private readonly walletProviderFactory: WalletProviderFactory,
   ) {}
 
   async create(createWalletDto: CreateWalletDto): Promise<WalletDto> {
@@ -37,6 +39,8 @@ export class WalletsService {
         errors: { user: 'UserNotExist' },
       });
     }
+
+    this.walletProviderFactory.validateProviderSupport(createWalletDto.provider);
 
     const wallet = await this.walletRepository.create({
       active: createWalletDto.active,
@@ -63,6 +67,10 @@ export class WalletsService {
         errors: { user: 'UserNotExist' },
       });
     }
+
+    this.walletProviderFactory.validateProviderSupport(
+      createWalletUserDto.provider,
+    );
 
     const created = await this.walletRepository.create({
       user,
@@ -130,6 +138,12 @@ export class WalletsService {
         });
       }
       user = userObject;
+    }
+
+    if (updateWalletDto.provider) {
+      this.walletProviderFactory.validateProviderSupport(
+        updateWalletDto.provider,
+      );
     }
 
     const updated = await this.walletRepository.update(id, {
