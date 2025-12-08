@@ -45,6 +45,7 @@ import { WebhooksModule } from './webhooks/webhooks.module';
 import { CmcModule } from './providers/cmc/cmc.module';
 import cmcConfig from './providers/cmc/config/cmc-config';
 import { ProvidersModule } from './providers/providers.module';
+import awsSecretsManagerConfig from './config/aws-secrets-manager.config';
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
@@ -79,6 +80,7 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
         rabbitmqConfig,
         minioConfig,
         cmcConfig,
+        awsSecretsManagerConfig,
       ],
       envFilePath: ['.env'],
     }),

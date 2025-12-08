@@ -27,8 +27,10 @@ import {
   APP_DEFAULT_HEADER_LANGUAGE,
   APP_DEFAULT_PORT,
 } from './config/types/app-const.type';
+import { bootstrapAwsSecrets } from './config/aws-secrets-manager.bootstrap';
 
 async function bootstrap() {
+  await bootstrapAwsSecrets();
   const app = await NestFactory.create(AppModule, {
     cors: true,
     bufferLogs: true,
