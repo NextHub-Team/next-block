@@ -64,17 +64,17 @@ async function bootstrap() {
     new StandardResponseInterceptor(),
   );
 
+  const apiPrefix = configService.getOrThrow('app.apiPrefix', {
+    infer: true,
+  });
+
   const builder = new DocumentBuilder()
     .setTitle(APP.name)
     .setDescription(
       '![NestJS](https://img.shields.io/badge/nestjs-%23E0234E.svg?style=for-the-badge&logo=nestjs&logoColor=white) ![Swagger](https://img.shields.io/badge/-Swagger-%23Clojure?style=for-the-badge&logo=swagger&logoColor=white) ![ReadTheDocs](https://img.shields.io/badge/Readthedocs-%23000000.svg?style=for-the-badge&logo=readthedocs&logoColor=white)',
     )
     .setLicense('MIT', 'https://opensource.org/license/mit/')
-    .setBasePath(
-      `/${configService.getOrThrow('app.apiPrefix', {
-        infer: true,
-      })}`,
-    )
+    .addServer(`/${apiPrefix}`)
     .setExternalDoc(
       'Documentation',
       configService.get(
