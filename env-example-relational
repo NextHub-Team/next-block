@@ -85,6 +85,15 @@ REDIS_WORKER_URL=redis://redis:6379/4
 GLOBAL_SECRET_PATH="files/secrets"
 
 ########################################
+# AWS Secrets Manager
+########################################
+AWS_SECRETS_MANAGER_ENABLE=false
+AWS_SECRETS_MANAGER_REGION=
+AWS_SECRETS_MANAGER_SECRET_IDS=
+AWS_SECRETS_MANAGER_SET_TO_ENV=true
+AWS_SECRETS_MANAGER_DEBUG=false
+
+########################################
 # Notifications - Gorush
 ########################################
 GORUSH_REQUEST_TIMEOUT=5000

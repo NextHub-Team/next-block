@@ -31,8 +31,20 @@ export class AwsSecretsManagerService
   }
 
   async syncSecretsToEnv(context = 'Bootstrap'): Promise<void> {
+    this.logger.debug(
+      `${context}: AWS Secrets Manager sync requested (enabled=${this.isEnabled}).`,
+    );
+
     this.checkIfEnabled();
     const options = this.buildOptions();
+
+    this.logger.debug(
+      `${context}: AWS Secrets Manager options -> region="${
+        this.secretsConfig.region || 'undefined'
+      }", setToEnv=${options.isSetToEnv}, debug=${
+        options.isDebug ?? false
+      }, secrets=${this.describeSecrets(options.secretsSource)}.`,
+    );
 
     if (!options.secretsSource || options.secretsSource.length === 0) {
       this.logger.warn(
@@ -49,38 +61,88 @@ export class AwsSecretsManagerService
     }
 
     this.logger.log(
-      `${context}: Fetching AWS secrets (${this.describeSecrets(options.secretsSource)}) to populate environment variables...`,
+      `${context}: Fetching AWS secrets (${this.describeSecrets(
+        options.secretsSource,
+      )}) to populate environment variables...`,
     );
 
-    const secretsService = new AWSSecretsService(options);
-    await secretsService.setAllSecrectToEnv();
+    try {
+      const secretsService = new AWSSecretsService(options);
+      await secretsService.setAllSecrectToEnv();
 
-    this.logger.log(
-      `${context}: AWS secrets loaded into process.env and ready for ConfigService consumers.`,
-    );
+      this.logger.log(
+        `${context}: AWS secrets loaded into process.env and ready for ConfigService consumers.`,
+      );
+    } catch (error) {
+      this.logger.error(
+        `${context}: Failed to load AWS secrets: ${(error as Error).message}`,
+        (error as Error)?.stack,
+      );
+      throw error;
+    }
   }
 
   async getSecretsById<T>(secretId: string): Promise<T> {
+    this.logger.debug(`Direct secret read requested for "${secretId}".`);
     this.checkIfEnabled();
-    const secretsService = new AWSSecretsService(this.buildOptions());
-    return secretsService.getSecretsByID<T>(secretId);
+    const options = this.buildOptions();
+
+    if (!secretId) {
+      const message = 'Secret identifier is required to fetch secrets by id.';
+      this.logger.error(message);
+      throw new Error(message);
+    }
+
+    if (!this.secretsConfig.region) {
+      const message = 'AWS region is not configured. Cannot fetch secret by id.';
+      this.logger.warn(message);
+      throw new Error(message);
+    }
+
+    try {
+      this.logger.log(
+        `Fetching AWS secret "${secretId}" using region ${this.secretsConfig.region}...`,
+      );
+      const secretsService = new AWSSecretsService(options);
+      const secret = await secretsService.getSecretsByID<T>(secretId);
+      this.logger.log(`AWS secret "${secretId}" successfully retrieved.`);
+      return secret;
+    } catch (error) {
+      this.logger.error(
+        `Failed to fetch AWS secret "${secretId}": ${(error as Error).message}`,
+        (error as Error)?.stack,
+      );
+      throw error;
+    }
   }
 
   private buildOptions(): AWSSecretsManagerModuleOptions {
+    const secretsSource =
+      this.secretsConfig.secretIds.length === 1
+        ? this.secretsConfig.secretIds[0]
+        : this.secretsConfig.secretIds;
+
+    this.logger.debug(
+      `Preparing AWS Secrets Manager client for region="${
+        this.secretsConfig.region || 'undefined'
+      }" with sources: ${this.describeSecrets(secretsSource)}.`,
+    );
+
     return {
       secretsManager: new SecretsManagerClient({
         region: this.secretsConfig.region,
       }),
       isSetToEnv: this.secretsConfig.setToEnv,
-      secretsSource:
-        this.secretsConfig.secretIds.length === 1
-          ? this.secretsConfig.secretIds[0]
-          : this.secretsConfig.secretIds,
+      secretsSource,
       isDebug: this.secretsConfig.debug,
     };
   }
 
-  private describeSecrets(source: string | string[]): string {
+  private describeSecrets(source?: string | string[]): string {
+    if (!source || (Array.isArray(source) && source.length === 0)) {
+      return 'none configured';
+    }
+
     return Array.isArray(source) ? source.join(', ') : source;
   }
 }
