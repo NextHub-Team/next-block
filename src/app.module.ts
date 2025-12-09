@@ -46,6 +46,8 @@ import { CmcModule } from './providers/cmc/cmc.module';
 import cmcConfig from './providers/cmc/config/cmc-config';
 import { ProvidersModule } from './providers/providers.module';
 import awsSecretsManagerConfig from './config/aws-secrets-manager.config';
+import fireblocksConfig from './providers/fireblocks/cw/config/fireblocks.config';
+import { FireblocksCwModule } from './providers/fireblocks/cw/fireblocks-cw.module';
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
@@ -58,6 +60,7 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   imports: [
     FireblocksNcwWalletsModule,
     FireblocksCwWalletsModule,
+    FireblocksCwModule,
     WalletsModule,
     MessagesModule,
     PassphrasesModule,
@@ -81,6 +84,7 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
         minioConfig,
         cmcConfig,
         awsSecretsManagerConfig,
+        fireblocksConfig,
       ],
       envFilePath: ['.env'],
     }),

@@ -12,6 +12,7 @@ import { MinIOConfig } from '../providers/minio/config/minio-config.type';
 import { SocketIOConfig } from '../communication/socketio/config/socketio-config.type';
 import { CmcConfig } from '../providers/cmc/config/cmc-config.type';
 import { AwsSecretsManagerConfig } from './types/aws-secrets-manager-config.type';
+import { FireblocksConfig } from '../providers/fireblocks/cw/config/fireblocks-config.type';
 
 export type AllConfigType = {
   app: AppConfig;
@@ -28,4 +29,5 @@ export type AllConfigType = {
   socketIO: SocketIOConfig;
   cmc: CmcConfig;
   awsSecretsManager: AwsSecretsManagerConfig;
+  fireblocks: FireblocksConfig;
 };
