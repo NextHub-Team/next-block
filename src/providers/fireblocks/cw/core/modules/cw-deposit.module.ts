@@ -5,8 +5,8 @@ import { FireblocksCwService } from '../../fireblocks-cw.service';
 import { CwDepositService } from '../services/cw-deposit.service';
 
 @Module({
-  imports: [ConfigModule, FireblocksCoreModule],
-  providers: [CwDepositService, FireblocksCwService],
+  imports: [FireblocksCoreModule],
+  providers: [CwDepositService],
   exports: [CwDepositService],
 })
 export class CwDepositModule {}
