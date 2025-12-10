@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { FireblocksCwService } from '../../fireblocks-cw.service';
-import { CwDepositService } from './cw-deposit.service';
-import { CwPortfolioService } from './cw-portfolio.service';
-import { CwTransactionsService } from './cw-transactions.service';
-import { CwTransfersService } from './cw-transfers.service';
+import { CwDepositService } from '../services/cw-deposit.service';
+import { CwPortfolioService } from '../services/cw-portfolio.service';
+import { CwTransactionsService } from '../services/cw-transactions.service';
+import { CwTransfersService } from '../services/cw-transfers.service';
 
 @Injectable()
 export class CwClientService {
