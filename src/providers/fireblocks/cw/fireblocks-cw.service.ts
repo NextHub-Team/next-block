@@ -4,6 +4,7 @@ import { ModuleRef } from '@nestjs/core';
 import { Fireblocks } from '@fireblocks/ts-sdk';
 import { AllConfigType } from '../../../config/config.type';
 import { FireblocksClientOptions } from './types/fireblocks-base.type';
+import { FireblocksEnvironmentType } from './types/fireblocks-enum.type';
 import { CwAdminService } from './core/base/cw-admin.service';
 import { CwClientService } from './core/base/cw-client.service';
 
@@ -19,15 +20,7 @@ export class FireblocksCwService implements OnModuleInit, OnModuleDestroy {
     private readonly configService: ConfigService<AllConfigType>,
     private readonly moduleRef: ModuleRef,
   ) {
-    this.options = {
-      enable: this.configService.get('fireblocks.enable', { infer: true }) ?? false,
-      apiKey: this.configService.getOrThrow('fireblocks.apiKey', { infer: true }),
-      secretKey: this.configService.getOrThrow('fireblocks.secretKey', {
-        infer: true,
-      }),
-      basePath: this.configService.get('fireblocks.basePath', { infer: true }) ?? '',
-      envType: this.configService.getOrThrow('fireblocks.envType', { infer: true }),
-    };
+    this.options = this.resolveOptions();
     this.logger.log(
       `Fireblocks client configured (env: ${this.options.envType}, basePath: ${this.options.basePath})`,
     );
@@ -122,5 +115,31 @@ export class FireblocksCwService implements OnModuleInit, OnModuleDestroy {
         error instanceof Error ? error.stack : `${error}`,
       );
     }
+  }
+
+  private resolveOptions(): FireblocksClientOptions {
+    const enable = this.configService.get('fireblocks.enable', { infer: true }) ?? false;
+    const envType =
+      this.configService.get('fireblocks.envType', { infer: true }) ??
+      FireblocksEnvironmentType.SANDBOX;
+    const basePath = this.configService.get('fireblocks.basePath', { infer: true }) ?? '';
+
+    if (!enable) {
+      return {
+        enable,
+        apiKey: '',
+        secretKey: '',
+        basePath,
+        envType,
+      } satisfies FireblocksClientOptions;
+    }
+
+    return {
+      enable,
+      apiKey: this.configService.getOrThrow('fireblocks.apiKey', { infer: true }),
+      secretKey: this.configService.getOrThrow('fireblocks.secretKey', { infer: true }),
+      basePath,
+      envType: this.configService.getOrThrow('fireblocks.envType', { infer: true }),
+    } satisfies FireblocksClientOptions;
   }
 }
