@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { AbstractClientAdminService } from '../base/abstract-client-admin.service';
-import { FireblocksClientService } from '../../shared/fireblocks-client.service';
+import { AbstractCwService } from '../base/abstract-cw.service';
+import { FireblocksCwService } from '../../../fireblocks-cw.service';
 
 @Injectable()
-export class AdminAuditService extends AbstractClientAdminService {
-  constructor(client: FireblocksClientService) {
+export class AdminAuditService extends AbstractCwService {
+  constructor(client: FireblocksCwService) {
     super(AdminAuditService.name, client);
   }
 

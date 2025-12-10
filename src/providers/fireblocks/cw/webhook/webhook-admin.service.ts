@@ -1,11 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { FireblocksClientService } from '../core/shared/fireblocks-client.service';
+import { FireblocksCwService } from '../fireblocks-cw.service';
 
 @Injectable()
 export class WebhookAdminService {
   private readonly logger = new Logger(WebhookAdminService.name);
 
-  constructor(private readonly client: FireblocksClientService) {}
+  constructor(private readonly client: FireblocksCwService) {}
 
   async rotateWebhookSecret(): Promise<void> {
     this.logger.log('Rotating webhook secret');

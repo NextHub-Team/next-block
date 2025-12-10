@@ -9,9 +9,9 @@ import { CwDepositModule } from './cw-deposit.module';
 import { CwPortfolioModule } from './cw-portfolio.module';
 import { CwTransactionsModule } from './cw-transactions.module';
 import { CwTransfersModule } from './cw-transfers.module';
-import { CwAdminService } from '../services/cw-admin.service';
-import { CwBaseService } from '../services/cw-base.service';
-import { CwClientService } from '../services/cw-client.service';
+import { CwAdminService } from '../base/cw-admin.service';
+import { CwBaseService } from '../base/cw-base.service';
+import { CwClientService } from '../base/cw-client.service';
 
 @Module({
   imports: [
