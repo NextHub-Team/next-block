@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { FireblocksCoreModule } from '../fireblocks-core.module';
-import { AdminAuditModule } from './admin-audit.module';
-import { AdminDestinationsModule } from './admin-destinations.module';
-import { AdminGasOperationsModule } from './admin-gas-operations.module';
-import { AdminSecurityModule } from './admin-security.module';
-import { AdminWithdrawalsModule } from './admin-withdrawals.module';
+import { AdminAuditModule } from '../admin/modules/admin-audit.module';
+import { AdminDestinationsModule } from '../admin/modules/admin-destinations.module';
+import { AdminGasOperationsModule } from '../admin/modules/admin-gas-operations.module';
+import { AdminSecurityModule } from '../admin/modules/admin-security.module';
+import { AdminWithdrawalsModule } from '../admin/modules/admin-withdrawals.module';
 import { CwDepositModule } from './cw-deposit.module';
 import { CwPortfolioModule } from './cw-portfolio.module';
 import { CwTransactionsModule } from './cw-transactions.module';
