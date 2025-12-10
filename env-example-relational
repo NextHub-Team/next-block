@@ -114,6 +114,15 @@ CMC_DEFAULT_FIAT_CURRENCY=USD
 CMC_DEFAULT_SYMBOLS=BTC,ETH,USDT
 
 ########################################
+# Custody provider - Fireblocks (Cold Wallet)
+########################################
+FIREBLOCKS_ENABLE=false
+FIREBLOCKS_API_KEY=
+FIREBLOCKS_SECRET_KEY=
+FIREBLOCKS_BASE_PATH=
+FIREBLOCKS_ENV_TYPE=sandbox
+
+########################################
 # Message broker - RabbitMQ
 ########################################
 RABBITMQ_ENABLE=false
