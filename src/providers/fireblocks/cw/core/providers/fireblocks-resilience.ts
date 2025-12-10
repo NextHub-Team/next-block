@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { FireblocksDomainOutcome } from './fireblocks-error-mapper';
+import { FireblocksDomainOutcome } from '../../infrastructure/persistence/relational/mappers/fireblocks-error.mapper';
 
 @Injectable()
 export class FireblocksResilience {
