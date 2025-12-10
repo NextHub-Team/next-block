@@ -25,7 +25,7 @@ const NON_ADMIN_MODULES: Array<Type> = [
 ];
 
 @Injectable()
-export class FireblocksCwUnifiedService {
+export class FireblocksCwRegistryService {
   getAdminModules(): Array<Type> {
     return [...ADMIN_MODULES];
   }

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { FireblocksCoreModule } from './fireblocks-core.module';
-import { FireblocksCwUnifiedService } from './fireblocks-cw-unified.service';
+import { FireblocksCwRegistryService } from './fireblocks-cw-registry.service';
 import { AdminAuditModule } from './modules/admin-audit.module';
 import { AdminDestinationsModule } from './modules/admin-destinations.module';
 import { AdminGasOperationsModule } from './modules/admin-gas-operations.module';
@@ -28,12 +28,12 @@ const NON_ADMIN_MODULES = [
 
 @Module({
   imports: [FireblocksCoreModule, ...ADMIN_MODULES, ...NON_ADMIN_MODULES],
-  providers: [FireblocksCwUnifiedService],
+  providers: [FireblocksCwRegistryService],
   exports: [
     FireblocksCoreModule,
-    FireblocksCwUnifiedService,
+    FireblocksCwRegistryService,
     ...ADMIN_MODULES,
     ...NON_ADMIN_MODULES,
   ],
 })
-export class FireblocksCwUnifiedModule {}
+export class FireblocksCwRegistryModule {}

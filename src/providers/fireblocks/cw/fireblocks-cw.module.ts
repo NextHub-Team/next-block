@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
-import { FireblocksCwUnifiedModule } from './core/fireblocks-cw-unified.module';
+import { FireblocksCwRegistryModule } from './core/fireblocks-cw-registry.module';
 import { FireblocksWebhookModule } from './webhook/fireblocks-webhook.module';
 
 @Module({
   imports: [
     FireblocksWebhookModule,
-    FireblocksCwUnifiedModule,
+    FireblocksCwRegistryModule,
   ],
   exports: [
     FireblocksWebhookModule,
-    FireblocksCwUnifiedModule,
+    FireblocksCwRegistryModule,
   ],
 })
 export class FireblocksCwModule {}

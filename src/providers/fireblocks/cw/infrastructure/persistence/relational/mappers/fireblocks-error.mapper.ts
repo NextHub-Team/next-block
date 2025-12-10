@@ -1,4 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
+import {
+  isInvalidRequest,
+  isPendingPolicy,
+  isPolicyRejection,
+  isRateLimitError,
+} from '../../../../fireblocks-cw.helper';
 
 export type FireblocksDomainOutcome =
   | 'REQUEST_ACCEPTED_PENDING_POLICY'
@@ -18,42 +24,22 @@ export class FireblocksErrorMapper {
     return outcome;
   }
 
-  private isRateLimitError(error: any): boolean {
-    return Boolean(error?.response?.status === 429);
-  }
-
-  private isPolicyRejection(error: any): boolean {
-    return (
-      error?.response?.data?.status === 'REJECTED' ||
-      error?.response?.data?.code === 'POLICY_REJECTION'
-    );
-  }
-
-  private isPendingPolicy(error: any): boolean {
-    return error?.response?.data?.status === 'PENDING_AUTHORIZATION';
-  }
-
-  private isInvalidRequest(error: any): boolean {
-    const status = error?.response?.status;
-    return status === 400 || status === 404 || status === 422;
-  }
-
   private resolveOutcome(error: unknown): FireblocksDomainOutcome {
-    if (this.isRateLimitError(error)) {
+    if (isRateLimitError(error)) {
       this.logger.warn('Fireblocks rate limit encountered');
       return 'RATE_LIMITED';
     }
 
-    if (this.isPolicyRejection(error)) {
+    if (isPolicyRejection(error)) {
       this.logger.warn('Fireblocks request rejected by policy');
       return 'REQUEST_REJECTED_POLICY';
     }
 
-    if (this.isPendingPolicy(error)) {
+    if (isPendingPolicy(error)) {
       return 'REQUEST_ACCEPTED_PENDING_POLICY';
     }
 
-    if (this.isInvalidRequest(error)) {
+    if (isInvalidRequest(error)) {
       this.logger.error('Invalid Fireblocks request detected');
       return 'INVALID_REQUEST';
     }

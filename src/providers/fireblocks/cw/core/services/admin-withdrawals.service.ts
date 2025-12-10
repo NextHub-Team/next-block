@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { FireblocksErrorMapper } from '../providers/fireblocks-error-mapper';
+import { FireblocksErrorMapper } from '../../infrastructure/persistence/relational/mappers/fireblocks-error.mapper';
 
 @Injectable()
 export class AdminWithdrawalsService {
