@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { FireblocksResilience } from '../../core/providers/fireblocks-resilience';
+import { FireblocksResilience } from '../providers/fireblocks-resilience';
 
 @Injectable()
 export class AdminSecurityService {
