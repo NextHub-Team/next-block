@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { FireblocksClientProvider } from '../../core/providers/fireblocks-client.provider';
-import { FireblocksErrorMapper } from '../../core/providers/fireblocks-error-mapper';
-import { FireblocksResilience } from '../../core/providers/fireblocks-resilience';
+import { FireblocksClientProvider } from '../core/providers/fireblocks-client.provider';
+import { FireblocksErrorMapper } from '../core/providers/fireblocks-error-mapper';
+import { FireblocksResilience } from '../core/providers/fireblocks-resilience';
 
 export interface TransferCommand {
   source: string;

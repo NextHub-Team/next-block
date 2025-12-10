@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AllConfigType } from '../../../../config/config.type';
+import { AllConfigType } from '../../../../../config/config.type';
 import { FireblocksClientOptions } from '../../types/fireblocks-base.type';
 
 @Injectable()
@@ -16,7 +16,7 @@ export class FireblocksClientProvider {
         infer: true,
       }),
       basePath: this.configService.get('fireblocks.basePath', { infer: true }) ?? '',
-      envType: this.configService.get('fireblocks.envType', { infer: true }) ?? '',
+      envType: this.configService.getOrThrow('fireblocks.envType', { infer: true }),
     };
     this.logger.log(
       `Fireblocks client configured (env: ${this.options.envType}, basePath: ${this.options.basePath})`,
