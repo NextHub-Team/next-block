@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { FireblocksClientProvider } from '../../core/providers/fireblocks-client.provider';
+import { FireblocksClientProvider } from '../core/providers/fireblocks-client.provider';
 
 @Injectable()
 export class CwDepositService {
