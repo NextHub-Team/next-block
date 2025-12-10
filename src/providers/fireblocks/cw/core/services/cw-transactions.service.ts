@@ -1,11 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { FireblocksClientService } from '../shared/fireblocks-client.service';
+import { FireblocksCwService } from '../../fireblocks-cw.service';
 
 @Injectable()
 export class CwTransactionsService {
   private readonly logger = new Logger(CwTransactionsService.name);
 
-  constructor(private readonly client: FireblocksClientService) {}
+  constructor(private readonly client: FireblocksCwService) {}
 
   async listTransactions(vaultAccountId: string): Promise<void> {
     this.logger.log(`List transactions for vault ${vaultAccountId}`);

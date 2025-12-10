@@ -1,11 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AllConfigType } from '../../../../../config/config.type';
-import { FireblocksClientOptions } from '../../types/fireblocks-base.type';
+import { AllConfigType } from '../../../config/config.type';
+import { FireblocksClientOptions } from './types/fireblocks-base.type';
 
 @Injectable()
-export class FireblocksClientService {
-  private readonly logger = new Logger(FireblocksClientService.name);
+export class FireblocksCwService {
+  private readonly logger = new Logger(FireblocksCwService.name);
   private readonly options: FireblocksClientOptions;
 
   constructor(private readonly configService: ConfigService<AllConfigType>) {

@@ -1,10 +1,10 @@
 import { AbstractAdminService } from './abstract-admin.service';
-import { FireblocksClientService } from '../../shared/fireblocks-client.service';
+import { FireblocksCwService } from '../../../fireblocks-cw.service';
 
-export abstract class AbstractClientAdminService extends AbstractAdminService {
+export abstract class AbstractCwService extends AbstractAdminService {
   protected constructor(
     context: string,
-    protected readonly client: FireblocksClientService,
+    protected readonly client: FireblocksCwService,
   ) {
     super(context);
   }
