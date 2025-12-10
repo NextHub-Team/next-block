@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { FireblocksCoreModule } from '../../core/fireblocks-core.module';
-import { AdminAuditService } from './admin-audit.service';
+import { FireblocksCoreModule } from '../fireblocks-core.module';
+import { AdminAuditService } from '../services/admin-audit.service';
 
 @Module({
   imports: [FireblocksCoreModule],

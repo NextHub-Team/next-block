@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { FireblocksCoreModule } from '../core/fireblocks-core.module';
-import { CwTransactionsService } from './cw-transactions.service';
+import { FireblocksCoreModule } from '../fireblocks-core.module';
+import { CwTransactionsService } from '../services/cw-transactions.service';
 
 @Module({
   imports: [FireblocksCoreModule],

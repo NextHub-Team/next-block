@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { FireblocksCoreModule } from '../../core/fireblocks-core.module';
-import { AdminWithdrawalsService } from './admin-withdrawals.service';
+import { FireblocksCoreModule } from '../fireblocks-core.module';
+import { AdminWithdrawalsService } from '../services/admin-withdrawals.service';
 
 @Module({
   imports: [FireblocksCoreModule],
