@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { FireblocksCoreModule } from '../fireblocks-core.module';
+import { FireblocksCoreModule } from '../../fireblocks-core.module';
 import { AdminDestinationsService } from '../services/admin-destinations.service';
 
 @Module({

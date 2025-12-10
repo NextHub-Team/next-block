@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { FireblocksResilienceService } from '../shared/fireblocks-resilience.service';
-import { AdminAuditService } from './admin-audit.service';
-import { AdminDestinationsService } from './admin-destinations.service';
-import { AdminGasOperationsService } from './admin-gas-operations.service';
-import { AdminSecurityService } from './admin-security.service';
-import { AdminWithdrawalsService } from './admin-withdrawals.service';
+import { AdminAuditService } from '../admin/services/admin-audit.service';
+import { AdminDestinationsService } from '../admin/services/admin-destinations.service';
+import { AdminGasOperationsService } from '../admin/services/admin-gas-operations.service';
+import { AdminSecurityService } from '../admin/services/admin-security.service';
+import { AdminWithdrawalsService } from '../admin/services/admin-withdrawals.service';
 
 @Injectable()
 export class CwAdminService {
