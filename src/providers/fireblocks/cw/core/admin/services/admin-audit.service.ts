@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { AllConfigType } from '../../../../../../config/config.type';
 import { AbstractCwService } from '../base/abstract-cw.service';
-import { FireblocksCwService } from '../../../fireblocks-cw.service';
 
 @Injectable()
 export class AdminAuditService extends AbstractCwService {
-  constructor(client: FireblocksCwService) {
-    super(AdminAuditService.name, client);
+  constructor(configService: ConfigService<AllConfigType>) {
+    super(AdminAuditService.name, configService);
   }
 
   async getLogs(): Promise<void> {

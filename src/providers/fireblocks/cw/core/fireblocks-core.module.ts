@@ -7,6 +7,11 @@ import { FireblocksResilienceService } from './shared/fireblocks-resilience.serv
 @Module({
   imports: [ConfigModule],
   providers: [FireblocksCwService, FireblocksErrorMapper, FireblocksResilienceService],
-  exports: [FireblocksCwService, FireblocksErrorMapper, FireblocksResilienceService],
+  exports: [
+    ConfigModule,
+    FireblocksCwService,
+    FireblocksErrorMapper,
+    FireblocksResilienceService,
+  ],
 })
 export class FireblocksCoreModule {}
