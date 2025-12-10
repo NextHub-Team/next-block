@@ -2,8 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { FireblocksDomainOutcome } from '../../infrastructure/persistence/relational/mappers/fireblocks-error.mapper';
 
 @Injectable()
-export class FireblocksResilience {
-  private readonly logger = new Logger(FireblocksResilience.name);
+export class FireblocksResilienceService {
+  private readonly logger = new Logger(FireblocksResilienceService.name);
 
   shouldOpenCircuit(outcome: FireblocksDomainOutcome): boolean {
     return outcome === 'RATE_LIMITED' || outcome === 'TRANSIENT_UPSTREAM';

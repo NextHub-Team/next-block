@@ -1,18 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { FireblocksClientProvider } from '../core/providers/fireblocks-client.provider';
+import { FireblocksClientService } from '../core/shared/fireblocks-client.service';
 
 @Injectable()
 export class WebhookAdminService {
   private readonly logger = new Logger(WebhookAdminService.name);
 
-  constructor(private readonly client: FireblocksClientProvider) {}
+  constructor(private readonly client: FireblocksClientService) {}
 
-  async resendFailedNotifications(): Promise<void> {
-    this.logger.log('Resend failed webhook notifications (stub)');
+  async rotateWebhookSecret(): Promise<void> {
+    this.logger.log('Rotating webhook secret');
     this.logger.debug(`Using basePath ${this.client.getOptions().basePath}`);
-  }
-
-  async getNotificationAttempts(eventId: string): Promise<void> {
-    this.logger.log(`Get webhook attempts for ${eventId} (stub)`);
   }
 }

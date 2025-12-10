@@ -1,11 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { FireblocksClientProvider } from '../providers/fireblocks-client.provider';
+import { FireblocksClientService } from '../shared/fireblocks-client.service';
 
 @Injectable()
 export class CwPortfolioService {
   private readonly logger = new Logger(CwPortfolioService.name);
 
-  constructor(private readonly client: FireblocksClientProvider) {}
+  constructor(private readonly client: FireblocksClientService) {}
 
   async getBalances(vaultAccountId: string): Promise<void> {
     this.logger.log(`Fetch balances for vault ${vaultAccountId}`);
