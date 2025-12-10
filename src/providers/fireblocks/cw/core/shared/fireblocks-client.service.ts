@@ -4,8 +4,8 @@ import { AllConfigType } from '../../../../../config/config.type';
 import { FireblocksClientOptions } from '../../types/fireblocks-base.type';
 
 @Injectable()
-export class FireblocksClientProvider {
-  private readonly logger = new Logger(FireblocksClientProvider.name);
+export class FireblocksClientService {
+  private readonly logger = new Logger(FireblocksClientService.name);
   private readonly options: FireblocksClientOptions;
 
   constructor(private readonly configService: ConfigService<AllConfigType>) {

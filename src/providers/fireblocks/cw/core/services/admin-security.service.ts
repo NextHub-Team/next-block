@@ -1,11 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { FireblocksResilience } from '../providers/fireblocks-resilience';
+import { FireblocksResilienceService } from '../shared/fireblocks-resilience.service';
 
 @Injectable()
 export class AdminSecurityService {
   private readonly logger = new Logger(AdminSecurityService.name);
 
-  constructor(private readonly resilience: FireblocksResilience) {}
+  constructor(private readonly resilience: FireblocksResilienceService) {}
 
   verifyWebhookHealth(): void {
     this.logger.log('Webhook verification health check');

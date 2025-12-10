@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { FireblocksClientProvider } from '../providers/fireblocks-client.provider';
+import { FireblocksClientService } from '../shared/fireblocks-client.service';
 import { FireblocksErrorMapper } from '../../infrastructure/persistence/relational/mappers/fireblocks-error.mapper';
-import { FireblocksResilience } from '../providers/fireblocks-resilience';
+import { FireblocksResilienceService } from '../shared/fireblocks-resilience.service';
 
 export interface TransferCommand {
   source: string;
@@ -17,9 +17,9 @@ export class CwTransfersService {
   private readonly logger = new Logger(CwTransfersService.name);
 
   constructor(
-    private readonly client: FireblocksClientProvider,
+    private readonly client: FireblocksClientService,
     private readonly errorMapper: FireblocksErrorMapper,
-    private readonly resilience: FireblocksResilience,
+    private readonly resilience: FireblocksResilienceService,
   ) {}
 
   async preflightValidate(command: TransferCommand): Promise<void> {
