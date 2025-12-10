@@ -10,7 +10,6 @@ import { CwPortfolioModule } from './cw-portfolio.module';
 import { CwTransactionsModule } from './cw-transactions.module';
 import { CwTransfersModule } from './cw-transfers.module';
 import { CwAdminService } from '../base/cw-admin.service';
-import { CwBaseService } from '../base/cw-base.service';
 import { CwClientService } from '../base/cw-client.service';
 
 @Module({
@@ -26,7 +25,7 @@ import { CwClientService } from '../base/cw-client.service';
     CwTransfersModule,
     CwTransactionsModule,
   ],
-  providers: [CwAdminService, CwClientService, CwBaseService],
-  exports: [CwAdminService, CwClientService, CwBaseService],
+  providers: [CwAdminService, CwClientService],
+  exports: [CwAdminService, CwClientService],
 })
 export class CwBaseModule {}
