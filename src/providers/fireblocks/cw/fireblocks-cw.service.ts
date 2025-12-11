@@ -62,6 +62,10 @@ export class FireblocksCwService implements OnModuleInit, OnModuleDestroy {
     return this.options;
   }
 
+  isEnabled(): boolean {
+    return this.options.enable;
+  }
+
   getSdk(): Fireblocks {
     if (!this.fireblocksSdk) {
       this.logger.error('Fireblocks SDK has not been initialized or is disabled.');
@@ -80,6 +84,13 @@ export class FireblocksCwService implements OnModuleInit, OnModuleDestroy {
       this.fireblocksSdk = new Fireblocks({
         apiKey: this.options.apiKey,
         secretKey: this.options.secretKey,
+        basePath: baseUrl,
+        additionalOptions: {
+          baseOptions: {
+            timeout: this.options.requestTimeoutMs,
+          },
+          userAgent: 'next-block-fireblocks-cw',
+        },
       });
 
       this.logger.log(

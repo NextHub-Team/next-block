@@ -1,4 +1,13 @@
-import { Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  HttpException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  ServiceUnavailableException,
+  TooManyRequestsException,
+} from '@nestjs/common';
 import {
   isInvalidRequest,
   isPendingPolicy,
@@ -24,6 +33,28 @@ export class FireblocksErrorMapper {
     return outcome;
   }
 
+  toHttpException(error: unknown, fallback = 'Fireblocks request failed'): HttpException {
+    const outcome = this.mapToDomainOutcome(error);
+    const message = this.extractMessage(error) ?? fallback;
+
+    switch (outcome) {
+      case 'RATE_LIMITED':
+        return new TooManyRequestsException(message);
+      case 'REQUEST_REJECTED_POLICY':
+        return new ForbiddenException(message);
+      case 'INVALID_REQUEST':
+        return new BadRequestException(message);
+      case 'REQUEST_ACCEPTED_PENDING_POLICY':
+        return new ServiceUnavailableException(
+          `${message} (pending policy approval)`,
+        );
+      case 'SECURITY_EVENT':
+        return new ForbiddenException(`${message} (security event)`);
+      default:
+        return new InternalServerErrorException(message);
+    }
+  }
+
   private resolveOutcome(error: unknown): FireblocksDomainOutcome {
     if (isRateLimitError(error)) {
       this.logger.warn('Fireblocks rate limit encountered');
@@ -46,5 +77,14 @@ export class FireblocksErrorMapper {
 
     this.logger.warn('Transient Fireblocks upstream error detected');
     return 'TRANSIENT_UPSTREAM';
+  }
+
+  private extractMessage(error: unknown): string | undefined {
+    if (error instanceof Error) {
+      return error.message;
+    }
+
+    const response = (error as any)?.response;
+    return response?.data?.message ?? response?.statusText ?? response?.data?.title;
   }
 }
