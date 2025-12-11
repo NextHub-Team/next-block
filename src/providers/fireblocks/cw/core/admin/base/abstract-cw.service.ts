@@ -1,16 +1,31 @@
+import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AllConfigType } from '../../../../../../config/config.type';
-import { AbstractAdminService } from './abstract-admin.service';
 
-export abstract class AbstractCwService extends AbstractAdminService {
+export abstract class AbstractCwService {
+  protected readonly logger: Logger;
+
   protected constructor(
     context: string,
-    protected readonly configService: ConfigService<AllConfigType>,
+    protected readonly configService?: ConfigService<AllConfigType>,
   ) {
-    super(context);
+    this.logger = new Logger(context);
+  }
+
+  protected logAction(message: string): void {
+    this.logger.log(message);
+  }
+
+  protected debug(message: string): void {
+    this.logger.debug(message);
   }
 
   protected debugBasePath(): void {
+    if (!this.configService) {
+      this.debug('Config service unavailable; basePath not configured.');
+      return;
+    }
+
     const basePath = this.configService.get('fireblocks.basePath', { infer: true }) ?? '';
     this.debug(`Using basePath ${basePath}`);
   }
