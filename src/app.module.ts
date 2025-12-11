@@ -58,16 +58,6 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
 
 @Module({
   imports: [
-    FireblocksNcwWalletsModule,
-    FireblocksCwWalletsModule,
-    FireblocksCwModule,
-    WalletsModule,
-    MessagesModule,
-    PassphrasesModule,
-    AddressBooksModule,
-    DevicesModule,
-    NotificationsModule,
-    WebhooksModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [
@@ -88,6 +78,16 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
       ],
       envFilePath: ['.env'],
     }),
+    FireblocksNcwWalletsModule,
+    FireblocksCwWalletsModule,
+    FireblocksCwModule,
+    WalletsModule,
+    MessagesModule,
+    PassphrasesModule,
+    AddressBooksModule,
+    DevicesModule,
+    NotificationsModule,
+    WebhooksModule,
     infrastructureDatabaseModule,
     I18nModule.forRootAsync({
       useFactory: (configService: ConfigService<AllConfigType>) => ({
