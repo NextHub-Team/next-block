@@ -1,7 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AllConfigType } from '../../../../../../config/config.type';
-
 export abstract class AbstractCwService {
   protected readonly logger: Logger;
 
@@ -12,7 +11,7 @@ export abstract class AbstractCwService {
     this.logger = new Logger(context);
   }
 
-  protected logAction(message: string): void {
+  protected log(message: string): void {
     this.logger.log(message);
   }
 
@@ -26,7 +25,9 @@ export abstract class AbstractCwService {
       return;
     }
 
-    const envType = this.configService.get('fireblocks.envType', { infer: true }) ?? 'unknown';
+    const envType =
+      this.configService.get('fireblocks.envType', { infer: true }) ??
+      'unknown';
     this.debug(`Using environment ${envType}`);
   }
 }

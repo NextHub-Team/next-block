@@ -142,7 +142,7 @@ export class CmcService extends BaseToggleableService implements OnModuleInit {
   ) {
     super(
       CmcService.name,
-      configService.get('cmc.enable', { infer: true }) ?? CMC_ENABLE,
+      configService.get('cmc.enable', CMC_ENABLE, { infer: true }),
     );
     if (apiClient) this.apiClient = apiClient;
   }

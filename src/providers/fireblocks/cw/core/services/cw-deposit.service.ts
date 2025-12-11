@@ -9,13 +9,4 @@ export class CwDepositService {
     @Inject(forwardRef(() => FireblocksCwService))
     private readonly client: FireblocksCwService,
   ) {}
-
-  async activateAssetInVault(vaultAccountId: string, assetId: string): Promise<void> {
-    this.logger.log(`Activate asset ${assetId} in vault ${vaultAccountId}`);
-    this.logger.debug(`Using environment ${this.client.getOptions().envType}`);
-  }
-
-  async createDepositAddress(vaultAccountId: string, assetId: string): Promise<void> {
-    this.logger.log(`Create deposit address for ${assetId} in vault ${vaultAccountId}`);
-  }
 }

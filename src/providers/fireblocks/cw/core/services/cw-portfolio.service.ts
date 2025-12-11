@@ -9,13 +9,4 @@ export class CwPortfolioService {
     @Inject(forwardRef(() => FireblocksCwService))
     private readonly client: FireblocksCwService,
   ) {}
-
-  async getBalances(vaultAccountId: string): Promise<void> {
-    this.logger.log(`Fetch balances for vault ${vaultAccountId}`);
-    this.logger.debug(`Using environment ${this.client.getOptions().envType}`);
-  }
-
-  async getSupportedAssets(): Promise<void> {
-    this.logger.log('Fetch supported assets catalog');
-  }
 }

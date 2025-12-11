@@ -9,9 +9,4 @@ export class CwTransactionsService {
     @Inject(forwardRef(() => FireblocksCwService))
     private readonly client: FireblocksCwService,
   ) {}
-
-  async listTransactions(vaultAccountId: string): Promise<void> {
-    this.logger.log(`List transactions for vault ${vaultAccountId}`);
-    this.logger.debug(`Using environment ${this.client.getOptions().envType}`);
-  }
 }

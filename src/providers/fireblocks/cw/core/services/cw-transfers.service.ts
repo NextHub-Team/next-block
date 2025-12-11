@@ -22,22 +22,4 @@ export class CwTransfersService {
     private readonly errorMapper: FireblocksErrorMapper,
     private readonly resilience: FireblocksResilienceService,
   ) {}
-
-  async preflightValidate(command: TransferCommand): Promise<void> {
-    this.logger.log(`Pre-flight validation for ${command.externalTxId}`);
-    this.logger.debug(`Validating asset ${command.assetId} from ${command.source}`);
-  }
-
-  async submit(command: TransferCommand): Promise<void> {
-    try {
-      this.logger.log(`Submitting transfer ${command.externalTxId}`);
-      this.logger.debug(`Using environment ${this.client.getOptions().envType}`);
-    } catch (error) {
-      const outcome = this.errorMapper.mapToDomainOutcome(error);
-      if (this.resilience.shouldOpenCircuit(outcome)) {
-        this.logger.warn(`Circuit breaker should open for outcome ${outcome}`);
-      }
-      throw error;
-    }
-  }
 }

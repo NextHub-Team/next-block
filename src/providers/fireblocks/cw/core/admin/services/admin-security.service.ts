@@ -7,12 +7,4 @@ export class AdminSecurityService extends AbstractCwService {
   constructor(private readonly resilience: FireblocksResilienceService) {
     super(AdminSecurityService.name);
   }
-
-  verifyWebhookHealth(): void {
-    this.logAction('Webhook verification health check');
-  }
-
-  recordSecurityEvent(reason: string): void {
-    this.resilience.recordSecurityEvent(reason);
-  }
 }
