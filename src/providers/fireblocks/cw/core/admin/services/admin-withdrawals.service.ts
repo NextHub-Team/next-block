@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { AbstractCwService } from '../../base/abstract-cw.service';
-import { FireblocksErrorMapper } from '../../../infrastructure/persistence/relational/mappers/fireblocks-error.mapper';
+import { FireblocksErrorMapper } from '../../../helpers/fireblocks-error.mapper';
 
 @Injectable()
 export class AdminWithdrawalsService extends AbstractCwService {

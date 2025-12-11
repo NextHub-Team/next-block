@@ -1,4 +1,5 @@
 export enum FireblocksEnvironmentType {
-  PRODUCTION = 'production',
   SANDBOX = 'sandbox',
+  PROD_US = 'prod-us',
+  PROD_EU = 'prod-eu',
 }
