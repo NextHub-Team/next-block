@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { AbstractAdminService } from '../base/abstract-admin.service';
+import { AbstractCwService } from '../base/abstract-cw.service';
 import { FireblocksResilienceService } from '../../shared/fireblocks-resilience.service';
 
 @Injectable()
-export class AdminSecurityService extends AbstractAdminService {
+export class AdminSecurityService extends AbstractCwService {
   constructor(private readonly resilience: FireblocksResilienceService) {
     super(AdminSecurityService.name);
   }
