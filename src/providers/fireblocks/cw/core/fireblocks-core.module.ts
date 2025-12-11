@@ -1,7 +1,7 @@
 import { Global, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { FireblocksCwService } from '../fireblocks-cw.service';
-import { FireblocksErrorMapper } from '../helpers/fireblocks-error.mapper';
+import { FireblocksErrorMapper } from '../infrastructure/persistence/relational/mappers/fireblocks-error.mapper';
 import { FireblocksResilienceService } from './shared/fireblocks-resilience.service';
 
 @Global()

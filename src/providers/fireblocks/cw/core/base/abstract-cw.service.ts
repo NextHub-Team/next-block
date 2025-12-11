@@ -1,7 +1,10 @@
-import { Logger } from '@nestjs/common';
+import { BadRequestException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AllConfigType } from '../../../../../config/config.type';
-import { FIREBLOCKS_ENV_TYPE } from '../../types/fireblocks-const.type';
+import {
+  FIREBLOCKS_ENABLE,
+  FIREBLOCKS_ENV_TYPE,
+} from '../../types/fireblocks-const.type';
 
 export abstract class AbstractCwService {
   protected readonly logger: Logger;
@@ -31,5 +34,20 @@ export abstract class AbstractCwService {
       infer: true,
     });
     this.debug(`Using environment ${envType}`);
+  }
+
+  protected ensureEnabled(): void {
+    const enabled = this.configService?.get('fireblocks.enable', FIREBLOCKS_ENABLE, {
+      infer: true,
+    });
+
+    if (enabled === false) {
+      throw new BadRequestException('Fireblocks CW provider is disabled');
+    }
+  }
+
+  protected guardEnabledAndLog(): void {
+    this.ensureEnabled();
+    this.debugEnvironment();
   }
 }

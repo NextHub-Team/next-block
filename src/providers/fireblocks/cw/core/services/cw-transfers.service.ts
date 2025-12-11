@@ -1,6 +1,6 @@
 import { Inject, Injectable, Logger, forwardRef } from '@nestjs/common';
 import { FireblocksCwService } from '../../fireblocks-cw.service';
-import { FireblocksErrorMapper } from '../../helpers/fireblocks-error.mapper';
+import { FireblocksErrorMapper } from '../../infrastructure/persistence/relational/mappers/fireblocks-error.mapper';
 import { FireblocksResilienceService } from '../shared/fireblocks-resilience.service';
 
 export interface TransferCommand {

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CwDepositService } from '../services/cw-deposit.service';
+import { FireblocksCustodialWalletDto } from '../../dto/fireblocks-wallet.dto';
+import { CwDepositService, CreateCustodialWalletCommand } from '../services/cw-deposit.service';
 import { CwPortfolioService } from '../services/cw-portfolio.service';
 import { CwTransactionsService } from '../services/cw-transactions.service';
 import { CwTransfersService } from '../services/cw-transfers.service';
@@ -12,4 +13,10 @@ export class CwClientService {
     public readonly transfers: CwTransfersService,
     public readonly transactions: CwTransactionsService,
   ) {}
+
+  async createWallet(
+    command: CreateCustodialWalletCommand,
+  ): Promise<FireblocksCustodialWalletDto> {
+    return this.deposits.createCustodialWallet(command);
+  }
 }
