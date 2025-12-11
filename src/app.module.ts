@@ -45,10 +45,14 @@ import { WebhooksModule } from './webhooks/webhooks.module';
 import { CmcModule } from './providers/cmc/cmc.module';
 import cmcConfig from './providers/cmc/config/cmc-config';
 import { ProvidersModule } from './providers/providers.module';
+
 import awsSecretsManagerConfig from './config/aws-secrets-manager.config';
 import fireblocksConfig from './providers/fireblocks/cw/config/fireblocks.config';
 import { FireblocksCwModule } from './providers/fireblocks/cw/fireblocks-cw.module';
 import queuedashConfig from './common/queuedash/config/queuedash.config';
+
+import {ContractDeployerModule} from './address-management/contract-deployer/contract-deployer.module'
+import {RewardMinterModule} from './address-management/reward-minter/reward-minter.module'
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
@@ -62,8 +66,20 @@ import { QueueDashModule } from './common/queuedash/queuedash.module';
 
 @Module({
   imports: [
+
     AccountsModule,
     QueueDashModule,
+    FireblocksNcwWalletsModule,
+    FireblocksCwWalletsModule,
+    WalletsModule,
+    MessagesModule,
+    PassphrasesModule,
+    AddressBooksModule,
+    DevicesModule,
+    NotificationsModule,
+    WebhooksModule,
+    ContractDeployerModule,
+    RewardMinterModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [
@@ -136,6 +152,7 @@ import { QueueDashModule } from './common/queuedash/queuedash.module';
     SocketIoModule,
     CmcModule,
     ProvidersModule,
+
   ],
   providers: [RabbitMQService],
 })
