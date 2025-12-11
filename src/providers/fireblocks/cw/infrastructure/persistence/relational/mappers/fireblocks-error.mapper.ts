@@ -2,11 +2,11 @@ import {
   BadRequestException,
   ForbiddenException,
   HttpException,
+  HttpStatus,
   Injectable,
   InternalServerErrorException,
   Logger,
   ServiceUnavailableException,
-  TooManyRequestsException,
 } from '@nestjs/common';
 import {
   isInvalidRequest,
@@ -39,7 +39,7 @@ export class FireblocksErrorMapper {
 
     switch (outcome) {
       case 'RATE_LIMITED':
-        return new TooManyRequestsException(message);
+        return new HttpException(message, HttpStatus.TOO_MANY_REQUESTS);
       case 'REQUEST_REJECTED_POLICY':
         return new ForbiddenException(message);
       case 'INVALID_REQUEST':
