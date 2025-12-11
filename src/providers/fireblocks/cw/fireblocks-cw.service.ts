@@ -4,9 +4,12 @@ import { ModuleRef } from '@nestjs/core';
 import { Fireblocks } from '@fireblocks/ts-sdk';
 import { AllConfigType } from '../../../config/config.type';
 import { FireblocksClientOptions } from './types/fireblocks-base.type';
-import { FireblocksEnvironmentType } from './types/fireblocks-enum.type';
 import { CwAdminService } from './core/base/cw-admin.service';
 import { CwClientService } from './core/base/cw-client.service';
+import {
+  FIREBLOCKS_ENABLE,
+  FIREBLOCKS_ENV_TYPE,
+} from './types/fireblocks-const.type';
 
 @Injectable()
 export class FireblocksCwService implements OnModuleInit, OnModuleDestroy {
@@ -115,10 +118,12 @@ export class FireblocksCwService implements OnModuleInit, OnModuleDestroy {
   }
 
   private resolveOptions(): FireblocksClientOptions {
-    const enable = this.configService.get('fireblocks.enable', { infer: true }) ?? false;
-    const envType =
-      this.configService.get('fireblocks.envType', { infer: true }) ??
-      FireblocksEnvironmentType.SANDBOX;
+    const enable = this.configService.get('fireblocks.enable', FIREBLOCKS_ENABLE, {
+      infer: true,
+    });
+    const envType = this.configService.get('fireblocks.envType', FIREBLOCKS_ENV_TYPE, {
+      infer: true,
+    });
 
     if (!enable) {
       return {
