@@ -25,12 +25,12 @@ export class FireblocksCwMapper {
     return GroupPlainToInstance(
       FireblocksVaultAssetDto,
       {
-        id: asset.id ?? asset.assetId,
+        id: asset.id,
         total: asset.total as string | undefined,
         available: asset.available as string | undefined,
         lockedAmount: asset.lockedAmount as string | undefined,
         pending: asset.pending as string | undefined,
-        totalStaked: asset.totalStaked as string | undefined,
+        totalStaked: asset.staked as string | undefined,
         balance: asset.balance as string | undefined,
       },
       roles,
@@ -64,8 +64,7 @@ export class FireblocksCwMapper {
       FireblocksDepositAddressDto,
       {
         address: address?.address,
-        tag: address?.tag ?? address?.legacyAddress?.tag,
-        description: address?.description,
+        tag: address?.tag,
         customerRefId: (address as { customerRefId?: string }).customerRefId,
       },
       roles,
@@ -102,9 +101,9 @@ export class FireblocksCwMapper {
       FireblocksAssetMetadataDto,
       {
         id: asset.id,
-        name: asset.name,
-        symbol: asset.symbol,
-        type: asset.type,
+        name: asset.displayName,
+        symbol: asset.onchain?.symbol ?? asset.displaySymbol,
+        type: asset.assetClass,
         hasTag: (asset as { hasTag?: boolean }).hasTag,
         blockchainId: (asset as { blockchainId?: string }).blockchainId,
         isSupported: (asset as { isSupported?: boolean }).isSupported,
@@ -121,10 +120,10 @@ export class FireblocksCwMapper {
       FireblocksBlockchainDto,
       {
         id: blockchain.id,
-        name: blockchain.name,
-        description: blockchain.description,
-        nativeAsset: blockchain.nativeAsset,
-        status: blockchain.status,
+        name: blockchain.displayName,
+        description: (blockchain.metadata as { description?: string })?.description,
+        nativeAsset: blockchain.nativeAssetId,
+        status: (blockchain.onchain as { status?: string })?.status,
       },
       roles,
     );

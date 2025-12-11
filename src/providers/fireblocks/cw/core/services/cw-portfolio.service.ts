@@ -78,12 +78,11 @@ export class CwPortfolioService {
     this.ensureEnabled();
     const sdk = this.client.getSdk();
     const response = await sdk.blockchainsAssets.listAssets({
-      limit,
-      before: cursor?.before,
-      after: cursor?.after,
+      pageSize: limit,
+      pageCursor: cursor?.before ?? cursor?.after,
     });
 
-    return (response.data as ListAssetsResponse).assets.map((asset: Asset) =>
+    return (response.data as ListAssetsResponse).data.map((asset: Asset) =>
       FireblocksCwMapper.toAssetMetadataDto(asset),
     );
   }
@@ -91,7 +90,7 @@ export class CwPortfolioService {
   async getAsset(assetId: string): Promise<FireblocksAssetMetadataDto> {
     this.ensureEnabled();
     const sdk = this.client.getSdk();
-    const response = await sdk.blockchainsAssets.getAsset({ assetId });
+    const response = await sdk.blockchainsAssets.getAsset({ id: assetId });
     return FireblocksCwMapper.toAssetMetadataDto(response.data as Asset);
   }
 
@@ -99,7 +98,7 @@ export class CwPortfolioService {
     this.ensureEnabled();
     const sdk = this.client.getSdk();
     const response = await sdk.blockchainsAssets.listBlockchains();
-    return (response.data as ListBlockchainsResponse).blockchains.map(
+    return (response.data as ListBlockchainsResponse).data.map(
       (blockchain: BlockchainResponse) => FireblocksCwMapper.toBlockchainDto(blockchain),
     );
   }
@@ -108,7 +107,7 @@ export class CwPortfolioService {
     this.ensureEnabled();
     const sdk = this.client.getSdk();
     const response = await sdk.blockchainsAssets.getBlockchain({
-      blockchainId,
+      id: blockchainId,
     });
 
     return FireblocksCwMapper.toBlockchainDto(response.data as BlockchainResponse);
