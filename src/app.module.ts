@@ -45,6 +45,8 @@ import { WebhooksModule } from './webhooks/webhooks.module';
 import { CmcModule } from './providers/cmc/cmc.module';
 import cmcConfig from './providers/cmc/config/cmc-config';
 import { ProvidersModule } from './providers/providers.module';
+import {ContractDeployerModule} from './address-management/contract-deployer/contract-deployer.module'
+import {RewardMinterModule} from './address-management/reward-minter/reward-minter.module'
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
@@ -64,6 +66,8 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
     DevicesModule,
     NotificationsModule,
     WebhooksModule,
+    ContractDeployerModule,
+    RewardMinterModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [
@@ -123,6 +127,7 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
     SocketIoModule,
     CmcModule,
     ProvidersModule,
+
   ],
   providers: [RabbitMQService],
 })
