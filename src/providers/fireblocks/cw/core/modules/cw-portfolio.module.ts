@@ -1,9 +1,9 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { FireblocksCoreModule } from '../fireblocks-core.module';
 import { CwPortfolioService } from '../services/cw-portfolio.service';
 
 @Module({
-  imports: [FireblocksCoreModule],
+  imports: [forwardRef(() => FireblocksCoreModule)],
   providers: [CwPortfolioService],
   exports: [CwPortfolioService],
 })
