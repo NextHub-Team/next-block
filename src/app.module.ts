@@ -47,6 +47,10 @@ import cmcConfig from './providers/cmc/config/cmc-config';
 import { ProvidersModule } from './providers/providers.module';
 import {ContractDeployerModule} from './address-management/contract-deployer/contract-deployer.module'
 import {RewardMinterModule} from './address-management/reward-minter/reward-minter.module'
+import awsSecretsManagerConfig from './config/aws-secrets-manager.config';
+import fireblocksConfig from './providers/fireblocks/cw/config/fireblocks.config';
+import { FireblocksCwModule } from './providers/fireblocks/cw/fireblocks-cw.module';
+
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
@@ -57,6 +61,7 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
 
 @Module({
   imports: [
+<<<<<<< HEAD
     FireblocksNcwWalletsModule,
     FireblocksCwWalletsModule,
     WalletsModule,
@@ -68,6 +73,8 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
     WebhooksModule,
     ContractDeployerModule,
     RewardMinterModule,
+=======
+>>>>>>> origin/main
     ConfigModule.forRoot({
       isGlobal: true,
       load: [
@@ -83,9 +90,21 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
         rabbitmqConfig,
         minioConfig,
         cmcConfig,
+        awsSecretsManagerConfig,
+        fireblocksConfig,
       ],
       envFilePath: ['.env'],
     }),
+    FireblocksNcwWalletsModule,
+    FireblocksCwWalletsModule,
+    FireblocksCwModule,
+    WalletsModule,
+    MessagesModule,
+    PassphrasesModule,
+    AddressBooksModule,
+    DevicesModule,
+    NotificationsModule,
+    WebhooksModule,
     infrastructureDatabaseModule,
     I18nModule.forRootAsync({
       useFactory: (configService: ConfigService<AllConfigType>) => ({

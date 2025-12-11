@@ -2,12 +2,14 @@ import { Global, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SecretConfigService } from './secret.service';
 import { GLOBAL_SECRET_PATH } from './const.type';
+import { AwsSecretsManagerService } from './aws-secrets-manager.service';
 
 @Global()
 @Module({
   imports: [ConfigModule],
   providers: [
     SecretConfigService,
+    AwsSecretsManagerService,
     {
       provide: 'GLOBAL_SECRET_PATH',
       useFactory: (configService: ConfigService) => {
@@ -19,6 +21,6 @@ import { GLOBAL_SECRET_PATH } from './const.type';
       inject: [ConfigService],
     },
   ],
-  exports: [SecretConfigService],
+  exports: [SecretConfigService, AwsSecretsManagerService],
 })
 export class SecretManagerModule {}
