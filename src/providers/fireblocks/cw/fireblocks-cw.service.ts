@@ -21,9 +21,7 @@ export class FireblocksCwService implements OnModuleInit, OnModuleDestroy {
     private readonly moduleRef: ModuleRef,
   ) {
     this.options = this.resolveOptions();
-    this.logger.log(
-      `Fireblocks client configured (env: ${this.options.envType}, basePath: ${this.options.basePath})`,
-    );
+    this.logger.log(`Fireblocks client configured (env: ${this.options.envType})`);
   }
 
   async onModuleInit(): Promise<void> {
@@ -68,7 +66,6 @@ export class FireblocksCwService implements OnModuleInit, OnModuleDestroy {
       this.fireblocksSdk = new Fireblocks({
         apiKey: this.options.apiKey,
         secretKey: this.options.secretKey,
-        basePath: this.options.basePath || undefined,
       });
 
       this.logger.log('Fireblocks SDK initialized successfully.');
@@ -122,14 +119,12 @@ export class FireblocksCwService implements OnModuleInit, OnModuleDestroy {
     const envType =
       this.configService.get('fireblocks.envType', { infer: true }) ??
       FireblocksEnvironmentType.SANDBOX;
-    const basePath = this.configService.get('fireblocks.basePath', { infer: true }) ?? '';
 
     if (!enable) {
       return {
         enable,
         apiKey: '',
         secretKey: '',
-        basePath,
         envType,
       } satisfies FireblocksClientOptions;
     }
@@ -138,7 +133,6 @@ export class FireblocksCwService implements OnModuleInit, OnModuleDestroy {
       enable,
       apiKey: this.configService.getOrThrow('fireblocks.apiKey', { infer: true }),
       secretKey: this.configService.getOrThrow('fireblocks.secretKey', { infer: true }),
-      basePath,
       envType: this.configService.getOrThrow('fireblocks.envType', { infer: true }),
     } satisfies FireblocksClientOptions;
   }

@@ -9,6 +9,6 @@ export class WebhookAdminService {
 
   async rotateWebhookSecret(): Promise<void> {
     this.logger.log('Rotating webhook secret');
-    this.logger.debug(`Using basePath ${this.client.getOptions().basePath}`);
+    this.logger.debug(`Using environment ${this.client.getOptions().envType}`);
   }
 }

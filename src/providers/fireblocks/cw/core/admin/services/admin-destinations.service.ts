@@ -12,6 +12,6 @@ export class AdminDestinationsService extends AbstractCwService {
   async addDestination(name: string, address: string): Promise<void> {
     this.logAction(`Adding destination ${name}`);
     this.debug(`Destination address ${address}`);
-    this.debugBasePath();
+    this.debugEnvironment();
   }
 }

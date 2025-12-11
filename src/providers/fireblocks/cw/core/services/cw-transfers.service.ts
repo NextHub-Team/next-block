@@ -31,7 +31,7 @@ export class CwTransfersService {
   async submit(command: TransferCommand): Promise<void> {
     try {
       this.logger.log(`Submitting transfer ${command.externalTxId}`);
-      this.logger.debug(`Using basePath ${this.client.getOptions().basePath}`);
+      this.logger.debug(`Using environment ${this.client.getOptions().envType}`);
     } catch (error) {
       const outcome = this.errorMapper.mapToDomainOutcome(error);
       if (this.resilience.shouldOpenCircuit(outcome)) {

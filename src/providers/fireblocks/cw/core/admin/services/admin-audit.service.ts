@@ -11,6 +11,6 @@ export class AdminAuditService extends AbstractCwService {
 
   async getLogs(): Promise<void> {
     this.logAction('Retrieving system audit logs');
-    this.debugBasePath();
+    this.debugEnvironment();
   }
 }

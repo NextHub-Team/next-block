@@ -12,7 +12,7 @@ export class CwPortfolioService {
 
   async getBalances(vaultAccountId: string): Promise<void> {
     this.logger.log(`Fetch balances for vault ${vaultAccountId}`);
-    this.logger.debug(`Using basePath ${this.client.getOptions().basePath}`);
+    this.logger.debug(`Using environment ${this.client.getOptions().envType}`);
   }
 
   async getSupportedAssets(): Promise<void> {
