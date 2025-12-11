@@ -5,7 +5,6 @@ import { FireblocksConfig } from './fireblocks-config.type';
 import { FireblocksEnvironmentType } from '../types/fireblocks-enum.type';
 import {
   FIREBLOCKS_API_KEY,
-  FIREBLOCKS_BASE_PATH,
   FIREBLOCKS_ENABLE,
   FIREBLOCKS_ENV_TYPE,
   FIREBLOCKS_SECRET_KEY,
@@ -22,10 +21,6 @@ class FireblocksEnvValidator {
 
   @IsString()
   @IsOptional()
-  FIREBLOCKS_BASE_PATH?: string;
-
-  @IsString()
-  @IsOptional()
   FIREBLOCKS_ENV_TYPE?: string;
 
   @IsBoolean()
@@ -37,7 +32,6 @@ const defaults: FireblocksConfig = {
   enable: FIREBLOCKS_ENABLE,
   apiKey: FIREBLOCKS_API_KEY,
   secretKey: FIREBLOCKS_SECRET_KEY,
-  basePath: FIREBLOCKS_BASE_PATH,
   envType: FIREBLOCKS_ENV_TYPE,
 };
 
@@ -64,7 +58,6 @@ export default createToggleableConfig<FireblocksConfig, FireblocksEnvValidator>(
       return {
         apiKey: env.FIREBLOCKS_API_KEY ?? defaults.apiKey,
         secretKey: env.FIREBLOCKS_SECRET_KEY ?? defaults.secretKey,
-        basePath: env.FIREBLOCKS_BASE_PATH ?? defaults.basePath,
         envType,
       } satisfies Partial<FireblocksConfig>;
     },

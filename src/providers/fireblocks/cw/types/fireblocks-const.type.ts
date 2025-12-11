@@ -6,6 +6,4 @@ export const FIREBLOCKS_API_KEY = '';
 
 export const FIREBLOCKS_SECRET_KEY = '';
 
-export const FIREBLOCKS_BASE_PATH = '';
-
 export const FIREBLOCKS_ENV_TYPE = FireblocksEnvironmentType.SANDBOX;

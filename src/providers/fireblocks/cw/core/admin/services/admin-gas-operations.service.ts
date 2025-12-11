@@ -11,6 +11,6 @@ export class AdminGasOperationsService extends AbstractCwService {
 
   async allocateGas(vaultAccountId: string, amount: string): Promise<void> {
     this.logAction(`Allocating gas ${amount} to vault ${vaultAccountId}`);
-    this.debugBasePath();
+    this.debugEnvironment();
   }
 }

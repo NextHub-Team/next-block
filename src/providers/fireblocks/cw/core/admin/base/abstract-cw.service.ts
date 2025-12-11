@@ -20,13 +20,13 @@ export abstract class AbstractCwService {
     this.logger.debug(message);
   }
 
-  protected debugBasePath(): void {
+  protected debugEnvironment(): void {
     if (!this.configService) {
-      this.debug('Config service unavailable; basePath not configured.');
+      this.debug('Config service unavailable; environment not configured.');
       return;
     }
 
-    const basePath = this.configService.get('fireblocks.basePath', { infer: true }) ?? '';
-    this.debug(`Using basePath ${basePath}`);
+    const envType = this.configService.get('fireblocks.envType', { infer: true }) ?? 'unknown';
+    this.debug(`Using environment ${envType}`);
   }
 }

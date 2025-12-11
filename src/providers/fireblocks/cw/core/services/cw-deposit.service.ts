@@ -12,7 +12,7 @@ export class CwDepositService {
 
   async activateAssetInVault(vaultAccountId: string, assetId: string): Promise<void> {
     this.logger.log(`Activate asset ${assetId} in vault ${vaultAccountId}`);
-    this.logger.debug(`Using basePath ${this.client.getOptions().basePath}`);
+    this.logger.debug(`Using environment ${this.client.getOptions().envType}`);
   }
 
   async createDepositAddress(vaultAccountId: string, assetId: string): Promise<void> {
