@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { AbstractCwService } from '../base/abstract-cw.service';
+import { AbstractCwService } from '../../base/abstract-cw.service';
 import { FireblocksErrorMapper } from '../../../infrastructure/persistence/relational/mappers/fireblocks-error.mapper';
 
 @Injectable()
