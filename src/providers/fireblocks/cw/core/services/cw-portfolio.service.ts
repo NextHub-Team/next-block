@@ -1,11 +1,14 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger, forwardRef } from '@nestjs/common';
 import { FireblocksCwService } from '../../fireblocks-cw.service';
 
 @Injectable()
 export class CwPortfolioService {
   private readonly logger = new Logger(CwPortfolioService.name);
 
-  constructor(private readonly client: FireblocksCwService) {}
+  constructor(
+    @Inject(forwardRef(() => FireblocksCwService))
+    private readonly client: FireblocksCwService,
+  ) {}
 
   async getBalances(vaultAccountId: string): Promise<void> {
     this.logger.log(`Fetch balances for vault ${vaultAccountId}`);
