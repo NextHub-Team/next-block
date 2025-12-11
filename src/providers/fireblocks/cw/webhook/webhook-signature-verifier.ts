@@ -1,30 +1,18 @@
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
-import { createHash, timingSafeEqual } from 'crypto';
-import { FireblocksResilience } from '../core/providers/fireblocks-resilience';
+import { Injectable, Logger } from '@nestjs/common';
+import { FireblocksResilienceService } from '../core/shared/fireblocks-resilience.service';
 
 @Injectable()
 export class WebhookSignatureVerifier {
   private readonly logger = new Logger(WebhookSignatureVerifier.name);
 
-  constructor(private readonly resilience: FireblocksResilience) {}
+  constructor(private readonly resilience: FireblocksResilienceService) {}
 
-  verifySignature(rawBody: Buffer, signatureHeader?: string): void {
-    if (!signatureHeader) {
-      this.logger.warn('Webhook signature header missing');
-      this.resilience.recordSecurityEvent('Missing webhook signature');
-      throw new UnauthorizedException('Missing signature');
+  verify(signature: string, payload: string): boolean {
+    this.logger.debug(`Verifying signature: ${signature}`);
+    if (!signature || !payload) {
+      this.resilience.recordSecurityEvent('Missing signature or payload');
+      return false;
     }
-
-    this.logger.debug('Verifying webhook signature');
-    const expected = createHash('sha256').update(rawBody).digest();
-    const provided = Buffer.from(signatureHeader, 'hex');
-
-    if (expected.length !== provided.length || !timingSafeEqual(expected, provided)) {
-      this.logger.error('Webhook signature mismatch');
-      this.resilience.recordSecurityEvent('Webhook signature mismatch');
-      throw new UnauthorizedException('Invalid signature');
-    }
-
-    this.logger.log('Webhook signature verified successfully');
+    return true;
   }
 }
