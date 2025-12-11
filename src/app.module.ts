@@ -43,11 +43,15 @@ import { WebhooksModule } from './webhooks/webhooks.module';
 import { CmcModule } from './providers/cmc/cmc.module';
 import cmcConfig from './providers/cmc/config/cmc-config';
 import { ProvidersModule } from './providers/providers.module';
+
 import awsSecretsManagerConfig from './config/aws-secrets-manager.config';
 import fireblocksConfig from './providers/fireblocks/cw/config/fireblocks.config';
 import { FireblocksCwModule } from './providers/fireblocks/cw/fireblocks-cw.module';
 import queuedashConfig from './common/queuedash/config/queuedash.config';
 import internalEventsConfig from './common/internal-events/config/internal-events.config';
+
+import {ContractDeployerModule} from './address-management/contract-deployer/contract-deployer.module'
+import {RewardMinterModule} from './address-management/reward-minter/reward-minter.module'
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
@@ -68,12 +72,24 @@ import { SleevesModule } from './sleeves/sleeves.module';
 
 @Module({
   imports: [
+
     SleevesModule,
     SleevesTransactionsModule,
     InternalEventsCoreModule.forRootAsync(),
     InternalEventsFeatureModule,
+
     AccountsModule,
     QueueDashModule,
+    FireblocksCwWalletsModule,
+    FireblocksCwModule,
+    MessagesModule,
+    PassphrasesModule,
+    AddressBooksModule,
+    DevicesModule,
+    NotificationsModule,
+    WebhooksModule,
+    ContractDeployerModule,
+    RewardMinterModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [
@@ -145,6 +161,7 @@ import { SleevesModule } from './sleeves/sleeves.module';
     SocketIoModule,
     CmcModule,
     ProvidersModule,
+
   ],
   providers: [RabbitMQService],
 })
