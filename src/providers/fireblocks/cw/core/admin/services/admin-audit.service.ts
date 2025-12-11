@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   PaginatedAssetWalletResponse,
@@ -14,6 +14,7 @@ import { AbstractCwService } from '../../base/abstract-cw.service';
 @Injectable()
 export class AdminAuditService extends AbstractCwService {
   constructor(
+    @Inject(forwardRef(() => FireblocksCwService))
     private readonly fireblocks: FireblocksCwService,
     configService: ConfigService<AllConfigType>,
   ) {
