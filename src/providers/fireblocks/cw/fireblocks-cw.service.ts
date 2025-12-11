@@ -3,12 +3,21 @@ import { ConfigService } from '@nestjs/config';
 import { ModuleRef } from '@nestjs/core';
 import { Fireblocks } from '@fireblocks/ts-sdk';
 import { AllConfigType } from '../../../config/config.type';
+import { getFireblocksBaseUrl } from './helpers/fireblocks-cw.helper';
 import { FireblocksClientOptions } from './types/fireblocks-base.type';
 import { CwAdminService } from './core/base/cw-admin.service';
 import { CwClientService } from './core/base/cw-client.service';
 import {
   FIREBLOCKS_ENABLE,
   FIREBLOCKS_ENV_TYPE,
+  FIREBLOCKS_CIRCUIT_BREAKER_FAILURE_THRESHOLD,
+  FIREBLOCKS_CIRCUIT_BREAKER_HALF_OPEN_SAMPLE,
+  FIREBLOCKS_CIRCUIT_BREAKER_RESET_TIMEOUT_MS,
+  FIREBLOCKS_DEBUG_LOGGING,
+  FIREBLOCKS_MAX_RETRIES,
+  FIREBLOCKS_RATE_LIMIT_INTERVAL_MS,
+  FIREBLOCKS_RATE_LIMIT_TOKENS_PER_INTERVAL,
+  FIREBLOCKS_REQUEST_TIMEOUT_MS,
 } from './types/fireblocks-const.type';
 
 @Injectable()
@@ -65,13 +74,17 @@ export class FireblocksCwService implements OnModuleInit, OnModuleDestroy {
   private async initializeSdk(): Promise<void> {
     this.logger.log('Starting Fireblocks SDK initialization (async mode)...');
 
+    const baseUrl = getFireblocksBaseUrl(this.options.envType);
+
     try {
       this.fireblocksSdk = new Fireblocks({
         apiKey: this.options.apiKey,
         secretKey: this.options.secretKey,
       });
 
-      this.logger.log('Fireblocks SDK initialized successfully.');
+      this.logger.log(
+        `Fireblocks SDK initialized successfully (base URL: ${baseUrl}).`,
+      );
     } catch (error: unknown) {
       this.fireblocksSdk = undefined;
       this.logger.error(
@@ -131,6 +144,18 @@ export class FireblocksCwService implements OnModuleInit, OnModuleDestroy {
         apiKey: '',
         secretKey: '',
         envType,
+        requestTimeoutMs: FIREBLOCKS_REQUEST_TIMEOUT_MS,
+        maxRetries: FIREBLOCKS_MAX_RETRIES,
+        circuitBreaker: {
+          failureThreshold: FIREBLOCKS_CIRCUIT_BREAKER_FAILURE_THRESHOLD,
+          resetTimeoutMs: FIREBLOCKS_CIRCUIT_BREAKER_RESET_TIMEOUT_MS,
+          halfOpenSample: FIREBLOCKS_CIRCUIT_BREAKER_HALF_OPEN_SAMPLE,
+        },
+        rateLimit: {
+          tokensPerInterval: FIREBLOCKS_RATE_LIMIT_TOKENS_PER_INTERVAL,
+          intervalMs: FIREBLOCKS_RATE_LIMIT_INTERVAL_MS,
+        },
+        debugLogging: FIREBLOCKS_DEBUG_LOGGING,
       } satisfies FireblocksClientOptions;
     }
 
@@ -139,6 +164,17 @@ export class FireblocksCwService implements OnModuleInit, OnModuleDestroy {
       apiKey: this.configService.getOrThrow('fireblocks.apiKey', { infer: true }),
       secretKey: this.configService.getOrThrow('fireblocks.secretKey', { infer: true }),
       envType: this.configService.getOrThrow('fireblocks.envType', { infer: true }),
+      requestTimeoutMs: this.configService.getOrThrow('fireblocks.requestTimeoutMs', {
+        infer: true,
+      }),
+      maxRetries: this.configService.getOrThrow('fireblocks.maxRetries', { infer: true }),
+      circuitBreaker: this.configService.getOrThrow('fireblocks.circuitBreaker', {
+        infer: true,
+      }),
+      rateLimit: this.configService.getOrThrow('fireblocks.rateLimit', { infer: true }),
+      debugLogging: this.configService.getOrThrow('fireblocks.debugLogging', {
+        infer: true,
+      }),
     } satisfies FireblocksClientOptions;
   }
 }

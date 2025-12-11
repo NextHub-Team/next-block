@@ -5,4 +5,16 @@ export type FireblocksClientOptions = {
   apiKey: string;
   secretKey: string;
   envType: FireblocksEnvironmentType;
+  requestTimeoutMs: number;
+  maxRetries: number;
+  circuitBreaker: {
+    failureThreshold: number;
+    resetTimeoutMs: number;
+    halfOpenSample: number;
+  };
+  rateLimit: {
+    tokensPerInterval: number;
+    intervalMs: number;
+  };
+  debugLogging: boolean;
 };
