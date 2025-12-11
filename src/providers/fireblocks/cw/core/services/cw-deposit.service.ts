@@ -13,7 +13,12 @@ import {
 } from '../../dto/fireblocks-wallet.dto';
 import { FireblocksCwMapper } from '../../helpers/fireblocks-cw.mapper';
 
-export interface CreateCustodialWalletCommand {
+export interface FireblocksUserIdentity {
+  userId: string | number;
+  providerId?: string | null;
+}
+
+export interface CreateVaultWalletRequest {
   name: string;
   assetId: string;
   customerRefId?: string;
@@ -44,8 +49,52 @@ export class CwDepositService {
     private readonly client: FireblocksCwService,
   ) {}
 
+  async ensureUserCustodialWallet(
+    user: FireblocksUserIdentity,
+    assetId: string,
+    options?: {
+      hiddenOnUI?: boolean;
+      autoFuel?: boolean;
+      addressDescription?: string;
+      idempotencyKey?: string;
+    },
+  ): Promise<FireblocksCustodialWalletDto> {
+    this.ensureEnabled();
+    const sdk = this.client.getSdk();
+
+    const vaultName = this.getVaultName(user);
+    const customerRefId = vaultName;
+    const vaultAccount = await this.findOrCreateVaultAccount(sdk, {
+      vaultName,
+      customerRefId,
+      hiddenOnUI: options?.hiddenOnUI,
+      autoFuel: options?.autoFuel,
+      idempotencyKey: options?.idempotencyKey,
+    });
+
+    const vaultAsset = await this.findOrCreateVaultAsset(sdk, {
+      vaultAccountId: vaultAccount.id as string,
+      assetId,
+      idempotencyKey: options?.idempotencyKey,
+    });
+
+    const depositAddress = await this.findOrCreateDepositAddress(sdk, {
+      vaultAccountId: vaultAccount.id as string,
+      assetId,
+      customerRefId,
+      description: options?.addressDescription,
+      idempotencyKey: options?.idempotencyKey,
+    });
+
+    return FireblocksCwMapper.toCustodialWalletDto({
+      vaultAccount,
+      vaultAsset,
+      depositAddress,
+    });
+  }
+
   async createCustodialWallet(
-    command: CreateCustodialWalletCommand,
+    command: CreateVaultWalletRequest,
   ): Promise<FireblocksCustodialWalletDto> {
     this.ensureEnabled();
     const sdk = this.client.getSdk();
@@ -127,6 +176,120 @@ export class CwDepositService {
     });
 
     return FireblocksCwMapper.toVaultAccountDto(response.data as VaultAccount);
+  }
+
+  private async findOrCreateVaultAccount(
+    sdk: ReturnType<FireblocksCwService['getSdk']>,
+    params: {
+      vaultName: string;
+      customerRefId?: string;
+      hiddenOnUI?: boolean;
+      autoFuel?: boolean;
+      idempotencyKey?: string;
+    },
+  ): Promise<VaultAccount> {
+    const paged = await sdk.vaults.getPagedVaultAccounts({
+      namePrefix: params.vaultName,
+    });
+
+    const existing = paged.data?.accounts?.find(
+      (vault) => vault.name === params.vaultName,
+    );
+
+    if (existing) {
+      this.logger.log(
+        `Reusing existing Fireblocks vault account ${existing.id} for ${params.vaultName}`,
+      );
+      return existing as VaultAccount;
+    }
+
+    const created = await sdk.vaults.createVaultAccount({
+      createVaultAccountRequest: {
+        name: params.vaultName,
+        customerRefId: params.customerRefId,
+        hiddenOnUI: params.hiddenOnUI,
+        autoFuel: params.autoFuel ?? true,
+      },
+      idempotencyKey: params.idempotencyKey,
+    });
+
+    const vaultAccount = created.data as VaultAccount;
+    this.logger.log(
+      `Created Fireblocks vault account ${vaultAccount.id} for ${params.vaultName}`,
+    );
+    return vaultAccount;
+  }
+
+  private async findOrCreateVaultAsset(
+    sdk: ReturnType<FireblocksCwService['getSdk']>,
+    params: { vaultAccountId: string; assetId: string; idempotencyKey?: string },
+  ): Promise<VaultAsset> {
+    try {
+      const existing = await sdk.vaults.getVaultAccountAsset({
+        vaultAccountId: params.vaultAccountId,
+        assetId: params.assetId,
+      });
+
+      if (existing?.data) {
+        return existing.data as VaultAsset;
+      }
+    } catch (error) {
+      this.logger.warn(
+        `Asset ${params.assetId} not found for vault ${params.vaultAccountId}, creating new asset wallet...`,
+      );
+    }
+
+    const created = await sdk.vaults.createVaultAccountAsset({
+      vaultAccountId: params.vaultAccountId,
+      assetId: params.assetId,
+      idempotencyKey: params.idempotencyKey,
+    });
+
+    return created.data as VaultAsset;
+  }
+
+  private async findOrCreateDepositAddress(
+    sdk: ReturnType<FireblocksCwService['getSdk']>,
+    params: {
+      vaultAccountId: string;
+      assetId: string;
+      description?: string;
+      customerRefId?: string;
+      idempotencyKey?: string;
+    },
+  ): Promise<CreateAddressResponse> {
+    try {
+      const existing = await sdk.vaults.getVaultAccountAssetAddressesPaginated({
+        vaultAccountId: params.vaultAccountId,
+        assetId: params.assetId,
+      });
+
+      const firstAddress = existing.data?.addresses?.[0];
+      if (firstAddress?.address) {
+        return firstAddress as CreateAddressResponse;
+      }
+    } catch (error) {
+      this.logger.warn(
+        `No existing deposit address found for ${params.vaultAccountId}/${params.assetId}, creating new address...`,
+      );
+    }
+
+    const created = await sdk.vaults.createVaultAccountAssetAddress({
+      vaultAccountId: params.vaultAccountId,
+      assetId: params.assetId,
+      createAddressRequest: {
+        description: params.description,
+        customerRefId: params.customerRefId,
+      },
+      idempotencyKey: params.idempotencyKey,
+    });
+
+    return created.data as CreateAddressResponse;
+  }
+
+  private getVaultName(user: FireblocksUserIdentity): string {
+    const identifier = user.providerId ?? user.userId;
+    return String(identifier);
   }
 
   private ensureEnabled(): void {
