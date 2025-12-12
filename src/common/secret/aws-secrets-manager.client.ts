@@ -21,7 +21,8 @@ export class AwsSecretsManagerClient {
     if (sources.length === 0) return;
 
     for (const secretId of sources) {
-      const secret = await this.getSecretsByID<Record<string, unknown>>(secretId);
+      const secret =
+        await this.getSecretsByID<Record<string, unknown>>(secretId);
       if (!this.options.isSetToEnv) continue;
 
       if (secret && typeof secret === 'object') {
@@ -34,7 +35,9 @@ export class AwsSecretsManagerClient {
           }
         });
       } else if (this.options.isDebug) {
-        this.logger.debug(`Secret ${secretId} is not an object and was not applied to env.`);
+        this.logger.debug(
+          `Secret ${secretId} is not an object and was not applied to env.`,
+        );
       }
     }
   }

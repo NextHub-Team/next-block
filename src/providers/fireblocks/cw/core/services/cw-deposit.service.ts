@@ -59,10 +59,13 @@ export class CwDepositService {
       idempotencyKey?: string;
     },
   ): Promise<FireblocksCustodialWalletDto> {
-    this.ensureEnabled();
+    this.client.ensureReady();
     const sdk = this.client.getSdk();
 
-    const vaultName = this.getVaultName(user);
+    const vaultName = await this.client.buildVaultName(
+      user.userId,
+      user.providerId,
+    );
     const customerRefId = vaultName;
     const vaultAccount = await this.findOrCreateVaultAccount(sdk, {
       vaultName,
@@ -96,7 +99,7 @@ export class CwDepositService {
   async createCustodialWallet(
     command: CreateVaultWalletRequest,
   ): Promise<FireblocksCustodialWalletDto> {
-    this.ensureEnabled();
+    this.client.ensureReady();
     const sdk = this.client.getSdk();
     const { name, assetId, customerRefId, hiddenOnUI, addressDescription } =
       command;
@@ -148,7 +151,7 @@ export class CwDepositService {
     description?: string,
     customerRefId?: string,
   ): Promise<FireblocksDepositAddressDto> {
-    this.ensureEnabled();
+    this.client.ensureReady();
     const sdk = this.client.getSdk();
 
     const response = await sdk.vaults.createVaultAccountAssetAddress({
@@ -167,7 +170,7 @@ export class CwDepositService {
     vaultAccountId: string,
     updates: UpdateCustodialWalletCommand,
   ): Promise<FireblocksVaultAccountDto> {
-    this.ensureEnabled();
+    this.client.ensureReady();
     const sdk = this.client.getSdk();
 
     const response = await sdk.vaults.updateVaultAccount({
@@ -222,7 +225,11 @@ export class CwDepositService {
 
   private async findOrCreateVaultAsset(
     sdk: ReturnType<FireblocksCwService['getSdk']>,
-    params: { vaultAccountId: string; assetId: string; idempotencyKey?: string },
+    params: {
+      vaultAccountId: string;
+      assetId: string;
+      idempotencyKey?: string;
+    },
   ): Promise<VaultAsset> {
     try {
       const existing = await sdk.vaults.getVaultAccountAsset({
@@ -233,7 +240,7 @@ export class CwDepositService {
       if (existing?.data) {
         return existing.data as VaultAsset;
       }
-    } catch (error) {
+    } catch {
       this.logger.warn(
         `Asset ${params.assetId} not found for vault ${params.vaultAccountId}, creating new asset wallet...`,
       );
@@ -268,7 +275,7 @@ export class CwDepositService {
       if (firstAddress?.address) {
         return firstAddress as CreateAddressResponse;
       }
-    } catch (error) {
+    } catch {
       this.logger.warn(
         `No existing deposit address found for ${params.vaultAccountId}/${params.assetId}, creating new address...`,
       );
@@ -285,16 +292,5 @@ export class CwDepositService {
     });
 
     return created.data as CreateAddressResponse;
-  }
-
-  private getVaultName(user: FireblocksUserIdentity): string {
-    const identifier = user.providerId ?? user.userId;
-    return String(identifier);
-  }
-
-  private ensureEnabled(): void {
-    if (!this.client.isEnabled()) {
-      throw new Error('Fireblocks CW client is disabled');
-    }
   }
 }

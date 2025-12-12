@@ -13,7 +13,7 @@ import {
   isPendingPolicy,
   isPolicyRejection,
   isRateLimitError,
-} from '../../../../fireblocks-cw.helper';
+} from '../../../../helpers/fireblocks-cw.helper';
 
 export type FireblocksDomainOutcome =
   | 'REQUEST_ACCEPTED_PENDING_POLICY'
@@ -33,7 +33,10 @@ export class FireblocksErrorMapper {
     return outcome;
   }
 
-  toHttpException(error: unknown, fallback = 'Fireblocks request failed'): HttpException {
+  toHttpException(
+    error: unknown,
+    fallback = 'Fireblocks request failed',
+  ): HttpException {
     const outcome = this.mapToDomainOutcome(error);
     const message = this.extractMessage(error) ?? fallback;
 
@@ -85,6 +88,8 @@ export class FireblocksErrorMapper {
     }
 
     const response = (error as any)?.response;
-    return response?.data?.message ?? response?.statusText ?? response?.data?.title;
+    return (
+      response?.data?.message ?? response?.statusText ?? response?.data?.title
+    );
   }
 }

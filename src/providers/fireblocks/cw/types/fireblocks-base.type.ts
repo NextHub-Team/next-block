@@ -17,4 +17,5 @@ export type FireblocksClientOptions = {
     intervalMs: number;
   };
   debugLogging: boolean;
+  vaultNamePrefix: string;
 };

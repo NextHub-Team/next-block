@@ -9,7 +9,10 @@ export class CryptoProviderEnum {
   private static providers = new Map<string, Wallet['provider']>();
 
   private static normalizeKey(provider: Wallet['provider']): string {
-    return provider.toString().toUpperCase().replace(/[^A-Z0-9]/g, '_');
+    return provider
+      .toString()
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, '_');
   }
 
   static register(provider: Wallet['provider']): void {

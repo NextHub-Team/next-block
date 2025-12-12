@@ -78,9 +78,16 @@ export class FireblocksCwMapper {
     roles?: RoleEnum[];
   }): FireblocksCustodialWalletDto {
     const roles = params.roles ?? [];
-    const vaultAccount = this.toVaultAccountDto(params.vaultAccount, undefined, roles);
+    const vaultAccount = this.toVaultAccountDto(
+      params.vaultAccount,
+      undefined,
+      roles,
+    );
     const vaultAsset = this.toVaultAssetDto(params.vaultAsset, roles);
-    const depositAddress = this.toDepositAddressDto(params.depositAddress, roles);
+    const depositAddress = this.toDepositAddressDto(
+      params.depositAddress,
+      roles,
+    );
 
     return GroupPlainToInstance(
       FireblocksCustodialWalletDto,
@@ -121,7 +128,8 @@ export class FireblocksCwMapper {
       {
         id: blockchain.id,
         name: blockchain.displayName,
-        description: (blockchain.metadata as { description?: string })?.description,
+        description: (blockchain.metadata as { description?: string })
+          ?.description,
         nativeAsset: blockchain.nativeAssetId,
         status: (blockchain.onchain as { status?: string })?.status,
       },

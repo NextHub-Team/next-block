@@ -7,9 +7,4 @@ export class AdminWithdrawalsService extends AbstractCwService {
   constructor(private readonly errorMapper: FireblocksErrorMapper) {
     super(AdminWithdrawalsService.name);
   }
-
-  classifyError(error: unknown): void {
-    const outcome = this.errorMapper.mapToDomainOutcome(error);
-    this.debug(`Withdrawal outcome classified as ${outcome}`);
-  }
 }

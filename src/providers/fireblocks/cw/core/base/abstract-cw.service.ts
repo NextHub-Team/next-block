@@ -30,16 +30,24 @@ export abstract class AbstractCwService {
       return;
     }
 
-    const envType = this.configService.get('fireblocks.envType', FIREBLOCKS_ENV_TYPE, {
-      infer: true,
-    });
+    const envType = this.configService.get(
+      'fireblocks.envType',
+      FIREBLOCKS_ENV_TYPE,
+      {
+        infer: true,
+      },
+    );
     this.debug(`Using environment ${envType}`);
   }
 
   protected ensureEnabled(): void {
-    const enabled = this.configService?.get('fireblocks.enable', FIREBLOCKS_ENABLE, {
-      infer: true,
-    });
+    const enabled = this.configService?.get(
+      'fireblocks.enable',
+      FIREBLOCKS_ENABLE,
+      {
+        infer: true,
+      },
+    );
 
     if (enabled === false) {
       throw new BadRequestException('Fireblocks CW provider is disabled');

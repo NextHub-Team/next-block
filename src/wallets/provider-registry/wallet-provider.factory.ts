@@ -1,4 +1,9 @@
-import { HttpStatus, Inject, Injectable, UnprocessableEntityException } from '@nestjs/common';
+import {
+  HttpStatus,
+  Inject,
+  Injectable,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { Wallet } from '../domain/wallet';
 import { SubWalletPort } from '../domain/ports/sub-wallet.port';
 import { TypeMessage } from '../../utils/types/message.type';
@@ -34,7 +39,9 @@ export class WalletProviderFactory {
     if (!adapter) {
       throw new UnprocessableEntityException({
         status: HttpStatus.UNPROCESSABLE_ENTITY,
-        message: TypeMessage.getMessageByStatus(HttpStatus.UNPROCESSABLE_ENTITY),
+        message: TypeMessage.getMessageByStatus(
+          HttpStatus.UNPROCESSABLE_ENTITY,
+        ),
         errors: { provider: 'WalletProviderNotSupported' },
       });
     }

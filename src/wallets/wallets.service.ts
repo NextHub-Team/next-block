@@ -40,7 +40,9 @@ export class WalletsService {
       });
     }
 
-    this.walletProviderFactory.validateProviderSupport(createWalletDto.provider);
+    this.walletProviderFactory.validateProviderSupport(
+      createWalletDto.provider,
+    );
 
     const wallet = await this.walletRepository.create({
       active: createWalletDto.active,

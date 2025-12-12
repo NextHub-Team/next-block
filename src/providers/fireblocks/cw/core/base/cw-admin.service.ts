@@ -18,7 +18,9 @@ export class CwAdminService {
     public readonly resilience: FireblocksResilienceService,
   ) {}
 
-  async getUserWallets(customerRefId: string): Promise<FireblocksUserPortfolioDto> {
+  async getUserWallets(
+    customerRefId: string,
+  ): Promise<FireblocksUserPortfolioDto> {
     return this.audit.getUserWallets(customerRefId);
   }
 }

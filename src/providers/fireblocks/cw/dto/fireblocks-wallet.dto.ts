@@ -1,6 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Exclude, Expose, Type } from 'class-transformer';
-import { IsBoolean, IsOptional, IsString, ValidateNested } from 'class-validator';
+import {
+  IsBoolean,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 
 @Exclude()
 export class FireblocksVaultAssetDto {
@@ -58,13 +63,19 @@ export class FireblocksVaultAccountDto {
   @Expose()
   name!: string;
 
-  @ApiPropertyOptional({ description: 'Customer reference id', example: 'user-ref-123' })
+  @ApiPropertyOptional({
+    description: 'Customer reference id',
+    example: 'user-ref-123',
+  })
   @IsOptional()
   @IsString()
   @Expose()
   customerRefId?: string;
 
-  @ApiPropertyOptional({ description: 'Should the account be hidden in UI', example: false })
+  @ApiPropertyOptional({
+    description: 'Should the account be hidden in UI',
+    example: false,
+  })
   @IsOptional()
   @IsBoolean()
   @Expose()
@@ -94,19 +105,28 @@ export class FireblocksDepositAddressDto {
   @Expose()
   address!: string;
 
-  @ApiPropertyOptional({ description: 'Memo / Tag if required', example: '123456' })
+  @ApiPropertyOptional({
+    description: 'Memo / Tag if required',
+    example: '123456',
+  })
   @IsOptional()
   @IsString()
   @Expose()
   tag?: string;
 
-  @ApiPropertyOptional({ description: 'Address description', example: 'Primary deposit' })
+  @ApiPropertyOptional({
+    description: 'Address description',
+    example: 'Primary deposit',
+  })
   @IsOptional()
   @IsString()
   @Expose()
   description?: string;
 
-  @ApiPropertyOptional({ description: 'Customer reference id', example: 'user-ref-123' })
+  @ApiPropertyOptional({
+    description: 'Customer reference id',
+    example: 'user-ref-123',
+  })
   @IsOptional()
   @IsString()
   @Expose()
@@ -115,19 +135,28 @@ export class FireblocksDepositAddressDto {
 
 @Exclude()
 export class FireblocksCustodialWalletDto {
-  @ApiProperty({ description: 'Vault account metadata', type: () => FireblocksVaultAccountDto })
+  @ApiProperty({
+    description: 'Vault account metadata',
+    type: () => FireblocksVaultAccountDto,
+  })
   @ValidateNested()
   @Type(() => FireblocksVaultAccountDto)
   @Expose()
   vaultAccount!: FireblocksVaultAccountDto;
 
-  @ApiProperty({ description: 'Vault asset metadata', type: () => FireblocksVaultAssetDto })
+  @ApiProperty({
+    description: 'Vault asset metadata',
+    type: () => FireblocksVaultAssetDto,
+  })
   @ValidateNested()
   @Type(() => FireblocksVaultAssetDto)
   @Expose()
   vaultAsset!: FireblocksVaultAssetDto;
 
-  @ApiProperty({ description: 'Primary deposit address', type: () => FireblocksDepositAddressDto })
+  @ApiProperty({
+    description: 'Primary deposit address',
+    type: () => FireblocksDepositAddressDto,
+  })
   @ValidateNested()
   @Type(() => FireblocksDepositAddressDto)
   @Expose()
@@ -162,12 +191,18 @@ export class FireblocksAssetMetadataDto {
   @Expose()
   blockchainId?: string;
 
-  @ApiPropertyOptional({ description: 'Whether memos/tags are required', example: false })
+  @ApiPropertyOptional({
+    description: 'Whether memos/tags are required',
+    example: false,
+  })
   @IsOptional()
   @Expose()
   hasTag?: boolean;
 
-  @ApiPropertyOptional({ description: 'Whether asset is supported in workspace', example: true })
+  @ApiPropertyOptional({
+    description: 'Whether asset is supported in workspace',
+    example: true,
+  })
   @IsOptional()
   @Expose()
   isSupported?: boolean;
@@ -197,7 +232,10 @@ export class FireblocksBlockchainDto {
   @Expose()
   nativeAsset?: string;
 
-  @ApiPropertyOptional({ description: 'Status reported by Fireblocks', example: 'ACTIVE' })
+  @ApiPropertyOptional({
+    description: 'Status reported by Fireblocks',
+    example: 'ACTIVE',
+  })
   @IsOptional()
   @IsString()
   @Expose()
@@ -206,7 +244,10 @@ export class FireblocksBlockchainDto {
 
 @Exclude()
 export class FireblocksUserPortfolioDto {
-  @ApiProperty({ description: 'User reference id associated to the vault accounts', example: 'user-ref-123' })
+  @ApiProperty({
+    description: 'User reference id associated to the vault accounts',
+    example: 'user-ref-123',
+  })
   @IsString()
   @Expose()
   userRefId!: string;

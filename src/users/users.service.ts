@@ -156,6 +156,14 @@ export class UsersService {
     return this.usersRepository.findByEmail(email);
   }
 
+  findBySocialId(socialId: User['socialId']): Promise<NullableType<User>> {
+    return this.usersRepository.findBySocialId(socialId);
+  }
+
+  findBySocialIds(socialIds: User['socialId'][]): Promise<User[]> {
+    return this.usersRepository.findBySocialIds(socialIds);
+  }
+
   findBySocialIdAndProvider({
     socialId,
     provider,
