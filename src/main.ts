@@ -69,6 +69,9 @@ async function bootstrap() {
       infer: true,
     },
   );
+  const openApiJsonUrl = docsUrl
+    .replace(/\/docs\/?$/, '')
+    .concat('/openapi.json');
 
   const builder = new DocumentBuilder()
     .setTitle(APP.name)
@@ -76,7 +79,8 @@ async function bootstrap() {
       [
         '[![NestJS](https://img.shields.io/badge/nestjs-%23E0234E.svg?style=for-the-badge&logo=nestjs&logoColor=white)](https://nestjs.com/)',
         '[![Swagger](https://img.shields.io/badge/-Swagger-%23Clojure?style=for-the-badge&logo=swagger&logoColor=white)](https://swagger.io/)',
-        `[![ReadTheDocs](https://img.shields.io/badge/Readthedocs-%23000000.svg?style=for-the-badge&logo=readthedocs&logoColor=white)](${docsUrl})`,
+        `[![ReadTheDocs](https://img.shields.io/badge/Readthedocs-%23000000.svg?style=for-the-badge&logo=readthedocs&logoColor=white)](${docsUrl.concat('/reference')})`,
+        `[![OpenAPI JSON](https://img.shields.io/badge/OpenAPI-Download%20JSON-6BA539?style=for-the-badge&logo=openapi-initiative&logoColor=white)](${openApiJsonUrl})`,
       ].join(' '),
     )
     .setLicense('MIT', 'https://opensource.org/license/mit/')
