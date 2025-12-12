@@ -33,7 +33,10 @@ export class FireblocksErrorMapper {
     return outcome;
   }
 
-  toHttpException(error: unknown, fallback = 'Fireblocks request failed'): HttpException {
+  toHttpException(
+    error: unknown,
+    fallback = 'Fireblocks request failed',
+  ): HttpException {
     const outcome = this.mapToDomainOutcome(error);
     const message = this.extractMessage(error) ?? fallback;
 
@@ -85,6 +88,8 @@ export class FireblocksErrorMapper {
     }
 
     const response = (error as any)?.response;
-    return response?.data?.message ?? response?.statusText ?? response?.data?.title;
+    return (
+      response?.data?.message ?? response?.statusText ?? response?.data?.title
+    );
   }
 }

@@ -48,25 +48,19 @@ const parseSecretIds = (value?: string): string[] => {
 export default createToggleableConfig<
   AwsSecretsManagerConfig,
   EnvironmentVariablesValidator
->(
-  'awsSecretsManager',
-  EnvironmentVariablesValidator,
-  defaults,
-  {
-    enableKey: 'enable',
-    enableEnvKey: 'AWS_SECRETS_MANAGER_ENABLE',
-    mapEnabledConfig: (env) => ({
-      region: env.AWS_SECRETS_MANAGER_REGION ?? defaults.region,
-      secretIds: parseSecretIds(env.AWS_SECRETS_MANAGER_SECRET_IDS),
-      setToEnv:
-        env.AWS_SECRETS_MANAGER_SET_TO_ENV ?? defaults.setToEnv ?? true,
-      debug: env.AWS_SECRETS_MANAGER_DEBUG ?? defaults.debug,
-    }),
-    mapDisabledConfig: () => ({
-      secretIds: [],
-    }),
-  },
-);
+>('awsSecretsManager', EnvironmentVariablesValidator, defaults, {
+  enableKey: 'enable',
+  enableEnvKey: 'AWS_SECRETS_MANAGER_ENABLE',
+  mapEnabledConfig: (env) => ({
+    region: env.AWS_SECRETS_MANAGER_REGION ?? defaults.region,
+    secretIds: parseSecretIds(env.AWS_SECRETS_MANAGER_SECRET_IDS),
+    setToEnv: env.AWS_SECRETS_MANAGER_SET_TO_ENV ?? defaults.setToEnv ?? true,
+    debug: env.AWS_SECRETS_MANAGER_DEBUG ?? defaults.debug,
+  }),
+  mapDisabledConfig: () => ({
+    secretIds: [],
+  }),
+});
 
 export function buildAwsSecretsOptionsFromEnv(): AwsSecretsManagerConfig {
   return {
@@ -74,7 +68,8 @@ export function buildAwsSecretsOptionsFromEnv(): AwsSecretsManagerConfig {
       process.env.AWS_SECRETS_MANAGER_ENABLE,
       AWS_SECRETS_MANAGER_ENABLE,
     ),
-    region: process.env.AWS_SECRETS_MANAGER_REGION ?? AWS_SECRETS_MANAGER_REGION,
+    region:
+      process.env.AWS_SECRETS_MANAGER_REGION ?? AWS_SECRETS_MANAGER_REGION,
     secretIds: parseSecretIds(process.env.AWS_SECRETS_MANAGER_SECRET_IDS),
     setToEnv: parseBool(
       process.env.AWS_SECRETS_MANAGER_SET_TO_ENV,

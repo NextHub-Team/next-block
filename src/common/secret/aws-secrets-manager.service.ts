@@ -1,5 +1,5 @@
 import { SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AllConfigType } from 'src/config/config.type';
 import { AwsSecretsManagerConfig } from 'src/config/types/aws-secrets-manager-config.type';
@@ -11,9 +11,7 @@ import { BaseToggleableService } from '../base/base-toggleable.service';
 import { buildAwsSecretsOptionsFromEnv } from 'src/config/aws-secrets-manager.config';
 
 @Injectable()
-export class AwsSecretsManagerService
-  extends BaseToggleableService
-{
+export class AwsSecretsManagerService extends BaseToggleableService {
   private readonly secretsConfig: AwsSecretsManagerConfig;
 
   constructor(private readonly configService: ConfigService<AllConfigType>) {
@@ -94,7 +92,8 @@ export class AwsSecretsManagerService
     }
 
     if (!this.secretsConfig.region) {
-      const message = 'AWS region is not configured. Cannot fetch secret by id.';
+      const message =
+        'AWS region is not configured. Cannot fetch secret by id.';
       this.logger.warn(message);
       throw new Error(message);
     }

@@ -33,7 +33,9 @@ export async function bootstrapAwsSecrets(): Promise<void> {
   }
 
   if (!config.region) {
-    logger.warn('AWS Secrets Manager bootstrap missing AWS region configuration.');
+    logger.warn(
+      'AWS Secrets Manager bootstrap missing AWS region configuration.',
+    );
     return;
   }
 

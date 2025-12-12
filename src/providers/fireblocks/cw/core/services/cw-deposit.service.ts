@@ -225,7 +225,11 @@ export class CwDepositService {
 
   private async findOrCreateVaultAsset(
     sdk: ReturnType<FireblocksCwService['getSdk']>,
-    params: { vaultAccountId: string; assetId: string; idempotencyKey?: string },
+    params: {
+      vaultAccountId: string;
+      assetId: string;
+      idempotencyKey?: string;
+    },
   ): Promise<VaultAsset> {
     try {
       const existing = await sdk.vaults.getVaultAccountAsset({
@@ -236,7 +240,7 @@ export class CwDepositService {
       if (existing?.data) {
         return existing.data as VaultAsset;
       }
-    } catch (error) {
+    } catch {
       this.logger.warn(
         `Asset ${params.assetId} not found for vault ${params.vaultAccountId}, creating new asset wallet...`,
       );
@@ -271,7 +275,7 @@ export class CwDepositService {
       if (firstAddress?.address) {
         return firstAddress as CreateAddressResponse;
       }
-    } catch (error) {
+    } catch {
       this.logger.warn(
         `No existing deposit address found for ${params.vaultAccountId}/${params.assetId}, creating new address...`,
       );

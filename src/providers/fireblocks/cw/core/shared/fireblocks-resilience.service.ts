@@ -11,7 +11,9 @@ export class FireblocksResilienceService {
 
   shouldRetry(outcome: FireblocksDomainOutcome): boolean {
     if (outcome === 'REQUEST_REJECTED_POLICY') {
-      this.logger.warn('Fireblocks request rejected by policy; will not retry.');
+      this.logger.warn(
+        'Fireblocks request rejected by policy; will not retry.',
+      );
       return false;
     }
 
@@ -55,7 +57,9 @@ export class FireblocksResilienceService {
         }
 
         const delay = this.buildBackoffDelay(attempt);
-        this.logger.warn(`Retrying Fireblocks call after outcome ${outcome} (attempt ${attempt}/${maxRetries})`);
+        this.logger.warn(
+          `Retrying Fireblocks call after outcome ${outcome} (attempt ${attempt}/${maxRetries})`,
+        );
         await new Promise((resolve) => setTimeout(resolve, delay));
       }
     }

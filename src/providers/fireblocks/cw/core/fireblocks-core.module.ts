@@ -8,7 +8,11 @@ import { UsersModule } from '../../../../users/users.module';
 @Global()
 @Module({
   imports: [ConfigModule, UsersModule],
-  providers: [FireblocksCwService, FireblocksErrorMapper, FireblocksResilienceService],
+  providers: [
+    FireblocksCwService,
+    FireblocksErrorMapper,
+    FireblocksResilienceService,
+  ],
   exports: [
     ConfigModule,
     FireblocksCwService,
