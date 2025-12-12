@@ -1,28 +1,21 @@
 import { Injectable, Type } from '@nestjs/common';
-import { AdminAuditModule } from './admin/modules/admin-audit.module';
+import { AdminVaultModule } from './admin/modules/admin-vault.module';
 import { AdminDestinationsModule } from './admin/modules/admin-destinations.module';
 import { AdminGasOperationsModule } from './admin/modules/admin-gas-operations.module';
 import { AdminSecurityModule } from './admin/modules/admin-security.module';
 import { AdminWithdrawalsModule } from './admin/modules/admin-withdrawals.module';
-import { CwDepositModule } from './modules/cw-deposit.module';
-import { CwPortfolioModule } from './modules/cw-portfolio.module';
+import { CwVaultModule } from './modules/cw-vault.module';
 import { CwTransactionsModule } from './modules/cw-transactions.module';
-import { CwTransfersModule } from './modules/cw-transfers.module';
 
 const ADMIN_MODULES: Array<Type> = [
   AdminSecurityModule,
   AdminDestinationsModule,
   AdminWithdrawalsModule,
   AdminGasOperationsModule,
-  AdminAuditModule,
+  AdminVaultModule,
 ];
 
-const NON_ADMIN_MODULES: Array<Type> = [
-  CwDepositModule,
-  CwPortfolioModule,
-  CwTransfersModule,
-  CwTransactionsModule,
-];
+const NON_ADMIN_MODULES: Array<Type> = [CwVaultModule, CwTransactionsModule];
 
 @Injectable()
 export class FireblocksCwRegistryService {

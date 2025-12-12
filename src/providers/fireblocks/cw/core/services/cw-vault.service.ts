@@ -1,15 +1,25 @@
-import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger, forwardRef } from '@nestjs/common';
 import {
+  Asset,
+  BlockchainResponse,
   CreateAddressResponse,
+  ListAssetsResponse,
+  ListBlockchainsResponse,
+  PaginatedAddressResponse,
   UpdateVaultAccountRequest,
   VaultAccount,
+  VaultAccountsPagedResponse,
   VaultAsset,
 } from '@fireblocks/ts-sdk';
 import { FireblocksCwService } from '../../fireblocks-cw.service';
 import {
+  FireblocksAssetMetadataDto,
+  FireblocksBlockchainDto,
   FireblocksCustodialWalletDto,
   FireblocksDepositAddressDto,
+  FireblocksUserPortfolioDto,
   FireblocksVaultAccountDto,
+  FireblocksVaultAssetDto,
 } from '../../dto/fireblocks-wallet.dto';
 import { FireblocksCwMapper } from '../../helpers/fireblocks-cw.mapper';
 
@@ -40,15 +50,26 @@ export interface UpdateCustodialWalletCommand {
   hiddenOnUI?: boolean;
 }
 
+/**
+ * Consolidated vault operations combining deposit and portfolio features.
+ */
 @Injectable()
-export class CwDepositService {
-  private readonly logger = new Logger(CwDepositService.name);
+export class CwVaultService {
+  private readonly logger = new Logger(CwVaultService.name);
 
   constructor(
     @Inject(forwardRef(() => FireblocksCwService))
     private readonly client: FireblocksCwService,
   ) {}
 
+  private get sdk(): ReturnType<FireblocksCwService['getSdk']> {
+    this.client.isReady();
+    return this.client.getSdk();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Wallet / deposit flows
+  // ---------------------------------------------------------------------------
   async ensureUserCustodialWallet(
     user: FireblocksUserIdentity,
     assetId: string,
@@ -59,8 +80,7 @@ export class CwDepositService {
       idempotencyKey?: string;
     },
   ): Promise<FireblocksCustodialWalletDto> {
-    this.client.ensureReady();
-    const sdk = this.client.getSdk();
+    const sdk = this.sdk;
 
     const vaultName = await this.client.buildVaultName(
       user.userId,
@@ -99,8 +119,7 @@ export class CwDepositService {
   async createCustodialWallet(
     command: CreateVaultWalletRequest,
   ): Promise<FireblocksCustodialWalletDto> {
-    this.client.ensureReady();
-    const sdk = this.client.getSdk();
+    const sdk = this.sdk;
     const { name, assetId, customerRefId, hiddenOnUI, addressDescription } =
       command;
 
@@ -151,8 +170,7 @@ export class CwDepositService {
     description?: string,
     customerRefId?: string,
   ): Promise<FireblocksDepositAddressDto> {
-    this.client.ensureReady();
-    const sdk = this.client.getSdk();
+    const sdk = this.sdk;
 
     const response = await sdk.vaults.createVaultAccountAssetAddress({
       vaultAccountId,
@@ -170,8 +188,7 @@ export class CwDepositService {
     vaultAccountId: string,
     updates: UpdateCustodialWalletCommand,
   ): Promise<FireblocksVaultAccountDto> {
-    this.client.ensureReady();
-    const sdk = this.client.getSdk();
+    const sdk = this.sdk;
 
     const response = await sdk.vaults.updateVaultAccount({
       vaultAccountId,
@@ -181,6 +198,137 @@ export class CwDepositService {
     return FireblocksCwMapper.toVaultAccountDto(response.data as VaultAccount);
   }
 
+  // ---------------------------------------------------------------------------
+  // Portfolio / catalog flows
+  // ---------------------------------------------------------------------------
+  async getVaultAccount(
+    vaultAccountId: string,
+  ): Promise<FireblocksVaultAccountDto> {
+    const sdk = this.sdk;
+    const response = await sdk.vaults.getVaultAccount({ vaultAccountId });
+    return FireblocksCwMapper.toVaultAccountDto(response.data as VaultAccount);
+  }
+
+  async getVaultAsset(
+    vaultAccountId: string,
+    assetId: string,
+  ): Promise<FireblocksVaultAssetDto> {
+    const sdk = this.sdk;
+    const response = await sdk.vaults.getVaultAccountAsset({
+      vaultAccountId,
+      assetId,
+    });
+
+    return FireblocksCwMapper.toVaultAssetDto(response.data as VaultAsset);
+  }
+
+  async getDepositAddresses(
+    vaultAccountId: string,
+    assetId: string,
+    limit?: number,
+    before?: string,
+    after?: string,
+  ): Promise<FireblocksDepositAddressDto[]> {
+    const sdk = this.sdk;
+    const response = await sdk.vaults.getVaultAccountAssetAddressesPaginated({
+      vaultAccountId,
+      assetId,
+      limit,
+      before,
+      after,
+    });
+
+    const data = (response.data as PaginatedAddressResponse).addresses || [];
+    return data.map((item) => FireblocksCwMapper.toDepositAddressDto(item));
+  }
+
+  async listWorkspaceAssets(
+    limit?: number,
+    cursor?: { before?: string; after?: string },
+  ): Promise<FireblocksAssetMetadataDto[]> {
+    const sdk = this.sdk;
+    const response = await sdk.blockchainsAssets.listAssets({
+      pageSize: limit,
+      pageCursor: cursor?.before ?? cursor?.after,
+    });
+
+    return (response.data as ListAssetsResponse).data.map((asset: Asset) =>
+      FireblocksCwMapper.toAssetMetadataDto(asset),
+    );
+  }
+
+  async getAsset(assetId: string): Promise<FireblocksAssetMetadataDto> {
+    const sdk = this.sdk;
+    const response = await sdk.blockchainsAssets.getAsset({ id: assetId });
+    return FireblocksCwMapper.toAssetMetadataDto(response.data as Asset);
+  }
+
+  async listBlockchains(): Promise<FireblocksBlockchainDto[]> {
+    const sdk = this.sdk;
+    const response = await sdk.blockchainsAssets.listBlockchains();
+    return (response.data as ListBlockchainsResponse).data.map(
+      (blockchain: BlockchainResponse) =>
+        FireblocksCwMapper.toBlockchainDto(blockchain),
+    );
+  }
+
+  async getBlockchain(blockchainId: string): Promise<FireblocksBlockchainDto> {
+    const sdk = this.sdk;
+    const response = await sdk.blockchainsAssets.getBlockchain({
+      id: blockchainId,
+    });
+
+    return FireblocksCwMapper.toBlockchainDto(
+      response.data as BlockchainResponse,
+    );
+  }
+
+  async getVaultAccounts(
+    limit?: number,
+    before?: string,
+    after?: string,
+    assetId?: string,
+  ): Promise<FireblocksVaultAccountDto[]> {
+    const response = await this.sdk.vaults.getPagedVaultAccounts({
+      limit,
+      before,
+      after,
+      assetId,
+    });
+
+    const accounts =
+      (response.data as VaultAccountsPagedResponse).accounts || [];
+    return accounts.map((account) =>
+      FireblocksCwMapper.toVaultAccountDto(
+        account as VaultAccount,
+        account.assets as VaultAsset[] | undefined,
+      ),
+    );
+  }
+
+  async getUserPortfolio(
+    customerRefId: string,
+  ): Promise<FireblocksUserPortfolioDto> {
+    const response = await this.sdk.vaults.getPagedVaultAccounts({});
+    const accounts =
+      (response.data as VaultAccountsPagedResponse).accounts || [];
+    const filtered = accounts.filter(
+      (account) => (account as VaultAccount).customerRefId === customerRefId,
+    );
+
+    this.logger.debug(
+      `Resolved ${filtered.length} vault accounts for user ${customerRefId}`,
+    );
+
+    return FireblocksCwMapper.toUserPortfolioDto(
+      customerRefId,
+      filtered as VaultAccount[],
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Helpers
+  // ---------------------------------------------------------------------------
   private async findOrCreateVaultAccount(
     sdk: ReturnType<FireblocksCwService['getSdk']>,
     params: {

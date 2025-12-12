@@ -85,10 +85,6 @@ export class FireblocksCwService
   }
 
   public isReady(): boolean {
-    return this.getEnabled() && !!this.fireblocksSdk;
-  }
-
-  public ensureReady(): void {
     this.checkIfEnabled();
     if (!this.fireblocksSdk) {
       this.logger.error(
@@ -98,6 +94,7 @@ export class FireblocksCwService
         'Fireblocks SDK is not initialized.',
       );
     }
+    return true;
   }
 
   getSdk(): Fireblocks {
@@ -107,7 +104,6 @@ export class FireblocksCwService
       );
       throw new Error('Fireblocks SDK has not been initialized');
     }
-
     return this.fireblocksSdk;
   }
 
@@ -118,14 +114,12 @@ export class FireblocksCwService
     const prefix = this.options.vaultNamePrefix || FIREBLOCKS_VAULT_NAME_PREFIX;
     const user = await this.usersService.findById(userId);
     const suffix = user?.socialId ?? fallbackProviderId ?? userId;
-
     return `${prefix}-${suffix}`;
   }
 
   // eslint-disable-next-line @typescript-eslint/require-await
   private async initializeSdk(): Promise<void> {
     this.logger.log('Starting Fireblocks SDK initialization (async mode)...');
-
     const baseUrl = getFireblocksBaseUrl(this.options.envType);
 
     try {
@@ -137,7 +131,7 @@ export class FireblocksCwService
           baseOptions: {
             timeout: this.options.requestTimeoutMs,
           },
-          userAgent: 'next-block-fireblocks-cw',
+          userAgent: `${APP.name}`,
         },
       });
 

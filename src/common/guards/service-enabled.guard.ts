@@ -65,9 +65,16 @@ export class EnableGuard implements CanActivate {
         );
       }
 
-      // Prefer ensureReady(), else checkIfEnabled(), else assume enabled
-      if (typeof svc.ensureReady === 'function') {
-        svc.ensureReady(); // should throw HTTP exception if not ready
+      // Prefer isReady()/ensureReady(), else checkIfEnabled(), else assume enabled
+      if (typeof svc.isReady === 'function') {
+        const ready = svc.isReady(); // may throw or return boolean
+        if (ready === false) {
+          throw new ServiceUnavailableException(
+            'Required service is not ready.',
+          );
+        }
+      } else if (typeof svc.ensureReady === 'function') {
+        svc.ensureReady(); // legacy support; should throw if not ready
       } else if (typeof svc.checkIfEnabled === 'function') {
         svc.checkIfEnabled(); // may throw
       }

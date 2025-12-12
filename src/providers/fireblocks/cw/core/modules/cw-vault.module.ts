@@ -1,10 +1,10 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { FireblocksCoreModule } from '../fireblocks-core.module';
-import { CwDepositService } from '../services/cw-deposit.service';
+import { CwVaultService } from '../services/cw-vault.service';
 
 @Module({
   imports: [forwardRef(() => FireblocksCoreModule)],
-  providers: [CwDepositService],
-  exports: [CwDepositService],
+  providers: [CwVaultService],
+  exports: [CwVaultService],
 })
-export class CwDepositModule {}
+export class CwVaultModule {}

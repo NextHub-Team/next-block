@@ -12,13 +12,18 @@ import { FireblocksCwMapper } from '../../../helpers/fireblocks-cw.mapper';
 import { AbstractCwService } from '../../base/abstract-cw.service';
 
 @Injectable()
-export class AdminAuditService extends AbstractCwService {
+export class AdminVaultService extends AbstractCwService {
   constructor(
     @Inject(forwardRef(() => FireblocksCwService))
     private readonly fireblocks: FireblocksCwService,
     configService: ConfigService<AllConfigType>,
   ) {
-    super(AdminAuditService.name, configService);
+    super(AdminVaultService.name, configService);
+  }
+
+  private get sdk(): ReturnType<FireblocksCwService['getSdk']> {
+    this.fireblocks.isReady();
+    return this.fireblocks.getSdk();
   }
 
   async getVaultAccounts(
@@ -28,14 +33,12 @@ export class AdminAuditService extends AbstractCwService {
     assetId?: string,
   ): Promise<VaultAccountsPagedResponse> {
     this.guardEnabledAndLog();
-    const response = await this.fireblocks
-      .getSdk()
-      .vaults.getPagedVaultAccounts({
-        limit,
-        before,
-        after,
-        assetId,
-      });
+    const response = await this.sdk.vaults.getPagedVaultAccounts({
+      limit,
+      before,
+      after,
+      assetId,
+    });
 
     return response.data as VaultAccountsPagedResponse;
   }
@@ -47,7 +50,7 @@ export class AdminAuditService extends AbstractCwService {
     assetId?: string,
   ): Promise<PaginatedAssetWalletResponse> {
     this.guardEnabledAndLog();
-    const response = await this.fireblocks.getSdk().vaults.getAssetWallets({
+    const response = await this.sdk.vaults.getAssetWallets({
       assetId,
       limit,
       before,

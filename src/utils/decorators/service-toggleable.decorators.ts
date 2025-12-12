@@ -27,7 +27,7 @@ export function RequireEnabled(
 
 /**
  * Use to declare one or more service providers that must be "ready".
- * The guard will resolve each and call ensureReady() if it exists,
+ * The guard will resolve each and call isReady() (or ensureReady()) if it exists,
  * otherwise fall back to checkIfEnabled().
  */
 export function RequireServiceReady(
