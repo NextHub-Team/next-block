@@ -62,23 +62,26 @@ async function bootstrap() {
     new StandardResponseInterceptor(),
   );
 
+  const docsUrl = configService.get(
+    'app.docsUrl',
+    `${APP_DEFAULT_DOCS_HOST}:${APP.port}${APP_DEFAULT_DOCS_PATH}`,
+    {
+      infer: true,
+    },
+  );
+
   const builder = new DocumentBuilder()
     .setTitle(APP.name)
     .setDescription(
-      '![NestJS](https://img.shields.io/badge/nestjs-%23E0234E.svg?style=for-the-badge&logo=nestjs&logoColor=white) ![Swagger](https://img.shields.io/badge/-Swagger-%23Clojure?style=for-the-badge&logo=swagger&logoColor=white) ![ReadTheDocs](https://img.shields.io/badge/Readthedocs-%23000000.svg?style=for-the-badge&logo=readthedocs&logoColor=white)',
+      [
+        '[![NestJS](https://img.shields.io/badge/nestjs-%23E0234E.svg?style=for-the-badge&logo=nestjs&logoColor=white)](https://nestjs.com/)',
+        '[![Swagger](https://img.shields.io/badge/-Swagger-%23Clojure?style=for-the-badge&logo=swagger&logoColor=white)](https://swagger.io/)',
+        `[![ReadTheDocs](https://img.shields.io/badge/Readthedocs-%23000000.svg?style=for-the-badge&logo=readthedocs&logoColor=white)](${docsUrl})`,
+      ].join(' '),
     )
     .setLicense('MIT', 'https://opensource.org/license/mit/')
     .addServer('/')
-    .setExternalDoc(
-      'Documentation',
-      configService.get(
-        'app.docsUrl',
-        `${APP_DEFAULT_DOCS_HOST}:${APP.port}${APP_DEFAULT_DOCS_PATH}`,
-        {
-          infer: true,
-        },
-      ),
-    )
+    .setExternalDoc('Documentation', docsUrl)
     .setVersion(APP.version)
     .addBearerAuth()
     .addGlobalParameters({
