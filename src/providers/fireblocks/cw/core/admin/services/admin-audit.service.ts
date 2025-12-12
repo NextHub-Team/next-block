@@ -28,12 +28,14 @@ export class AdminAuditService extends AbstractCwService {
     assetId?: string,
   ): Promise<VaultAccountsPagedResponse> {
     this.guardEnabledAndLog();
-    const response = await this.fireblocks.getSdk().vaults.getPagedVaultAccounts({
-      limit,
-      before,
-      after,
-      assetId,
-    });
+    const response = await this.fireblocks
+      .getSdk()
+      .vaults.getPagedVaultAccounts({
+        limit,
+        before,
+        after,
+        assetId,
+      });
 
     return response.data as VaultAccountsPagedResponse;
   }
@@ -55,7 +57,9 @@ export class AdminAuditService extends AbstractCwService {
     return response.data as PaginatedAssetWalletResponse;
   }
 
-  async getUserWallets(customerRefId: string): Promise<FireblocksUserPortfolioDto> {
+  async getUserWallets(
+    customerRefId: string,
+  ): Promise<FireblocksUserPortfolioDto> {
     const paged = await this.getVaultAccounts();
     const accounts = (paged.accounts || []).filter(
       (account) => (account as VaultAccount).customerRefId === customerRefId,

@@ -16,6 +16,7 @@ import {
   FIREBLOCKS_CIRCUIT_BREAKER_HALF_OPEN_SAMPLE,
   FIREBLOCKS_CIRCUIT_BREAKER_RESET_TIMEOUT_MS,
   FIREBLOCKS_DEBUG_LOGGING,
+  FIREBLOCKS_VAULT_NAME_PREFIX,
 } from '../types/fireblocks-const.type';
 
 class FireblocksEnvValidator {
@@ -73,6 +74,10 @@ class FireblocksEnvValidator {
   @IsBoolean()
   @IsOptional()
   FIREBLOCKS_DEBUG_LOGGING?: boolean;
+
+  @IsString()
+  @IsOptional()
+  FIREBLOCKS_VAULT_NAME_PREFIX?: string;
 }
 
 const defaults: FireblocksConfig = {
@@ -92,6 +97,7 @@ const defaults: FireblocksConfig = {
     intervalMs: FIREBLOCKS_RATE_LIMIT_INTERVAL_MS,
   },
   debugLogging: FIREBLOCKS_DEBUG_LOGGING,
+  vaultNamePrefix: FIREBLOCKS_VAULT_NAME_PREFIX,
 };
 
 export default createToggleableConfig<FireblocksConfig, FireblocksEnvValidator>(
@@ -137,6 +143,8 @@ export default createToggleableConfig<FireblocksConfig, FireblocksEnvValidator>(
         env.FIREBLOCKS_RATE_LIMIT_INTERVAL_MS ?? defaults.rateLimit.intervalMs;
       const debugLogging =
         env.FIREBLOCKS_DEBUG_LOGGING ?? defaults.debugLogging;
+      const vaultNamePrefix =
+        env.FIREBLOCKS_VAULT_NAME_PREFIX ?? defaults.vaultNamePrefix;
 
       return {
         apiKey: env.FIREBLOCKS_API_KEY ?? defaults.apiKey,
@@ -151,6 +159,7 @@ export default createToggleableConfig<FireblocksConfig, FireblocksEnvValidator>(
         },
         rateLimit: { tokensPerInterval, intervalMs },
         debugLogging,
+        vaultNamePrefix,
       } satisfies Partial<FireblocksConfig>;
     },
   },

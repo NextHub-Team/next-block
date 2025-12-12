@@ -13,7 +13,7 @@ import {
   isPendingPolicy,
   isPolicyRejection,
   isRateLimitError,
-} from '../../../../fireblocks-cw.helper';
+} from '../../../../helpers/fireblocks-cw.helper';
 
 export type FireblocksDomainOutcome =
   | 'REQUEST_ACCEPTED_PENDING_POLICY'

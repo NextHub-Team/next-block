@@ -26,6 +26,8 @@ export const FIREBLOCKS_RATE_LIMIT_INTERVAL_MS = 1000;
 
 export const FIREBLOCKS_DEBUG_LOGGING = false;
 
+export const FIREBLOCKS_VAULT_NAME_PREFIX = 'next-block';
+
 export const FIREBLOCKS_ENVIRONMENT_BASE_URL: Record<
   FireblocksEnvironmentUrlKey,
   string
