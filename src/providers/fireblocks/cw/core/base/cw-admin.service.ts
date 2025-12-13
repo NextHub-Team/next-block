@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { FireblocksUserPortfolioDto } from '../../dto/fireblocks-wallet.dto';
+import { FireblocksResponseEnvelopeDto } from '../../dto/fireblocks-response.dto';
 import { FireblocksResilienceService } from '../shared/fireblocks-resilience.service';
 import { AdminVaultService } from '../admin/services/admin-vault.service';
 import { AdminDestinationsService } from '../admin/services/admin-destinations.service';
@@ -20,7 +21,7 @@ export class CwAdminService {
 
   async getUserWallets(
     customerRefId: string,
-  ): Promise<FireblocksUserPortfolioDto> {
+  ): Promise<FireblocksResponseEnvelopeDto<FireblocksUserPortfolioDto>> {
     return this.vaults.fetchUserPortfolioByCustomerRefId(customerRefId);
   }
 }

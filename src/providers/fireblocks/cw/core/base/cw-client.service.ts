@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { FireblocksCustodialWalletDto } from '../../dto/fireblocks-wallet.dto';
 import {
-  CreateVaultWalletRequest,
-  CwVaultService,
-  FireblocksUserIdentity,
-} from '../services/cw-vault.service';
+  CreateVaultWalletRequestDto,
+  EnsureVaultWalletOptionsDto,
+  FireblocksUserIdentityDto,
+} from '../../dto/fireblocks-vault-requests.dto';
+import { CwVaultService } from '../services/cw-vault.service';
 import { CwTransactionsService } from '../services/cw-transactions.service';
 
 @Injectable()
@@ -24,25 +25,16 @@ export class CwClientService {
   }
 
   async createWallet(
-    command: CreateVaultWalletRequest,
+    command: CreateVaultWalletRequestDto,
   ): Promise<FireblocksCustodialWalletDto> {
     return this.vaults.createVaultWalletForAsset(command);
   }
 
   async ensureUserWallet(
-    user: FireblocksUserIdentity,
+    user: FireblocksUserIdentityDto,
     assetId: string,
-    options?: {
-      hiddenOnUI?: boolean;
-      autoFuel?: boolean;
-      addressDescription?: string;
-      idempotencyKey?: string;
-    },
+    options?: EnsureVaultWalletOptionsDto,
   ): Promise<FireblocksCustodialWalletDto> {
-    return this.vaults.ensureUserVaultWalletForAsset(
-      user,
-      assetId,
-      options,
-    );
+    return this.vaults.ensureUserVaultWalletForAsset(user, assetId, options);
   }
 }

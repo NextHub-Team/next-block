@@ -111,10 +111,18 @@ export class FireblocksCwService
     userId: number | string,
     fallbackProviderId?: string | null,
   ): Promise<string> {
-    const prefix = this.options.vaultNamePrefix ?? FIREBLOCKS_VAULT_NAME_PREFIX;
     const user = await this.usersService.findById(userId);
     const suffix = user?.socialId ?? fallbackProviderId ?? userId;
-    return prefix ? `${prefix}-${suffix}` : `${suffix}`;
+    const configuredPrefix =
+      (this.options.vaultNamePrefix ?? FIREBLOCKS_VAULT_NAME_PREFIX) || '';
+    const basePrefix =
+      configuredPrefix.trim().length > 0
+        ? configuredPrefix.trim()
+        : FIREBLOCKS_VAULT_NAME_PREFIX;
+    const normalizedPrefix = basePrefix.endsWith(':')
+      ? basePrefix
+      : `${basePrefix}:`;
+    return `${normalizedPrefix}${suffix}`;
   }
 
   // eslint-disable-next-line @typescript-eslint/require-await

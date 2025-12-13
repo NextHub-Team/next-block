@@ -32,21 +32,13 @@ import {
   FireblocksVaultAccountDto,
   FireblocksVaultAssetDto,
 } from '../../dto/fireblocks-wallet.dto';
+import {
+  CreateVaultWalletRequestDto,
+  EnsureVaultWalletOptionsDto,
+  FireblocksUserIdentityDto,
+  UpdateCustodialWalletDto,
+} from '../../dto/fireblocks-vault-requests.dto';
 import { FireblocksCwMapper } from '../../helpers/fireblocks-cw.mapper';
-
-export interface FireblocksUserIdentity {
-  userId: string | number;
-  providerId?: string | null;
-}
-
-export interface CreateVaultWalletRequest {
-  name: string;
-  assetId: string;
-  customerRefId?: string;
-  hiddenOnUI?: boolean;
-  addressDescription?: string;
-  idempotencyKey?: string;
-}
 
 export interface CustodialWalletResult {
   vaultAccount: VaultAccount;
@@ -57,13 +49,6 @@ export interface CustodialWalletResult {
 export interface VaultAssetAddressesResult {
   vaultAccount: FireblocksVaultAccountDto;
   addresses: Record<string, FireblocksDepositAddressDto>;
-}
-
-export interface UpdateCustodialWalletCommand {
-  name?: string;
-  autoFuel?: boolean;
-  customerRefId?: string;
-  hiddenOnUI?: boolean;
 }
 
 /**
@@ -90,14 +75,9 @@ export class CwVaultService {
    * Ensure a user's vault account, asset wallet, and deposit address exist for a specific asset.
    */
   async ensureUserVaultWalletForAsset(
-    user: FireblocksUserIdentity,
+    user: FireblocksUserIdentityDto,
     assetId: string,
-    options?: {
-      hiddenOnUI?: boolean;
-      autoFuel?: boolean;
-      addressDescription?: string;
-      idempotencyKey?: string;
-    },
+    options?: EnsureVaultWalletOptionsDto,
   ): Promise<FireblocksCustodialWalletDto> {
     const sdk = this.sdk;
 
@@ -105,12 +85,12 @@ export class CwVaultService {
       user.userId,
       user.providerId,
     );
-    const customerRefId = vaultName;
+    const customerRefId = `${user.userId}`;
     const vaultAccount = await this.resolveVaultAccount(sdk, {
       vaultName,
       customerRefId,
-      hiddenOnUI: options?.hiddenOnUI,
-      autoFuel: options?.autoFuel,
+      hiddenOnUI: options?.hiddenOnUI ?? true,
+      autoFuel: options?.autoFuel ?? false,
       idempotencyKey: options?.idempotencyKey,
     });
 
@@ -193,7 +173,7 @@ export class CwVaultService {
    * Create a new vault account with a single asset wallet and deposit address.
    */
   async createVaultWalletForAsset(
-    command: CreateVaultWalletRequest,
+    command: CreateVaultWalletRequestDto,
   ): Promise<FireblocksCustodialWalletDto> {
     const sdk = this.sdk;
     const { name, assetId, customerRefId, hiddenOnUI, addressDescription } =
@@ -268,7 +248,7 @@ export class CwVaultService {
    */
   async updateVaultAccountDetails(
     vaultAccountId: string,
-    updates: UpdateCustodialWalletCommand,
+    updates: UpdateCustodialWalletDto,
   ): Promise<FireblocksVaultAccountDto> {
     const sdk = this.sdk;
 
@@ -646,7 +626,7 @@ export class CwVaultService {
     sdk: ReturnType<FireblocksCwService['getSdk']>,
     params: {
       vaultName: string;
-      customerRefId?: string;
+      customerRefId: string;
       hiddenOnUI?: boolean;
       autoFuel?: boolean;
       idempotencyKey?: string;
@@ -662,6 +642,17 @@ export class CwVaultService {
     );
 
     if (existing) {
+      if (
+        params.customerRefId &&
+        existing.customerRefId !== params.customerRefId
+      ) {
+        await sdk.vaults.setVaultAccountCustomerRefId({
+          vaultAccountId: existing.id as string,
+          idempotencyKey: params.idempotencyKey,
+          setCustomerRefIdRequest: { customerRefId: params.customerRefId },
+        });
+        existing.customerRefId = params.customerRefId;
+      }
       this.logger.log(
         `Reusing existing Fireblocks vault account ${existing.id} for ${params.vaultName}`,
       );
@@ -671,9 +662,10 @@ export class CwVaultService {
     const created = await sdk.vaults.createVaultAccount({
       createVaultAccountRequest: {
         name: params.vaultName,
+        // Use backend user id as customerRefId; keep name human-readable for Console
         customerRefId: params.customerRefId,
-        hiddenOnUI: params.hiddenOnUI,
-        autoFuel: params.autoFuel ?? true,
+        hiddenOnUI: params.hiddenOnUI ?? true,
+        autoFuel: params.autoFuel ?? false,
       },
       idempotencyKey: params.idempotencyKey,
     });
@@ -741,6 +733,18 @@ export class CwVaultService {
 
       const firstAddress = existing.data?.addresses?.[0];
       if (firstAddress?.address) {
+        if (params.customerRefId && !firstAddress.customerRefId) {
+          await sdk.vaults.setCustomerRefIdForAddress({
+            vaultAccountId: params.vaultAccountId,
+            assetId: params.assetId,
+            addressId: firstAddress.address as string,
+            idempotencyKey: params.idempotencyKey,
+            setCustomerRefIdForAddressRequest: {
+              customerRefId: params.customerRefId,
+            },
+          });
+          firstAddress.customerRefId = params.customerRefId;
+        }
         return firstAddress as CreateAddressResponse;
       }
     } catch {
