@@ -21,6 +21,6 @@ export class CwAdminService {
   async getUserWallets(
     customerRefId: string,
   ): Promise<FireblocksUserPortfolioDto> {
-    return this.vaults.getUserWallets(customerRefId);
+    return this.vaults.fetchUserPortfolioByCustomerRefId(customerRefId);
   }
 }

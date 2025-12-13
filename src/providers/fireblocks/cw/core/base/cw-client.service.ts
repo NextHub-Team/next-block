@@ -26,7 +26,7 @@ export class CwClientService {
   async createWallet(
     command: CreateVaultWalletRequest,
   ): Promise<FireblocksCustodialWalletDto> {
-    return this.vaults.createCustodialWallet(command);
+    return this.vaults.createVaultWalletForAsset(command);
   }
 
   async ensureUserWallet(
@@ -39,6 +39,10 @@ export class CwClientService {
       idempotencyKey?: string;
     },
   ): Promise<FireblocksCustodialWalletDto> {
-    return this.vaults.ensureUserCustodialWallet(user, assetId, options);
+    return this.vaults.ensureUserVaultWalletForAsset(
+      user,
+      assetId,
+      options,
+    );
   }
 }

@@ -111,10 +111,10 @@ export class FireblocksCwService
     userId: number | string,
     fallbackProviderId?: string | null,
   ): Promise<string> {
-    const prefix = this.options.vaultNamePrefix || FIREBLOCKS_VAULT_NAME_PREFIX;
+    const prefix = this.options.vaultNamePrefix ?? FIREBLOCKS_VAULT_NAME_PREFIX;
     const user = await this.usersService.findById(userId);
     const suffix = user?.socialId ?? fallbackProviderId ?? userId;
-    return `${prefix}-${suffix}`;
+    return prefix ? `${prefix}-${suffix}` : `${suffix}`;
   }
 
   // eslint-disable-next-line @typescript-eslint/require-await
@@ -152,10 +152,12 @@ export class FireblocksCwService
     if (!this.fireblocksSdk) return;
 
     try {
-      await this.fireblocksSdk.vaults.getPagedVaultAccounts({ limit: 1 });
-      this.logger.log('Fireblocks connection is OK.');
+      const { data } =
+        await this.fireblocksSdk.workspaceStatusBeta.getWorkspaceStatus();
+      const status = data?.status ?? 'unknown';
+      this.logger.log(`Fireblocks health check OK (status: ${status}).`);
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : `${error}`;
+      const message = this.formatError(error);
       this.logger.warn(`Fireblocks connectivity check failed: ${message}`);
     }
   }
@@ -246,11 +248,12 @@ export class FireblocksCwService
     const fireblocksConfig = this.configService.getOrThrow('fireblocks', {
       infer: true,
     });
+    const secretKey = this.normalizeSecretKey(fireblocksConfig.secretKey);
 
     return {
       enable,
       apiKey: fireblocksConfig.apiKey,
-      secretKey: fireblocksConfig.secretKey,
+      secretKey,
       envType: fireblocksConfig.envType,
       requestTimeoutMs: fireblocksConfig.requestTimeoutMs,
       maxRetries: fireblocksConfig.maxRetries,
@@ -259,5 +262,71 @@ export class FireblocksCwService
       debugLogging: fireblocksConfig.debugLogging,
       vaultNamePrefix: fireblocksConfig.vaultNamePrefix,
     } satisfies FireblocksClientOptions;
+  }
+
+  /**
+   * Normalize PEM strings that are provided via environment variables.
+   * Many setups store the key on a single line using escaped newlines,
+   * which must be converted back before passing to JWT.
+   */
+  private normalizeSecretKey(secretKey: string): string {
+    if (!secretKey) return secretKey;
+    return secretKey.includes('\\n')
+      ? secretKey.replace(/\\n/g, '\n')
+      : secretKey;
+  }
+
+  /**
+   * Format SDK or HTTP errors so we log a helpful message instead of [object Object].
+   */
+  private formatError(error: unknown): string {
+    if (!error) return 'Unknown error';
+
+    if (error instanceof Error) {
+      const response = (error as any).response;
+      const status = response?.status ?? (error as any).status;
+      const code = (error as any).code;
+      const data = response?.data ?? (error as any).data;
+      const parts: string[] = [error.message];
+      if (status) parts.push(`status=${status}`);
+      if (code) parts.push(`code=${code}`);
+      if (data) {
+        try {
+          parts.push(`data=${JSON.stringify(data)}`);
+        } catch {
+          parts.push(`data=${String(data)}`);
+        }
+      }
+      return parts.filter(Boolean).join(' | ');
+    }
+
+    if (typeof error === 'object') {
+      const anyError = error as Record<string, any>;
+      const response = anyError.response;
+      const status =
+        response?.status ?? anyError.status ?? anyError.statusCode;
+      const code = anyError.code ?? anyError.errorCode;
+      const msg = anyError.message ?? anyError.error ?? anyError.title;
+      const data = response?.data ?? anyError.data ?? anyError.body;
+      const parts: string[] = [];
+      if (msg) parts.push(String(msg));
+      if (status) parts.push(`status=${status}`);
+      if (code) parts.push(`code=${code}`);
+      if (data) {
+        try {
+          parts.push(`data=${JSON.stringify(data)}`);
+        } catch {
+          parts.push(`data=${String(data)}`);
+        }
+      }
+      if (parts.length) return parts.join(' | ');
+      try {
+        return JSON.stringify(error);
+      } catch {
+        return `${error}`;
+      }
+    }
+
+    return String(error);
   }
 }
