@@ -152,11 +152,17 @@ export class FireblocksCwService
     if (!this.fireblocksSdk) return;
 
     try {
-      const { data } =
-        await this.fireblocksSdk.workspaceStatusBeta.getWorkspaceStatus();
-      const status = data?.status ?? 'unknown';
+      const data = await this.fireblocksSdk.web3Connections.get(); // Simple call to verify connectivity
+      const status = data.statusCode;
       this.logger.log(`Fireblocks health check OK (status: ${status}).`);
     } catch (error: unknown) {
+      const ok = this.isOkErrorResponse(error);
+      if (ok.isOk) {
+        this.logger.log(
+          `Fireblocks health check OK (status: ${ok.status ?? 'unknown'}).`,
+        );
+        return;
+      }
       const message = this.formatError(error);
       this.logger.warn(`Fireblocks connectivity check failed: ${message}`);
     }
@@ -284,7 +290,8 @@ export class FireblocksCwService
 
     if (error instanceof Error) {
       const response = (error as any).response;
-      const status = response?.status ?? (error as any).status;
+      const status =
+        response?.status ?? response?.statusCode ?? (error as any).status;
       const code = (error as any).code;
       const data = response?.data ?? (error as any).data;
       const parts: string[] = [error.message];
@@ -304,7 +311,10 @@ export class FireblocksCwService
       const anyError = error as Record<string, any>;
       const response = anyError.response;
       const status =
-        response?.status ?? anyError.status ?? anyError.statusCode;
+        response?.status ??
+        response?.statusCode ??
+        anyError.status ??
+        anyError.statusCode;
       const code = anyError.code ?? anyError.errorCode;
       const msg = anyError.message ?? anyError.error ?? anyError.title;
       const data = response?.data ?? anyError.data ?? anyError.body;
@@ -328,5 +338,32 @@ export class FireblocksCwService
     }
 
     return String(error);
+  }
+
+  /**
+   * Some Fireblocks SDK errors wrap a response with { message: 'ok', code: 0 }.
+   * Only treat that as success if the HTTP status is < 400 (or missing).
+   */
+  private isOkErrorResponse(error: unknown): {
+    isOk: boolean;
+    status?: number;
+  } {
+    if (!error || typeof error !== 'object') return { isOk: false };
+    const response = (error as any).response;
+    const data = response?.data ?? (error as any).data;
+    const status =
+      response?.status ??
+      response?.statusCode ??
+      (response?.data?.status as any);
+
+    if (
+      (status === undefined || (typeof status === 'number' && status < 400)) &&
+      data?.message === 'ok' &&
+      (data?.code === 0 || data?.status === 'ok')
+    ) {
+      return { isOk: true, status };
+    }
+
+    return { isOk: false, status };
   }
 }

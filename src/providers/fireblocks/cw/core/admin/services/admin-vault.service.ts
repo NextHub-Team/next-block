@@ -10,11 +10,15 @@ import {
   VaultAccount,
   VaultAccountsPagedResponse,
   VaultAsset,
+  GetAPIUsersResponse,
+  GetConsoleUsersResponse,
+  GetUsersResponse,
 } from '@fireblocks/ts-sdk';
 import { AllConfigType } from '../../../../../../config/config.type';
 import { FireblocksCwService } from '../../../fireblocks-cw.service';
 import { FireblocksUserPortfolioDto } from '../../../dto/fireblocks-wallet.dto';
 import { FireblocksCwMapper } from '../../../helpers/fireblocks-cw.mapper';
+import { FireblocksSdkResponse } from '../../../types/fireblocks-base.type';
 import { AbstractCwService } from '../../base/abstract-cw.service';
 
 @Injectable()
@@ -41,26 +45,25 @@ export class AdminVaultService extends AbstractCwService {
     after?: string,
     assetId?: string,
     namePrefix?: string,
-  ): Promise<VaultAccountsPagedResponse> {
+  ): Promise<FireblocksSdkResponse<VaultAccountsPagedResponse>> {
     this.guardEnabledAndLog();
-    const response = await this.sdk.vaults.getPagedVaultAccounts({
+    return this.sdk.vaults.getPagedVaultAccounts({
       limit,
       before,
       after,
       assetId,
       namePrefix,
     });
-
-    return response.data as VaultAccountsPagedResponse;
   }
 
   /**
    * Fetch a vault account by id.
    */
-  async fetchVaultAccountById(vaultAccountId: string): Promise<VaultAccount> {
+  async fetchVaultAccountById(
+    vaultAccountId: string,
+  ): Promise<FireblocksSdkResponse<VaultAccount>> {
     this.guardEnabledAndLog();
-    const response = await this.sdk.vaults.getVaultAccount({ vaultAccountId });
-    return response.data as VaultAccount;
+    return this.sdk.vaults.getVaultAccount({ vaultAccountId });
   }
 
   /**
@@ -69,14 +72,12 @@ export class AdminVaultService extends AbstractCwService {
   async fetchVaultAccountAsset(
     vaultAccountId: string,
     assetId: string,
-  ): Promise<VaultAsset> {
+  ): Promise<FireblocksSdkResponse<VaultAsset>> {
     this.guardEnabledAndLog();
-    const response = await this.sdk.vaults.getVaultAccountAsset({
+    return this.sdk.vaults.getVaultAccountAsset({
       vaultAccountId,
       assetId,
     });
-
-    return response.data as VaultAsset;
   }
 
   /**
@@ -87,16 +88,14 @@ export class AdminVaultService extends AbstractCwService {
     before?: string,
     after?: string,
     assetId?: string,
-  ): Promise<PaginatedAssetWalletResponse> {
+  ): Promise<FireblocksSdkResponse<PaginatedAssetWalletResponse>> {
     this.guardEnabledAndLog();
-    const response = await this.sdk.vaults.getAssetWallets({
+    return this.sdk.vaults.getAssetWallets({
       assetId,
       limit,
       before,
       after,
     });
-
-    return response.data as PaginatedAssetWalletResponse;
   }
 
   /**
@@ -112,7 +111,7 @@ export class AdminVaultService extends AbstractCwService {
       undefined,
       customerRefId,
     );
-    const accounts = (paged.accounts || []).filter(
+    const accounts = (paged.data?.accounts || []).filter(
       (account) => (account as VaultAccount).customerRefId === customerRefId,
     );
 
@@ -128,14 +127,12 @@ export class AdminVaultService extends AbstractCwService {
   async bulkCreateVaultAccounts(
     request: CreateMultipleAccountsRequest,
     idempotencyKey?: string,
-  ): Promise<JobCreated> {
+  ): Promise<FireblocksSdkResponse<JobCreated>> {
     this.guardEnabledAndLog();
-    const response = await this.sdk.vaults.createMultipleAccounts({
+    return this.sdk.vaults.createMultipleAccounts({
       createMultipleAccountsRequest: request,
       idempotencyKey,
     });
-
-    return response.data as JobCreated;
   }
 
   /**
@@ -143,12 +140,9 @@ export class AdminVaultService extends AbstractCwService {
    */
   async fetchBulkCreateVaultAccountsJobStatus(
     jobId: string,
-  ): Promise<CreateMultipleVaultAccountsJobStatus> {
+  ): Promise<FireblocksSdkResponse<CreateMultipleVaultAccountsJobStatus>> {
     this.guardEnabledAndLog();
-    const response =
-      await this.sdk.vaults.getCreateMultipleVaultAccountsJobStatus({ jobId });
-
-    return response.data as CreateMultipleVaultAccountsJobStatus;
+    return this.sdk.vaults.getCreateMultipleVaultAccountsJobStatus({ jobId });
   }
 
   /**
@@ -157,14 +151,12 @@ export class AdminVaultService extends AbstractCwService {
   async bulkCreateDepositAddresses(
     request: CreateMultipleDepositAddressesRequest,
     idempotencyKey?: string,
-  ): Promise<JobCreated> {
+  ): Promise<FireblocksSdkResponse<JobCreated>> {
     this.guardEnabledAndLog();
-    const response = await this.sdk.vaults.createMultipleDepositAddresses({
+    return this.sdk.vaults.createMultipleDepositAddresses({
       createMultipleDepositAddressesRequest: request,
       idempotencyKey,
     });
-
-    return response.data as JobCreated;
   }
 
   /**
@@ -172,13 +164,36 @@ export class AdminVaultService extends AbstractCwService {
    */
   async fetchBulkCreateDepositAddressesJobStatus(
     jobId: string,
-  ): Promise<CreateMultipleDepositAddressesJobStatus> {
+  ): Promise<FireblocksSdkResponse<CreateMultipleDepositAddressesJobStatus>> {
     this.guardEnabledAndLog();
-    const response =
-      await this.sdk.vaults.getCreateMultipleDepositAddressesJobStatus({
-        jobId,
-      });
+    return this.sdk.vaults.getCreateMultipleDepositAddressesJobStatus({
+      jobId,
+    });
+  }
 
-    return response.data as CreateMultipleDepositAddressesJobStatus;
+  /**
+   * List all workspace users (Admin API key required).
+   */
+  async listUsers(): Promise<FireblocksSdkResponse<GetUsersResponse>> {
+    this.guardEnabledAndLog();
+    return this.sdk.users.getUsers();
+  }
+
+  /**
+   * List all API users (Admin API key required).
+   */
+  async listApiUsers(): Promise<FireblocksSdkResponse<GetAPIUsersResponse>> {
+    this.guardEnabledAndLog();
+    return this.sdk.apiUser.getApiUsers();
+  }
+
+  /**
+   * List all console users (Admin API key required).
+   */
+  async listConsoleUsers(): Promise<
+    FireblocksSdkResponse<GetConsoleUsersResponse>
+  > {
+    this.guardEnabledAndLog();
+    return this.sdk.consoleUser.getConsoleUsers();
   }
 }

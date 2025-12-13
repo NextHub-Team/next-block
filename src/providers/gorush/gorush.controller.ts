@@ -50,7 +50,7 @@ import {
 @RequireServiceReady(GorushService) // service readiness check
 @ApiBearerAuth()
 @Roles(RoleEnum.admin)
-@ApiTags('GoRush')
+@ApiTags('GoRush-Notification')
 @Controller({
   path: 'gorush',
   version: GORUSH_SDK_VERSION,

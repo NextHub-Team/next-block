@@ -50,7 +50,7 @@ import { EnableGuard } from 'src/common/guards/service-enabled.guard';
 @UseGuards(AuthGuard('jwt'), RolesGuard, EnableGuard)
 @RequireEnabled('minIO.enable') // config-based toggle
 @RequireServiceReady(MinioService) // service readiness check
-@ApiTags('MinIO')
+@ApiTags('MinIO-Storage')
 @ApiBearerAuth()
 @Controller('minio')
 export class MinioController {

@@ -1,3 +1,4 @@
+import type { FireblocksResponse } from '@fireblocks/ts-sdk';
 import { FireblocksEnvironmentType } from './fireblocks-enum.type';
 
 export type FireblocksClientOptions = {
@@ -19,3 +20,5 @@ export type FireblocksClientOptions = {
   debugLogging: boolean;
   vaultNamePrefix: string;
 };
+
+export type FireblocksSdkResponse<T> = FireblocksResponse<T>;
