@@ -3,18 +3,12 @@ import { FireblocksUserPortfolioDto } from '../../dto/fireblocks-wallet.dto';
 import { FireblocksResponseEnvelopeDto } from '../../dto/fireblocks-response.dto';
 import { FireblocksResilienceService } from '../shared/fireblocks-resilience.service';
 import { AdminVaultService } from '../admin/services/admin-vault.service';
-import { AdminDestinationsService } from '../admin/services/admin-destinations.service';
-import { AdminGasOperationsService } from '../admin/services/admin-gas-operations.service';
-import { AdminSecurityService } from '../admin/services/admin-security.service';
 import { AdminWithdrawalsService } from '../admin/services/admin-withdrawals.service';
 
 @Injectable()
 export class CwAdminService {
   constructor(
-    public readonly security: AdminSecurityService,
-    public readonly destinations: AdminDestinationsService,
     public readonly withdrawals: AdminWithdrawalsService,
-    public readonly gasOperations: AdminGasOperationsService,
     public readonly vaults: AdminVaultService,
     public readonly resilience: FireblocksResilienceService,
   ) {}
