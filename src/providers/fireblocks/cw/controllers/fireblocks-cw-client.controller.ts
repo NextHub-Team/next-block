@@ -44,7 +44,7 @@ import { FireblocksCwService } from '../fireblocks-cw.service';
 @RequireEnabled('fireblocks.enable')
 @RequireServiceReady(FireblocksCwService)
 @Controller({ path: 'vaults', version: '1' })
-@Roles(RoleEnum.admin)
+@Roles(RoleEnum.admin, RoleEnum.user)
 export class FireblocksCwClientController {
   constructor(private readonly client: FireblocksCwClientService) {}
 
@@ -52,6 +52,7 @@ export class FireblocksCwClientController {
   @ApiOkResponse({ type: FireblocksVaultAccountDto, isArray: true })
   @ApiOperationRoles('List Fireblocks vault accounts for the current user', [
     RoleEnum.admin,
+    RoleEnum.user,
   ])
   listMyVaultAccounts(
     @Request() req: RequestWithUser,
@@ -63,6 +64,7 @@ export class FireblocksCwClientController {
   @ApiOkResponse({ type: FireblocksVaultAccountWalletDto, isArray: true })
   @ApiOperationRoles('List all Fireblocks vault wallets for the current user', [
     RoleEnum.admin,
+    RoleEnum.user,
   ])
   listMyVaultWallets(
     @Request() req: RequestWithUser,
@@ -78,7 +80,7 @@ export class FireblocksCwClientController {
   @ApiOkResponse({ type: FireblocksVaultAssetDto, isArray: true })
   @ApiOperationRoles(
     'List wallets within a specific Fireblocks vault account for the current user',
-    [RoleEnum.admin],
+    [RoleEnum.admin, RoleEnum.user],
   )
   listMyVaultAccountWallets(
     @Request() req: RequestWithUser,
@@ -99,7 +101,7 @@ export class FireblocksCwClientController {
   @ApiOkResponse({ type: FireblocksVaultAssetDto })
   @ApiOperationRoles(
     'Fetch a specific wallet in a Fireblocks vault account for the current user',
-    [RoleEnum.admin],
+    [RoleEnum.admin, RoleEnum.user],
   )
   getMyVaultAccountWallet(
     @Request() req: RequestWithUser,
@@ -118,6 +120,7 @@ export class FireblocksCwClientController {
   @ApiCreatedResponse({ type: FireblocksCustodialWalletDto })
   @ApiOperationRoles('Create a Fireblocks vault wallet for an asset', [
     RoleEnum.admin,
+    RoleEnum.user,
   ])
   createVaultWallet(
     @Request() req: RequestWithUser,
@@ -134,7 +137,7 @@ export class FireblocksCwClientController {
   @ApiOkResponse({ type: FireblocksCustodialWalletDto })
   @ApiOperationRoles(
     'Ensure the vault wallet and deposit address for a user asset',
-    [RoleEnum.admin],
+    [RoleEnum.admin, RoleEnum.user],
   )
   ensureUserWallet(
     @Request() req: RequestWithUser,

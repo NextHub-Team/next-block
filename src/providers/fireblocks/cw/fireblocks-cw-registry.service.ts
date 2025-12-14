@@ -1,10 +1,9 @@
 import { Injectable, Type } from '@nestjs/common';
 import { FireblocksCwAdminVaultModule } from './modules/fireblocks-cw-admin-vault.module';
-import { FireblocksCwVaultModule } from './modules/fireblocks-cw-vault.module';
 
 const ADMIN_MODULES: Array<Type> = [FireblocksCwAdminVaultModule];
 
-const NON_ADMIN_MODULES: Array<Type> = [FireblocksCwVaultModule];
+const NON_ADMIN_MODULES: Array<Type> = [];
 
 @Injectable()
 export class FireblocksCwRegistryService {

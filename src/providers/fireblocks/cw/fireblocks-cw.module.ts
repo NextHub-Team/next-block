@@ -9,7 +9,6 @@ import { FireblocksCwClientController } from './controllers/fireblocks-cw-client
 import { FireblocksCwAdminService } from './services/fireblocks-cw-admin.service';
 import { FireblocksCwClientService } from './services/fireblocks-cw-client.service';
 import { FireblocksCwAdminVaultModule } from './modules/fireblocks-cw-admin-vault.module';
-import { FireblocksCwVaultModule } from './modules/fireblocks-cw-vault.module';
 
 @Module({
   imports: [
@@ -17,7 +16,6 @@ import { FireblocksCwVaultModule } from './modules/fireblocks-cw-vault.module';
     FireblocksWebhookModule,
     FireblocksCwRegistryModule,
     FireblocksCwAdminVaultModule,
-    FireblocksCwVaultModule,
     RouterModule.register([
       {
         path: 'fireblocks/cw',

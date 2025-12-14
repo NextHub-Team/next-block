@@ -96,10 +96,10 @@ AWS_SECRETS_MANAGER_DEBUG=false
 ########################################
 # Notifications - Gorush
 ########################################
+GORUSH_ENABLE=false
 GORUSH_REQUEST_TIMEOUT=5000
 GORUSH_URL=http://example.com:8088
 GORUSH_GRPC_PORT=9000
-GORUSH_ENABLE=false
 
 ########################################
 # CoinMarketCap market data (CMC)
