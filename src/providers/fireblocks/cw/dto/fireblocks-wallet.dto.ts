@@ -164,6 +164,27 @@ export class FireblocksCustodialWalletDto {
 }
 
 @Exclude()
+export class FireblocksVaultAccountWalletDto {
+  @ApiProperty({
+    description: 'Parent vault account metadata',
+    type: () => FireblocksVaultAccountDto,
+  })
+  @ValidateNested()
+  @Type(() => FireblocksVaultAccountDto)
+  @Expose()
+  vaultAccount!: FireblocksVaultAccountDto;
+
+  @ApiProperty({
+    description: 'Specific asset wallet information',
+    type: () => FireblocksVaultAssetDto,
+  })
+  @ValidateNested()
+  @Type(() => FireblocksVaultAssetDto)
+  @Expose()
+  wallet!: FireblocksVaultAssetDto;
+}
+
+@Exclude()
 export class FireblocksAssetMetadataDto {
   @ApiProperty({ description: 'Asset id', example: 'ETH' })
   @IsString()

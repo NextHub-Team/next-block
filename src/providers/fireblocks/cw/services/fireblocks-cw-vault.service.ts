@@ -22,7 +22,7 @@ import {
   VaultAsset,
   VaultActionStatus,
 } from '@fireblocks/ts-sdk';
-import { FireblocksCwService } from '../../fireblocks-cw.service';
+import { FireblocksCwService } from '../fireblocks-cw.service';
 import {
   FireblocksAssetMetadataDto,
   FireblocksBlockchainDto,
@@ -31,14 +31,14 @@ import {
   FireblocksUserPortfolioDto,
   FireblocksVaultAccountDto,
   FireblocksVaultAssetDto,
-} from '../../dto/fireblocks-wallet.dto';
+} from '../dto/fireblocks-wallet.dto';
 import {
   CreateVaultWalletRequestDto,
   EnsureVaultWalletOptionsDto,
   FireblocksUserIdentityDto,
   UpdateCustodialWalletDto,
-} from '../../dto/fireblocks-vault-requests.dto';
-import { FireblocksCwMapper } from '../../helpers/fireblocks-cw.mapper';
+} from '../dto/fireblocks-vault-requests.dto';
+import { FireblocksCwMapper } from '../helpers/fireblocks-cw.mapper';
 
 export interface CustodialWalletResult {
   vaultAccount: VaultAccount;
@@ -55,8 +55,8 @@ export interface VaultAssetAddressesResult {
  * Consolidated vault operations combining deposit and portfolio features.
  */
 @Injectable()
-export class CwVaultService {
-  private readonly logger = new Logger(CwVaultService.name);
+export class FireblocksCwVaultService {
+  private readonly logger = new Logger(FireblocksCwVaultService.name);
 
   constructor(
     @Inject(forwardRef(() => FireblocksCwService))

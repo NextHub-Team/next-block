@@ -1,4 +1,9 @@
-import { Inject, Injectable, forwardRef } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  forwardRef,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   CreateMultipleAccountsRequest,
@@ -7,32 +12,36 @@ import {
   CreateMultipleVaultAccountsJobStatus,
   JobCreated,
   VaultAccount,
+  VaultAsset,
   GetAPIUsersResponse,
   GetConsoleUsersResponse,
   GetUsersResponse,
 } from '@fireblocks/ts-sdk';
-import { AllConfigType } from '../../../../../../config/config.type';
-import { FireblocksCwService } from '../../../fireblocks-cw.service';
-import { FireblocksUserPortfolioDto } from '../../../dto/fireblocks-wallet.dto';
+import { AllConfigType } from '../../../../config/config.type';
+import { FireblocksCwService } from '../fireblocks-cw.service';
+import { FireblocksUserPortfolioDto } from '../dto/fireblocks-wallet.dto';
 import {
   FireblocksAssetWalletsPageResponseDto,
   FireblocksResponseEnvelopeDto,
+  FireblocksSpecialAddressItemDto,
+  FireblocksSpecialAddressesResponseDto,
   FireblocksVaultAccountResponseDto,
   FireblocksVaultAccountsPageResponseDto,
   FireblocksVaultAssetResponseDto,
-} from '../../../dto/fireblocks-response.dto';
-import { FireblocksCwMapper } from '../../../helpers/fireblocks-cw.mapper';
-import { AbstractCwService } from '../../base/abstract-cw.service';
-import { FireblocksVaultResponseMapper } from '../../../infrastructure/persistence/relational/mappers/fireblocks-vault-response.mapper';
+} from '../dto/fireblocks-response.dto';
+import { FireblocksSpecialAddressesRequestDto } from '../dto/fireblocks-vault-requests.dto';
+import { FireblocksCwMapper } from '../helpers/fireblocks-cw.mapper';
+import { AbstractCwService } from '../base/abstract-cw.service';
+import { FireblocksVaultResponseMapper } from '../infrastructure/persistence/relational/mappers/fireblocks-vault-response.mapper';
 
 @Injectable()
-export class AdminVaultService extends AbstractCwService {
+export class FireblocksCwAdminVaultService extends AbstractCwService {
   constructor(
     @Inject(forwardRef(() => FireblocksCwService))
     private readonly fireblocks: FireblocksCwService,
     configService: ConfigService<AllConfigType>,
   ) {
-    super(AdminVaultService.name, configService);
+    super(FireblocksCwAdminVaultService.name, configService);
   }
 
   private get sdk(): ReturnType<FireblocksCwService['getSdk']> {
@@ -201,6 +210,78 @@ export class AdminVaultService extends AbstractCwService {
   }
 
   /**
+   * Create special deposit addresses for a set of assets in a vault account.
+   */
+  async createSpecialAddressesForAssets(
+    request: FireblocksSpecialAddressesRequestDto,
+  ): Promise<
+    FireblocksResponseEnvelopeDto<FireblocksSpecialAddressesResponseDto>
+  > {
+    this.guardEnabledAndLog();
+
+    const {
+      assets,
+      vaultAccountId,
+      customerRefId,
+      addressDescription,
+      idempotencyKey,
+    } = request;
+
+    if (!assets?.length) {
+      throw new BadRequestException(
+        'At least one asset is required to create special addresses',
+      );
+    }
+
+    const vaultAccountResponse = await this.sdk.vaults.getVaultAccount({
+      vaultAccountId,
+    });
+
+    const vaultAccount = vaultAccountResponse.data as VaultAccount;
+    const vaultAccountDto = FireblocksCwMapper.toVaultAccountDto(
+      vaultAccount,
+      vaultAccount.assets as VaultAsset[] | undefined,
+    );
+
+    const createdAddresses: FireblocksSpecialAddressItemDto[] = [];
+
+    for (const asset of assets) {
+      await this.ensureVaultAsset(
+        vaultAccountId,
+        asset.assetId,
+        idempotencyKey,
+      );
+
+      const depositAddress =
+        await this.sdk.vaults.createVaultAccountAssetAddress({
+          vaultAccountId,
+          assetId: asset.assetId,
+          createAddressRequest: {
+            description: asset.description ?? addressDescription,
+            customerRefId,
+          },
+          idempotencyKey,
+        });
+
+      createdAddresses.push({
+        assetId: asset.assetId,
+        depositAddress: FireblocksCwMapper.toDepositAddressDto(
+          depositAddress.data,
+        ),
+      });
+    }
+
+    return {
+      statusCode: vaultAccountResponse.statusCode,
+      headers: vaultAccountResponse.headers,
+      data: {
+        vaultAccount: vaultAccountDto,
+        addresses: createdAddresses,
+      },
+    };
+  }
+
+  /**
    * List all workspace users (Admin API key required).
    */
   async listUsers(): Promise<FireblocksResponseEnvelopeDto<GetUsersResponse>> {
@@ -229,5 +310,36 @@ export class AdminVaultService extends AbstractCwService {
     this.guardEnabledAndLog();
     const response = await this.sdk.consoleUser.getConsoleUsers();
     return FireblocksVaultResponseMapper.envelope(response);
+  }
+
+  private async ensureVaultAsset(
+    vaultAccountId: string,
+    assetId: string,
+    idempotencyKey?: string,
+  ): Promise<VaultAsset> {
+    try {
+      const response = await this.sdk.vaults.getVaultAccountAsset({
+        vaultAccountId,
+        assetId,
+      });
+      if (response?.data) {
+        return response.data as VaultAsset;
+      }
+    } catch (error: unknown) {
+      this.logger.warn(
+        `Vault asset ${assetId} not found for account ${vaultAccountId}; creating wallet...`,
+      );
+      if (error instanceof Error) {
+        this.logger.debug(error.message);
+      }
+    }
+
+    const created = await this.sdk.vaults.createVaultAccountAsset({
+      vaultAccountId,
+      assetId,
+      idempotencyKey,
+    });
+
+    return created.data as VaultAsset;
   }
 }

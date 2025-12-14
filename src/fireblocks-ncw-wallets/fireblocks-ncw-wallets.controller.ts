@@ -29,7 +29,7 @@ import { FindAllFireblocksNcwWalletsDto } from './dto/find-all-fireblocks-ncw-wa
 import { RegisterApiTag } from '../common/api-docs/decorators/register-api-tag.decorator';
 
 @RegisterApiTag(
-  'Fireblocks - NCW',
+  'Fireblocks-NCW',
   'The Fireblocks Embedded Wallet (Non-Custodial Wallet: NCW)',
   'https://ncw-developers.fireblocks.com/docs/getting-started',
 )
@@ -37,7 +37,7 @@ import { RegisterApiTag } from '../common/api-docs/decorators/register-api-tag.d
 @UseGuards(AuthGuard('jwt'))
 @Controller({
   path: 'fireblocks/ncw',
-  version: '11',
+  version: '1',
 })
 export class FireblocksNcwWalletsController {
   constructor(

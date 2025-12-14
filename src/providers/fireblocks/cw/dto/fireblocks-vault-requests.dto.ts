@@ -1,6 +1,13 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Exclude, Expose } from 'class-transformer';
-import { IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { Exclude, Expose, Type } from 'class-transformer';
+import {
+  IsArray,
+  IsBoolean,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 
 @Exclude()
 export class FireblocksUserIdentityDto {
@@ -138,4 +145,73 @@ export class UpdateCustodialWalletDto {
   @IsBoolean()
   @Expose()
   hiddenOnUI?: boolean;
+}
+
+@Exclude()
+export class FireblocksSpecialAddressAssetDto {
+  @ApiProperty({
+    description: 'Asset identifier to create an address for',
+    example: 'USDC',
+  })
+  @IsString()
+  @Expose()
+  assetId!: string;
+
+  @ApiPropertyOptional({
+    description: 'Optional description to apply to the deposit address',
+    example: 'Special deposit',
+  })
+  @IsOptional()
+  @IsString()
+  @Expose()
+  description?: string;
+}
+
+@Exclude()
+export class FireblocksSpecialAddressesRequestDto {
+  @ApiProperty({
+    description:
+      'Vault account identifier where the addresses should be created',
+    example: '123456',
+  })
+  @IsString()
+  @Expose()
+  vaultAccountId!: string;
+
+  @ApiProperty({
+    description: 'Assets that require special deposit addresses',
+    type: () => [FireblocksSpecialAddressAssetDto],
+  })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => FireblocksSpecialAddressAssetDto)
+  @Expose()
+  assets!: FireblocksSpecialAddressAssetDto[];
+
+  @ApiPropertyOptional({
+    description: 'Customer reference id to attach to each new address',
+    example: 'user-ref-123',
+  })
+  @IsOptional()
+  @IsString()
+  @Expose()
+  customerRefId?: string;
+
+  @ApiPropertyOptional({
+    description: 'Fallback description for addresses that do not provide one',
+    example: 'Special deposit',
+  })
+  @IsOptional()
+  @IsString()
+  @Expose()
+  addressDescription?: string;
+
+  @ApiPropertyOptional({
+    description: 'Optional idempotency key for Fireblocks requests',
+    example: 'uuid-special-addresses',
+  })
+  @IsOptional()
+  @IsString()
+  @Expose()
+  idempotencyKey?: string;
 }

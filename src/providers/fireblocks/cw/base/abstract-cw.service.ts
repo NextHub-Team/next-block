@@ -1,10 +1,10 @@
 import { BadRequestException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AllConfigType } from '../../../../../config/config.type';
+import { AllConfigType } from '../../../../config/config.type';
 import {
   FIREBLOCKS_ENABLE,
   FIREBLOCKS_ENV_TYPE,
-} from '../../types/fireblocks-const.type';
+} from '../types/fireblocks-const.type';
 
 export abstract class AbstractCwService {
   protected readonly logger: Logger;

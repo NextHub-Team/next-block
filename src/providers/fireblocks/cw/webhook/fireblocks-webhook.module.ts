@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { FireblocksCoreModule } from '../core/fireblocks-core.module';
+import { FireblocksCoreModule } from '../base/fireblocks-core.module';
 import { WebhookSignatureVerifier } from './webhook-signature-verifier';
 import { WebhookEventDedupeStore } from './webhook-event-dedupe.store';
 import { WebhookEventRouter } from './webhook-event-router';

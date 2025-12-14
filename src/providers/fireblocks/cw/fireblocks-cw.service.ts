@@ -10,8 +10,8 @@ import { Fireblocks } from '@fireblocks/ts-sdk';
 import { AllConfigType } from '../../../config/config.type';
 import { getFireblocksBaseUrl } from './helpers/fireblocks-cw.helper';
 import { FireblocksClientOptions } from './types/fireblocks-base.type';
-import { CwAdminService } from './core/base/cw-admin.service';
-import { CwClientService } from './core/base/cw-client.service';
+import { FireblocksCwAdminService } from './services/fireblocks-cw-admin.service';
+import { FireblocksCwClientService } from './services/fireblocks-cw-client.service';
 import { UsersService } from '../../../users/users.service';
 import {
   FIREBLOCKS_ENABLE,
@@ -35,8 +35,8 @@ export class FireblocksCwService
 {
   private readonly options: FireblocksClientOptions;
   private fireblocksSdk?: Fireblocks;
-  public admin!: CwAdminService;
-  public client!: CwClientService;
+  public admin!: FireblocksCwAdminService;
+  public client!: FireblocksCwClientService;
 
   constructor(
     private readonly configService: ConfigService<AllConfigType>,
@@ -64,8 +64,12 @@ export class FireblocksCwService
     }
 
     this.logger.log('Initializing Fireblocks CW services...');
-    this.admin = this.moduleRef.get(CwAdminService, { strict: false });
-    this.client = this.moduleRef.get(CwClientService, { strict: false });
+    this.admin = this.moduleRef.get(FireblocksCwAdminService, {
+      strict: false,
+    });
+    this.client = this.moduleRef.get(FireblocksCwClientService, {
+      strict: false,
+    });
 
     await this.initializeSdk();
     await this.checkConnection();

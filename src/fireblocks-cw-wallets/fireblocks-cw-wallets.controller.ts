@@ -29,7 +29,7 @@ import { FindAllFireblocksCwWalletsDto } from './dto/find-all-fireblocks-cw-wall
 import { RegisterApiTag } from '../common/api-docs/decorators/register-api-tag.decorator';
 
 @RegisterApiTag(
-  'Fireblocks - CW',
+  'Fireblocks-CW',
   'Direct Custody Wallets managed by Fireblocks',
   'https://developers.fireblocks.com/docs/create-direct-custody-wallets',
 )
@@ -37,7 +37,7 @@ import { RegisterApiTag } from '../common/api-docs/decorators/register-api-tag.d
 @UseGuards(AuthGuard('jwt'))
 @Controller({
   path: 'fireblocks/cw',
-  version: '11',
+  version: '1',
 })
 export class FireblocksCwWalletsController {
   constructor(

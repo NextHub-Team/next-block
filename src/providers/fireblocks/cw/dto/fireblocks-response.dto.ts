@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Exclude, Expose, Type } from 'class-transformer';
+import { IsString, ValidateNested } from 'class-validator';
 import {
   FireblocksBlockchainDto,
   FireblocksCustodialWalletDto,
@@ -163,4 +164,45 @@ export class FireblocksBlockchainListResponseDto extends FireblocksResponseEnvel
   @Expose()
   @Type(() => FireblocksBlockchainDto)
   declare data: FireblocksBlockchainDto[];
+}
+
+@Exclude()
+export class FireblocksSpecialAddressItemDto {
+  @ApiProperty({
+    description: 'Asset identifier for the created address',
+    example: 'ETH',
+  })
+  @IsString()
+  @Expose()
+  assetId!: string;
+
+  @ApiProperty({
+    description: 'Created deposit address for the asset',
+    type: () => FireblocksDepositAddressDto,
+  })
+  @ValidateNested()
+  @Type(() => FireblocksDepositAddressDto)
+  @Expose()
+  depositAddress!: FireblocksDepositAddressDto;
+}
+
+@Exclude()
+export class FireblocksSpecialAddressesResponseDto {
+  @ApiProperty({
+    description: 'Vault account metadata used to create the addresses',
+    type: () => FireblocksVaultAccountDto,
+  })
+  @ValidateNested()
+  @Type(() => FireblocksVaultAccountDto)
+  @Expose()
+  vaultAccount!: FireblocksVaultAccountDto;
+
+  @ApiProperty({
+    description: 'List of created special addresses grouped by asset',
+    type: () => [FireblocksSpecialAddressItemDto],
+  })
+  @ValidateNested({ each: true })
+  @Type(() => FireblocksSpecialAddressItemDto)
+  @Expose()
+  addresses!: FireblocksSpecialAddressItemDto[];
 }
