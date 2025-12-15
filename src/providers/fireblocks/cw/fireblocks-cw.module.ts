@@ -11,14 +11,13 @@ import { FireblocksCwService } from './fireblocks-cw.service';
 import { FireblocksErrorMapper } from './infrastructure/persistence/relational/mappers/fireblocks-error.mapper';
 import { EnableGuard } from '../../../common/guards/service-enabled.guard';
 
-
 @Module({
   imports: [
     ConfigModule,
     UsersModule,
     RouterModule.register([
       {
-        path: 'fireblocks/cw',
+        path: 'fireblocks/cw/service',
         module: FireblocksCwModule,
       },
     ]),
