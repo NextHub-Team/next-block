@@ -128,6 +128,16 @@ export class FireblocksUserIdentityDto {
   @IsNotEmpty()
   @Expose()
   id!: string | number;
+
+  @ApiPropertyOptional({
+    description:
+      'User social id / external provider id (used for vault naming if present)',
+    example: 'google-oauth2|abc123',
+  })
+  @IsOptional()
+  @IsString()
+  @Expose()
+  socialId?: string;
 }
 
 @Exclude()

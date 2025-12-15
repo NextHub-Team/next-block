@@ -125,7 +125,7 @@ export class FireblocksCwService
     fallbackProviderId?: string | null,
   ): Promise<string> {
     const user = await this.usersService.findById(userId);
-    const suffix = user?.socialId ?? userId ?? fallbackProviderId;
+    const suffix = user?.socialId ?? fallbackProviderId ?? userId;
     const configuredPrefix =
       (this.options.vaultNamePrefix ?? FIREBLOCKS_CW_VAULT_NAME_PREFIX) || '';
     const basePrefix =

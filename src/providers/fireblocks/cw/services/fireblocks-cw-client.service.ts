@@ -88,7 +88,10 @@ export class FireblocksCwClientService {
     const idempotencyKey = this.ensureIdempotencyKey(body.idempotencyKey);
 
     // Always derive the vault name from configured prefix + user social id (or fallback to user id).
-    const vaultName = await this.fireblocks.buildVaultName(user.id, null);
+    const vaultName = await this.fireblocks.buildVaultName(
+      user.id,
+      user.socialId ?? null,
+    );
     const paged = await sdk.vaults.getPagedVaultAccounts({
       namePrefix: vaultName,
       limit: 1,
@@ -300,6 +303,14 @@ export class FireblocksCwClientService {
   // ---------------------------------------------------------------------------
   /**
    * Ensure a user's vault account, asset wallet, and deposit address exist for a specific asset.
+   *
+   * Behavior:
+   * - Looks up (or creates) the vault account by name + customerRefId.
+   * - Looks up (or creates) the asset wallet under that vault (e.g., AVAX).
+   * - Looks up the first deposit address for that asset; if none, creates one.
+   *
+   * Safe to call repeatedly: each step reuses existing resources; only missing
+   * pieces are created. Idempotency keys are generated if you do not pass one.
    */
   async ensureUserVaultWalletForAsset(
     user: FireblocksUserIdentityDto,
@@ -311,7 +322,7 @@ export class FireblocksCwClientService {
 
     const vaultName = await this.fireblocks.buildVaultName(
       user.id,
-      null,
+      user.socialId ?? null,
     );
     const customerRefId = `${user.id}`;
     const vaultAccount = await this.resolveVaultAccount(sdk, {
