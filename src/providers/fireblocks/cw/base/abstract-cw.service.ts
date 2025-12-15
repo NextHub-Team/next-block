@@ -2,8 +2,8 @@ import { BadRequestException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AllConfigType } from '../../../../config/config.type';
 import {
-  FIREBLOCKS_ENABLE,
-  FIREBLOCKS_ENV_TYPE,
+  FIREBLOCKS_CW_ENABLE,
+  FIREBLOCKS_CW_ENV_TYPE,
 } from '../types/fireblocks-const.type';
 
 export abstract class AbstractCwService {
@@ -32,7 +32,7 @@ export abstract class AbstractCwService {
 
     const envType = this.configService.get(
       'fireblocks.envType',
-      FIREBLOCKS_ENV_TYPE,
+      FIREBLOCKS_CW_ENV_TYPE,
       {
         infer: true,
       },
@@ -43,7 +43,7 @@ export abstract class AbstractCwService {
   protected ensureEnabled(): void {
     const enabled = this.configService?.get(
       'fireblocks.enable',
-      FIREBLOCKS_ENABLE,
+      FIREBLOCKS_CW_ENABLE,
       {
         infer: true,
       },

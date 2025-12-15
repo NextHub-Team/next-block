@@ -14,17 +14,17 @@ import { FireblocksCwAdminService } from './services/fireblocks-cw-admin.service
 import { FireblocksCwClientService } from './services/fireblocks-cw-client.service';
 import { UsersService } from '../../../users/users.service';
 import {
-  FIREBLOCKS_ENABLE,
-  FIREBLOCKS_ENV_TYPE,
-  FIREBLOCKS_CIRCUIT_BREAKER_FAILURE_THRESHOLD,
-  FIREBLOCKS_CIRCUIT_BREAKER_HALF_OPEN_SAMPLE,
-  FIREBLOCKS_CIRCUIT_BREAKER_RESET_TIMEOUT_MS,
-  FIREBLOCKS_DEBUG_LOGGING,
-  FIREBLOCKS_MAX_RETRIES,
-  FIREBLOCKS_RATE_LIMIT_INTERVAL_MS,
-  FIREBLOCKS_RATE_LIMIT_TOKENS_PER_INTERVAL,
-  FIREBLOCKS_REQUEST_TIMEOUT_MS,
-  FIREBLOCKS_VAULT_NAME_PREFIX,
+  FIREBLOCKS_CW_ENABLE,
+  FIREBLOCKS_CW_ENV_TYPE,
+  FIREBLOCKS_CW_CIRCUIT_BREAKER_FAILURE_THRESHOLD,
+  FIREBLOCKS_CW_CIRCUIT_BREAKER_HALF_OPEN_SAMPLE,
+  FIREBLOCKS_CW_CIRCUIT_BREAKER_RESET_TIMEOUT_MS,
+  FIREBLOCKS_CW_DEBUG_LOGGING,
+  FIREBLOCKS_CW_MAX_RETRIES,
+  FIREBLOCKS_CW_RATE_LIMIT_INTERVAL_MS,
+  FIREBLOCKS_CW_RATE_LIMIT_TOKENS_PER_INTERVAL,
+  FIREBLOCKS_CW_REQUEST_TIMEOUT_MS,
+  FIREBLOCKS_CW_VAULT_NAME_PREFIX,
 } from './types/fireblocks-const.type';
 import { BaseToggleableService } from '../../../common/base/base-toggleable.service';
 
@@ -45,7 +45,7 @@ export class FireblocksCwService
   ) {
     super(
       FireblocksCwService.name,
-      configService.get('fireblocks.enable', FIREBLOCKS_ENABLE, {
+      configService.get('fireblocks.enable', FIREBLOCKS_CW_ENABLE, {
         infer: true,
       }),
     );
@@ -118,11 +118,11 @@ export class FireblocksCwService
     const user = await this.usersService.findById(userId);
     const suffix = user?.socialId ?? userId ?? fallbackProviderId;
     const configuredPrefix =
-      (this.options.vaultNamePrefix ?? FIREBLOCKS_VAULT_NAME_PREFIX) || '';
+      (this.options.vaultNamePrefix ?? FIREBLOCKS_CW_VAULT_NAME_PREFIX) || '';
     const basePrefix =
       configuredPrefix.trim().length > 0
         ? configuredPrefix.trim()
-        : FIREBLOCKS_VAULT_NAME_PREFIX;
+        : FIREBLOCKS_CW_VAULT_NAME_PREFIX;
     const normalizedPrefix = basePrefix.endsWith(':')
       ? basePrefix
       : `${basePrefix}:`;
@@ -222,14 +222,14 @@ export class FireblocksCwService
   private resolveOptions(): FireblocksClientOptions {
     const enable = this.configService.get(
       'fireblocks.enable',
-      FIREBLOCKS_ENABLE,
+      FIREBLOCKS_CW_ENABLE,
       {
         infer: true,
       },
     );
     const envType = this.configService.get(
       'fireblocks.envType',
-      FIREBLOCKS_ENV_TYPE,
+      FIREBLOCKS_CW_ENV_TYPE,
       {
         infer: true,
       },
@@ -237,9 +237,9 @@ export class FireblocksCwService
     const vaultNamePrefix =
       this.configService.get<string>(
         'fireblocks.vaultNamePrefix',
-        FIREBLOCKS_VAULT_NAME_PREFIX,
+        FIREBLOCKS_CW_VAULT_NAME_PREFIX,
         { infer: true },
-      ) ?? FIREBLOCKS_VAULT_NAME_PREFIX;
+      ) ?? FIREBLOCKS_CW_VAULT_NAME_PREFIX;
 
     if (!enable) {
       return {
@@ -247,18 +247,18 @@ export class FireblocksCwService
         apiKey: '',
         secretKey: '',
         envType,
-        requestTimeoutMs: FIREBLOCKS_REQUEST_TIMEOUT_MS,
-        maxRetries: FIREBLOCKS_MAX_RETRIES,
+        requestTimeoutMs: FIREBLOCKS_CW_REQUEST_TIMEOUT_MS,
+        maxRetries: FIREBLOCKS_CW_MAX_RETRIES,
         circuitBreaker: {
-          failureThreshold: FIREBLOCKS_CIRCUIT_BREAKER_FAILURE_THRESHOLD,
-          resetTimeoutMs: FIREBLOCKS_CIRCUIT_BREAKER_RESET_TIMEOUT_MS,
-          halfOpenSample: FIREBLOCKS_CIRCUIT_BREAKER_HALF_OPEN_SAMPLE,
+          failureThreshold: FIREBLOCKS_CW_CIRCUIT_BREAKER_FAILURE_THRESHOLD,
+          resetTimeoutMs: FIREBLOCKS_CW_CIRCUIT_BREAKER_RESET_TIMEOUT_MS,
+          halfOpenSample: FIREBLOCKS_CW_CIRCUIT_BREAKER_HALF_OPEN_SAMPLE,
         },
         rateLimit: {
-          tokensPerInterval: FIREBLOCKS_RATE_LIMIT_TOKENS_PER_INTERVAL,
-          intervalMs: FIREBLOCKS_RATE_LIMIT_INTERVAL_MS,
+          tokensPerInterval: FIREBLOCKS_CW_RATE_LIMIT_TOKENS_PER_INTERVAL,
+          intervalMs: FIREBLOCKS_CW_RATE_LIMIT_INTERVAL_MS,
         },
-        debugLogging: FIREBLOCKS_DEBUG_LOGGING,
+        debugLogging: FIREBLOCKS_CW_DEBUG_LOGGING,
         vaultNamePrefix,
       } satisfies FireblocksClientOptions;
     }
