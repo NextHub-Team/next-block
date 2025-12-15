@@ -8,50 +8,40 @@ import type {
 } from '@fireblocks/ts-sdk';
 import { FireblocksCwMapper } from '../../../../helpers/fireblocks-cw.mapper';
 import {
-  FireblocksAssetWalletsPageResponseDto,
-  FireblocksBlockchainListResponseDto,
-  FireblocksBlockchainResponseDto,
-  FireblocksDepositAddressResponseDto,
-  FireblocksResponseEnvelopeDto,
-  FireblocksUserPortfolioResponseDto,
   FireblocksPaginatedAssetWalletResponseDto,
-  FireblocksVaultAccountResponseDto,
   FireblocksVaultAccountsPageDto,
-  FireblocksVaultAccountsPageResponseDto,
-  FireblocksVaultAssetResponseDto,
-} from '../../../../dto/fireblocks-response.dto';
-import {
   FireblocksBlockchainDto,
   FireblocksDepositAddressDto,
-} from '../../../../dto/fireblocks-wallet.dto';
+  FireblocksUserPortfolioDto,
+  FireblocksVaultAccountDto,
+  FireblocksVaultAssetDto,
+} from '../../../../dto/fireblocks-cw-responses.dto';
+import { GroupPlainToInstance } from '../../../../../../../utils/transformers/class.transformer';
+import { RoleEnum } from '../../../../../../../roles/roles.enum';
 
 export class FireblocksVaultResponseMapper {
   static vaultAccount(
     response: FireblocksResponse<VaultAccount>,
-  ): FireblocksVaultAccountResponseDto {
-    return {
-      statusCode: response.statusCode,
-      headers: response.headers,
-      data: FireblocksCwMapper.toVaultAccountDto(
-        response.data as VaultAccount,
-        (response.data as VaultAccount)?.assets as VaultAsset[] | undefined,
-      ),
-    };
+  ): FireblocksVaultAccountDto {
+    const dto = FireblocksCwMapper.toVaultAccountDto(
+      response.data as VaultAccount,
+      (response.data as VaultAccount)?.assets as VaultAsset[] | undefined,
+    );
+    return GroupPlainToInstance(FireblocksVaultAccountDto, dto, [
+      RoleEnum.admin,
+    ]);
   }
 
   static vaultAsset(
     response: FireblocksResponse<VaultAsset>,
-  ): FireblocksVaultAssetResponseDto {
-    return {
-      statusCode: response.statusCode,
-      headers: response.headers,
-      data: FireblocksCwMapper.toVaultAssetDto(response.data as VaultAsset),
-    };
+  ): FireblocksVaultAssetDto {
+    const dto = FireblocksCwMapper.toVaultAssetDto(response.data as VaultAsset);
+    return GroupPlainToInstance(FireblocksVaultAssetDto, dto, [RoleEnum.admin]);
   }
 
   static vaultAccountsPage(
     response: FireblocksResponse<VaultAccountsPagedResponse>,
-  ): FireblocksVaultAccountsPageResponseDto {
+  ): FireblocksVaultAccountsPageDto {
     const accounts =
       (response.data as VaultAccountsPagedResponse).accounts ?? [];
     const dto = new FireblocksVaultAccountsPageDto();
@@ -64,16 +54,14 @@ export class FireblocksVaultResponseMapper {
     dto.nextUrl = (response.data as VaultAccountsPagedResponse).nextUrl;
     dto.previousUrl = (response.data as VaultAccountsPagedResponse).previousUrl;
 
-    return {
-      statusCode: response.statusCode,
-      headers: response.headers,
-      data: dto,
-    };
+    return GroupPlainToInstance(FireblocksVaultAccountsPageDto, dto, [
+      RoleEnum.admin,
+    ]);
   }
 
   static assetWalletsPage(
     response: FireblocksResponse<PaginatedAssetWalletResponse>,
-  ): FireblocksAssetWalletsPageResponseDto {
+  ): FireblocksPaginatedAssetWalletResponseDto {
     const dto = new FireblocksPaginatedAssetWalletResponseDto();
     const wallets = (
       (response.data as PaginatedAssetWalletResponse).assetWallets ?? []
@@ -82,64 +70,56 @@ export class FireblocksVaultResponseMapper {
     );
     dto.assetWallets = wallets;
 
-    return {
-      statusCode: response.statusCode,
-      headers: response.headers,
-      data: dto,
-    };
+    return GroupPlainToInstance(
+      FireblocksPaginatedAssetWalletResponseDto,
+      dto,
+      [RoleEnum.admin],
+    );
   }
 
   static depositAddress(
     response: FireblocksResponse<FireblocksDepositAddressDto>,
-  ): FireblocksDepositAddressResponseDto {
-    return {
-      statusCode: response.statusCode,
-      headers: response.headers,
-      data: response.data as FireblocksDepositAddressDto,
-    };
+  ): FireblocksDepositAddressDto {
+    return GroupPlainToInstance(
+      FireblocksDepositAddressDto,
+      response.data as FireblocksDepositAddressDto,
+      [RoleEnum.admin],
+    );
   }
 
   static userPortfolio(
     response: FireblocksResponse<any>,
-  ): FireblocksUserPortfolioResponseDto {
-    return {
-      statusCode: response.statusCode,
-      headers: response.headers,
-      data: response.data,
-    };
+  ): FireblocksUserPortfolioDto {
+    return GroupPlainToInstance(
+      FireblocksUserPortfolioDto,
+      response.data as FireblocksUserPortfolioDto,
+      [RoleEnum.admin],
+    );
   }
 
   static blockchain(
     response: FireblocksResponse<Asset>,
-  ): FireblocksBlockchainResponseDto {
+  ): FireblocksBlockchainDto {
     const data = FireblocksCwMapper.toAssetMetadataDto(response.data as Asset);
-    return {
-      statusCode: response.statusCode,
-      headers: response.headers,
-      data: data as FireblocksBlockchainDto,
-    };
+    return GroupPlainToInstance(
+      FireblocksBlockchainDto,
+      data as FireblocksBlockchainDto,
+      [RoleEnum.admin],
+    );
   }
 
   static blockchains(
     response: FireblocksResponse<Asset[]>,
-  ): FireblocksBlockchainListResponseDto {
+  ): FireblocksBlockchainDto[] {
     const data = (response.data as Asset[]).map((asset) =>
       FireblocksCwMapper.toAssetMetadataDto(asset),
     );
-    return {
-      statusCode: response.statusCode,
-      headers: response.headers,
-      data: data as FireblocksBlockchainDto[],
-    };
-  }
-
-  static envelope<T>(
-    response: FireblocksResponse<T>,
-  ): FireblocksResponseEnvelopeDto<T> {
-    return {
-      statusCode: response.statusCode,
-      headers: response.headers,
-      data: response.data,
-    };
+    return data.map((item) =>
+      GroupPlainToInstance(
+        FireblocksBlockchainDto,
+        item as FireblocksBlockchainDto,
+        [RoleEnum.admin],
+      ),
+    );
   }
 }

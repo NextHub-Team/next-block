@@ -18,14 +18,19 @@ import {
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { FireblocksCwClientService } from '../services/fireblocks-cw-client.service';
-import { CreateVaultWalletRequestDto } from '../dto/fireblocks-vault-requests.dto';
+import {
+  CreateUserVaultRequestDto,
+  CreateVaultWalletRequestDto,
+  CreateUserVaultAssetRequestDto,
+  CreateUserVaultAddressRequestDto,
+} from '../dto/fireblocks-cw-requests.dto';
 import {
   FireblocksCustodialWalletDto,
   FireblocksVaultAccountDto,
   FireblocksVaultAccountWalletDto,
   FireblocksVaultAssetDto,
-} from '../dto/fireblocks-wallet.dto';
-import { FireblocksEnsureUserWalletDto } from '../dto/fireblocks-cw-controller.dto';
+} from '../dto/fireblocks-cw-responses.dto';
+import { FireblocksEnsureUserWalletDto } from '../dto/fireblocks-cw-requests.dto';
 import { RequestWithUser } from '../../../../utils/types/object.type';
 import { RolesGuard } from '../../../../roles/roles.guard';
 import { Roles } from '../../../../roles/roles.decorator';
@@ -60,6 +65,20 @@ export class FireblocksCwClientController {
     return this.client.listUserVaultAccounts(req.user.id);
   }
 
+  @Post('me/accounts')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiCreatedResponse({ type: FireblocksVaultAccountDto })
+  @ApiOperationRoles('Create Fireblocks vault account for current user', [
+    RoleEnum.admin,
+    RoleEnum.user,
+  ])
+  createMyVaultAccount(
+    @Request() req: RequestWithUser,
+    @Body() body: CreateUserVaultRequestDto,
+  ): Promise<FireblocksVaultAccountDto> {
+    return this.client.createVaultAccountForUser(req.user, body);
+  }
+
   @Get('me/wallets')
   @ApiOkResponse({ type: FireblocksVaultAccountWalletDto, isArray: true })
   @ApiOperationRoles('List all Fireblocks vault wallets for the current user', [
@@ -89,6 +108,21 @@ export class FireblocksCwClientController {
     return this.client.listUserVaultAccountWallets(req.user.id, vaultAccountId);
   }
 
+  @Post('me/accounts/:vaultAccountId/wallets')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiCreatedResponse({ type: FireblocksVaultAssetDto })
+  @ApiOperationRoles(
+    'Create a wallet under an existing Fireblocks vault account for current user',
+    [RoleEnum.admin, RoleEnum.user],
+  )
+  createMyVaultWallet(
+    @Request() req: RequestWithUser,
+    @Param('vaultAccountId') vaultAccountId: string,
+    @Body() body: CreateUserVaultAssetRequestDto,
+  ): Promise<FireblocksVaultAssetDto> {
+    return this.client.createVaultAssetForUser(req.user, vaultAccountId, body);
+  }
+
   @Get('me/accounts/:vaultAccountId/wallets/:assetId')
   @ApiParam({
     name: 'vaultAccountId',
@@ -112,6 +146,27 @@ export class FireblocksCwClientController {
       req.user.id,
       vaultAccountId,
       assetId,
+    );
+  }
+
+  @Post('me/accounts/:vaultAccountId/wallets/:assetId/addresses')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiCreatedResponse({ type: FireblocksCustodialWalletDto })
+  @ApiOperationRoles(
+    'Create or ensure a deposit address for a specific wallet',
+    [RoleEnum.admin, RoleEnum.user],
+  )
+  createMyWalletAddress(
+    @Request() req: RequestWithUser,
+    @Param('vaultAccountId') vaultAccountId: string,
+    @Param('assetId') assetId: string,
+    @Body() body: CreateUserVaultAddressRequestDto,
+  ): Promise<FireblocksCustodialWalletDto> {
+    return this.client.createVaultWalletAddressForUser(
+      req.user,
+      vaultAccountId,
+      assetId,
+      body,
     );
   }
 
@@ -144,8 +199,7 @@ export class FireblocksCwClientController {
     @Body() command: FireblocksEnsureUserWalletDto,
   ): Promise<FireblocksCustodialWalletDto> {
     const userIdentity = {
-      userId: req.user.id,
-      providerId: command.providerId ?? null,
+      id: req.user.id,
     };
     return this.client.ensureUserWallet(
       userIdentity,

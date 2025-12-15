@@ -8,6 +8,7 @@ const ENVIRONMENT_URL_KEY: Record<
   [FireblocksEnvironmentType.SANDBOX]: 'SANDBOX',
   [FireblocksEnvironmentType.PROD_US]: 'PROD_US',
   [FireblocksEnvironmentType.PROD_EU]: 'PROD_EU',
+  [FireblocksEnvironmentType.PROD_EU2]: 'PROD_EU2',
 };
 
 export const getFireblocksBaseUrl = (

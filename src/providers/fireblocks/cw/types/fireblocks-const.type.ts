@@ -1,6 +1,10 @@
 import { FireblocksEnvironmentType } from './fireblocks-enum.type';
 
-export type FireblocksEnvironmentUrlKey = 'SANDBOX' | 'PROD_US' | 'PROD_EU';
+export type FireblocksEnvironmentUrlKey =
+  | 'SANDBOX'
+  | 'PROD_US'
+  | 'PROD_EU'
+  | 'PROD_EU2';
 
 export const FIREBLOCKS_CW_ENABLE = false;
 
@@ -35,4 +39,5 @@ export const FIREBLOCKS_ENVIRONMENT_BASE_URL: Record<
   SANDBOX: 'https://sandbox-api.fireblocks.io/v1',
   PROD_US: 'https://api.fireblocks.io/v1',
   PROD_EU: 'https://eu-api.fireblocks.io/v1',
+  PROD_EU2: 'https://eu2-api.fireblocks.io/v1',
 };

@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiCreatedResponse,
   ApiOkResponse,
   ApiParam,
   ApiTags,
@@ -16,19 +17,21 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { FireblocksCwAdminService } from '../services/fireblocks-cw-admin.service';
 import {
-  FireblocksAssetWalletsPageResponseDto,
-  FireblocksResponseEnvelopeDto,
+  FireblocksPaginatedAssetWalletResponseDto,
   FireblocksSpecialAddressesResponseDto,
-  FireblocksUserPortfolioResponseDto,
-  FireblocksVaultAccountResponseDto,
-  FireblocksVaultAssetResponseDto,
-  FireblocksVaultAccountsPageResponseDto,
-} from '../dto/fireblocks-response.dto';
-import { FireblocksSpecialAddressesRequestDto } from '../dto/fireblocks-vault-requests.dto';
+  FireblocksVaultAccountsPageDto,
+  FireblocksUserPortfolioDto,
+  FireblocksVaultAccountDto,
+  FireblocksVaultAssetDto,
+  FireblocksAssetCatalogDto,
+  FireblocksAssetMetadataDto,
+} from '../dto/fireblocks-cw-responses.dto';
 import {
   FireblocksAssetWalletsQueryDto,
+  FireblocksSpecialAddressesRequestDto,
+  FireblocksAssetsCatalogQueryDto,
   FireblocksVaultAccountsQueryDto,
-} from '../dto/fireblocks-cw-controller.dto';
+} from '../dto/fireblocks-cw-requests.dto';
 import { RolesGuard } from '../../../../roles/roles.guard';
 import { Roles } from '../../../../roles/roles.decorator';
 import { RoleEnum } from '../../../../roles/roles.enum';
@@ -51,42 +54,40 @@ export class FireblocksCwAdminController {
   constructor(private readonly admin: FireblocksCwAdminService) {}
 
   @Get('assets')
-  @ApiOkResponse({ type: FireblocksAssetWalletsPageResponseDto })
+  @ApiOkResponse({ type: FireblocksPaginatedAssetWalletResponseDto })
   @ApiOperationRoles('List Fireblocks asset wallets', [RoleEnum.admin])
-  listAssetWallets(
+  async listAssetWallets(
     @Query() query: FireblocksAssetWalletsQueryDto,
-  ): Promise<FireblocksAssetWalletsPageResponseDto> {
+  ): Promise<FireblocksPaginatedAssetWalletResponseDto> {
     return this.admin.listAssetWallets(query);
   }
 
   @Get('users/:userId/portfolio')
-  @ApiOkResponse({ type: FireblocksUserPortfolioResponseDto })
+  @ApiOkResponse({ type: FireblocksUserPortfolioDto })
   @ApiOperationRoles('Get Fireblocks user portfolio', [RoleEnum.admin])
-  getUserPortfolio(
+  async getUserPortfolio(
     @Param('userId') userId: string,
-  ): Promise<FireblocksUserPortfolioResponseDto> {
+  ): Promise<FireblocksUserPortfolioDto> {
     return this.admin.getUserWallets(userId);
   }
 
   @Post('addresses')
-  @ApiOkResponse({ type: FireblocksSpecialAddressesResponseDto })
+  @ApiCreatedResponse({ type: FireblocksSpecialAddressesResponseDto })
   @ApiOperationRoles('Create special deposit addresses for vault assets', [
     RoleEnum.admin,
   ])
-  createSpecialAddresses(
+  async createSpecialAddresses(
     @Body() body: FireblocksSpecialAddressesRequestDto,
-  ): Promise<
-    FireblocksResponseEnvelopeDto<FireblocksSpecialAddressesResponseDto>
-  > {
+  ): Promise<FireblocksSpecialAddressesResponseDto> {
     return this.admin.createSpecialAddresses(body);
   }
 
   @Get()
-  @ApiOkResponse({ type: FireblocksVaultAccountsPageResponseDto })
+  @ApiOkResponse({ type: FireblocksVaultAccountsPageDto })
   @ApiOperationRoles('List Fireblocks vault accounts', [RoleEnum.admin])
-  listVaultAccounts(
+  async listVaultAccounts(
     @Query() query: FireblocksVaultAccountsQueryDto,
-  ): Promise<FireblocksVaultAccountsPageResponseDto> {
+  ): Promise<FireblocksVaultAccountsPageDto> {
     return this.admin.listVaultAccounts(query);
   }
 
@@ -96,11 +97,11 @@ export class FireblocksCwAdminController {
     description: 'Target Fireblocks vault account id',
     type: String,
   })
-  @ApiOkResponse({ type: FireblocksVaultAccountResponseDto })
+  @ApiOkResponse({ type: FireblocksVaultAccountDto })
   @ApiOperationRoles('Fetch a Fireblocks vault account', [RoleEnum.admin])
-  fetchVaultAccount(
+  async fetchVaultAccount(
     @Param('vaultAccountId') vaultAccountId: string,
-  ): Promise<FireblocksVaultAccountResponseDto> {
+  ): Promise<FireblocksVaultAccountDto> {
     return this.admin.fetchVaultAccount(vaultAccountId);
   }
 
@@ -115,12 +116,35 @@ export class FireblocksCwAdminController {
     description: 'Asset identifier',
     type: String,
   })
-  @ApiOkResponse({ type: FireblocksVaultAssetResponseDto })
+  @ApiOkResponse({ type: FireblocksVaultAssetDto })
   @ApiOperationRoles('Fetch a vault account asset', [RoleEnum.admin])
-  fetchVaultAsset(
+  async fetchVaultAsset(
     @Param('vaultAccountId') vaultAccountId: string,
     @Param('assetId') assetId: string,
-  ): Promise<FireblocksVaultAssetResponseDto> {
+  ): Promise<FireblocksVaultAssetDto> {
     return this.admin.fetchVaultAsset(vaultAccountId, assetId);
+  }
+
+  @Get('assets/catalog')
+  @ApiOkResponse({ type: FireblocksAssetCatalogDto })
+  @ApiOperationRoles('List supported assets (Fireblocks)', [RoleEnum.admin])
+  async listSupportedAssets(
+    @Query() query: FireblocksAssetsCatalogQueryDto,
+  ): Promise<FireblocksAssetCatalogDto> {
+    return this.admin.listSupportedAssets(query);
+  }
+
+  @Get('assets/catalog/:assetId')
+  @ApiParam({
+    name: 'assetId',
+    description: 'Asset identifier to fetch metadata for',
+    type: String,
+  })
+  @ApiOkResponse({ type: FireblocksAssetMetadataDto })
+  @ApiOperationRoles('Fetch asset metadata (Fireblocks)', [RoleEnum.admin])
+  async fetchAssetMetadata(
+    @Param('assetId') assetId: string,
+  ): Promise<FireblocksAssetMetadataDto> {
+    return this.admin.fetchAssetMetadata(assetId);
   }
 }

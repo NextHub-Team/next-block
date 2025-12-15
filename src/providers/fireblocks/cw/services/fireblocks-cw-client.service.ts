@@ -18,6 +18,15 @@ import {
   VaultAccountsPagedResponse,
   VaultAsset,
 } from '@fireblocks/ts-sdk';
+import { v4 as uuidv4 } from 'uuid';
+import {
+  CreateVaultWalletRequestDto,
+  EnsureVaultWalletOptionsDto,
+  FireblocksUserIdentityDto,
+  CreateUserVaultRequestDto,
+  CreateUserVaultAssetRequestDto,
+  CreateUserVaultAddressRequestDto,
+} from '../dto/fireblocks-cw-requests.dto';
 import {
   FireblocksAssetMetadataDto,
   FireblocksBlockchainDto,
@@ -27,14 +36,14 @@ import {
   FireblocksVaultAccountDto,
   FireblocksVaultAccountWalletDto,
   FireblocksVaultAssetDto,
-} from '../dto/fireblocks-wallet.dto';
-import {
-  CreateVaultWalletRequestDto,
-  EnsureVaultWalletOptionsDto,
-  FireblocksUserIdentityDto,
-} from '../dto/fireblocks-vault-requests.dto';
+} from '../dto/fireblocks-cw-responses.dto';
 import { FireblocksCwService } from '../fireblocks-cw.service';
 import { FireblocksCwMapper } from '../helpers/fireblocks-cw.mapper';
+import {
+  GroupPlainToInstance,
+  GroupPlainToInstances,
+} from '../../../../utils/transformers/class.transformer';
+import { RoleEnum } from '../../../../roles/roles.enum';
 
 /**
  * Consolidated Fireblocks client-facing vault service.
@@ -69,6 +78,158 @@ export class FireblocksCwClientService {
     options?: EnsureVaultWalletOptionsDto,
   ): Promise<FireblocksCustodialWalletDto> {
     return this.ensureUserVaultWalletForAsset(user, assetId, options);
+  }
+
+  async createVaultAccountForUser(
+    user: FireblocksUserIdentityDto,
+    body: CreateUserVaultRequestDto,
+  ): Promise<FireblocksVaultAccountDto> {
+    const sdk = this.sdk;
+    const idempotencyKey = this.ensureIdempotencyKey(body.idempotencyKey);
+
+    // Always derive the vault name from configured prefix + user social id (or fallback to user id).
+    const vaultName = await this.fireblocks.buildVaultName(user.id, null);
+    const paged = await sdk.vaults.getPagedVaultAccounts({
+      namePrefix: vaultName,
+      limit: 1,
+    });
+    const existing = paged.data?.accounts?.find(
+      (a) => (a as any).name === vaultName,
+    ) as VaultAccount | undefined;
+    if (existing) {
+      return GroupPlainToInstance(
+        FireblocksVaultAccountDto,
+        FireblocksCwMapper.toVaultAccountDto(
+          existing,
+          existing.assets as VaultAsset[] | undefined,
+        ),
+        [RoleEnum.user, RoleEnum.admin],
+      );
+    }
+
+    const response = await sdk.vaults.createVaultAccount({
+      createVaultAccountRequest: {
+        name: vaultName,
+        customerRefId: `${user.id}`,
+        hiddenOnUI: body.hiddenOnUI ?? true,
+        autoFuel: body.autoFuel ?? false,
+      },
+      idempotencyKey,
+    });
+
+    return GroupPlainToInstance(
+      FireblocksVaultAccountDto,
+      FireblocksCwMapper.toVaultAccountDto(
+        response.data as VaultAccount,
+        (response.data as VaultAccount).assets as VaultAsset[] | undefined,
+      ),
+      [RoleEnum.user, RoleEnum.admin],
+    );
+  }
+
+  async createVaultAssetForUser(
+    user: FireblocksUserIdentityDto,
+    vaultAccountId: string,
+    body: CreateUserVaultAssetRequestDto,
+  ): Promise<FireblocksVaultAssetDto> {
+    const sdk = this.sdk;
+    const idempotencyKey = this.ensureIdempotencyKey(body.idempotencyKey);
+    const vault = await sdk.vaults.getVaultAccount({ vaultAccountId });
+    const vaultData = vault.data as VaultAccount;
+    if (vaultData.customerRefId && vaultData.customerRefId !== `${user.id}`) {
+      throw new ForbiddenException(
+        `Vault ${vaultAccountId} is not associated with the current user`,
+      );
+    }
+
+    try {
+      const existing = await sdk.vaults.getVaultAccountAsset({
+        vaultAccountId,
+        assetId: body.assetId,
+      });
+      if (existing?.data) {
+        return GroupPlainToInstance(
+          FireblocksVaultAssetDto,
+          FireblocksCwMapper.toVaultAssetDto(existing.data as VaultAsset),
+          [RoleEnum.user, RoleEnum.admin],
+        );
+      }
+    } catch {
+      // ignore and create
+    }
+
+    const created = await sdk.vaults.createVaultAccountAsset({
+      vaultAccountId,
+      assetId: body.assetId,
+      idempotencyKey,
+    });
+
+    return GroupPlainToInstance(
+      FireblocksVaultAssetDto,
+      FireblocksCwMapper.toVaultAssetDto(created.data as VaultAsset),
+      [RoleEnum.user, RoleEnum.admin],
+    );
+  }
+
+  async createVaultWalletAddressForUser(
+    user: FireblocksUserIdentityDto,
+    vaultAccountId: string,
+    assetId: string,
+    body: CreateUserVaultAddressRequestDto,
+  ): Promise<FireblocksCustodialWalletDto> {
+    const sdk = this.sdk;
+    const idempotencyKey = this.ensureIdempotencyKey(body.idempotencyKey);
+    const vaultResp = await sdk.vaults.getVaultAccount({ vaultAccountId });
+    const vaultAccount = vaultResp.data as VaultAccount;
+    if (
+      vaultAccount.customerRefId &&
+      vaultAccount.customerRefId !== `${user.id}`
+    ) {
+      throw new ForbiddenException(
+        `Vault ${vaultAccountId} is not associated with the current user`,
+      );
+    }
+
+    const assetResp = await sdk.vaults.getVaultAccountAsset({
+      vaultAccountId,
+      assetId,
+    });
+    const vaultAsset = assetResp.data as VaultAsset;
+
+    try {
+      const existing = await sdk.vaults.getVaultAccountAssetAddressesPaginated({
+        vaultAccountId,
+        assetId,
+      });
+      const first = existing.data?.addresses?.[0];
+      if (first?.address) {
+        return FireblocksCwMapper.toCustodialWalletDto({
+          vaultAccount,
+          vaultAsset,
+          depositAddress: first,
+          roles: [RoleEnum.user, RoleEnum.admin],
+        });
+      }
+    } catch {
+      // ignore and create
+    }
+
+    const created = await sdk.vaults.createVaultAccountAssetAddress({
+      vaultAccountId,
+      assetId,
+      createAddressRequest: {
+        description: body.description,
+        customerRefId: vaultAccount.customerRefId ?? `${user.id}`,
+      },
+      idempotencyKey,
+    });
+
+    return FireblocksCwMapper.toCustodialWalletDto({
+      vaultAccount,
+      vaultAsset,
+      depositAddress: created.data,
+      roles: [RoleEnum.user, RoleEnum.admin],
+    });
   }
 
   async listUserVaultAccounts(
@@ -146,24 +307,25 @@ export class FireblocksCwClientService {
     options?: EnsureVaultWalletOptionsDto,
   ): Promise<FireblocksCustodialWalletDto> {
     const sdk = this.sdk;
+    const idempotencyKey = this.ensureIdempotencyKey(options?.idempotencyKey);
 
     const vaultName = await this.fireblocks.buildVaultName(
-      user.userId,
-      user.providerId,
+      user.id,
+      null,
     );
-    const customerRefId = `${user.userId}`;
+    const customerRefId = `${user.id}`;
     const vaultAccount = await this.resolveVaultAccount(sdk, {
       vaultName,
       customerRefId,
       hiddenOnUI: options?.hiddenOnUI ?? true,
       autoFuel: options?.autoFuel ?? false,
-      idempotencyKey: options?.idempotencyKey,
+      idempotencyKey,
     });
 
     const vaultAsset = await this.resolveVaultAsset(sdk, {
       vaultAccountId: vaultAccount.id as string,
       assetId,
-      idempotencyKey: options?.idempotencyKey,
+      idempotencyKey,
     });
 
     const depositAddress = await this.resolveDepositAddress(sdk, {
@@ -171,14 +333,18 @@ export class FireblocksCwClientService {
       assetId,
       customerRefId,
       description: options?.addressDescription,
-      idempotencyKey: options?.idempotencyKey,
+      idempotencyKey,
     });
 
-    return FireblocksCwMapper.toCustodialWalletDto({
-      vaultAccount,
-      vaultAsset,
-      depositAddress,
-    });
+    return GroupPlainToInstance(
+      FireblocksCustodialWalletDto,
+      FireblocksCwMapper.toCustodialWalletDto({
+        vaultAccount,
+        vaultAsset,
+        depositAddress,
+      }),
+      [RoleEnum.user, RoleEnum.admin],
+    );
   }
 
   /**
@@ -188,6 +354,7 @@ export class FireblocksCwClientService {
     command: CreateVaultWalletRequestDto,
   ): Promise<FireblocksCustodialWalletDto> {
     const sdk = this.sdk;
+    const idempotencyKey = this.ensureIdempotencyKey(command.idempotencyKey);
     const { name, assetId, customerRefId, hiddenOnUI, addressDescription } =
       command;
 
@@ -197,7 +364,7 @@ export class FireblocksCwClientService {
         customerRefId,
         hiddenOnUI,
       },
-      idempotencyKey: command.idempotencyKey,
+      idempotencyKey,
     });
 
     const vaultAccount = vaultAccountResponse.data;
@@ -206,7 +373,7 @@ export class FireblocksCwClientService {
     const vaultAssetResponse = await sdk.vaults.createVaultAccountAsset({
       vaultAccountId: vaultAccount.id as string,
       assetId,
-      idempotencyKey: command.idempotencyKey,
+      idempotencyKey,
     });
 
     const vaultAsset = vaultAssetResponse.data as VaultAsset;
@@ -218,18 +385,22 @@ export class FireblocksCwClientService {
       await sdk.vaults.createVaultAccountAssetAddress({
         vaultAccountId: vaultAccount.id as string,
         assetId,
-        createAddressRequest: {
-          description: addressDescription,
-          customerRefId,
-        },
-        idempotencyKey: command.idempotencyKey,
-      });
-
-    return FireblocksCwMapper.toCustodialWalletDto({
-      vaultAccount,
-      vaultAsset,
-      depositAddress: depositAddressResponse.data,
+      createAddressRequest: {
+        description: addressDescription,
+        customerRefId,
+      },
+      idempotencyKey,
     });
+
+    return GroupPlainToInstance(
+      FireblocksCustodialWalletDto,
+      FireblocksCwMapper.toCustodialWalletDto({
+        vaultAccount,
+        vaultAsset,
+        depositAddress: depositAddressResponse.data,
+      }),
+      [RoleEnum.user, RoleEnum.admin],
+    );
   }
 
   /**
@@ -252,7 +423,11 @@ export class FireblocksCwClientService {
       },
     });
 
-    return FireblocksCwMapper.toDepositAddressDto(response.data);
+    return GroupPlainToInstance(
+      FireblocksDepositAddressDto,
+      FireblocksCwMapper.toDepositAddressDto(response.data),
+      [RoleEnum.user, RoleEnum.admin],
+    );
   }
 
   /**
@@ -298,7 +473,11 @@ export class FireblocksCwClientService {
   ): Promise<FireblocksVaultAccountDto> {
     const sdk = this.sdk;
     const response = await sdk.vaults.getVaultAccount({ vaultAccountId });
-    return FireblocksCwMapper.toVaultAccountDto(response.data as VaultAccount);
+    return GroupPlainToInstance(
+      FireblocksVaultAccountDto,
+      FireblocksCwMapper.toVaultAccountDto(response.data as VaultAccount),
+      [RoleEnum.user, RoleEnum.admin],
+    );
   }
 
   /**
@@ -314,7 +493,11 @@ export class FireblocksCwClientService {
       assetId,
     });
 
-    return FireblocksCwMapper.toVaultAssetDto(response.data as VaultAsset);
+    return GroupPlainToInstance(
+      FireblocksVaultAssetDto,
+      FireblocksCwMapper.toVaultAssetDto(response.data as VaultAsset),
+      [RoleEnum.user, RoleEnum.admin],
+    );
   }
 
   /**
@@ -337,7 +520,11 @@ export class FireblocksCwClientService {
     });
 
     const data = (response.data as PaginatedAddressResponse).addresses || [];
-    return data.map((item) => FireblocksCwMapper.toDepositAddressDto(item));
+    return GroupPlainToInstances(
+      FireblocksDepositAddressDto,
+      data.map((item) => FireblocksCwMapper.toDepositAddressDto(item)),
+      [RoleEnum.user, RoleEnum.admin],
+    );
   }
 
   /**
@@ -353,8 +540,12 @@ export class FireblocksCwClientService {
       pageCursor: cursor?.before ?? cursor?.after,
     });
 
-    return (response.data as ListAssetsResponse).data.map((asset: Asset) =>
-      FireblocksCwMapper.toAssetMetadataDto(asset),
+    return GroupPlainToInstances(
+      FireblocksAssetMetadataDto,
+      (response.data as ListAssetsResponse).data.map((asset: Asset) =>
+        FireblocksCwMapper.toAssetMetadataDto(asset),
+      ),
+      [RoleEnum.user, RoleEnum.admin],
     );
   }
 
@@ -366,7 +557,11 @@ export class FireblocksCwClientService {
   ): Promise<FireblocksAssetMetadataDto> {
     const sdk = this.sdk;
     const response = await sdk.blockchainsAssets.getAsset({ id: assetId });
-    return FireblocksCwMapper.toAssetMetadataDto(response.data as Asset);
+    return GroupPlainToInstance(
+      FireblocksAssetMetadataDto,
+      FireblocksCwMapper.toAssetMetadataDto(response.data as Asset),
+      [RoleEnum.user, RoleEnum.admin],
+    );
   }
 
   /**
@@ -375,9 +570,13 @@ export class FireblocksCwClientService {
   async listSupportedBlockchains(): Promise<FireblocksBlockchainDto[]> {
     const sdk = this.sdk;
     const response = await sdk.blockchainsAssets.listBlockchains();
-    return (response.data as ListBlockchainsResponse).data.map(
-      (blockchain: BlockchainResponse) =>
-        FireblocksCwMapper.toBlockchainDto(blockchain),
+    return GroupPlainToInstances(
+      FireblocksBlockchainDto,
+      (response.data as ListBlockchainsResponse).data.map(
+        (blockchain: BlockchainResponse) =>
+          FireblocksCwMapper.toBlockchainDto(blockchain),
+      ),
+      [RoleEnum.user, RoleEnum.admin],
     );
   }
 
@@ -392,8 +591,12 @@ export class FireblocksCwClientService {
       id: blockchainId,
     });
 
-    return FireblocksCwMapper.toBlockchainDto(
-      response.data as BlockchainResponse,
+    return GroupPlainToInstance(
+      FireblocksBlockchainDto,
+      FireblocksCwMapper.toBlockchainDto(
+        response.data as BlockchainResponse,
+      ),
+      [RoleEnum.user, RoleEnum.admin],
     );
   }
 
@@ -425,9 +628,13 @@ export class FireblocksCwClientService {
       })`,
     );
 
-    return FireblocksCwMapper.toUserPortfolioDto(
-      customerRefId,
-      filtered as VaultAccount[],
+    return GroupPlainToInstance(
+      FireblocksUserPortfolioDto,
+      FireblocksCwMapper.toUserPortfolioDto(
+        customerRefId,
+        filtered as VaultAccount[],
+      ),
+      [RoleEnum.user, RoleEnum.admin],
     );
   }
 
@@ -447,6 +654,7 @@ export class FireblocksCwClientService {
       idempotencyKey?: string;
     },
   ): Promise<VaultAccount> {
+    const idempotencyKey = this.ensureIdempotencyKey(params.idempotencyKey);
     const paged = await sdk.vaults.getPagedVaultAccounts({
       namePrefix: params.vaultName,
       limit: 1,
@@ -463,7 +671,7 @@ export class FireblocksCwClientService {
       ) {
         await sdk.vaults.setVaultAccountCustomerRefId({
           vaultAccountId: existing.id as string,
-          idempotencyKey: params.idempotencyKey,
+          idempotencyKey,
           setCustomerRefIdRequest: { customerRefId: params.customerRefId },
         });
         existing.customerRefId = params.customerRefId;
@@ -482,7 +690,7 @@ export class FireblocksCwClientService {
         hiddenOnUI: params.hiddenOnUI ?? true,
         autoFuel: params.autoFuel ?? false,
       },
-      idempotencyKey: params.idempotencyKey,
+      idempotencyKey,
     });
 
     const vaultAccount = created.data as VaultAccount;
@@ -503,6 +711,7 @@ export class FireblocksCwClientService {
       idempotencyKey?: string;
     },
   ): Promise<VaultAsset> {
+    const idempotencyKey = this.ensureIdempotencyKey(params.idempotencyKey);
     try {
       const existing = await sdk.vaults.getVaultAccountAsset({
         vaultAccountId: params.vaultAccountId,
@@ -521,7 +730,7 @@ export class FireblocksCwClientService {
     const created = await sdk.vaults.createVaultAccountAsset({
       vaultAccountId: params.vaultAccountId,
       assetId: params.assetId,
-      idempotencyKey: params.idempotencyKey,
+      idempotencyKey,
     });
 
     return created.data as VaultAsset;
@@ -540,6 +749,7 @@ export class FireblocksCwClientService {
       idempotencyKey?: string;
     },
   ): Promise<CreateAddressResponse> {
+    const idempotencyKey = this.ensureIdempotencyKey(params.idempotencyKey);
     try {
       const existing = await sdk.vaults.getVaultAccountAssetAddressesPaginated({
         vaultAccountId: params.vaultAccountId,
@@ -553,7 +763,7 @@ export class FireblocksCwClientService {
             vaultAccountId: params.vaultAccountId,
             assetId: params.assetId,
             addressId: firstAddress.address as string,
-            idempotencyKey: params.idempotencyKey,
+            idempotencyKey,
             setCustomerRefIdForAddressRequest: {
               customerRefId: params.customerRefId,
             },
@@ -575,9 +785,17 @@ export class FireblocksCwClientService {
         description: params.description,
         customerRefId: params.customerRefId,
       },
-      idempotencyKey: params.idempotencyKey,
+      idempotencyKey,
     });
 
     return created.data as CreateAddressResponse;
+  }
+
+  /**
+   * Return provided idempotency key or generate a UUID to guarantee safe retries.
+   */
+  private ensureIdempotencyKey(key?: string): string {
+    if (key && key.trim().length > 0) return key.trim();
+    return uuidv4();
   }
 }

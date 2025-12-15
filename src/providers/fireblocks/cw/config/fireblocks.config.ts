@@ -117,6 +117,8 @@ export default createToggleableConfig<FireblocksConfig, FireblocksEnvValidator>(
           us: FireblocksEnvironmentType.PROD_US,
           'prod-eu': FireblocksEnvironmentType.PROD_EU,
           eu: FireblocksEnvironmentType.PROD_EU,
+          'prod-eu2': FireblocksEnvironmentType.PROD_EU2,
+          eu2: FireblocksEnvironmentType.PROD_EU2,
           sandbox: FireblocksEnvironmentType.SANDBOX,
           dev: FireblocksEnvironmentType.SANDBOX,
           development: FireblocksEnvironmentType.SANDBOX,

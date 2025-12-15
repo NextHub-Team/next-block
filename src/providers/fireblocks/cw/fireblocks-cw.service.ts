@@ -33,6 +33,15 @@ export class FireblocksCwService
   extends BaseToggleableService
   implements OnModuleInit, OnModuleDestroy
 {
+  /**
+   * Usage pattern (real Fireblocks flows):
+   * 1) Verify user exists in DB (needs id + socialId).
+   * 2) Use user data to resolve/find vault account (see FireblocksCwClientService.ensureUserVaultWalletForAsset).
+   * 3) Confirm the vault belongs to the user (customerRefId/socialId-based name).
+   * 4) If missing, create the vault with user id/socialId via ensure helper.
+   * 5) If vault exists but wallet is missing, create AVAX (or target asset) wallet.
+   * 6) If wallet exists, return/check it (ensure helper returns the existing wallet/address).
+   */
   private readonly options: FireblocksClientOptions;
   private fireblocksSdk?: Fireblocks;
   public admin!: FireblocksCwAdminService;

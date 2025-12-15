@@ -15,7 +15,7 @@ import {
   FireblocksUserPortfolioDto,
   FireblocksVaultAccountDto,
   FireblocksVaultAssetDto,
-} from '../dto/fireblocks-wallet.dto';
+} from '../dto/fireblocks-cw-responses.dto';
 
 export class FireblocksCwMapper {
   static toVaultAssetDto(
@@ -31,7 +31,7 @@ export class FireblocksCwMapper {
         lockedAmount: asset.lockedAmount as string | undefined,
         pending: asset.pending as string | undefined,
         totalStaked: asset.staked as string | undefined,
-        balance: asset.balance as string | undefined,
+        balance: asset.balance as string | undefined, //TODO: Update from next Fireblocks SDK version
       },
       roles,
     );

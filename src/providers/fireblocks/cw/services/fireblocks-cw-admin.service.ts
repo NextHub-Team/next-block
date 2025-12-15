@@ -25,32 +25,32 @@ import {
 import { AllConfigType } from '../../../../config/config.type';
 import { FireblocksCwService } from '../fireblocks-cw.service';
 import {
-  FireblocksAssetWalletsPageResponseDto,
-  FireblocksResponseEnvelopeDto,
   FireblocksSpecialAddressItemDto,
   FireblocksSpecialAddressesResponseDto,
-  FireblocksUserPortfolioResponseDto,
-  FireblocksVaultAccountResponseDto,
-  FireblocksVaultAccountsPageResponseDto,
-  FireblocksVaultAssetResponseDto,
-} from '../dto/fireblocks-response.dto';
-import {
-  FireblocksAssetWalletsQueryDto,
-  FireblocksVaultAccountsQueryDto,
-} from '../dto/fireblocks-cw-controller.dto';
-import {
+  FireblocksPaginatedAssetWalletResponseDto,
+  FireblocksVaultAccountsPageDto,
   FireblocksDepositAddressDto,
   FireblocksUserPortfolioDto,
   FireblocksVaultAccountDto,
   FireblocksVaultAssetDto,
-} from '../dto/fireblocks-wallet.dto';
+  FireblocksAssetMetadataDto,
+  FireblocksAssetCatalogDto,
+} from '../dto/fireblocks-cw-responses.dto';
 import {
+  FireblocksAssetWalletsQueryDto,
+  FireblocksVaultAccountsQueryDto,
   FireblocksSpecialAddressesRequestDto,
   UpdateCustodialWalletDto,
-} from '../dto/fireblocks-vault-requests.dto';
+  FireblocksAssetsCatalogQueryDto,
+} from '../dto/fireblocks-cw-requests.dto';
 import { FireblocksCwMapper } from '../helpers/fireblocks-cw.mapper';
 import { AbstractCwService } from '../base/abstract-cw.service';
 import { FireblocksVaultResponseMapper } from '../infrastructure/persistence/relational/mappers/fireblocks-vault-response.mapper';
+import {
+  GroupPlainToInstance,
+  GroupPlainToInstances,
+} from '../../../../utils/transformers/class.transformer';
+import { RoleEnum } from '../../../../roles/roles.enum';
 
 /**
  * Consolidated admin service combining vault operations and controller-facing helpers.
@@ -75,13 +75,13 @@ export class FireblocksCwAdminService extends AbstractCwService {
   // ---------------------------------------------------------------------------
   async getUserWallets(
     userId: string,
-  ): Promise<FireblocksUserPortfolioResponseDto> {
+  ): Promise<FireblocksUserPortfolioDto> {
     return this.fetchUserPortfolioByCustomerRefId(userId);
   }
 
   listAssetWallets(
     query: FireblocksAssetWalletsQueryDto,
-  ): Promise<FireblocksAssetWalletsPageResponseDto> {
+  ): Promise<FireblocksPaginatedAssetWalletResponseDto> {
     return this.listAssetWalletsPaged(
       query.limit,
       query.before,
@@ -92,15 +92,13 @@ export class FireblocksCwAdminService extends AbstractCwService {
 
   createSpecialAddresses(
     body: FireblocksSpecialAddressesRequestDto,
-  ): Promise<
-    FireblocksResponseEnvelopeDto<FireblocksSpecialAddressesResponseDto>
-  > {
+  ): Promise<FireblocksSpecialAddressesResponseDto> {
     return this.createSpecialAddressesForAssets(body);
   }
 
   listVaultAccounts(
     query: FireblocksVaultAccountsQueryDto,
-  ): Promise<FireblocksVaultAccountsPageResponseDto> {
+  ): Promise<FireblocksVaultAccountsPageDto> {
     return this.listVaultAccountsPaged(
       query.limit,
       query.before,
@@ -112,14 +110,14 @@ export class FireblocksCwAdminService extends AbstractCwService {
 
   fetchVaultAccount(
     vaultAccountId: string,
-  ): Promise<FireblocksVaultAccountResponseDto> {
+  ): Promise<FireblocksVaultAccountDto> {
     return this.fetchVaultAccountById(vaultAccountId);
   }
 
   fetchVaultAsset(
     vaultAccountId: string,
     assetId: string,
-  ): Promise<FireblocksVaultAssetResponseDto> {
+  ): Promise<FireblocksVaultAssetDto> {
     return this.fetchVaultAccountAsset(vaultAccountId, assetId);
   }
 
@@ -135,7 +133,7 @@ export class FireblocksCwAdminService extends AbstractCwService {
     after?: string,
     assetId?: string,
     namePrefix?: string,
-  ): Promise<FireblocksVaultAccountsPageResponseDto> {
+  ): Promise<FireblocksVaultAccountsPageDto> {
     this.guardEnabledAndLog();
     const response = await this.sdk.vaults.getPagedVaultAccounts({
       limit,
@@ -152,7 +150,7 @@ export class FireblocksCwAdminService extends AbstractCwService {
    */
   async fetchVaultAccountById(
     vaultAccountId: string,
-  ): Promise<FireblocksVaultAccountResponseDto> {
+  ): Promise<FireblocksVaultAccountDto> {
     this.guardEnabledAndLog();
     const response = await this.sdk.vaults.getVaultAccount({ vaultAccountId });
     return FireblocksVaultResponseMapper.vaultAccount(response);
@@ -164,7 +162,7 @@ export class FireblocksCwAdminService extends AbstractCwService {
   async fetchVaultAccountAsset(
     vaultAccountId: string,
     assetId: string,
-  ): Promise<FireblocksVaultAssetResponseDto> {
+  ): Promise<FireblocksVaultAssetDto> {
     this.guardEnabledAndLog();
     const response = await this.sdk.vaults.getVaultAccountAsset({
       vaultAccountId,
@@ -179,7 +177,7 @@ export class FireblocksCwAdminService extends AbstractCwService {
    */
   async fetchUserPortfolioByCustomerRefId(
     customerRefId: string,
-  ): Promise<FireblocksResponseEnvelopeDto<FireblocksUserPortfolioDto>> {
+  ): Promise<FireblocksUserPortfolioDto> {
     const paged = await this.listVaultAccountsPaged(
       undefined,
       undefined,
@@ -187,7 +185,7 @@ export class FireblocksCwAdminService extends AbstractCwService {
       undefined,
       customerRefId,
     );
-    const accounts = (paged.data.accounts || []).filter(
+    const accounts = (paged.accounts || []).filter(
       (account) => account.customerRefId === customerRefId,
     );
 
@@ -196,11 +194,9 @@ export class FireblocksCwAdminService extends AbstractCwService {
       accounts as VaultAccount[],
     );
 
-    return {
-      statusCode: paged.statusCode,
-      headers: paged.headers,
-      data: dto,
-    };
+    return GroupPlainToInstance(FireblocksUserPortfolioDto, dto, [
+      RoleEnum.admin,
+    ]);
   }
 
   /**
@@ -298,7 +294,7 @@ export class FireblocksCwAdminService extends AbstractCwService {
     before?: string,
     after?: string,
     assetId?: string,
-  ): Promise<FireblocksAssetWalletsPageResponseDto> {
+  ): Promise<FireblocksPaginatedAssetWalletResponseDto> {
     this.guardEnabledAndLog();
     const response = await this.sdk.vaults.getAssetWallets({
       assetId,
@@ -475,9 +471,7 @@ export class FireblocksCwAdminService extends AbstractCwService {
    */
   async createSpecialAddressesForAssets(
     request: FireblocksSpecialAddressesRequestDto,
-  ): Promise<
-    FireblocksResponseEnvelopeDto<FireblocksSpecialAddressesResponseDto>
-  > {
+  ): Promise<FireblocksSpecialAddressesResponseDto> {
     this.guardEnabledAndLog();
 
     const {
@@ -532,14 +526,57 @@ export class FireblocksCwAdminService extends AbstractCwService {
       });
     }
 
-    return {
-      statusCode: vaultAccountResponse.statusCode,
-      headers: vaultAccountResponse.headers,
-      data: {
+    return GroupPlainToInstance(
+      FireblocksSpecialAddressesResponseDto,
+      {
         vaultAccount: vaultAccountDto,
         addresses: createdAddresses,
       },
-    };
+      [RoleEnum.admin],
+    );
+  }
+
+  /**
+   * List supported assets for the workspace (with environment).
+   */
+  async listSupportedAssets(
+    query: FireblocksAssetsCatalogQueryDto,
+  ): Promise<FireblocksAssetCatalogDto> {
+    this.guardEnabledAndLog();
+    const response = await this.sdk.blockchainsAssets.listAssets({
+      pageSize: query.limit,
+      pageCursor: query.cursor,
+    });
+
+    const assets = GroupPlainToInstances(
+      FireblocksAssetMetadataDto,
+      (response.data?.data as any[])?.map((a: any) =>
+        FireblocksCwMapper.toAssetMetadataDto(a),
+      ) ?? [],
+      [RoleEnum.admin],
+    );
+
+    return GroupPlainToInstance(
+      FireblocksAssetCatalogDto,
+      {
+        envType: this.fireblocks.getOptions().envType,
+        assets,
+      },
+      [RoleEnum.admin],
+    );
+  }
+
+  /**
+   * Fetch metadata for a specific asset.
+   */
+  async fetchAssetMetadata(assetId: string): Promise<FireblocksAssetMetadataDto> {
+    this.guardEnabledAndLog();
+    const response = await this.sdk.blockchainsAssets.getAsset({ id: assetId });
+    return GroupPlainToInstance(
+      FireblocksAssetMetadataDto,
+      FireblocksCwMapper.toAssetMetadataDto(response.data as any),
+      [RoleEnum.admin],
+    );
   }
 
   // ---------------------------------------------------------------------------
@@ -551,14 +588,14 @@ export class FireblocksCwAdminService extends AbstractCwService {
   async bulkCreateVaultAccounts(
     request: CreateMultipleAccountsRequest,
     idempotencyKey?: string,
-  ): Promise<FireblocksResponseEnvelopeDto<JobCreated>> {
+  ): Promise<JobCreated> {
     this.guardEnabledAndLog();
     const response = await this.sdk.vaults.createMultipleAccounts({
       createMultipleAccountsRequest: request,
       idempotencyKey,
     });
 
-    return FireblocksVaultResponseMapper.envelope(response);
+    return response.data as JobCreated;
   }
 
   /**
@@ -566,13 +603,11 @@ export class FireblocksCwAdminService extends AbstractCwService {
    */
   async fetchBulkCreateVaultAccountsJobStatus(
     jobId: string,
-  ): Promise<
-    FireblocksResponseEnvelopeDto<CreateMultipleVaultAccountsJobStatus>
-  > {
+  ): Promise<CreateMultipleVaultAccountsJobStatus> {
     this.guardEnabledAndLog();
     const response =
       await this.sdk.vaults.getCreateMultipleVaultAccountsJobStatus({ jobId });
-    return FireblocksVaultResponseMapper.envelope(response);
+    return response.data as CreateMultipleVaultAccountsJobStatus;
   }
 
   /**
@@ -581,14 +616,14 @@ export class FireblocksCwAdminService extends AbstractCwService {
   async bulkCreateDepositAddresses(
     request: CreateMultipleDepositAddressesRequest,
     idempotencyKey?: string,
-  ): Promise<FireblocksResponseEnvelopeDto<JobCreated>> {
+  ): Promise<JobCreated> {
     this.guardEnabledAndLog();
     const response = await this.sdk.vaults.createMultipleDepositAddresses({
       createMultipleDepositAddressesRequest: request,
       idempotencyKey,
     });
 
-    return FireblocksVaultResponseMapper.envelope(response);
+    return response.data as JobCreated;
   }
 
   /**
@@ -596,16 +631,14 @@ export class FireblocksCwAdminService extends AbstractCwService {
    */
   async fetchBulkCreateDepositAddressesJobStatus(
     jobId: string,
-  ): Promise<
-    FireblocksResponseEnvelopeDto<CreateMultipleDepositAddressesJobStatus>
-  > {
+  ): Promise<CreateMultipleDepositAddressesJobStatus> {
     this.guardEnabledAndLog();
     const response =
       await this.sdk.vaults.getCreateMultipleDepositAddressesJobStatus({
         jobId,
       });
 
-    return FireblocksVaultResponseMapper.envelope(response);
+    return response.data as CreateMultipleDepositAddressesJobStatus;
   }
 
   // ---------------------------------------------------------------------------
@@ -614,32 +647,28 @@ export class FireblocksCwAdminService extends AbstractCwService {
   /**
    * List all workspace users (Admin API key required).
    */
-  async listUsers(): Promise<FireblocksResponseEnvelopeDto<GetUsersResponse>> {
+  async listUsers(): Promise<GetUsersResponse> {
     this.guardEnabledAndLog();
     const response = await this.sdk.users.getUsers();
-    return FireblocksVaultResponseMapper.envelope(response);
+    return response.data as GetUsersResponse;
   }
 
   /**
    * List all API users (Admin API key required).
    */
-  async listApiUsers(): Promise<
-    FireblocksResponseEnvelopeDto<GetAPIUsersResponse>
-  > {
+  async listApiUsers(): Promise<GetAPIUsersResponse> {
     this.guardEnabledAndLog();
     const response = await this.sdk.apiUser.getApiUsers();
-    return FireblocksVaultResponseMapper.envelope(response);
+    return response.data as GetAPIUsersResponse;
   }
 
   /**
    * List all console users (Admin API key required).
    */
-  async listConsoleUsers(): Promise<
-    FireblocksResponseEnvelopeDto<GetConsoleUsersResponse>
-  > {
+  async listConsoleUsers(): Promise<GetConsoleUsersResponse> {
     this.guardEnabledAndLog();
     const response = await this.sdk.consoleUser.getConsoleUsers();
-    return FireblocksVaultResponseMapper.envelope(response);
+    return response.data as GetConsoleUsersResponse;
   }
 
   // ---------------------------------------------------------------------------

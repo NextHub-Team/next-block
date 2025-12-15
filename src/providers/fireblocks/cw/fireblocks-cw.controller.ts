@@ -8,7 +8,7 @@ import {
 import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { FireblocksCwService } from './fireblocks-cw.service';
-import { FireblocksCwStatusDto } from './dto/fireblocks-cw-controller.dto';
+import { FireblocksCwStatusDto } from './dto/fireblocks-cw-responses.dto';
 import { RolesGuard } from '../../../roles/roles.guard';
 import { Roles } from '../../../roles/roles.decorator';
 import { RoleEnum } from '../../../roles/roles.enum';
