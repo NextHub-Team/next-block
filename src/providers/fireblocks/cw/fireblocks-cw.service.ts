@@ -9,13 +9,15 @@ import { ModuleRef } from '@nestjs/core';
 import { Fireblocks } from '@fireblocks/ts-sdk';
 import { AllConfigType } from '../../../config/config.type';
 import { getFireblocksBaseUrl } from './helpers/fireblocks-cw.helper';
-import { FireblocksClientOptions } from './types/fireblocks-base.type';
 import { FireblocksCwAdminService } from './services/fireblocks-cw-admin.service';
 import { FireblocksCwClientService } from './services/fireblocks-cw-client.service';
 import { UsersService } from '../../../users/users.service';
+import { FireblocksConfig } from './config/fireblocks-config.type';
 import {
   FIREBLOCKS_CW_ENABLE,
   FIREBLOCKS_CW_ENV_TYPE,
+  FIREBLOCKS_CW_API_KEY,
+  FIREBLOCKS_CW_SECRET_KEY,
   FIREBLOCKS_CW_CIRCUIT_BREAKER_FAILURE_THRESHOLD,
   FIREBLOCKS_CW_CIRCUIT_BREAKER_HALF_OPEN_SAMPLE,
   FIREBLOCKS_CW_CIRCUIT_BREAKER_RESET_TIMEOUT_MS,
@@ -42,7 +44,7 @@ export class FireblocksCwService
    * 5) If vault exists but wallet is missing, create AVAX (or target asset) wallet.
    * 6) If wallet exists, return/check it (ensure helper returns the existing wallet/address).
    */
-  private readonly options: FireblocksClientOptions;
+  private readonly options: FireblocksConfig;
   private fireblocksSdk?: Fireblocks;
   public admin!: FireblocksCwAdminService;
   public client!: FireblocksCwClientService;
@@ -72,7 +74,7 @@ export class FireblocksCwService
       return;
     }
 
-    this.logger.log('Initializing Fireblocks CW services...');
+    this.logger.log('Initializing Fireblocks CW Sub services.');
     this.admin = this.moduleRef.get(FireblocksCwAdminService, {
       strict: false,
     });
@@ -86,14 +88,14 @@ export class FireblocksCwService
 
   async onModuleDestroy(): Promise<void> {
     if (!this.fireblocksSdk) {
-      this.logger.log('Fireblocks SDK not initialized; skipping teardown.');
+      this.logger.log('Fireblocks SDK not initialized; skipping shutdown.');
       return;
     }
 
-    await this.teardownSdk();
+    await this.shutdown();
   }
 
-  getOptions(): FireblocksClientOptions {
+  getOptions(): FireblocksConfig {
     return this.options;
   }
 
@@ -122,10 +124,10 @@ export class FireblocksCwService
 
   async buildVaultName(
     userId: number | string,
-    fallbackProviderId?: string | null,
+    fallbackSocialId?: string | null,
   ): Promise<string> {
     const user = await this.usersService.findById(userId);
-    const suffix = user?.socialId ?? fallbackProviderId ?? userId;
+    const suffix = user?.socialId ?? fallbackSocialId ?? userId;
     const configuredPrefix =
       (this.options.vaultNamePrefix ?? FIREBLOCKS_CW_VAULT_NAME_PREFIX) || '';
     const basePrefix =
@@ -189,7 +191,7 @@ export class FireblocksCwService
     }
   }
 
-  private async teardownSdk(): Promise<void> {
+  private async shutdown(): Promise<void> {
     const sdk = this.fireblocksSdk;
     this.fireblocksSdk = undefined;
 
@@ -197,7 +199,7 @@ export class FireblocksCwService
       return;
     }
 
-    this.logger.log('Tearing down Fireblocks SDK resources...');
+    this.logger.log('Shutting down Fireblocks SDK resources...');
 
     const closableSdk = sdk as unknown as {
       close?: () => Promise<void> | void;
@@ -217,7 +219,7 @@ export class FireblocksCwService
         );
       } else {
         this.logger.log(
-          'Fireblocks SDK does not expose explicit teardown hooks; reference cleared for GC.',
+          'Fireblocks SDK does not expose explicit shutdown hooks; reference cleared for GC.',
         );
       }
     } catch (error: unknown) {
@@ -228,67 +230,58 @@ export class FireblocksCwService
     }
   }
 
-  private resolveOptions(): FireblocksClientOptions {
-    const enable = this.configService.get(
-      'fireblocks.enable',
-      FIREBLOCKS_CW_ENABLE,
-      {
+  private resolveOptions(): FireblocksConfig {
+    const fireblocksConfig =
+      this.configService.get<FireblocksConfig>('fireblocks', {
         infer: true,
-      },
-    );
-    const envType = this.configService.get(
-      'fireblocks.envType',
-      FIREBLOCKS_CW_ENV_TYPE,
-      {
-        infer: true,
-      },
-    );
-    const vaultNamePrefix =
-      this.configService.get<string>(
-        'fireblocks.vaultNamePrefix',
-        FIREBLOCKS_CW_VAULT_NAME_PREFIX,
-        { infer: true },
-      ) ?? FIREBLOCKS_CW_VAULT_NAME_PREFIX;
+      }) ?? ({} as Partial<FireblocksConfig>);
 
-    if (!enable) {
-      return {
-        enable,
-        apiKey: '',
-        secretKey: '',
-        envType,
-        requestTimeoutMs: FIREBLOCKS_CW_REQUEST_TIMEOUT_MS,
-        maxRetries: FIREBLOCKS_CW_MAX_RETRIES,
-        circuitBreaker: {
-          failureThreshold: FIREBLOCKS_CW_CIRCUIT_BREAKER_FAILURE_THRESHOLD,
-          resetTimeoutMs: FIREBLOCKS_CW_CIRCUIT_BREAKER_RESET_TIMEOUT_MS,
-          halfOpenSample: FIREBLOCKS_CW_CIRCUIT_BREAKER_HALF_OPEN_SAMPLE,
-        },
-        rateLimit: {
-          tokensPerInterval: FIREBLOCKS_CW_RATE_LIMIT_TOKENS_PER_INTERVAL,
-          intervalMs: FIREBLOCKS_CW_RATE_LIMIT_INTERVAL_MS,
-        },
-        debugLogging: FIREBLOCKS_CW_DEBUG_LOGGING,
-        vaultNamePrefix,
-      } satisfies FireblocksClientOptions;
+    const merged = this.mergeWithDefaults(fireblocksConfig);
+
+    if (!merged.enable) {
+      // Explicitly clear credentials when the integration is disabled.
+      return { ...merged, apiKey: '', secretKey: '' };
     }
 
-    const fireblocksConfig = this.configService.getOrThrow('fireblocks', {
-      infer: true,
-    });
-    const secretKey = this.normalizeSecretKey(fireblocksConfig.secretKey);
-
     return {
-      enable,
-      apiKey: fireblocksConfig.apiKey,
-      secretKey,
-      envType: fireblocksConfig.envType,
-      requestTimeoutMs: fireblocksConfig.requestTimeoutMs,
-      maxRetries: fireblocksConfig.maxRetries,
-      circuitBreaker: fireblocksConfig.circuitBreaker,
-      rateLimit: fireblocksConfig.rateLimit,
-      debugLogging: fireblocksConfig.debugLogging,
-      vaultNamePrefix: fireblocksConfig.vaultNamePrefix,
-    } satisfies FireblocksClientOptions;
+      ...merged,
+      secretKey: this.normalizeSecretKey(merged.secretKey),
+    };
+  }
+
+  private mergeWithDefaults(
+    config?: Partial<FireblocksConfig>,
+  ): FireblocksConfig {
+    return {
+      enable: config?.enable ?? FIREBLOCKS_CW_ENABLE,
+      apiKey: config?.apiKey ?? FIREBLOCKS_CW_API_KEY,
+      secretKey: config?.secretKey ?? FIREBLOCKS_CW_SECRET_KEY,
+      envType: config?.envType ?? FIREBLOCKS_CW_ENV_TYPE,
+      requestTimeoutMs:
+        config?.requestTimeoutMs ?? FIREBLOCKS_CW_REQUEST_TIMEOUT_MS,
+      maxRetries: config?.maxRetries ?? FIREBLOCKS_CW_MAX_RETRIES,
+      circuitBreaker: {
+        failureThreshold:
+          config?.circuitBreaker?.failureThreshold ??
+          FIREBLOCKS_CW_CIRCUIT_BREAKER_FAILURE_THRESHOLD,
+        resetTimeoutMs:
+          config?.circuitBreaker?.resetTimeoutMs ??
+          FIREBLOCKS_CW_CIRCUIT_BREAKER_RESET_TIMEOUT_MS,
+        halfOpenSample:
+          config?.circuitBreaker?.halfOpenSample ??
+          FIREBLOCKS_CW_CIRCUIT_BREAKER_HALF_OPEN_SAMPLE,
+      },
+      rateLimit: {
+        tokensPerInterval:
+          config?.rateLimit?.tokensPerInterval ??
+          FIREBLOCKS_CW_RATE_LIMIT_TOKENS_PER_INTERVAL,
+        intervalMs:
+          config?.rateLimit?.intervalMs ?? FIREBLOCKS_CW_RATE_LIMIT_INTERVAL_MS,
+      },
+      debugLogging: config?.debugLogging ?? FIREBLOCKS_CW_DEBUG_LOGGING,
+      vaultNamePrefix:
+        config?.vaultNamePrefix ?? FIREBLOCKS_CW_VAULT_NAME_PREFIX,
+    };
   }
 
   /**
