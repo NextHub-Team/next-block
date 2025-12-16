@@ -1,32 +1,60 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
-import { ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
+import { Controller, Get, HttpCode, HttpStatus, Query } from '@nestjs/common';
+import { ApiOkResponse } from '@nestjs/swagger';
 import { RewardMinterService } from './reward-minter.service';
-import { RewardMintEventDto } from './dto/reward-mint-event.dto';
-import { RewardMint } from './domain/reward-mint';
 import { RegisterApiTag } from '../../common/api-docs/decorators/register-api-tag.decorator';
 
+type TokenType = 'reward' | 'status' | 'subscription';
+
 @RegisterApiTag(
-  'Address Management – Reward Minter',
-  'Handle reward mint events and apply them to RewardToken contract',
+  'Address Management',
+  'Handle reward mint events and apply them to SleeveToken contracts',
 )
 @Controller({
   path: 'address-management/reward-minter',
-  version: '11',
 })
 export class RewardMinterController {
   constructor(private readonly rewardMinterService: RewardMinterService) {}
 
-  // @Post('direct-test')
-  // @HttpCode(HttpStatus.CREATED)
-  // @ApiCreatedResponse({ type: RewardMint })
-  // async directTest(): Promise<RewardMint> {
-  //   return this.rewardMinterService.directTestMint();
-  // }
+  @Get('balance')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    schema: {
+      example: {
+        contractAddress: '0x...',
+        walletAddress: '0x...',
+        sleeveId: 'test-sleeve-1',
+        tokenType: 'reward',
+        balance: '40',
+        balances: { reward: '40', status: '0', subscription: '0' },
+      },
+    },
+  })
+  async getBalance(
+    @Query('sleeveId') sleeveId: string,
+    @Query('walletAddress') walletAddress: string,
+    @Query('tokenType') tokenType?: TokenType,
+  ) {
+    const result = await this.rewardMinterService.getBalance({
+      sleeveId,
+      walletAddress,
+      tokenType,
+    });
 
-  // @Post('apply')
-  // @HttpCode(HttpStatus.OK)
-  // @ApiOkResponse({ type: RewardMint })
-  // async apply(@Body() dto: RewardMintEventDto): Promise<RewardMint> {
-  //   return this.rewardMinterService.applyFromEvent(dto);
-  // }
+    if ('tokenType' in result) {
+      return {
+        sleeveId,
+        walletAddress,
+        contractAddress: result.contractAddress,
+        tokenType: result.tokenType,
+        balance: result.balance,
+      };
+    }
+
+    return {
+      sleeveId,
+      walletAddress,
+      contractAddress: result.contractAddress,
+      balances: result.balances,
+    };
+  }
 }

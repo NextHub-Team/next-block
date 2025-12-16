@@ -52,6 +52,7 @@ import internalEventsConfig from './common/internal-events/config/internal-event
 
 import {ContractDeployerModule} from './address-management/contract-deployer/contract-deployer.module'
 import {RewardMinterModule} from './address-management/reward-minter/reward-minter.module'
+import { SleeveRegistryModule } from './address-management/sleeve-registry/sleeve-registry.module';
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
@@ -90,6 +91,7 @@ import { SleevesModule } from './sleeves/sleeves.module';
     WebhooksModule,
     ContractDeployerModule,
     RewardMinterModule,
+    SleeveRegistryModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [

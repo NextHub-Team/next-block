@@ -6,7 +6,7 @@ import { DeployedContract } from './domain/deployed-contract';
 import { RegisterApiTag } from '../../common/api-docs/decorators/register-api-tag.decorator';
 
 @RegisterApiTag(
-  'Address Management – Contract Deployer',
+  'Address Management',
   'Compile and deploy address-book related smart contracts',
 )
 @Controller({

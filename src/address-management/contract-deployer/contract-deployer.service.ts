@@ -40,16 +40,3 @@ export class ContractDeployerService {
   }
 }
 
-// {
-//     "status": 200,
-//     "success": true,
-//     "message": "success",
-//     "error": null,
-//     "data": {
-//         "address": "0x5346D9280711c649CBfACc1B06D05E30b7015E7C",
-//         "name": "RewardToken",
-//         "network": "avax-fuji",
-//         "deployedAt": "2025-12-16T10:58:51.587Z"
-//     },
-//     "hasNextPage": false
-// }
