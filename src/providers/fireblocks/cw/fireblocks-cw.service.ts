@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { ModuleRef } from '@nestjs/core';
 import { Fireblocks } from '@fireblocks/ts-sdk';
 import { AllConfigType } from '../../../config/config.type';
+import { ConfigGet, ConfigGetOrThrow } from '../../../config/config.decorator';
 import { getFireblocksBaseUrl } from './helpers/fireblocks-cw.helper';
 import { FireblocksCwAdminService } from './services/fireblocks-cw-admin.service';
 import { FireblocksCwClientService } from './services/fireblocks-cw-client.service';
@@ -28,6 +29,7 @@ import {
   FIREBLOCKS_CW_REQUEST_TIMEOUT_MS,
   FIREBLOCKS_CW_VAULT_NAME_PREFIX,
 } from './types/fireblocks-const.type';
+import { FireblocksEnvironmentType } from './types/fireblocks-enum.type';
 import { BaseToggleableService } from '../../../common/base/base-toggleable.service';
 
 @Injectable()
@@ -35,6 +37,72 @@ export class FireblocksCwService
   extends BaseToggleableService
   implements OnModuleInit, OnModuleDestroy
 {
+  @ConfigGetOrThrow('fireblocks.apiKey', { inferEnvVar: true })
+  private readonly apiKey?: string;
+
+  @ConfigGetOrThrow('fireblocks.secretKey', { inferEnvVar: true })
+  private readonly rawSecretKey?: string;
+
+  @ConfigGet('fireblocks.envType', {
+    inferEnvVar: true,
+    defaultValue: FIREBLOCKS_CW_ENV_TYPE,
+  })
+  private readonly envType!: FireblocksEnvironmentType;
+
+  @ConfigGet('fireblocks.requestTimeoutMs', {
+    inferEnvVar: true,
+    defaultValue: FIREBLOCKS_CW_REQUEST_TIMEOUT_MS,
+  })
+  private readonly requestTimeoutMs!: number;
+
+  @ConfigGet('fireblocks.maxRetries', {
+    inferEnvVar: true,
+    defaultValue: FIREBLOCKS_CW_MAX_RETRIES,
+  })
+  private readonly maxRetries!: number;
+
+  @ConfigGet('fireblocks.circuitBreaker.failureThreshold', {
+    inferEnvVar: true,
+    defaultValue: FIREBLOCKS_CW_CIRCUIT_BREAKER_FAILURE_THRESHOLD,
+  })
+  private readonly circuitBreakerFailureThreshold!: number;
+
+  @ConfigGet('fireblocks.circuitBreaker.resetTimeoutMs', {
+    inferEnvVar: true,
+    defaultValue: FIREBLOCKS_CW_CIRCUIT_BREAKER_RESET_TIMEOUT_MS,
+  })
+  private readonly circuitBreakerResetTimeoutMs!: number;
+
+  @ConfigGet('fireblocks.circuitBreaker.halfOpenSample', {
+    inferEnvVar: true,
+    defaultValue: FIREBLOCKS_CW_CIRCUIT_BREAKER_HALF_OPEN_SAMPLE,
+  })
+  private readonly circuitBreakerHalfOpenSample!: number;
+
+  @ConfigGet('fireblocks.rateLimit.tokensPerInterval', {
+    inferEnvVar: true,
+    defaultValue: FIREBLOCKS_CW_RATE_LIMIT_TOKENS_PER_INTERVAL,
+  })
+  private readonly rateLimitTokensPerInterval!: number;
+
+  @ConfigGet('fireblocks.rateLimit.intervalMs', {
+    inferEnvVar: true,
+    defaultValue: FIREBLOCKS_CW_RATE_LIMIT_INTERVAL_MS,
+  })
+  private readonly rateLimitIntervalMs!: number;
+
+  @ConfigGet('fireblocks.debugLogging', {
+    inferEnvVar: true,
+    defaultValue: FIREBLOCKS_CW_DEBUG_LOGGING,
+  })
+  private readonly debugLogging!: boolean;
+
+  @ConfigGet('fireblocks.vaultNamePrefix', {
+    inferEnvVar: true,
+    defaultValue: FIREBLOCKS_CW_VAULT_NAME_PREFIX,
+  })
+  private readonly configuredVaultNamePrefix!: string;
+
   /**
    * Usage pattern (real Fireblocks flows):
    * 1) Verify user exists in DB (needs id + socialId).
@@ -60,7 +128,7 @@ export class FireblocksCwService
         infer: true,
       }),
     );
-    this.options = this.resolveOptions();
+    this.options = this.buildOptions();
     this.logger.log(
       `Fireblocks client configured (env: ${this.options.envType})`,
     );
@@ -230,58 +298,54 @@ export class FireblocksCwService
     }
   }
 
-  private resolveOptions(): FireblocksConfig {
-    const fireblocksConfig =
-      this.configService.get<FireblocksConfig>('fireblocks', {
-        infer: true,
-      }) ?? ({} as Partial<FireblocksConfig>);
-
-    const merged = this.mergeWithDefaults(fireblocksConfig);
-
-    if (!merged.enable) {
-      // Explicitly clear credentials when the integration is disabled.
-      return { ...merged, apiKey: '', secretKey: '' };
-    }
-
-    return {
-      ...merged,
-      secretKey: this.normalizeSecretKey(merged.secretKey),
-    };
-  }
-
-  private mergeWithDefaults(
-    config?: Partial<FireblocksConfig>,
-  ): FireblocksConfig {
-    return {
-      enable: config?.enable ?? FIREBLOCKS_CW_ENABLE,
-      apiKey: config?.apiKey ?? FIREBLOCKS_CW_API_KEY,
-      secretKey: config?.secretKey ?? FIREBLOCKS_CW_SECRET_KEY,
-      envType: config?.envType ?? FIREBLOCKS_CW_ENV_TYPE,
-      requestTimeoutMs:
-        config?.requestTimeoutMs ?? FIREBLOCKS_CW_REQUEST_TIMEOUT_MS,
-      maxRetries: config?.maxRetries ?? FIREBLOCKS_CW_MAX_RETRIES,
+  private buildOptions(): FireblocksConfig {
+    const options: FireblocksConfig = {
+      enable: this.getEnabled(),
+      apiKey: this.apiKey ?? FIREBLOCKS_CW_API_KEY,
+      secretKey: this.rawSecretKey ?? FIREBLOCKS_CW_SECRET_KEY,
+      envType: this.envType ?? FIREBLOCKS_CW_ENV_TYPE,
+      requestTimeoutMs: this.requestTimeoutMs ?? FIREBLOCKS_CW_REQUEST_TIMEOUT_MS,
+      maxRetries: this.maxRetries ?? FIREBLOCKS_CW_MAX_RETRIES,
       circuitBreaker: {
         failureThreshold:
-          config?.circuitBreaker?.failureThreshold ??
+          this.circuitBreakerFailureThreshold ??
           FIREBLOCKS_CW_CIRCUIT_BREAKER_FAILURE_THRESHOLD,
         resetTimeoutMs:
-          config?.circuitBreaker?.resetTimeoutMs ??
+          this.circuitBreakerResetTimeoutMs ??
           FIREBLOCKS_CW_CIRCUIT_BREAKER_RESET_TIMEOUT_MS,
         halfOpenSample:
-          config?.circuitBreaker?.halfOpenSample ??
+          this.circuitBreakerHalfOpenSample ??
           FIREBLOCKS_CW_CIRCUIT_BREAKER_HALF_OPEN_SAMPLE,
       },
       rateLimit: {
         tokensPerInterval:
-          config?.rateLimit?.tokensPerInterval ??
+          this.rateLimitTokensPerInterval ??
           FIREBLOCKS_CW_RATE_LIMIT_TOKENS_PER_INTERVAL,
         intervalMs:
-          config?.rateLimit?.intervalMs ?? FIREBLOCKS_CW_RATE_LIMIT_INTERVAL_MS,
+          this.rateLimitIntervalMs ?? FIREBLOCKS_CW_RATE_LIMIT_INTERVAL_MS,
       },
-      debugLogging: config?.debugLogging ?? FIREBLOCKS_CW_DEBUG_LOGGING,
+      debugLogging: this.debugLogging ?? FIREBLOCKS_CW_DEBUG_LOGGING,
       vaultNamePrefix:
-        config?.vaultNamePrefix ?? FIREBLOCKS_CW_VAULT_NAME_PREFIX,
+        this.configuredVaultNamePrefix ?? FIREBLOCKS_CW_VAULT_NAME_PREFIX,
     };
+
+    if (
+      options.enable &&
+      (!options.apiKey?.trim()?.length || !options.secretKey?.trim()?.length)
+    ) {
+      throw new Error(
+        'Fireblocks CW is enabled but apiKey or secretKey is missing. Please set FIREBLOCKS_CW_API_KEY and FIREBLOCKS_CW_SECRET_KEY.',
+      );
+    }
+
+    if (!options.enable) {
+      options.apiKey = '';
+      options.secretKey = '';
+    } else {
+      options.secretKey = this.normalizeSecretKey(options.secretKey);
+    }
+
+    return options;
   }
 
   /**
