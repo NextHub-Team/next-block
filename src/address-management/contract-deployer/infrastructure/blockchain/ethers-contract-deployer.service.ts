@@ -1,14 +1,17 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ContractDeployerBlockchainPort } from '../../contract-deployer.blockchain';
-import { compile } from '@ethereum-waffle/compiler';
 import { ethers } from 'ethers';
 import * as fs from 'fs';
 import * as path from 'path';
+import solc from 'solc';
+
+type SolcOutput = {
+  contracts?: Record<string, Record<string, any>>;
+  errors?: Array<{ severity: string; formattedMessage: string }>;
+};
 
 @Injectable()
-export class EthersContractDeployerService
-  implements ContractDeployerBlockchainPort
-{
+export class EthersContractDeployerService implements ContractDeployerBlockchainPort {
   private readonly logger = new Logger(EthersContractDeployerService.name);
   private readonly provider: ethers.JsonRpcProvider;
   private readonly wallet: ethers.Wallet;
@@ -22,15 +25,15 @@ export class EthersContractDeployerService
     }
 
     this.logger.log(`Using RPC_URL: ${rpcUrl}`);
-
     this.provider = new ethers.JsonRpcProvider(rpcUrl);
     this.wallet = new ethers.Wallet(privateKey, this.provider);
   }
 
   async compileAndDeploy(
     contractName: string,
-    compilerVersion = '0.8.28',
-  ): Promise<{ address: string }> {
+    compilerVersion?: string,
+    constructorArgs: any[] = [],
+  ): Promise<{ address: string; txHash: string }> {
     const contractsDir = path.resolve(
       process.cwd(),
       'src',
@@ -39,59 +42,91 @@ export class EthersContractDeployerService
       'contracts',
     );
 
-    if (!fs.existsSync(contractsDir)) {
-      throw new Error(
-        `Contracts directory does not exist: ${contractsDir}. Please create it and add your .sol files.`,
-      );
-    }
-
     const contractFileName = `${contractName}.sol`;
     const contractPath = path.join(contractsDir, contractFileName);
 
+    if (!fs.existsSync(contractsDir)) {
+      throw new Error(`Contracts directory does not exist: ${contractsDir}`);
+    }
     if (!fs.existsSync(contractPath)) {
       throw new Error(`Contract file not found: ${contractPath}`);
     }
 
     this.logger.log(
-      `Compiling contract "${contractName}" from: ${contractPath} (solc ${compilerVersion})`,
+      `Compiling "${contractName}" from ${contractPath} (local solc; requested=${compilerVersion ?? 'n/a'})`,
     );
 
-    const buildDir = path.resolve(
-      process.cwd(),
-      'build',
-      'address-management',
-      'contract-deployer',
-    );
-    if (!fs.existsSync(buildDir)) {
-      fs.mkdirSync(buildDir, { recursive: true });
+    const source = fs.readFileSync(contractPath, 'utf8');
+
+    const input = {
+      language: 'Solidity',
+      sources: {
+        [contractFileName]: { content: source },
+      },
+      settings: {
+        optimizer: { enabled: true, runs: 200 },
+        outputSelection: {
+          '*': {
+            '*': ['abi', 'evm.bytecode.object'],
+          },
+        },
+      },
+    };
+
+    const findImports = (importPath: string) => {
+      // 1) Resolve relative imports
+      if (importPath.startsWith('./') || importPath.startsWith('../')) {
+        const resolved = path.resolve(path.dirname(contractPath), importPath);
+        if (fs.existsSync(resolved)) {
+          return { contents: fs.readFileSync(resolved, 'utf8') };
+        }
+      }
+
+      // 2) Resolve node_modules imports (e.g., @openzeppelin/...)
+      const nmResolved = path.resolve(process.cwd(), 'node_modules', importPath);
+      if (fs.existsSync(nmResolved)) {
+        return { contents: fs.readFileSync(nmResolved, 'utf8') };
+      }
+
+      // 3) Fallback: try contractsDir direct
+      const localResolved = path.resolve(contractsDir, importPath);
+      if (fs.existsSync(localResolved)) {
+        return { contents: fs.readFileSync(localResolved, 'utf8') };
+      }
+
+      return { error: `Import not found: ${importPath}` };
+    };
+
+    const raw = solc.compile(JSON.stringify(input), { import: findImports });
+    const output = JSON.parse(raw) as SolcOutput;
+
+    // Show compiler errors clearly
+    if (output.errors?.length) {
+      const errors = output.errors
+        .filter((e) => e.severity === 'error')
+        .map((e) => e.formattedMessage)
+        .join('\n');
+
+      const warnings = output.errors
+        .filter((e) => e.severity !== 'error')
+        .map((e) => e.formattedMessage)
+        .join('\n');
+
+      if (warnings) this.logger.warn(`Solc warnings:\n${warnings}`);
+      if (errors) throw new Error(`Solc compilation failed:\n${errors}`);
     }
 
-    const nodeModulesDirectory = path.resolve(process.cwd(), 'node_modules');
-
-    const output = await compile({
-      sourceDirectory: contractsDir,
-      compilerVersion,
-      outputDirectory: buildDir,
-      nodeModulesDirectory,
-    });
-
-    if (!output.contracts || Object.keys(output.contracts).length === 0) {
-      throw new Error(
-        `Compilation output is invalid. "contracts" field is missing or empty.`,
-      );
+    const fileContracts = output.contracts?.[contractFileName];
+    if (!fileContracts) {
+      throw new Error(`No compiled contracts found for file: ${contractFileName}`);
     }
 
-    const contractKey = Object.keys(output.contracts).find((key) =>
-      key.endsWith(contractFileName),
-    );
-
-    if (!contractKey) {
-      throw new Error(`Compiled output does not include ${contractFileName}`);
-    }
-
-    const compiled = (output.contracts as any)[contractKey]?.[contractName];
+    const compiled = fileContracts[contractName];
     if (!compiled) {
-      throw new Error(`${contractName} not found in compiled output`);
+      const available = Object.keys(fileContracts).join(', ');
+      throw new Error(
+        `Contract "${contractName}" not found in "${contractFileName}". Available: ${available}`,
+      );
     }
 
     const abi = compiled.abi;
@@ -101,46 +136,52 @@ export class EthersContractDeployerService
       throw new Error(`ABI or bytecode missing for ${contractName}`);
     }
 
+
+    const buildDir = path.resolve(
+      process.cwd(),
+      'build',
+      'address-management',
+      'contract-deployer',
+    );
+
+    if (!fs.existsSync(buildDir)) {
+      fs.mkdirSync(buildDir, { recursive: true });
+    }
+
     const abiFile = path.join(buildDir, `${contractName}.abi.json`);
     const bytecodeFile = path.join(buildDir, `${contractName}.bytecode.json`);
 
     fs.writeFileSync(abiFile, JSON.stringify(abi, null, 2));
     fs.writeFileSync(bytecodeFile, bytecode);
 
-    this.logger.log(`${contractName} compiled successfully. Deploying...`);
+    this.logger.log(`Artifacts written: abi=${abiFile} bytecode=${bytecodeFile}`);
+
+    // =========================================================
+
+    this.logger.log(
+      `${contractName} compiled successfully. Deploying with args: ${JSON.stringify(constructorArgs)}`,
+    );
 
     const factory = new ethers.ContractFactory(abi, bytecode, this.wallet);
 
-    // 
-    const contract = await factory.deploy('');
+    // IMPORTANT: spread constructor args
+    const contract = await factory.deploy(...constructorArgs);
 
     const deploymentTx = contract.deploymentTransaction();
-    if (!deploymentTx) {
-      throw new Error('No deployment transaction found on contract instance');
+    if (!deploymentTx) throw new Error('No deployment transaction found on contract instance');
+
+    this.logger.log(`Deploy tx hash: ${deploymentTx.hash}, waiting for confirmation...`);
+
+    const receipt = await deploymentTx.wait();
+    if (!receipt) throw new Error('Deployment transaction not mined');
+
+    if (receipt.status !== 1) {
+      throw new Error(`Deployment failed. tx=${deploymentTx.hash} status=${receipt.status}`);
     }
-
-    this.logger.log(
-      `Deploy tx hash: ${deploymentTx.hash}, waiting for confirmation...`,
-    );
-
-
-    const receipt = await this.provider.waitForTransaction(
-      deploymentTx.hash,
-      null,
-      600_000,
-    );
-
-    if (!receipt) {
-      throw new Error('Deployment transaction not mined within timeout');
-    }
-
-    this.logger.log(
-      `Deploy tx mined. status=${receipt.status}, gasUsed=${receipt.gasUsed.toString()}`,
-    );
 
     const address = contract.target.toString();
     this.logger.log(`Contract ${contractName} deployed at: ${address}`);
 
-    return { address };
+    return { address, txHash: deploymentTx.hash };
   }
 }

@@ -298,6 +298,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "SUBSCRIPTION",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -593,6 +606,35 @@
         "internalType": "string",
         "name": "",
         "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "userBalances",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "rewardBalance",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "statusBalance",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "subscriptionBalance",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
