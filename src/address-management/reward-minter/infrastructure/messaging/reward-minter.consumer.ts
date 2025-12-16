@@ -10,27 +10,17 @@ export class RewardMinterConsumer {
   constructor(private readonly rewardMinterService: RewardMinterService) {}
 
   @EventPattern('points.mint')
-  async handleRewardMint(
-    @Payload() data: RewardMintEventDto,
-    @Ctx() context: RmqContext,
-  ) {
-    const channel = context.getChannelRef();
-    const message = context.getMessage();
+  async handle(@Payload() dto: RewardMintEventDto, @Ctx() ctx: RmqContext): Promise<void> {
+    const channel = ctx.getChannelRef();
+    const msg = ctx.getMessage();
 
     try {
-      if (!data?.userId) throw new Error('Payload.userId is required');
-
-      this.logger.log('Received points.mint event');
-      this.logger.debug(`Payload: ${JSON.stringify(data, null, 2)}`);
-
-      const address = await this.rewardMinterService.resolveOrCreateWalletAddress(data);
-
-      this.logger.log(`Deposit address for userId=${data.userId}: ${address}`);
-
-      channel.ack(message);
-    } catch (err: any) {
-      this.logger.error(`Error while processing points.mint: ${err?.message || err}`);
-      channel.ack(message);
+      this.logger.log(`points.mint received sleeveIdRaw=${JSON.stringify(dto?.sleeveId)}`);
+      await this.rewardMinterService.handleEvent(dto);
+      channel.ack(msg);
+    } catch (e: any) {
+      this.logger.error(`points.mint failed: ${e?.message || e}`);
+      channel.nack(msg, false, false);
     }
   }
 }

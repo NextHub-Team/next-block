@@ -1,12 +1,6 @@
 [
   {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "uri_",
-        "type": "string"
-      }
-    ],
+    "inputs": [],
     "stateMutability": "nonpayable",
     "type": "constructor"
   },
@@ -314,6 +308,30 @@
     "inputs": [
       {
         "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      }
+    ],
+    "name": "balanceByType",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
         "name": "account",
         "type": "address"
       },
@@ -353,6 +371,35 @@
         "internalType": "uint256[]",
         "name": "",
         "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      }
+    ],
+    "name": "balances",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "reward",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "status",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "subscription",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -567,34 +614,6 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "from",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "id",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "transferToken",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
@@ -606,35 +625,6 @@
         "internalType": "string",
         "name": "",
         "type": "string"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      }
-    ],
-    "name": "userBalances",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "rewardBalance",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "statusBalance",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "subscriptionBalance",
-        "type": "uint256"
       }
     ],
     "stateMutability": "view",
