@@ -21,11 +21,9 @@ import {
 
 class FireblocksEnvValidator {
   @IsString()
-  @IsOptional()
   FIREBLOCKS_CW_API_KEY?: string;
 
   @IsString()
-  @IsOptional()
   FIREBLOCKS_CW_SECRET_KEY?: string;
 
   @IsString()
@@ -128,8 +126,7 @@ export default createToggleableConfig<FireblocksConfig, FireblocksEnvValidator>(
 
       const requestTimeoutMs =
         env.FIREBLOCKS_CW_REQUEST_TIMEOUT_MS ?? defaults.requestTimeoutMs;
-      const maxRetries =
-        env.FIREBLOCKS_CW_MAX_RETRIES ?? defaults.maxRetries;
+      const maxRetries = env.FIREBLOCKS_CW_MAX_RETRIES ?? defaults.maxRetries;
       const failureThreshold =
         env.FIREBLOCKS_CW_CIRCUIT_BREAKER_FAILURE_THRESHOLD ??
         defaults.circuitBreaker.failureThreshold;
@@ -145,7 +142,8 @@ export default createToggleableConfig<FireblocksConfig, FireblocksEnvValidator>(
       const intervalMs =
         env.FIREBLOCKS_CW_RATE_LIMIT_INTERVAL_MS ??
         defaults.rateLimit.intervalMs;
-      const debugLogging = env.FIREBLOCKS_CW_DEBUG_LOGGING ?? defaults.debugLogging;
+      const debugLogging =
+        env.FIREBLOCKS_CW_DEBUG_LOGGING ?? defaults.debugLogging;
       const vaultNamePrefix =
         env.FIREBLOCKS_CW_VAULT_NAME_PREFIX ?? defaults.vaultNamePrefix;
 
