@@ -18,16 +18,18 @@ export class RewardMinterConsumer {
     const message = context.getMessage();
 
     try {
+      if (!data?.userId) throw new Error('Payload.userId is required');
+
       this.logger.log('Received points.mint event');
       this.logger.debug(`Payload: ${JSON.stringify(data, null, 2)}`);
 
-      await this.rewardMinterService.applyFromEvent(data);
+      const address = await this.rewardMinterService.resolveOrCreateWalletAddress(data);
+
+      this.logger.log(`Deposit address for userId=${data.userId}: ${address}`);
 
       channel.ack(message);
     } catch (err: any) {
-      this.logger.error(
-        `Error while processing points.mint: ${err.message || err}`,
-      );
+      this.logger.error(`Error while processing points.mint: ${err?.message || err}`);
       channel.ack(message);
     }
   }
