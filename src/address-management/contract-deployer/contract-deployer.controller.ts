@@ -1,15 +1,7 @@
-import {
-  Body,
-  Controller,
-  HttpCode,
-  HttpStatus,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { ContractDeployerService } from './contract-deployer.service';
 import { DeployContractDto } from './dto/deploy-contract.dto';
-import {
-  ApiCreatedResponse,
-} from '@nestjs/swagger';
+import { ApiCreatedResponse } from '@nestjs/swagger';
 import { DeployedContract } from './domain/deployed-contract';
 import { RegisterApiTag } from '../../common/api-docs/decorators/register-api-tag.decorator';
 
@@ -19,22 +11,18 @@ import { RegisterApiTag } from '../../common/api-docs/decorators/register-api-ta
 )
 @Controller({
   path: 'address-management/contract-deployer',
-//   version: '11',
 })
 export class ContractDeployerController {
-  constructor(
-    private readonly contractDeployerService: ContractDeployerService,
-  ) {}
+  constructor(private readonly contractDeployerService: ContractDeployerService) {}
 
   @Post('deploy')
   @HttpCode(HttpStatus.CREATED)
-  @ApiCreatedResponse({
-    type: DeployedContract,
-  })
+  @ApiCreatedResponse({ type: DeployedContract })
   async deploy(@Body() dto: DeployContractDto): Promise<DeployedContract> {
     return this.contractDeployerService.deployContract(
       dto.contractName,
       dto.compilerVersion,
+      dto.constructorArgs ?? [],
     );
   }
 }
