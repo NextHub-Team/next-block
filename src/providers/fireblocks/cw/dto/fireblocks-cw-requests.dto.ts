@@ -401,22 +401,50 @@ export class FireblocksSpecialAddressesRequestDto {
 @Exclude()
 export class CreateUserVaultRequestDto {
   @ApiPropertyOptional({
-    description: 'Override vault account name (defaults to buildVaultName)',
-    example: 'user:123',
+    description: 'Hide account in Fireblocks Console',
+    example: false,
+  })
+  @IsOptional()
+  @IsBoolean()
+  @Expose()
+  hiddenOnUI?: boolean;
+
+  @ApiPropertyOptional({
+    description: 'Enable auto-fuel',
+    example: true,
+  })
+  @IsOptional()
+  @IsBoolean()
+  @Expose()
+  autoFuel?: boolean;
+
+  @ApiPropertyOptional({
+    description: 'Idempotency key for Fireblocks requests',
+    example: 'uuid-123',
   })
   @IsOptional()
   @IsString()
   @Expose()
-  name?: string;
+  idempotencyKey?: string;
+}
 
-  @ApiPropertyOptional({
+@Exclude()
+export class CreateAdminVaultAccountRequestDto {
+  @ApiProperty({
+    description: 'Vault account name',
+    example: 'user:123',
+  })
+  @IsString()
+  @Expose()
+  name!: string;
+
+  @ApiProperty({
     description: 'Customer reference id to attach',
     example: 'user-ref-123',
   })
-  @IsOptional()
   @IsString()
   @Expose()
-  customerRefId?: string;
+  customerRefId!: string;
 
   @ApiPropertyOptional({
     description: 'Hide account in Fireblocks Console',

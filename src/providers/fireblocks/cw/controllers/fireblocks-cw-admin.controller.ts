@@ -31,6 +31,7 @@ import {
   FireblocksSpecialAddressesRequestDto,
   FireblocksAssetsCatalogQueryDto,
   FireblocksVaultAccountsQueryDto,
+  CreateAdminVaultAccountRequestDto,
 } from '../dto/fireblocks-cw-requests.dto';
 import { RolesGuard } from '../../../../roles/roles.guard';
 import { Roles } from '../../../../roles/roles.decorator';
@@ -89,6 +90,15 @@ export class FireblocksCwAdminController {
     @Query() query: FireblocksVaultAccountsQueryDto,
   ): Promise<FireblocksVaultAccountsPageDto> {
     return this.admin.listVaultAccounts(query);
+  }
+
+  @Post('accounts')
+  @ApiCreatedResponse({ type: FireblocksVaultAccountDto })
+  @ApiOperationRoles('Create a Fireblocks vault account', [RoleEnum.admin])
+  async createVaultAccount(
+    @Body() body: CreateAdminVaultAccountRequestDto,
+  ): Promise<FireblocksVaultAccountDto> {
+    return this.admin.createVaultAccount(body);
   }
 
   @Get(':vaultAccountId')

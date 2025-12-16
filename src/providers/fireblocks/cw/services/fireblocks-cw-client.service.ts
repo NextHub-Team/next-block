@@ -87,9 +87,11 @@ export class FireblocksCwClientService {
     const sdk = this.sdk;
     const idempotencyKey = this.ensureIdempotencyKey(body.idempotencyKey);
 
-    const vaultName =
-      body.name ??
-      (await this.fireblocks.buildVaultName(user.id, user.socialId));
+    const vaultName = await this.fireblocks.buildVaultName(
+      user.id,
+      user.socialId ?? `${user.id}`,
+    );
+    const customerRefId = `${user.id}`;
     const paged = await sdk.vaults.getPagedVaultAccounts({
       namePrefix: vaultName,
       limit: 1,
@@ -111,7 +113,7 @@ export class FireblocksCwClientService {
     const response = await sdk.vaults.createVaultAccount({
       createVaultAccountRequest: {
         name: vaultName,
-        customerRefId: body.customerRefId ?? `${user.id}`,
+        customerRefId,
         hiddenOnUI: body.hiddenOnUI ?? true,
         autoFuel: body.autoFuel ?? false,
       },

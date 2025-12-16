@@ -42,6 +42,7 @@ import {
   FireblocksSpecialAddressesRequestDto,
   UpdateCustodialWalletDto,
   FireblocksAssetsCatalogQueryDto,
+  CreateAdminVaultAccountRequestDto,
 } from '../dto/fireblocks-cw-requests.dto';
 import { FireblocksCwMapper } from '../helpers/fireblocks-cw.mapper';
 import { AbstractCwService } from '../base/abstract-cw.service';
@@ -51,6 +52,7 @@ import {
   GroupPlainToInstances,
 } from '../../../../utils/transformers/class.transformer';
 import { RoleEnum } from '../../../../roles/roles.enum';
+import { v4 as uuidv4 } from 'uuid';
 
 /**
  * Consolidated admin service combining vault operations and controller-facing helpers.
@@ -106,6 +108,25 @@ export class FireblocksCwAdminService extends AbstractCwService {
       query.assetId,
       query.namePrefix,
     );
+  }
+
+  async createVaultAccount(
+    command: CreateAdminVaultAccountRequestDto,
+  ): Promise<FireblocksVaultAccountDto> {
+    this.guardEnabledAndLog();
+    const idempotencyKey = this.ensureIdempotencyKey(command.idempotencyKey);
+
+    const response = await this.sdk.vaults.createVaultAccount({
+      createVaultAccountRequest: {
+        name: command.name,
+        customerRefId: command.customerRefId,
+        hiddenOnUI: command.hiddenOnUI ?? true,
+        autoFuel: command.autoFuel ?? false,
+      },
+      idempotencyKey,
+    });
+
+    return FireblocksVaultResponseMapper.vaultAccount(response);
   }
 
   fetchVaultAccount(
@@ -703,5 +724,15 @@ export class FireblocksCwAdminService extends AbstractCwService {
     });
 
     return created.data as VaultAsset;
+  }
+
+  /**
+   * Return provided idempotency key or generate a UUID to guard against retries.
+   */
+  private ensureIdempotencyKey(key?: string): string {
+    if (key && key.trim().length > 0) {
+      return key.trim();
+    }
+    return uuidv4();
   }
 }
