@@ -103,7 +103,7 @@ export class WalletsController {
     return this.walletsService.findActives(req.user.id);
   }
 
-  @ApiOperationRoles('Count my wallets')
+  @ApiOperationRoles('Count Current User wallets')
   @Get('me/count')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: Number })
@@ -111,7 +111,7 @@ export class WalletsController {
     return this.walletsService.countAll(req.user.id);
   }
 
-  @ApiOperationRoles('Count my active wallets')
+  @ApiOperationRoles('Count Current User active wallets')
   @Get('me/actives/count')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: Number })
