@@ -2,7 +2,8 @@ name: Mirror main to private repo
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -15,25 +16,25 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Configure author
+      - name: Configure Git author (real user)
         run: |
           git config user.name "amirtaherkhani"
           git config user.email "amirtaherkhani@outlook.com"
 
-      - name: Verify access to target repo (Repo B)
+      - name: Verify access to target repository
         env:
           PRIVATE_VERO_REPO_TOKEN: ${{ secrets.PRIVATE_VERO_REPO_TOKEN }}
         run: |
-          set -euo pipefail
-          git ls-remote --exit-code \
+          set -e
+          git ls-remote \
             "https://x-access-token:${PRIVATE_VERO_REPO_TOKEN}@github.com/Metapolitanltd/VaultBackend.git" \
             HEAD
 
-      - name: Add remote and fetch
+      - name: Add target remote and fetch
         env:
           PRIVATE_VERO_REPO_TOKEN: ${{ secrets.PRIVATE_VERO_REPO_TOKEN }}
         run: |
-          set -euo pipefail
+          set -e
           git remote add repo-b \
             "https://x-access-token:${PRIVATE_VERO_REPO_TOKEN}@github.com/Metapolitanltd/VaultBackend.git"
           git fetch repo-b main
@@ -42,6 +43,6 @@ jobs:
         run: |
           git merge-base --is-ancestor repo-b/main HEAD
 
-      - name: Push to Repo B
+      - name: Push commits to private repo
         run: |
           git push repo-b main:main
