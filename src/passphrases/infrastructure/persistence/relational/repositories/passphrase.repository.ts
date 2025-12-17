@@ -55,13 +55,13 @@ export class PassphraseRelationalRepository implements PassphraseRepository {
   async update(
     id: Passphrase['id'],
     payload: Partial<Passphrase>,
-  ): Promise<Passphrase> {
+  ): Promise<NullableType<Passphrase>> {
     const entity = await this.passphraseRepository.findOne({
       where: { id },
     });
 
     if (!entity) {
-      throw new Error('Record not found');
+      return null;
     }
 
     const updatedEntity = await this.passphraseRepository.save(

@@ -61,13 +61,13 @@ export class FireblocksNcwWalletRelationalRepository
   async update(
     id: FireblocksNcwWallet['id'],
     payload: Partial<FireblocksNcwWallet>,
-  ): Promise<FireblocksNcwWallet> {
+  ): Promise<NullableType<FireblocksNcwWallet>> {
     const entity = await this.fireblocksNcwWalletRepository.findOne({
       where: { id },
     });
 
     if (!entity) {
-      throw new Error('Record not found');
+      return null;
     }
 
     const updatedEntity = await this.fireblocksNcwWalletRepository.save(

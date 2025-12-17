@@ -63,13 +63,13 @@ export class NotificationRelationalRepository
   async update(
     id: Notification['id'],
     payload: Partial<Notification>,
-  ): Promise<Notification> {
+  ): Promise<NullableType<Notification>> {
     const entity = await this.notificationRepository.findOne({
       where: { id },
     });
 
     if (!entity) {
-      throw new Error('Record not found');
+      return null;
     }
 
     const updatedEntity = await this.notificationRepository.save(

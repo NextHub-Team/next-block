@@ -21,6 +21,7 @@ import {
   GroupPlainToInstance,
   GroupPlainToInstances,
 } from '../utils/transformers/class.transformer';
+import { FilterAddressBooksInputDto } from './dto/filter-address-book-input.dto';
 
 @Injectable()
 export class AddressBooksService {
@@ -132,18 +133,17 @@ export class AddressBooksService {
   }
 
   async filter(
-    userId?: User['id'],
-    blockchain?: AddressBook['blockchain'],
-    assetType?: AddressBook['assetType'],
-    isFavorite?: AddressBook['isFavorite'],
+    filters: FilterAddressBooksInputDto,
+    roles: RoleEnum[] = [RoleEnum.admin],
   ): Promise<AddressBookDto[]> {
     const result = await this.addressBookRepository.filter(
-      userId,
-      blockchain,
-      assetType,
-      isFavorite,
+      filters.userId,
+      filters.blockchain,
+      filters.assetType,
+      filters.isFavorite,
+      filters.label,
     );
-    return GroupPlainToInstances(AddressBookDto, result, [RoleEnum.admin]);
+    return GroupPlainToInstances(AddressBookDto, result, roles);
   }
 
   async createByMe(

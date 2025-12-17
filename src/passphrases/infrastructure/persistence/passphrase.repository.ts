@@ -25,7 +25,7 @@ export abstract class PassphraseRepository {
   abstract update(
     id: Passphrase['id'],
     payload: DeepPartial<Passphrase>,
-  ): Promise<Passphrase | null>;
+  ): Promise<NullableType<Passphrase>>;
 
   abstract remove(id: Passphrase['id']): Promise<void>;
 

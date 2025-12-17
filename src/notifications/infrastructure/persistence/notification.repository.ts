@@ -27,7 +27,7 @@ export abstract class NotificationRepository {
   abstract update(
     id: Notification['id'],
     payload: DeepPartial<Notification>,
-  ): Promise<Notification | null>;
+  ): Promise<NullableType<Notification>>;
 
   abstract remove(id: Notification['id']): Promise<void>;
 

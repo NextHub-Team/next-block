@@ -25,7 +25,7 @@ export abstract class FireblocksNcwWalletRepository {
   abstract update(
     id: FireblocksNcwWallet['id'],
     payload: DeepPartial<FireblocksNcwWallet>,
-  ): Promise<FireblocksNcwWallet | null>;
+  ): Promise<NullableType<FireblocksNcwWallet>>;
 
   abstract remove(id: FireblocksNcwWallet['id']): Promise<void>;
 }

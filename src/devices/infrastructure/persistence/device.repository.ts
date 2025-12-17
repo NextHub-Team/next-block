@@ -22,7 +22,7 @@ export abstract class DeviceRepository {
   abstract update(
     id: Device['id'],
     payload: DeepPartial<Device>,
-  ): Promise<Device | null>;
+  ): Promise<NullableType<Device>>;
 
   abstract remove(id: Device['id']): Promise<void>;
 

@@ -21,7 +21,7 @@ export abstract class MessageRepository {
   abstract update(
     id: Message['id'],
     payload: DeepPartial<Message>,
-  ): Promise<Message | null>;
+  ): Promise<NullableType<Message>>;
 
   abstract remove(id: Message['id']): Promise<void>;
 }

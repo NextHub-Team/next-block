@@ -58,13 +58,16 @@ export class DeviceRelationalRepository implements DeviceRepository {
     return entities.map((entity) => DeviceMapper.toDomain(entity));
   }
 
-  async update(id: Device['id'], payload: Partial<Device>): Promise<Device> {
+  async update(
+    id: Device['id'],
+    payload: Partial<Device>,
+  ): Promise<NullableType<Device>> {
     const entity = await this.deviceRepository.findOne({
       where: { id },
     });
 
     if (!entity) {
-      throw new Error('Record not found');
+      return null;
     }
 
     const updatedEntity = await this.deviceRepository.save(

@@ -9,6 +9,7 @@ import { User } from '../../../../domain/user';
 import { UserRepository } from '../../user.repository';
 import { UserMapper } from '../mappers/user.mapper';
 import { IPaginationOptions } from '../../../../../utils/types/pagination-options';
+import { DeepPartial } from '../../../../../utils/types/deep-partial.type';
 
 @Injectable()
 export class UsersRelationalRepository implements UserRepository {
@@ -121,22 +122,24 @@ export class UsersRelationalRepository implements UserRepository {
     return entity ? UserMapper.toDomain(entity) : null;
   }
 
-  async update(id: User['id'], payload: Partial<User>): Promise<User> {
+  async update(
+    id: User['id'],
+    payload: DeepPartial<User>,
+  ): Promise<NullableType<User>> {
     const entity = await this.usersRepository.findOne({
       where: { id: Number(id) },
     });
 
     if (!entity) {
-      throw new Error('User not found');
+      return null;
     }
 
+    const domainEntity = UserMapper.toDomain(entity);
+    const mergedDomain = Object.assign(new User(), domainEntity);
+    Object.assign(mergedDomain, payload);
+
     const updatedEntity = await this.usersRepository.save(
-      this.usersRepository.create(
-        UserMapper.toPersistence({
-          ...UserMapper.toDomain(entity),
-          ...payload,
-        }),
-      ),
+      this.usersRepository.create(UserMapper.toPersistence(mergedDomain)),
     );
 
     return UserMapper.toDomain(updatedEntity);

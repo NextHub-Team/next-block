@@ -13,6 +13,11 @@ export class FilterAddressBooksDto {
   @IsString()
   assetType?: string;
 
+  @ApiPropertyOptional({ description: 'Label associated with the address' })
+  @IsOptional()
+  @IsString()
+  label?: string;
+
   @ApiPropertyOptional({
     description: 'Whether the address is marked as favorite',
     default: false,

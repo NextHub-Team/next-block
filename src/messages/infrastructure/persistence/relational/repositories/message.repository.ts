@@ -52,13 +52,16 @@ export class MessageRelationalRepository implements MessageRepository {
     return entities.map((entity) => MessageMapper.toDomain(entity));
   }
 
-  async update(id: Message['id'], payload: Partial<Message>): Promise<Message> {
+  async update(
+    id: Message['id'],
+    payload: Partial<Message>,
+  ): Promise<NullableType<Message>> {
     const entity = await this.messageRepository.findOne({
       where: { id },
     });
 
     if (!entity) {
-      throw new Error('Record not found');
+      return null;
     }
 
     const updatedEntity = await this.messageRepository.save(

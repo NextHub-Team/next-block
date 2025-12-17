@@ -63,14 +63,14 @@ export class AddressBookRelationalRepository implements AddressBookRepository {
   async update(
     id: AddressBook['id'],
     payload: Partial<AddressBook>,
-  ): Promise<AddressBook> {
+  ): Promise<NullableType<AddressBook>> {
     const entity = await this.addressBookRepository.findOne({
       where: { id },
       relations: ['user'],
     });
 
     if (!entity) {
-      throw new Error('Record not found');
+      return null;
     }
 
     const updatedEntity = await this.addressBookRepository.save(

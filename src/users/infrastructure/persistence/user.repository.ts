@@ -38,7 +38,7 @@ export abstract class UserRepository {
   abstract update(
     id: User['id'],
     payload: DeepPartial<User>,
-  ): Promise<User | null>;
+  ): Promise<NullableType<User>>;
 
   abstract remove(id: User['id']): Promise<void>;
 }

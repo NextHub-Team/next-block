@@ -131,10 +131,14 @@ export class AddressBooksController {
     @Query() query: FilterAddressBooksDto,
   ): Promise<AddressBookDto[]> {
     return this.addressBooksService.filter(
-      req.user.id,
-      query.blockchain,
-      query.assetType,
-      query.isFavorite,
+      {
+        userId: req.user.id,
+        blockchain: query.blockchain,
+        assetType: query.assetType,
+        isFavorite: query.isFavorite,
+        label: query.label,
+      },
+      [RoleEnum.user],
     );
   }
 
@@ -183,12 +187,13 @@ export class AddressBooksController {
     @Param() params: UserIdParamDto,
     @Query() query: FilterAddressBooksDto,
   ) {
-    return this.addressBooksService.filter(
-      params.userId,
-      query.blockchain,
-      query.assetType,
-      query.isFavorite,
-    );
+    return this.addressBooksService.filter({
+      userId: params.userId,
+      blockchain: query.blockchain,
+      assetType: query.assetType,
+      isFavorite: query.isFavorite,
+      label: query.label,
+    });
   }
 
   @Roles(RoleEnum.admin)
