@@ -26,15 +26,8 @@ jobs:
           PRIVATE_VERO_REPO_TOKEN: ${{ secrets.PRIVATE_VERO_REPO_TOKEN }}
         run: |
           set -euo pipefail
-
-          if [ -z "$PRIVATE_VERO_REPO_TOKEN" ]; then
-            echo "PRIVATE_VERO_REPO_TOKEN is empty"
-            exit 1
-          fi
-
           git remote add repo-b \
             "https://x-access-token:${PRIVATE_VERO_REPO_TOKEN}@github.com/Metapolitanltd/VaultBackend.git"
-
           git fetch repo-b main
 
       - name: Verify fast-forward is possible
