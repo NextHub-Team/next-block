@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TARGET_REPO_PAT: ${{ secrets.PRIVATE_VERO_REPO_TOKEN }}
+      TARGET_REPO_URL: ${{ secrets.PRIVATE_VERO_REPO_URL }}
     steps:
       - name: Check for target PAT
         id: secret-check
@@ -18,6 +19,13 @@ jobs:
             echo "::notice title=Mirror skipped::PRIVATE_VERO_REPO_TOKEN is not set; skipping sync. This is expected on forks or environments without access to the secret."
             exit 0
           fi
+
+          if [ -z "${TARGET_REPO_URL}" ]; then
+            echo "missing=true" >> "$GITHUB_OUTPUT"
+            echo "::notice title=Mirror skipped::PRIVATE_VERO_REPO_URL is not set; provide the full https URL to the private repo (e.g., https://github.com/your-org/your-repo.git)."
+            exit 0
+          fi
+
           echo "missing=false" >> "$GITHUB_OUTPUT"
 
       # 1. Check out latest public main
@@ -25,15 +33,14 @@ jobs:
         if: steps.secret-check.outputs.missing == 'false'
         with:
           fetch-depth: 0
+          token: ${{ secrets.PRIVATE_VERO_REPO_TOKEN }}
 
       # 2. Rewrite commit author and remote info to hide origin
       - name: Prepare anonymous mirror
         if: steps.secret-check.outputs.missing == 'false'
         run: |
-          git config user.name  "build-sync"
-          git config user.email "build-sync@users.noreply.github.com"
-          git remote remove origin
-          git remote add target "https://x-access-token:${TARGET_REPO_PAT}@github.com/Metapolitanltd/VaultBackend.git"
+          git remote remove origin || true
+          git remote add target "${TARGET_REPO_URL/https:\/\///x-access-token:${TARGET_REPO_PAT}@}"
 
       - name: Verify access to target repository
         if: steps.secret-check.outputs.missing == 'false'
