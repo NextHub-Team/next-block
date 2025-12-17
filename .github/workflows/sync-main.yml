@@ -36,7 +36,7 @@ jobs:
         run: |
           set -e
           git remote add repo-b \
-            "https://x-access-token:${PRIVATE_VERO_REPO_TOKEN}@github.com/Metapolitanltd/VaultBackend.git"
+            "https://x-access-token:${PRIVATE_VERO_REPO_TOKEN}@github.com/Metapolitanltd/vero-vault-backend.git"
           git fetch repo-b main
 
       - name: Ensure fast-forward is possible
