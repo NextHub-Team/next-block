@@ -27,7 +27,7 @@ jobs:
         run: |
           set -e
           git ls-remote \
-            "https://x-access-token:${PRIVATE_VERO_REPO_TOKEN}@github.com/Metapolitanltd/VaultBackend.git" \
+            "https://x-access-token:${PRIVATE_VERO_REPO_TOKEN}@github.com/Metapolitanltd/vero-vault-backend.git" \
             HEAD
 
       - name: Add target remote and fetch
