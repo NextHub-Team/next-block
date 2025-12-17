@@ -15,7 +15,7 @@ import {
 export class FireblocksVaultAccountsQueryDto {
   @ApiPropertyOptional({
     description: 'Maximum number of vault accounts',
-    example: 20,
+    example: 50,
   })
   @Expose()
   @IsOptional()
@@ -26,7 +26,7 @@ export class FireblocksVaultAccountsQueryDto {
 
   @ApiPropertyOptional({
     description: 'Cursor to previous page',
-    example: 'prev_cursor',
+    example: 'cursor_prev_abc123def456',
   })
   @Expose()
   @IsOptional()
@@ -35,7 +35,7 @@ export class FireblocksVaultAccountsQueryDto {
 
   @ApiPropertyOptional({
     description: 'Cursor to next page',
-    example: 'next_cursor',
+    example: 'cursor_next_def789abc012',
   })
   @Expose()
   @IsOptional()
@@ -44,7 +44,7 @@ export class FireblocksVaultAccountsQueryDto {
 
   @ApiPropertyOptional({
     description: 'Filter accounts by asset id',
-    example: 'USDC',
+    example: 'USDC_POLYGON',
   })
   @Expose()
   @IsOptional()
@@ -53,7 +53,7 @@ export class FireblocksVaultAccountsQueryDto {
 
   @ApiPropertyOptional({
     description: 'Filter accounts by name prefix or customer ref id',
-    example: 'user-',
+    example: 'custody-user-019a',
   })
   @Expose()
   @IsOptional()
@@ -65,7 +65,7 @@ export class FireblocksVaultAccountsQueryDto {
 export class FireblocksAssetWalletsQueryDto {
   @ApiPropertyOptional({
     description: 'Maximum number of asset wallets',
-    example: 20,
+    example: 100,
   })
   @Expose()
   @IsOptional()
@@ -76,7 +76,7 @@ export class FireblocksAssetWalletsQueryDto {
 
   @ApiPropertyOptional({
     description: 'Cursor to previous page',
-    example: 'prev_cursor',
+    example: 'cursor_prev_wallets_01',
   })
   @Expose()
   @IsOptional()
@@ -85,7 +85,7 @@ export class FireblocksAssetWalletsQueryDto {
 
   @ApiPropertyOptional({
     description: 'Cursor to next page',
-    example: 'next_cursor',
+    example: 'cursor_next_wallets_02',
   })
   @Expose()
   @IsOptional()
@@ -94,7 +94,7 @@ export class FireblocksAssetWalletsQueryDto {
 
   @ApiPropertyOptional({
     description: 'Filter asset wallets by asset id',
-    example: 'BTC',
+    example: 'ETH_TEST3',
   })
   @Expose()
   @IsOptional()
@@ -104,7 +104,10 @@ export class FireblocksAssetWalletsQueryDto {
 
 @Exclude()
 export class FireblocksAssetsCatalogQueryDto {
-  @ApiPropertyOptional({ description: 'Maximum number of assets', example: 100 })
+  @ApiPropertyOptional({
+    description: 'Maximum number of assets',
+    example: 200,
+  })
   @Expose()
   @IsOptional()
   @IsInt()
@@ -114,7 +117,7 @@ export class FireblocksAssetsCatalogQueryDto {
 
   @ApiPropertyOptional({
     description: 'Opaque cursor from previous call (Fireblocks pageCursor)',
-    example: 'abc123',
+    example: 'cursor_assets_abc123',
   })
   @Expose()
   @IsOptional()
@@ -124,7 +127,10 @@ export class FireblocksAssetsCatalogQueryDto {
 
 @Exclude()
 export class FireblocksUserIdentityDto {
-  @ApiProperty({ description: 'Application user id', example: '123' })
+  @ApiProperty({
+    description: 'Application user id',
+    example: '0a4d4a34-7e02-4ad9-a53f-0f7ef8a3d9bc',
+  })
   @IsNotEmpty()
   @Expose()
   id!: string | number;
@@ -132,7 +138,7 @@ export class FireblocksUserIdentityDto {
   @ApiPropertyOptional({
     description:
       'User social id / external provider id (used for vault naming if present)',
-    example: 'google-oauth2|abc123',
+    example: 'auth0|64efb1d3c1f0c9123456789a',
   })
   @IsOptional()
   @IsString()
@@ -142,13 +148,13 @@ export class FireblocksUserIdentityDto {
 
 @Exclude()
 export class EnsureVaultWalletOptionsDto {
-  @ApiPropertyOptional({ description: 'Hide from Console UI', example: false })
+  @ApiPropertyOptional({ description: 'Hide from Console UI', example: true })
   @IsOptional()
   @IsBoolean()
   @Expose()
   hiddenOnUI?: boolean;
 
-  @ApiPropertyOptional({ description: 'Enable auto fuel', example: true })
+  @ApiPropertyOptional({ description: 'Enable auto fuel', example: false })
   @IsOptional()
   @IsBoolean()
   @Expose()
@@ -156,7 +162,7 @@ export class EnsureVaultWalletOptionsDto {
 
   @ApiPropertyOptional({
     description: 'Deposit address description',
-    example: 'Default deposit',
+    example: 'Dedicated OTC deposit',
   })
   @IsOptional()
   @IsString()
@@ -165,7 +171,7 @@ export class EnsureVaultWalletOptionsDto {
 
   @ApiPropertyOptional({
     description: 'Idempotency key for Fireblocks requests',
-    example: 'uuid-456',
+    example: '79c6a2d5-63fe-4a93-8980-863deec95bf2',
   })
   @IsOptional()
   @IsString()
@@ -193,19 +199,22 @@ export class FireblocksEnsureUserWalletDto {
 
 @Exclude()
 export class CreateVaultWalletRequestDto {
-  @ApiProperty({ description: 'Vault account name', example: 'user-123' })
+  @ApiProperty({
+    description: 'Vault account name',
+    example: 'custody-user-019a3bf6',
+  })
   @IsString()
   @Expose()
   name!: string;
 
-  @ApiProperty({ description: 'Asset id', example: 'USDC' })
+  @ApiProperty({ description: 'Asset id', example: 'USDC_POLYGON' })
   @IsString()
   @Expose()
   assetId!: string;
 
   @ApiPropertyOptional({
     description: 'Customer reference id to attach',
-    example: 'user-ref-123',
+    example: 'd13bd918-938a-4a5b-8b28-4fa3437ea5ce',
   })
   @IsOptional()
   @IsString()
@@ -214,7 +223,7 @@ export class CreateVaultWalletRequestDto {
 
   @ApiPropertyOptional({
     description: 'Hide account in Fireblocks Console',
-    example: false,
+    example: true,
   })
   @IsOptional()
   @IsBoolean()
@@ -223,7 +232,7 @@ export class CreateVaultWalletRequestDto {
 
   @ApiPropertyOptional({
     description: 'Address description when creating a deposit address',
-    example: 'Primary deposit',
+    example: 'Primary Polygon deposit',
   })
   @IsOptional()
   @IsString()
@@ -238,7 +247,7 @@ export class CreateVaultWalletRequestDto {
 
   @ApiPropertyOptional({
     description: 'Idempotency key for Fireblocks requests',
-    example: 'uuid-123',
+    example: '5a76c74d-45b1-4457-9368-140f64e568df',
   })
   @IsOptional()
   @IsString()
@@ -248,19 +257,22 @@ export class CreateVaultWalletRequestDto {
 
 @Exclude()
 export class CreateUserVaultAssetRequestDto {
-  @ApiProperty({ description: 'Target vault account id', example: 'va-123' })
+  @ApiProperty({
+    description: 'Target vault account id',
+    example: '123456789',
+  })
   @IsString()
   @Expose()
   vaultAccountId!: string;
 
-  @ApiProperty({ description: 'Asset id to create', example: 'AVAXTEST' })
+  @ApiProperty({ description: 'Asset id to create', example: 'AVAXCCHAIN' })
   @IsString()
   @Expose()
   assetId!: string;
 
   @ApiPropertyOptional({
     description: 'Idempotency key for Fireblocks requests',
-    example: 'uuid-asset',
+    example: '7f3bce64-30c0-4b7a-a561-6a83376fd2e0',
   })
   @IsOptional()
   @IsString()
@@ -270,19 +282,22 @@ export class CreateUserVaultAssetRequestDto {
 
 @Exclude()
 export class CreateUserVaultAddressRequestDto {
-  @ApiProperty({ description: 'Vault account id', example: 'va-123' })
+  @ApiProperty({
+    description: 'Vault account id',
+    example: '123456789',
+  })
   @IsString()
   @Expose()
   vaultAccountId!: string;
 
-  @ApiProperty({ description: 'Asset id', example: 'AVAXTEST' })
+  @ApiProperty({ description: 'Asset id', example: 'ETH_TEST3' })
   @IsString()
   @Expose()
   assetId!: string;
 
   @ApiPropertyOptional({
     description: 'Address description',
-    example: 'Primary deposit',
+    example: 'Primary ETH deposit address',
   })
   @IsOptional()
   @IsString()
@@ -291,7 +306,7 @@ export class CreateUserVaultAddressRequestDto {
 
   @ApiPropertyOptional({
     description: 'Idempotency key',
-    example: 'uuid-address',
+    example: '3f5885d6-61c2-4a64-8f88-6cf3e07a5d91',
   })
   @IsOptional()
   @IsString()
@@ -301,13 +316,16 @@ export class CreateUserVaultAddressRequestDto {
 
 @Exclude()
 export class UpdateCustodialWalletDto {
-  @ApiPropertyOptional({ description: 'Vault name', example: 'user-123' })
+  @ApiPropertyOptional({
+    description: 'Vault name',
+    example: 'custody-user-019a3bf6',
+  })
   @IsOptional()
   @IsString()
   @Expose()
   name?: string;
 
-  @ApiPropertyOptional({ description: 'Auto fuel flag', example: true })
+  @ApiPropertyOptional({ description: 'Auto fuel flag', example: false })
   @IsOptional()
   @IsBoolean()
   @Expose()
@@ -315,14 +333,14 @@ export class UpdateCustodialWalletDto {
 
   @ApiPropertyOptional({
     description: 'Customer reference id',
-    example: 'user-ref-123',
+    example: 'd13bd918-938a-4a5b-8b28-4fa3437ea5ce',
   })
   @IsOptional()
   @IsString()
   @Expose()
   customerRefId?: string;
 
-  @ApiPropertyOptional({ description: 'Hide from UI', example: false })
+  @ApiPropertyOptional({ description: 'Hide from UI', example: true })
   @IsOptional()
   @IsBoolean()
   @Expose()
@@ -333,7 +351,7 @@ export class UpdateCustodialWalletDto {
 export class FireblocksSpecialAddressAssetDto {
   @ApiProperty({
     description: 'Asset identifier to create an address for',
-    example: 'USDC',
+    example: 'XRP',
   })
   @IsString()
   @Expose()
@@ -341,7 +359,7 @@ export class FireblocksSpecialAddressAssetDto {
 
   @ApiPropertyOptional({
     description: 'Optional description to apply to the deposit address',
-    example: 'Special deposit',
+    example: 'OTC settlement flow',
   })
   @IsOptional()
   @IsString()
@@ -354,7 +372,7 @@ export class FireblocksSpecialAddressesRequestDto {
   @ApiProperty({
     description:
       'Vault account identifier where the addresses should be created',
-    example: '123456',
+    example: '2468101214',
   })
   @IsString()
   @Expose()
@@ -372,7 +390,7 @@ export class FireblocksSpecialAddressesRequestDto {
 
   @ApiPropertyOptional({
     description: 'Customer reference id to attach to each new address',
-    example: 'user-ref-123',
+    example: 'd13bd918-938a-4a5b-8b28-4fa3437ea5ce',
   })
   @IsOptional()
   @IsString()
@@ -381,7 +399,7 @@ export class FireblocksSpecialAddressesRequestDto {
 
   @ApiPropertyOptional({
     description: 'Fallback description for addresses that do not provide one',
-    example: 'Special deposit',
+    example: 'VIP OTC deposit',
   })
   @IsOptional()
   @IsString()
@@ -390,7 +408,7 @@ export class FireblocksSpecialAddressesRequestDto {
 
   @ApiPropertyOptional({
     description: 'Optional idempotency key for Fireblocks requests',
-    example: 'uuid-special-addresses',
+    example: 'a4f2a96f-bc42-4e02-8e61-460fdddf1eaa',
   })
   @IsOptional()
   @IsString()
@@ -411,7 +429,7 @@ export class CreateUserVaultRequestDto {
 
   @ApiPropertyOptional({
     description: 'Enable auto-fuel',
-    example: true,
+    example: false,
   })
   @IsOptional()
   @IsBoolean()
@@ -420,7 +438,7 @@ export class CreateUserVaultRequestDto {
 
   @ApiPropertyOptional({
     description: 'Idempotency key for Fireblocks requests',
-    example: 'uuid-123',
+    example: '5de2ad69-0ea8-4a66-a1cb-6ad72037d1df',
   })
   @IsOptional()
   @IsString()
@@ -432,7 +450,7 @@ export class CreateUserVaultRequestDto {
 export class CreateAdminVaultAccountRequestDto {
   @ApiProperty({
     description: 'Vault account name',
-    example: 'user:123',
+    example: 'custody:user:019a3bf6',
   })
   @IsString()
   @Expose()
@@ -440,7 +458,7 @@ export class CreateAdminVaultAccountRequestDto {
 
   @ApiProperty({
     description: 'Customer reference id to attach',
-    example: 'user-ref-123',
+    example: 'd13bd918-938a-4a5b-8b28-4fa3437ea5ce',
   })
   @IsString()
   @Expose()
@@ -466,7 +484,7 @@ export class CreateAdminVaultAccountRequestDto {
 
   @ApiPropertyOptional({
     description: 'Idempotency key for Fireblocks requests',
-    example: 'uuid-123',
+    example: '0f114b2f-19d8-4f74-aa58-23cc6a8a475f',
   })
   @IsOptional()
   @IsString()

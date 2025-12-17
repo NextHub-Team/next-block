@@ -75,9 +75,7 @@ export class FireblocksCwAdminService extends AbstractCwService {
   // ---------------------------------------------------------------------------
   // Controller-facing helpers (previously wrappers)
   // ---------------------------------------------------------------------------
-  async getUserWallets(
-    userId: string,
-  ): Promise<FireblocksUserPortfolioDto> {
+  async getUserWallets(userId: string): Promise<FireblocksUserPortfolioDto> {
     return this.fetchUserPortfolioByCustomerRefId(userId);
   }
 
@@ -371,8 +369,9 @@ export class FireblocksCwAdminService extends AbstractCwService {
           idempotencyKey: options?.idempotencyKey,
         });
 
-      addresses[assetId] =
-        FireblocksCwMapper.toDepositAddressDto(depositAddress.data);
+      addresses[assetId] = FireblocksCwMapper.toDepositAddressDto(
+        depositAddress.data,
+      );
     }
 
     return {
@@ -590,7 +589,9 @@ export class FireblocksCwAdminService extends AbstractCwService {
   /**
    * Fetch metadata for a specific asset.
    */
-  async fetchAssetMetadata(assetId: string): Promise<FireblocksAssetMetadataDto> {
+  async fetchAssetMetadata(
+    assetId: string,
+  ): Promise<FireblocksAssetMetadataDto> {
     this.guardEnabledAndLog();
     const response = await this.sdk.blockchainsAssets.getAsset({ id: assetId });
     return GroupPlainToInstance(

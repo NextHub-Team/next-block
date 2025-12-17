@@ -17,7 +17,7 @@ import { FireblocksEnvironmentType } from '../types/fireblocks-enum.type';
 export class FireblocksRateLimitDto {
   @ApiProperty({
     description: 'The number of tokens available per rate limit interval',
-    example: 10,
+    example: 50,
   })
   @Expose()
   @IsInt()
@@ -26,7 +26,7 @@ export class FireblocksRateLimitDto {
 
   @ApiProperty({
     description: 'Interval duration for the rate limit (milliseconds)',
-    example: 1000,
+    example: 60000,
   })
   @Expose()
   @IsInt()
@@ -38,7 +38,7 @@ export class FireblocksRateLimitDto {
 export class FireblocksCircuitBreakerDto {
   @ApiProperty({
     description: 'Failure threshold before triggering the circuit breaker',
-    example: 5,
+    example: 10,
   })
   @Expose()
   @IsInt()
@@ -47,7 +47,7 @@ export class FireblocksCircuitBreakerDto {
 
   @ApiProperty({
     description: 'Cooldown window before the circuit breaker is reset (ms)',
-    example: 30000,
+    example: 60000,
   })
   @Expose()
   @IsInt()
@@ -55,8 +55,9 @@ export class FireblocksCircuitBreakerDto {
   resetTimeoutMs!: number;
 
   @ApiProperty({
-    description: 'Number of successful samples required to half-open the breaker',
-    example: 1,
+    description:
+      'Number of successful samples required to half-open the breaker',
+    example: 3,
   })
   @Expose()
   @IsInt()
@@ -75,7 +76,7 @@ export class FireblocksCwStatusDto {
 
   @ApiProperty({
     description: 'Prefix used when deriving vault account names',
-    example: 'user',
+    example: 'custody-user',
   })
   @Expose()
   @IsString()
@@ -83,7 +84,7 @@ export class FireblocksCwStatusDto {
 
   @ApiProperty({
     description: 'Request timeout used by the Fireblocks SDK (ms)',
-    example: 30000,
+    example: 60000,
   })
   @Expose()
   @IsInt()
@@ -91,7 +92,7 @@ export class FireblocksCwStatusDto {
 
   @ApiProperty({
     description: 'Max SDK retries per request',
-    example: 3,
+    example: 5,
   })
   @Expose()
   @IsInt()
@@ -99,7 +100,7 @@ export class FireblocksCwStatusDto {
 
   @ApiProperty({
     description: 'Whether extra SDK debug logging is enabled',
-    example: false,
+    example: true,
   })
   @Expose()
   @IsBoolean()
@@ -134,37 +135,55 @@ export class FireblocksVaultAssetDto {
   @Expose()
   id!: string;
 
-  @ApiPropertyOptional({ description: 'Total balance', example: '1.23' })
+  @ApiPropertyOptional({
+    description: 'Total balance',
+    example: '1.75293485',
+  })
   @IsOptional()
   @IsString()
   @Expose()
   total?: string;
 
-  @ApiPropertyOptional({ description: 'Available balance', example: '0.5' })
+  @ApiPropertyOptional({
+    description: 'Available balance',
+    example: '1.15000000',
+  })
   @IsOptional()
   @IsString()
   @Expose()
   available?: string;
 
-  @ApiPropertyOptional({ description: 'Locked amount', example: '0.1' })
+  @ApiPropertyOptional({
+    description: 'Locked amount',
+    example: '0.25000000',
+  })
   @IsOptional()
   @IsString()
   @Expose()
   lockedAmount?: string;
 
-  @ApiPropertyOptional({ description: 'Pending balance', example: '0.02' })
+  @ApiPropertyOptional({
+    description: 'Pending balance',
+    example: '0.01500000',
+  })
   @IsOptional()
   @IsString()
   @Expose()
   pending?: string;
 
-  @ApiPropertyOptional({ description: 'Total staked', example: '0.01' })
+  @ApiPropertyOptional({
+    description: 'Total staked',
+    example: '0.02000000',
+  })
   @IsOptional()
   @IsString()
   @Expose()
   totalStaked?: string;
 
-  @ApiPropertyOptional({ description: 'Legacy balance field', example: '1.23' })
+  @ApiPropertyOptional({
+    description: 'Legacy balance field',
+    example: '1.75293485',
+  })
   @IsOptional()
   @IsString()
   @Expose()
@@ -173,23 +192,32 @@ export class FireblocksVaultAssetDto {
 
 @Exclude()
 export class FireblocksVaultAccountDto {
-  @ApiProperty({ description: 'Vault account id', example: '1' })
+  @ApiProperty({ description: 'Vault account id', example: '123456789' })
   @IsString()
   @Expose()
   id!: string;
 
-  @ApiProperty({ description: 'Vault account name', example: 'user-1' })
+  @ApiProperty({
+    description: 'Vault account name',
+    example: 'custody-user-019a3bf6',
+  })
   @IsString()
   @Expose()
   name!: string;
 
-  @ApiPropertyOptional({ description: 'Customer reference id', example: 'user-ref-123' })
+  @ApiPropertyOptional({
+    description: 'Customer reference id',
+    example: 'd13bd918-938a-4a5b-8b28-4fa3437ea5ce',
+  })
   @IsOptional()
   @IsString()
   @Expose()
   customerRefId?: string;
 
-  @ApiPropertyOptional({ description: 'Should the account be hidden in UI', example: false })
+  @ApiPropertyOptional({
+    description: 'Should the account be hidden in UI',
+    example: true,
+  })
   @IsOptional()
   @IsBoolean()
   @Expose()
@@ -214,24 +242,36 @@ export class FireblocksVaultAccountDto {
 
 @Exclude()
 export class FireblocksDepositAddressDto {
-  @ApiProperty({ description: 'Deposit address', example: 'bc1q...' })
+  @ApiProperty({
+    description: 'Deposit address',
+    example: 'bc1qxy2kgdygjrsqtzq2n0yrf1234p83kkfjhx0wlh',
+  })
   @IsString()
   @Expose()
   address!: string;
 
-  @ApiPropertyOptional({ description: 'Memo / Tag if required', example: '123456' })
+  @ApiPropertyOptional({
+    description: 'Memo / Tag if required',
+    example: '987654321',
+  })
   @IsOptional()
   @IsString()
   @Expose()
   tag?: string;
 
-  @ApiPropertyOptional({ description: 'Address description', example: 'Primary deposit' })
+  @ApiPropertyOptional({
+    description: 'Address description',
+    example: 'Primary BTC deposit',
+  })
   @IsOptional()
   @IsString()
   @Expose()
   description?: string;
 
-  @ApiPropertyOptional({ description: 'Customer reference id', example: 'user-ref-123' })
+  @ApiPropertyOptional({
+    description: 'Customer reference id',
+    example: 'd13bd918-938a-4a5b-8b28-4fa3437ea5ce',
+  })
   @IsOptional()
   @IsString()
   @Expose()
@@ -240,19 +280,28 @@ export class FireblocksDepositAddressDto {
 
 @Exclude()
 export class FireblocksCustodialWalletDto {
-  @ApiProperty({ description: 'Vault account metadata', type: () => FireblocksVaultAccountDto })
+  @ApiProperty({
+    description: 'Vault account metadata',
+    type: () => FireblocksVaultAccountDto,
+  })
   @ValidateNested()
   @Type(() => FireblocksVaultAccountDto)
   @Expose()
   vaultAccount!: FireblocksVaultAccountDto;
 
-  @ApiProperty({ description: 'Vault asset metadata', type: () => FireblocksVaultAssetDto })
+  @ApiProperty({
+    description: 'Vault asset metadata',
+    type: () => FireblocksVaultAssetDto,
+  })
   @ValidateNested()
   @Type(() => FireblocksVaultAssetDto)
   @Expose()
   vaultAsset!: FireblocksVaultAssetDto;
 
-  @ApiProperty({ description: 'Primary deposit address', type: () => FireblocksDepositAddressDto })
+  @ApiProperty({
+    description: 'Primary deposit address',
+    type: () => FireblocksDepositAddressDto,
+  })
   @ValidateNested()
   @Type(() => FireblocksDepositAddressDto)
   @Expose()
@@ -261,13 +310,19 @@ export class FireblocksCustodialWalletDto {
 
 @Exclude()
 export class FireblocksVaultAccountWalletDto {
-  @ApiProperty({ description: 'Parent vault account metadata', type: () => FireblocksVaultAccountDto })
+  @ApiProperty({
+    description: 'Parent vault account metadata',
+    type: () => FireblocksVaultAccountDto,
+  })
   @ValidateNested()
   @Type(() => FireblocksVaultAccountDto)
   @Expose()
   vaultAccount!: FireblocksVaultAccountDto;
 
-  @ApiProperty({ description: 'Specific asset wallet information', type: () => FireblocksVaultAssetDto })
+  @ApiProperty({
+    description: 'Specific asset wallet information',
+    type: () => FireblocksVaultAssetDto,
+  })
   @ValidateNested()
   @Type(() => FireblocksVaultAssetDto)
   @Expose()
@@ -276,17 +331,20 @@ export class FireblocksVaultAccountWalletDto {
 
 @Exclude()
 export class FireblocksAssetMetadataDto {
-  @ApiProperty({ description: 'Asset id', example: 'ETH' })
+  @ApiProperty({ description: 'Asset id', example: 'USDC_POLYGON' })
   @IsString()
   @Expose()
   id!: string;
 
-  @ApiProperty({ description: 'Asset display name', example: 'Ethereum' })
+  @ApiProperty({
+    description: 'Asset display name',
+    example: 'USD Coin (Polygon)',
+  })
   @IsString()
   @Expose()
   name!: string;
 
-  @ApiProperty({ description: 'Asset symbol', example: 'ETH' })
+  @ApiProperty({ description: 'Asset symbol', example: 'USDC' })
   @IsString()
   @Expose()
   symbol!: string;
@@ -296,30 +354,45 @@ export class FireblocksAssetMetadataDto {
   @Expose()
   type!: string;
 
-  @ApiPropertyOptional({ description: 'Native blockchain asset id', example: 'ETH' })
+  @ApiPropertyOptional({
+    description: 'Native blockchain asset id',
+    example: 'MATIC',
+  })
   @IsOptional()
   @IsString()
   @Expose()
   nativeAsset?: string;
 
-  @ApiPropertyOptional({ description: 'Blockchain id / protocol', example: 'ETH' })
+  @ApiPropertyOptional({
+    description: 'Blockchain id / protocol',
+    example: 'POLYGON',
+  })
   @IsOptional()
   @IsString()
   @Expose()
   blockchainId?: string;
 
-  @ApiPropertyOptional({ description: 'Blockchain protocol name', example: 'Ethereum' })
+  @ApiPropertyOptional({
+    description: 'Blockchain protocol name',
+    example: 'Polygon PoS',
+  })
   @IsOptional()
   @IsString()
   @Expose()
   blockchainProtocol?: string;
 
-  @ApiPropertyOptional({ description: 'Whether memos/tags are required', example: false })
+  @ApiPropertyOptional({
+    description: 'Whether memos/tags are required',
+    example: false,
+  })
   @IsOptional()
   @Expose()
   hasTag?: boolean;
 
-  @ApiPropertyOptional({ description: 'Whether asset is supported in workspace', example: true })
+  @ApiPropertyOptional({
+    description: 'Whether asset is supported in workspace',
+    example: true,
+  })
   @IsOptional()
   @Expose()
   isSupported?: boolean;
@@ -335,12 +408,15 @@ export class FireblocksAssetMetadataDto {
 
 @Exclude()
 export class FireblocksBlockchainDto {
-  @ApiProperty({ description: 'Blockchain id', example: 'ETH' })
+  @ApiProperty({ description: 'Blockchain id', example: 'POLYGON' })
   @IsString()
   @Expose()
   id!: string;
 
-  @ApiProperty({ description: 'Blockchain display name', example: 'Ethereum' })
+  @ApiProperty({
+    description: 'Blockchain display name',
+    example: 'Polygon PoS',
+  })
   @IsString()
   @Expose()
   name!: string;
@@ -351,13 +427,16 @@ export class FireblocksBlockchainDto {
   @Expose()
   description?: string;
 
-  @ApiPropertyOptional({ description: 'Native asset id', example: 'ETH' })
+  @ApiPropertyOptional({ description: 'Native asset id', example: 'MATIC' })
   @IsOptional()
   @IsString()
   @Expose()
   nativeAsset?: string;
 
-  @ApiPropertyOptional({ description: 'Status reported by Fireblocks', example: 'ACTIVE' })
+  @ApiPropertyOptional({
+    description: 'Status reported by Fireblocks',
+    example: 'ACTIVE',
+  })
   @IsOptional()
   @IsString()
   @Expose()
@@ -368,7 +447,7 @@ export class FireblocksBlockchainDto {
 export class FireblocksUserPortfolioDto {
   @ApiProperty({
     description: 'User reference id associated to the vault accounts',
-    example: 'user-ref-123',
+    example: 'd13bd918-938a-4a5b-8b28-4fa3437ea5ce',
   })
   @IsString()
   @Expose()
@@ -438,12 +517,18 @@ export class FireblocksAssetCatalogDto {
 
 @Exclude()
 export class FireblocksSpecialAddressItemDto {
-  @ApiProperty({ description: 'Asset identifier for the created address', example: 'ETH' })
+  @ApiProperty({
+    description: 'Asset identifier for the created address',
+    example: 'XRP',
+  })
   @IsString()
   @Expose()
   assetId!: string;
 
-  @ApiProperty({ description: 'Created deposit address for the asset', type: () => FireblocksDepositAddressDto })
+  @ApiProperty({
+    description: 'Created deposit address for the asset',
+    type: () => FireblocksDepositAddressDto,
+  })
   @ValidateNested()
   @Type(() => FireblocksDepositAddressDto)
   @Expose()

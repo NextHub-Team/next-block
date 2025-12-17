@@ -304,7 +304,8 @@ export class FireblocksCwService
       apiKey: this.apiKey ?? FIREBLOCKS_CW_API_KEY,
       secretKey: this.rawSecretKey ?? FIREBLOCKS_CW_SECRET_KEY,
       envType: this.envType ?? FIREBLOCKS_CW_ENV_TYPE,
-      requestTimeoutMs: this.requestTimeoutMs ?? FIREBLOCKS_CW_REQUEST_TIMEOUT_MS,
+      requestTimeoutMs:
+        this.requestTimeoutMs ?? FIREBLOCKS_CW_REQUEST_TIMEOUT_MS,
       maxRetries: this.maxRetries ?? FIREBLOCKS_CW_MAX_RETRIES,
       circuitBreaker: {
         failureThreshold:
