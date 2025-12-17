@@ -21,10 +21,9 @@ jobs:
           git config user.name "amirtaherkhani"
           git config user.email "amirtaherkhani@outlook.com"
 
-      - name: Add private repo remote and fetch
+      - name: Add Repo B remote and fetch
         env:
           PRIVATE_VERO_REPO_TOKEN: ${{ secrets.PRIVATE_VERO_REPO_TOKEN }}
-          PRIVATE_VERO_REPO_URL: ${{ secrets.PRIVATE_VERO_REPO_URL }}
         run: |
           set -euo pipefail
 
@@ -33,25 +32,15 @@ jobs:
             exit 1
           fi
 
-          if [ -z "$PRIVATE_VERO_REPO_URL" ]; then
-            echo "PRIVATE_VERO_REPO_URL is empty"
-            exit 1
-          fi
+          git remote add repo-b \
+            "https://x-access-token:${PRIVATE_VERO_REPO_TOKEN}@github.com/Metapolitanltd/VaultBackend.git"
 
-          # Normalize URL (supports with or without https://)
-          REPO_URL="$PRIVATE_VERO_REPO_URL"
-          REPO_URL="${REPO_URL#https://}"
-          REPO_URL="${REPO_URL#http://}"
-
-          echo "Using repo URL: github.com/***/***.git (masked)"
-
-          git remote add repo-b "https://x-access-token:${PRIVATE_VERO_REPO_TOKEN}@${REPO_URL}"
           git fetch repo-b main
 
       - name: Verify fast-forward is possible
         run: |
           git merge-base --is-ancestor repo-b/main HEAD
 
-      - name: Forward push commits to private repo
+      - name: Forward push commits to Repo B
         run: |
           git push repo-b main:main
