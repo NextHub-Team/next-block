@@ -1,4 +1,4 @@
-name: behind-main
+name: Check Sub Branch
 on:
   pull_request:
     branches: [main]
