@@ -12,7 +12,10 @@ yarn-error.log*
 lerna-debug.log*
 
 # OS
+# macOS
 .DS_Store
+**/.DS_Store
+
 
 # Tests
 /coverage

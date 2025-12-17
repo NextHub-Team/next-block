@@ -70,10 +70,7 @@ export class CreateAccountDto {
     enum: AccountProviderName,
   })
   @IsEnum(AccountProviderName, {
-    message: getEnumErrorMessage(
-      AccountProviderName,
-      'Provider name',
-    ),
+    message: getEnumErrorMessage(AccountProviderName, 'Provider name'),
   })
   providerName: AccountProviderName;
 
