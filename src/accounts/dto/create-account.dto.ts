@@ -10,18 +10,20 @@ import {
   IsOptional,
   IsEnum,
   IsObject,
+  IsDate,
+  MaxLength,
 } from 'class-validator';
 
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   AccountProviderName,
   AccountStatus,
   KycStatus,
 } from '../types/account-enum.type';
 
-export class CreateAccountDto {
-  @ApiProperty({
-    required: false,
+export class BaseAccountPayloadDto {
+  @ApiPropertyOptional({
+    description: 'KYC status reported by the provider',
     enum: KycStatus,
     default: KycStatus.PENDING,
   })
@@ -31,24 +33,38 @@ export class CreateAccountDto {
   })
   KycStatus?: KycStatus = KycStatus.PENDING;
 
-  @ApiProperty({
-    required: false,
-    type: () => String,
+  @ApiPropertyOptional({
+    description: 'Timestamp of the latest provider sync',
+    type: String,
+    format: 'date-time',
+    example: '2024-05-12T08:30:00.000Z',
+  })
+  @IsOptional()
+  @IsDate()
+  @Type(() => Date)
+  lastSyncedAt?: Date | null;
+
+  @ApiPropertyOptional({
+    description: 'Human-friendly label to identify the account',
+    type: String,
+    example: 'Primary Coinbase account',
   })
   @IsOptional()
   @IsString()
+  @MaxLength(255)
   label?: string | null;
 
-  @ApiProperty({
-    required: false,
+  @ApiPropertyOptional({
+    description: 'Arbitrary metadata that describes the account',
     type: () => Object,
+    example: { tier: 'gold', region: 'US' },
   })
   @IsOptional()
   @IsObject()
   metadata?: JsonObject | null;
 
-  @ApiProperty({
-    required: false,
+  @ApiPropertyOptional({
+    description: 'Operational status of the account',
     enum: AccountStatus,
     default: AccountStatus.ACTIVE,
   })
@@ -59,29 +75,33 @@ export class CreateAccountDto {
   status?: AccountStatus = AccountStatus.ACTIVE;
 
   @ApiProperty({
-    required: true,
-    type: () => String,
+    description: 'Identifier of the account on the provider side',
+    type: String,
+    example: 'acct_1234567890',
   })
   @IsString()
+  @MaxLength(255)
   providerAccountId: string;
 
   @ApiProperty({
-    required: true,
+    description: 'Provider that manages the account',
     enum: AccountProviderName,
   })
   @IsEnum(AccountProviderName, {
     message: getEnumErrorMessage(AccountProviderName, 'Provider name'),
   })
   providerName: AccountProviderName;
+}
 
+export class CreateAccountUserDto extends BaseAccountPayloadDto {}
+
+export class CreateAccountDto extends BaseAccountPayloadDto {
   @ApiProperty({
-    required: true,
+    description: 'User that will own the account',
     type: () => UserDto,
   })
   @ValidateNested()
   @Type(() => UserDto)
   @IsNotEmptyObject()
   user: UserDto;
-
-  // Don't forget to use the class-validator decorators in the DTO properties.
 }

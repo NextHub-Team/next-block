@@ -1,9 +1,125 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  IsDate,
+  IsEnum,
+  IsObject,
+  IsOptional,
+  IsString,
+  IsUUID,
+  MaxLength,
+  ValidateNested,
+} from 'class-validator';
+import { Exclude, Expose, Type } from 'class-transformer';
+import { UserDto } from '../../users/dto/user.dto';
+import { JsonObject } from '../../utils/types/object.type';
+import {
+  AccountProviderName,
+  AccountStatus,
+  KycStatus,
+} from '../types/account-enum.type';
+import { RoleEnum } from '../../roles/roles.enum';
+import { RoleGroups } from '../../utils/transformers/enum.transformer';
 
+@Exclude()
 export class AccountDto {
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
+  @ApiProperty({
+    description: 'Unique identifier for the account record',
+    format: 'uuid',
+  })
+  @IsUUID()
+  @Expose()
   id: string;
+
+  @ApiProperty({
+    description: 'KYC status synced from the provider',
+    enum: KycStatus,
+    example: KycStatus.VERIFIED,
+  })
+  @IsEnum(KycStatus)
+  @Expose()
+  KycStatus: KycStatus;
+
+  @ApiPropertyOptional({
+    description: 'Timestamp of the last successful provider sync',
+    type: String,
+    format: 'date-time',
+  })
+  @IsOptional()
+  @IsDate()
+  @Type(() => Date)
+  @Expose()
+  lastSyncedAt?: Date | null;
+
+  @ApiPropertyOptional({
+    description: 'Label displayed in the UI',
+    example: 'Main Binance Account',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  @Expose(RoleGroups([RoleEnum.user, RoleEnum.admin]))
+  label?: string | null;
+
+  @ApiPropertyOptional({
+    description: 'Additional metadata stored alongside the account',
+    type: () => Object,
+  })
+  @IsOptional()
+  @IsObject()
+  @Expose(RoleGroups([RoleEnum.user, RoleEnum.admin]))
+  metadata?: JsonObject | null;
+
+  @ApiProperty({
+    description: 'Operational status of the account record',
+    enum: AccountStatus,
+  })
+  @IsEnum(AccountStatus)
+  @Expose()
+  status: AccountStatus;
+
+  @ApiProperty({
+    description: 'Provider-side account ID',
+    maxLength: 255,
+  })
+  @IsString()
+  @MaxLength(255)
+  @Expose()
+  providerAccountId: string;
+
+  @ApiProperty({
+    description: 'Provider name registered in the platform',
+    enum: AccountProviderName,
+  })
+  @IsEnum(AccountProviderName)
+  @Expose()
+  providerName: AccountProviderName;
+
+  @ApiProperty({
+    description: 'Account owner (visible to admins only)',
+    type: () => UserDto,
+  })
+  @ValidateNested()
+  @Type(() => UserDto)
+  @Expose(RoleGroups([RoleEnum.admin]))
+  user: UserDto;
+
+  @ApiProperty({
+    description: 'Creation timestamp',
+    type: String,
+    format: 'date-time',
+  })
+  @IsDate()
+  @Type(() => Date)
+  @Expose()
+  createdAt: Date;
+
+  @ApiProperty({
+    description: 'Last update timestamp',
+    type: String,
+    format: 'date-time',
+  })
+  @IsDate()
+  @Type(() => Date)
+  @Expose()
+  updatedAt: Date;
 }

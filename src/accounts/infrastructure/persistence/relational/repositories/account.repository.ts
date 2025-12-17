@@ -7,6 +7,8 @@ import { Account } from '../../../../domain/account';
 import { AccountRepository } from '../../account.repository';
 import { AccountMapper } from '../mappers/account.mapper';
 import { IPaginationOptions } from '../../../../../utils/types/pagination-options';
+import { User } from '../../../../../users/domain/user';
+import { AccountStatus } from '../../../../types/account-enum.type';
 
 @Injectable()
 export class AccountRelationalRepository implements AccountRepository {
@@ -36,9 +38,18 @@ export class AccountRelationalRepository implements AccountRepository {
     return entities.map((entity) => AccountMapper.toDomain(entity));
   }
 
-  async findById(id: Account['id']): Promise<NullableType<Account>> {
+  async findById(
+    id: Account['id'],
+    userId?: User['id'],
+  ): Promise<NullableType<Account>> {
+    const whereClause: any = { id };
+
+    if (typeof userId !== 'undefined') {
+      whereClause.user = { id: Number(userId) };
+    }
+
     const entity = await this.accountRepository.findOne({
-      where: { id },
+      where: whereClause,
     });
 
     return entity ? AccountMapper.toDomain(entity) : null;
@@ -52,13 +63,160 @@ export class AccountRelationalRepository implements AccountRepository {
     return entities.map((entity) => AccountMapper.toDomain(entity));
   }
 
-  async update(id: Account['id'], payload: Partial<Account>): Promise<Account> {
+  async findAllByUserId(userId: User['id']): Promise<Account[]> {
+    const entities = await this.accountRepository.find({
+      where: {
+        user: {
+          id: Number(userId),
+        },
+      },
+    });
+
+    return entities.map((entity) => AccountMapper.toDomain(entity));
+  }
+
+  async findByUserIdAndProviderName(
+    userId: User['id'],
+    providerName: Account['providerName'],
+  ): Promise<NullableType<Account>> {
+    const entity = await this.accountRepository.findOne({
+      where: {
+        user: {
+          id: Number(userId),
+        },
+        providerName,
+      },
+    });
+
+    return entity ? AccountMapper.toDomain(entity) : null;
+  }
+
+  async findByProviderAccountId(
+    providerAccountId: Account['providerAccountId'],
+  ): Promise<NullableType<Account>> {
+    const entity = await this.accountRepository.findOne({
+      where: { providerAccountId },
+    });
+
+    return entity ? AccountMapper.toDomain(entity) : null;
+  }
+
+  async filter(
+    userId?: User['id'],
+    label?: Account['label'],
+    status?: Account['status'],
+    providerAccountId?: Account['providerAccountId'],
+  ): Promise<Account[]> {
+    const whereClause: any = {};
+
+    if (typeof userId !== 'undefined') {
+      whereClause.user = { id: Number(userId) };
+    }
+    if (typeof label !== 'undefined') {
+      whereClause.label = label;
+    }
+    if (typeof status !== 'undefined') {
+      whereClause.status = status;
+    }
+    if (typeof providerAccountId !== 'undefined') {
+      whereClause.providerAccountId = providerAccountId;
+    }
+
+    const entities = await this.accountRepository.find({
+      where: whereClause,
+    });
+
+    return entities.map((entity) => AccountMapper.toDomain(entity));
+  }
+
+  async findActives(userId?: User['id']): Promise<Account[]> {
+    const whereClause: any = {
+      status: AccountStatus.ACTIVE,
+    };
+
+    if (typeof userId !== 'undefined') {
+      whereClause.user = { id: Number(userId) };
+    }
+
+    const entities = await this.accountRepository.find({
+      where: whereClause,
+    });
+
+    return entities.map((entity) => AccountMapper.toDomain(entity));
+  }
+
+  async countAll(userId?: User['id']): Promise<number> {
+    const whereClause: any = {};
+
+    if (typeof userId !== 'undefined') {
+      whereClause.user = { id: Number(userId) };
+    }
+
+    return this.accountRepository.count({
+      where: whereClause,
+    });
+  }
+
+  async countActives(userId?: User['id']): Promise<number> {
+    const whereClause: any = {
+      status: AccountStatus.ACTIVE,
+    };
+
+    if (typeof userId !== 'undefined') {
+      whereClause.user = { id: Number(userId) };
+    }
+
+    return this.accountRepository.count({
+      where: whereClause,
+    });
+  }
+
+  async findByUserSocialId(socialId: User['socialId']): Promise<Account[]> {
+    if (!socialId) {
+      return [];
+    }
+
+    const entities = await this.accountRepository.find({
+      where: {
+        user: {
+          socialId,
+        },
+      },
+    });
+
+    return entities.map((entity) => AccountMapper.toDomain(entity));
+  }
+
+  async findBySocialIdAndProviderName(
+    socialId: User['socialId'],
+    providerName: Account['providerName'],
+  ): Promise<NullableType<Account>> {
+    if (!socialId || !providerName) {
+      return null;
+    }
+
+    const entity = await this.accountRepository.findOne({
+      where: {
+        user: {
+          socialId,
+        },
+        providerName,
+      },
+    });
+
+    return entity ? AccountMapper.toDomain(entity) : null;
+  }
+
+  async update(
+    id: Account['id'],
+    payload: Partial<Account>,
+  ): Promise<NullableType<Account>> {
     const entity = await this.accountRepository.findOne({
       where: { id },
     });
 
     if (!entity) {
-      throw new Error('Record not found');
+      return null;
     }
 
     const updatedEntity = await this.accountRepository.save(
