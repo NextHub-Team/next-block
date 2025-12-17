@@ -1,0 +1,38 @@
+name: sync main
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source repo (full history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure real Git author
+        run: |
+          git config user.name "amirtaherkhani"
+          git config user.email "amirtaherkhani@outlook.com"
+
+      - name: Add private repo remote
+        env:
+          PRIVATE_VERO_REPO_TOKEN: ${{ secrets.PRIVATE_VERO_REPO_TOKEN }}
+          PRIVATE_VERO_REPO_URL: ${{ secrets.PRIVATE_VERO_REPO_URL }}
+        run: |
+          git remote add repo-b https://x-access-token:${PRIVATE_VERO_REPO_TOKEN}@${PRIVATE_VERO_REPO_URL}
+          git fetch repo-b main
+
+      - name: Verify fast-forward is possible
+        run: |
+          git merge-base --is-ancestor repo-b/main HEAD
+
+      - name: Forward push commits to private repo
+        run: |
+          git push repo-b main:main
