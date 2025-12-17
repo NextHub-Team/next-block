@@ -1,13 +1,12 @@
-name: Forward sync main to private repo
+name: Mirror main to private repo
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
 
 jobs:
-  sync:
+  mirror:
     runs-on: ubuntu-latest
 
     steps:
@@ -16,12 +15,21 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Configure real Git author
+      - name: Configure author
         run: |
           git config user.name "amirtaherkhani"
           git config user.email "amirtaherkhani@outlook.com"
 
-      - name: Add Repo B remote and fetch
+      - name: Verify access to target repo (Repo B)
+        env:
+          PRIVATE_VERO_REPO_TOKEN: ${{ secrets.PRIVATE_VERO_REPO_TOKEN }}
+        run: |
+          set -euo pipefail
+          git ls-remote --exit-code \
+            "https://x-access-token:${PRIVATE_VERO_REPO_TOKEN}@github.com/Metapolitanltd/VaultBackend.git" \
+            HEAD
+
+      - name: Add remote and fetch
         env:
           PRIVATE_VERO_REPO_TOKEN: ${{ secrets.PRIVATE_VERO_REPO_TOKEN }}
         run: |
@@ -30,10 +38,10 @@ jobs:
             "https://x-access-token:${PRIVATE_VERO_REPO_TOKEN}@github.com/Metapolitanltd/VaultBackend.git"
           git fetch repo-b main
 
-      - name: Verify fast-forward is possible
+      - name: Ensure fast-forward is possible
         run: |
           git merge-base --is-ancestor repo-b/main HEAD
 
-      - name: Forward push commits to Repo B
+      - name: Push to Repo B
         run: |
           git push repo-b main:main
