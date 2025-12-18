@@ -109,10 +109,12 @@ export class LoggerExceptionFilter implements ExceptionFilter {
     // ---- duration ----
     const duration = Date.now() - startedAt;
 
-    // headers (always)
-    response.__message = shortMsg;
-    response.setHeader('X-Execution-Time', `${duration}ms`);
-    response.setHeader('X-Client-Agent-Name', agentName);
+    // headers (only if not already sent)
+    if (!response.headersSent) {
+      response.__message = shortMsg;
+      response.setHeader('X-Execution-Time', `${duration}ms`);
+      response.setHeader('X-Client-Agent-Name', agentName);
+    }
 
     // ---- user & request context ----
     const method = request.method ?? '';

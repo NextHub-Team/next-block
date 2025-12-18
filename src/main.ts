@@ -21,6 +21,8 @@ import { SwaggerTagRegistry } from './common/api-docs/swagger-tag.registry';
 import { registerTestWebhookListeners } from './webhooks/register-test-webhooks';
 // import { bootstrapSocketIoRedis } from './communication/socketio/adapters/socketio-redis.boostrap';
 import { StandardResponseInterceptor } from './utils/interceptors/message-response.interceptor';
+import { bootstrapQueueDash } from './common/queuedash/queuedash.bootstrap';
+import { bootstrapBullMqQueues } from './common/queuedash/queuedash.bullmq.bootstrap';
 import {
   APP_DEFAULT_DOCS_HOST,
   APP_DEFAULT_DOCS_PATH,
@@ -52,6 +54,8 @@ async function bootstrap() {
   app.setGlobalPrefix(apiPrefix, {
     exclude: ['/'],
   });
+  bootstrapBullMqQueues(app);
+  bootstrapQueueDash(app);
   app.enableVersioning({
     type: VersioningType.URI,
   });
@@ -78,7 +82,7 @@ async function bootstrap() {
     .setDescription(
       [
         '[![NestJS](https://img.shields.io/badge/nestjs-%23E0234E.svg?style=for-the-badge&logo=nestjs&logoColor=white)](https://nestjs.com/)',
-        '[![Swagger](https://img.shields.io/badge/-Swagger-%23Clojure?style=for-the-badge&logo=swagger&logoColor=white)](https://swagger.io/)',
+        `[![Swagger](https://img.shields.io/badge/-Swagger-%23Clojure?style=for-the-badge&logo=swagger&logoColor=white)](${docsUrl})`,
         `[![ReadTheDocs](https://img.shields.io/badge/Readthedocs-%23000000.svg?style=for-the-badge&logo=readthedocs&logoColor=white)](${docsUrl.concat('/reference')})`,
         `[![OpenAPI JSON](https://img.shields.io/badge/OpenAPI-Download%20JSON-6BA539?style=for-the-badge&logo=openapi-initiative&logoColor=white)](${openApiJsonUrl})`,
       ].join(' '),
