@@ -53,7 +53,7 @@ import queuedashConfig from './common/queuedash/config/queuedash.config';
 
 import {ContractDeployerModule} from './address-management/contract-deployer/contract-deployer.module'
 import {RewardMinterModule} from './address-management/reward-minter/reward-minter.module'
-import { SleeveRegistryModule } from './address-management/sleeve-registry/sleeve-registry.module';
+
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
@@ -81,7 +81,6 @@ import { QueueDashModule } from './common/queuedash/queuedash.module';
     WebhooksModule,
     ContractDeployerModule,
     RewardMinterModule,
-    SleeveRegistryModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [

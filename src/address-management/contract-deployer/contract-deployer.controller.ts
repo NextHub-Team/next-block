@@ -1,28 +1,46 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { ApiBody, ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ContractDeployerService } from './contract-deployer.service';
 import { DeployContractDto } from './dto/deploy-contract.dto';
-import { ApiCreatedResponse } from '@nestjs/swagger';
 import { DeployedContract } from './domain/deployed-contract';
-import { RegisterApiTag } from '../../common/api-docs/decorators/register-api-tag.decorator';
+import { writeSleeve } from './sleeve-store';
 
-@RegisterApiTag(
-  'Address Management',
-  'Compile and deploy address-book related smart contracts',
-)
-@Controller({
-  path: 'address-management/contract-deployer',
-})
+@ApiTags('Address Management')
+@Controller('address-management/contract-deployer')
 export class ContractDeployerController {
   constructor(private readonly contractDeployerService: ContractDeployerService) {}
 
   @Post('deploy')
   @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({
+    summary: 'Deploy Solidity contract and register sleeveId',
+    description:
+      'Deploys the given Solidity contract and stores sleeveId',
+  })
+  @ApiBody({
+    type: DeployContractDto,
+    examples: {
+      request: {
+        summary: 'Required request body',
+        value: {
+          contractName: 'SleeveToken',
+          constructorArgs: [],
+          sleeveId: 'test-sleeve-5',
+        },
+      },
+    },
+  })
   @ApiCreatedResponse({ type: DeployedContract })
   async deploy(@Body() dto: DeployContractDto): Promise<DeployedContract> {
-    return this.contractDeployerService.deployContract(
+    const deployed = await this.contractDeployerService.deployContract(
       dto.contractName,
-      dto.compilerVersion,
+      undefined,
       dto.constructorArgs ?? [],
     );
+
+   
+    writeSleeve(dto.sleeveId, deployed.address);
+
+    return deployed;
   }
 }

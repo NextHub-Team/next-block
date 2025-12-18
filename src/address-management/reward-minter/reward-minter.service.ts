@@ -6,14 +6,13 @@ import {
 } from './infrastructure/blockchain/avax-sleeve-token.adapter';
 import { FireblocksCwClientService } from '../../providers/fireblocks/cw/services/fireblocks-cw-client.service';
 import { UsersService } from '../../users/users.service';
-import { SleeveContractService } from '../sleeve-registry/sleeve-contract.service';
+import { readSleeves } from '../contract-deployer/sleeve-store';
 
 @Injectable()
 export class RewardMinterService {
   private readonly logger = new Logger(RewardMinterService.name);
 
   constructor(
-    private readonly sleeveRegistry: SleeveContractService,
     private readonly tokenAdapter: AvaxSleeveTokenAdapter,
     private readonly fireblocksClient: FireblocksCwClientService,
     private readonly usersService: UsersService,
@@ -36,6 +35,24 @@ export class RewardMinterService {
     if (t === SleeveTokenType.Subscription) return SleeveTokenType.Subscription;
 
     throw new Error(`Invalid tokenType=${input}`);
+  }
+
+  private resolveSleeveContractOrThrow(sleeveId: string): string {
+    const key = String(sleeveId ?? '').trim();
+    if (!key) throw new Error('sleeveId is required');
+
+    const sleeves = readSleeves();
+    const addr = sleeves[key];
+
+    if (!addr) {
+      this.logger.error(
+        `Sleeve not registered. key="${key}" keysInStore=${JSON.stringify(Object.keys(sleeves))}`,
+      );
+      throw new Error(`No contract address registered for sleeveId=${key}`);
+    }
+
+    return addr;
+    // TODO: replace JSON store with DB-backed repository
   }
 
   async resolveOrCreateWalletAddress(dto: RewardMintEventDto): Promise<string> {
@@ -89,7 +106,7 @@ export class RewardMinterService {
     const walletAddress = await this.resolveOrCreateWalletAddress(dto);
     this.logger.log(`wallet resolved=${walletAddress}`);
 
-    const sleeveContractAddress = this.sleeveRegistry.getAddressOrThrow(dto.sleeveId);
+    const sleeveContractAddress = this.resolveSleeveContractOrThrow(dto.sleeveId);
     this.logger.log(`sleeve contract resolved=${sleeveContractAddress}`);
 
     await this.tokenAdapter.applyEvent(sleeveContractAddress, walletAddress, dto);
@@ -103,9 +120,12 @@ export class RewardMinterService {
     tokenType?: string;
   }): Promise<
     | { tokenType: SleeveTokenType; balance: string; contractAddress: string }
-    | { balances: { reward: string; status: string; subscription: string }; contractAddress: string }
+    | {
+        balances: { reward: string; status: string; subscription: string };
+        contractAddress: string;
+      }
   > {
-    const contractAddress = this.sleeveRegistry.getAddressOrThrow(params.sleeveId);
+    const contractAddress = this.resolveSleeveContractOrThrow(params.sleeveId);
     const tokenType = this.parseTokenType(params.tokenType);
 
     if (tokenType) {
