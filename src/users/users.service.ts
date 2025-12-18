@@ -18,6 +18,7 @@ import { FileType } from '../files/domain/file';
 import { Role } from '../roles/domain/role';
 import { Status } from '../statuses/domain/status';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { DeepPartial } from '../utils/types/deep-partial.type';
 
 @Injectable()
 export class UsersService {
@@ -177,6 +178,23 @@ export class UsersService {
     });
   }
 
+  findByProviderAndSocialIds({
+    socialIds,
+    provider,
+  }: {
+    socialIds: User['socialId'][];
+    provider: User['provider'];
+  }): Promise<User[]> {
+    return this.usersRepository.findByProviderAndSocialIds({
+      socialIds,
+      provider,
+    });
+  }
+
+  findByEmails(emails: User['email'][]): Promise<User[]> {
+    return this.usersRepository.findByEmails(emails);
+  }
+
   async update(
     id: User['id'],
     updateUserDto: UpdateUserDto,
@@ -288,6 +306,18 @@ export class UsersService {
       provider: updateUserDto.provider,
       socialId: updateUserDto.socialId,
     });
+  }
+
+  updateMany(
+    payloads: { id: User['id']; payload: DeepPartial<User> }[],
+  ): Promise<User[]> {
+    return this.usersRepository.updateMany(payloads);
+  }
+
+  createMany(
+    data: Omit<User, 'id' | 'createdAt' | 'deletedAt' | 'updatedAt'>[],
+  ): Promise<User[]> {
+    return this.usersRepository.createMany(data);
   }
 
   async remove(id: User['id']): Promise<void> {

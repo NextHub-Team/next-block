@@ -10,6 +10,10 @@ export abstract class UserRepository {
     data: Omit<User, 'id' | 'createdAt' | 'deletedAt' | 'updatedAt'>,
   ): Promise<User>;
 
+  abstract createMany(
+    data: Omit<User, 'id' | 'createdAt' | 'deletedAt' | 'updatedAt'>[],
+  ): Promise<User[]>;
+
   abstract findManyWithPagination({
     filterOptions,
     sortOptions,
@@ -34,11 +38,23 @@ export abstract class UserRepository {
     socialId: User['socialId'];
     provider: User['provider'];
   }): Promise<NullableType<User>>;
+  abstract findByProviderAndSocialIds({
+    socialIds,
+    provider,
+  }: {
+    socialIds: User['socialId'][];
+    provider: User['provider'];
+  }): Promise<User[]>;
+  abstract findByEmails(emails: User['email'][]): Promise<User[]>;
 
   abstract update(
     id: User['id'],
     payload: DeepPartial<User>,
   ): Promise<NullableType<User>>;
+
+  abstract updateMany(
+    payloads: { id: User['id']; payload: DeepPartial<User> }[],
+  ): Promise<User[]>;
 
   abstract remove(id: User['id']): Promise<void>;
 }

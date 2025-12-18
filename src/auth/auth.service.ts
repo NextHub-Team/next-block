@@ -35,6 +35,7 @@ import { Session } from '../session/domain/session';
 import { SessionService } from '../session/session.service';
 import { StatusEnum } from '../statuses/statuses.enum';
 import { User } from '../users/domain/user';
+import { UNKNOWN_USER_NAME_PLACEHOLDER } from '../users/constants/user.constants';
 
 @Injectable()
 export class AuthService {
@@ -142,10 +143,42 @@ export class AuthService {
     }
 
     if (user) {
-      if (socialEmail && !userByEmail) {
-        user.email = socialEmail;
+      const updates: Partial<User> = {};
+      const emailBelongsToAnotherUser =
+        userByEmail && userByEmail.id !== user.id;
+
+      if (
+        socialEmail &&
+        !emailBelongsToAnotherUser &&
+        user.email?.toLowerCase() !== socialEmail
+      ) {
+        updates.email = socialEmail;
       }
-      await this.usersService.update(user.id, user);
+
+      const firstNameUpdate = this.resolveNameUpdate(
+        user.firstName,
+        socialData.firstName,
+      );
+      const lastNameUpdate = this.resolveNameUpdate(
+        user.lastName,
+        socialData.lastName,
+      );
+
+      if (firstNameUpdate) {
+        updates.firstName = firstNameUpdate;
+      }
+      if (lastNameUpdate) {
+        updates.lastName = lastNameUpdate;
+      }
+
+      if (Object.keys(updates).length) {
+        await this.usersService.update(user.id, {
+          ...updates,
+          provider: user.provider ?? authProvider,
+          socialId: user.socialId,
+        });
+        user = await this.usersService.findById(user.id);
+      }
     } else if (userByEmail) {
       user = userByEmail;
     } else if (socialData.id) {
@@ -158,8 +191,8 @@ export class AuthService {
 
       user = await this.usersService.create({
         email: socialEmail ?? null,
-        firstName: socialData.firstName ?? null,
-        lastName: socialData.lastName ?? null,
+        firstName: this.normalizeNameValue(socialData.firstName) ?? null,
+        lastName: this.normalizeNameValue(socialData.lastName) ?? null,
         socialId: socialData.id,
         provider: authProvider,
         role,
@@ -213,6 +246,46 @@ export class AuthService {
       tokenExpires,
       user,
     };
+  }
+
+  private normalizeNameValue(value?: string | null): string | undefined {
+    if (!value) {
+      return undefined;
+    }
+
+    const normalized = value.trim();
+
+    return normalized ? normalized : undefined;
+  }
+
+  private resolveNameUpdate(
+    current: string | null,
+    incoming?: string | null,
+  ): string | undefined {
+    const normalizedIncoming = this.normalizeNameValue(incoming);
+    if (!normalizedIncoming) {
+      return undefined;
+    }
+
+    const incomingLower = normalizedIncoming.toLowerCase();
+    const normalizedCurrent =
+      this.normalizeNameValue(current)?.toLowerCase() ?? '';
+    const isCurrentUnknown =
+      !normalizedCurrent ||
+      normalizedCurrent === UNKNOWN_USER_NAME_PLACEHOLDER.toLowerCase();
+
+    if (incomingLower === UNKNOWN_USER_NAME_PLACEHOLDER.toLowerCase()) {
+      return undefined;
+    }
+
+    if (
+      isCurrentUnknown ||
+      normalizedCurrent !== incomingLower
+    ) {
+      return normalizedIncoming;
+    }
+
+    return undefined;
   }
 
   async register(dto: AuthRegisterLoginDto): Promise<void> {
