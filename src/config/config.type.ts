@@ -13,6 +13,7 @@ import { SocketIOConfig } from '../communication/socketio/config/socketio-config
 import { CmcConfig } from '../providers/cmc/config/cmc-config.type';
 import { AwsSecretsManagerConfig } from './types/aws-secrets-manager-config.type';
 import { FireblocksConfig } from '../providers/fireblocks/cw/config/fireblocks-config.type';
+import { QueueDashConfig } from '../common/queuedash/config/queuedash-config.type';
 
 export type AllConfigType = {
   app: AppConfig;
@@ -30,4 +31,5 @@ export type AllConfigType = {
   cmc: CmcConfig;
   awsSecretsManager: AwsSecretsManagerConfig;
   fireblocks: FireblocksConfig;
+  queuedash: QueueDashConfig;
 };

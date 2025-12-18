@@ -64,6 +64,25 @@ AUTH_CONFIRM_EMAIL_SECRET=secret_for_confirm_email
 AUTH_CONFIRM_EMAIL_TOKEN_EXPIRES_IN=1d
 
 ########################################
+# QueueDash (Queue UI)
+########################################
+# Enable/disable QueueDash endpoint + UI
+QUEUEDASH_ENABLE=true
+# Relative path mounted under `/${API_PREFIX}` (default: `queuedash`) -> `/api/queuedash`
+QUEUEDASH_PATH=queuedash
+# Allow tRPC batching (optional)
+QUEUEDASH_ALLOW_BATCHING=true
+# Log QueueDash HTTP requests
+QUEUEDASH_LOG_REQUESTS=true
+
+# Optional: register a demo Bull queue so QueueDash UI shows something.
+# Requires Redis (default here: redis://redis:6379).
+QUEUEDASH_DEMO_QUEUE_ENABLE=true
+QUEUEDASH_REDIS_URL=redis://redis:6379
+QUEUEDASH_DEMO_QUEUE_NAME=report-queue
+QUEUEDASH_DEMO_QUEUE_DISPLAY_NAME=Reports
+
+########################################
 # OAuth providers
 ########################################
 GOOGLE_CLIENT_ID=

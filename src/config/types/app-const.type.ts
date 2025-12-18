@@ -7,4 +7,4 @@ export const APP_DEFAULT_HEADER_LANGUAGE: string = 'x-custom-lang';
 export const APP_DEFAULT_DB_TYPE: string = 'postgres';
 export const APP_DEFAULT_MONITOR_SAMPLE_MS: number = 10000;
 export const APP_DEFAULT_DOCS_HOST: string = 'http://localhost';
-export const APP_DEFAULT_DOCS_PATH: string = '/apps/docs';
+export const APP_DEFAULT_DOCS_PATH: string = '/docs';

@@ -48,6 +48,7 @@ import { ProvidersModule } from './providers/providers.module';
 import awsSecretsManagerConfig from './config/aws-secrets-manager.config';
 import fireblocksConfig from './providers/fireblocks/cw/config/fireblocks.config';
 import { FireblocksCwModule } from './providers/fireblocks/cw/fireblocks-cw.module';
+import queuedashConfig from './common/queuedash/config/queuedash.config';
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
@@ -57,10 +58,12 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
 });
 
 import { AccountsModule } from './accounts/accounts.module';
+import { QueueDashModule } from './common/queuedash/queuedash.module';
 
 @Module({
   imports: [
     AccountsModule,
+    QueueDashModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [
@@ -78,6 +81,7 @@ import { AccountsModule } from './accounts/accounts.module';
         cmcConfig,
         awsSecretsManagerConfig,
         fireblocksConfig,
+        queuedashConfig,
       ],
       envFilePath: ['.env'],
     }),
