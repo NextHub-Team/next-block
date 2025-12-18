@@ -82,6 +82,17 @@ async function logQueueDashUi(
     }
   };
 
+  const httpServer = app.getHttpServer();
+  if (
+    httpServer &&
+    typeof httpServer.once === 'function' &&
+    httpServer.listening !== true
+  ) {
+    // Wait until the Nest HTTP server is actually listening before calling getUrl()
+    httpServer.once('listening', () => void writeLog());
+    return;
+  }
+
   void writeLog();
 }
 
