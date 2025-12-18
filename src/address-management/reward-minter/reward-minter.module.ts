@@ -5,10 +5,10 @@ import { RewardMinterConsumer } from './infrastructure/messaging/reward-minter.c
 import { AvaxSleeveTokenAdapter } from './infrastructure/blockchain/avax-sleeve-token.adapter';
 import { FireblocksCwModule } from '../../providers/fireblocks/cw/fireblocks-cw.module';
 import { UsersModule } from '../../users/users.module';
-import { SleeveRegistryModule } from '../sleeve-registry/sleeve-registry.module';
+
 
 @Module({
-  imports: [UsersModule, FireblocksCwModule, SleeveRegistryModule],
+  imports: [UsersModule, FireblocksCwModule],
   controllers: [RewardMinterController, RewardMinterConsumer],
   providers: [RewardMinterService, AvaxSleeveTokenAdapter],
 })
