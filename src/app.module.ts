@@ -53,6 +53,7 @@ import queuedashConfig from './common/queuedash/config/queuedash.config';
 
 import {ContractDeployerModule} from './address-management/contract-deployer/contract-deployer.module'
 import {RewardMinterModule} from './address-management/reward-minter/reward-minter.module'
+import {AddressManagementModule} from './address-management/address-management.module'
 
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
@@ -81,6 +82,7 @@ import { QueueDashModule } from './common/queuedash/queuedash.module';
     WebhooksModule,
     ContractDeployerModule,
     RewardMinterModule,
+    AddressManagementModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [

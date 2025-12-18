@@ -25,7 +25,7 @@ export class ContractDeployerController {
         value: {
           contractName: 'SleeveToken',
           constructorArgs: [],
-          sleeveId: 'test-sleeve-5',
+          sleeveId: 'sleeveId',
         },
       },
     },
