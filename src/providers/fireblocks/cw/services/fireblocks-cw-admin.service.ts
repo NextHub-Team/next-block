@@ -16,6 +16,7 @@ import {
   GetConsoleUsersResponse,
   GetUsersResponse,
   JobCreated,
+  CreateAddressResponse,
   UpdateVaultAccountAssetAddressRequest,
   UpdateVaultAccountRequest,
   VaultAccount,
@@ -35,6 +36,7 @@ import {
   FireblocksVaultAssetDto,
   FireblocksAssetMetadataDto,
   FireblocksAssetCatalogDto,
+  FireblocksCustodialWalletDto,
 } from '../dto/fireblocks-cw-responses.dto';
 import {
   FireblocksAssetWalletsQueryDto,
@@ -602,6 +604,155 @@ export class FireblocksCwAdminService extends AbstractCwService {
   }
 
   // ---------------------------------------------------------------------------
+  // Bulk vault wallet orchestration
+  // ---------------------------------------------------------------------------
+  /**
+   * Ensure asset wallets and deposit addresses exist for multiple vault accounts.
+   */
+  async bulkCreateVaultAssetsAndDepositAddresses(
+    requests: Array<{
+      vaultAccountId: string;
+      assetId: string;
+      addressDescription?: string;
+      customerRefId?: string;
+      idempotencyKey?: string;
+    }>,
+  ): Promise<FireblocksCustodialWalletDto[]> {
+    this.guardEnabledAndLog();
+
+    if (!requests?.length) {
+      throw new BadRequestException(
+        'At least one vault account and asset pair is required',
+      );
+    }
+
+    const vaultCache = new Map<string, VaultAccount>();
+    const results: FireblocksCustodialWalletDto[] = [];
+
+    for (const request of requests) {
+      const cachedVault = vaultCache.get(request.vaultAccountId);
+      const vaultAccount =
+        cachedVault ??
+        ((
+          await this.sdk.vaults.getVaultAccount({
+            vaultAccountId: request.vaultAccountId,
+          })
+        )?.data as VaultAccount);
+
+      if (!vaultAccount) {
+        throw new NotFoundException(
+          `Vault account ${request.vaultAccountId} could not be resolved`,
+        );
+      }
+
+      vaultCache.set(request.vaultAccountId, vaultAccount);
+      const idempotencyKey = this.ensureIdempotencyKey(request.idempotencyKey);
+
+      const vaultAsset = await this.ensureVaultAsset(
+        request.vaultAccountId,
+        request.assetId,
+        idempotencyKey,
+      );
+
+      const depositAddress = await this.getOrCreateDepositAddress({
+        vaultAccountId: request.vaultAccountId,
+        assetId: request.assetId,
+        customerRefId:
+          request.customerRefId ??
+          vaultAccount.customerRefId ??
+          vaultAccount.name,
+        description: request.addressDescription,
+        idempotencyKey,
+        createIfMissing: true,
+      });
+
+      if (!depositAddress) {
+        throw new BadRequestException(
+          `Failed to create deposit address for vault ${request.vaultAccountId} (${request.assetId})`,
+        );
+      }
+
+      results.push(
+        FireblocksCwMapper.toCustodialWalletDto({
+          vaultAccount,
+          vaultAsset,
+          depositAddress,
+        }),
+      );
+    }
+
+    return GroupPlainToInstances(FireblocksCustodialWalletDto, results, [
+      RoleEnum.admin,
+    ]);
+  }
+
+  /**
+   * Fetch existing vault wallets and their primary deposit addresses in bulk.
+   */
+  async bulkFetchVaultAssetsWithAddresses(
+    requests: Array<{ vaultAccountId: string; assetId: string }>,
+  ): Promise<FireblocksCustodialWalletDto[]> {
+    this.guardEnabledAndLog();
+
+    if (!requests?.length) {
+      throw new BadRequestException(
+        'At least one vault account and asset pair is required',
+      );
+    }
+
+    const vaultCache = new Map<string, VaultAccount>();
+    const results: FireblocksCustodialWalletDto[] = [];
+
+    for (const request of requests) {
+      const cachedVault = vaultCache.get(request.vaultAccountId);
+      const vaultAccount =
+        cachedVault ??
+        ((
+          await this.sdk.vaults.getVaultAccount({
+            vaultAccountId: request.vaultAccountId,
+          })
+        )?.data as VaultAccount);
+
+      if (!vaultAccount) {
+        throw new NotFoundException(
+          `Vault account ${request.vaultAccountId} could not be resolved`,
+        );
+      }
+
+      vaultCache.set(request.vaultAccountId, vaultAccount);
+
+      const vaultAssetResponse = await this.sdk.vaults.getVaultAccountAsset({
+        vaultAccountId: request.vaultAccountId,
+        assetId: request.assetId,
+      });
+      const vaultAsset = vaultAssetResponse.data as VaultAsset;
+
+      const depositAddress = await this.getOrCreateDepositAddress({
+        vaultAccountId: request.vaultAccountId,
+        assetId: request.assetId,
+      });
+
+      if (!depositAddress) {
+        throw new NotFoundException(
+          `No deposit address found for vault ${request.vaultAccountId} and asset ${request.assetId}`,
+        );
+      }
+
+      results.push(
+        FireblocksCwMapper.toCustodialWalletDto({
+          vaultAccount,
+          vaultAsset,
+          depositAddress,
+        }),
+      );
+    }
+
+    return GroupPlainToInstances(FireblocksCustodialWalletDto, results, [
+      RoleEnum.admin,
+    ]);
+  }
+
+  // ---------------------------------------------------------------------------
   // Bulk jobs
   // ---------------------------------------------------------------------------
   /**
@@ -696,6 +847,52 @@ export class FireblocksCwAdminService extends AbstractCwService {
   // ---------------------------------------------------------------------------
   // Helpers
   // ---------------------------------------------------------------------------
+  private async getOrCreateDepositAddress(params: {
+    vaultAccountId: string;
+    assetId: string;
+    customerRefId?: string;
+    description?: string;
+    idempotencyKey?: string;
+    createIfMissing?: boolean;
+  }): Promise<CreateAddressResponse | undefined> {
+    try {
+      const response =
+        await this.sdk.vaults.getVaultAccountAssetAddressesPaginated({
+          vaultAccountId: params.vaultAccountId,
+          assetId: params.assetId,
+          limit: 1,
+        });
+
+      const existing = response.data?.addresses?.[0];
+      if (existing?.address) {
+        return existing as CreateAddressResponse;
+      }
+    } catch (error: unknown) {
+      this.logger.warn(
+        `Unable to fetch deposit addresses for ${params.vaultAccountId}/${params.assetId}`,
+      );
+      if (error instanceof Error) {
+        this.logger.debug(error.message);
+      }
+    }
+
+    if (!params.createIfMissing) {
+      return undefined;
+    }
+
+    const created = await this.sdk.vaults.createVaultAccountAssetAddress({
+      vaultAccountId: params.vaultAccountId,
+      assetId: params.assetId,
+      createAddressRequest: {
+        customerRefId: params.customerRefId,
+        description: params.description,
+      },
+      idempotencyKey: params.idempotencyKey,
+    });
+
+    return created.data as CreateAddressResponse;
+  }
+
   private async ensureVaultAsset(
     vaultAccountId: string,
     assetId: string,
