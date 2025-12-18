@@ -22,13 +22,13 @@ export class RewardMinterController {
     name: 'sleeveId',
     required: true,
     type: String,
-    example: 'test-sleeve-5',
+    example: 'sleeveId',
   })
   @ApiQuery({
     name: 'walletAddress',
     required: true,
     type: String,
-    example: '0x1457d39F5e2d4513E622A7d3716cF1E7CcB14cea',
+    example: '0x..',
   })
   @ApiQuery({
     name: 'tokenType',
@@ -41,8 +41,8 @@ export class RewardMinterController {
       oneOf: [
         {
           example: {
-            sleeveId: 'test-sleeve-5',
-            walletAddress: '0x1457d39F5e2d4513E622A7d3716cF1E7CcB14cea',
+            sleeveId: 'sleeveId',
+            walletAddress: '0x..',
             contractAddress: '0x...',
             tokenType: 'reward',
             balance: '40',
@@ -50,8 +50,8 @@ export class RewardMinterController {
         },
         {
           example: {
-            sleeveId: 'test-sleeve-5',
-            walletAddress: '0x1457d39F5e2d4513E622A7d3716cF1E7CcB14cea',
+            sleeveId: 'sleeveId',
+            walletAddress: '0x..',
             contractAddress: '0x...',
             balances: { reward: '40', status: '0', subscription: '0' },
           },
