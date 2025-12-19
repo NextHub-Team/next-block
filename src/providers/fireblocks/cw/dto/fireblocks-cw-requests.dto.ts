@@ -1,18 +1,21 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Exclude, Expose, Type } from 'class-transformer';
+import { Exclude, Expose, Type, Transform } from 'class-transformer';
 import {
+  ArrayNotEmpty,
   IsArray,
   IsBoolean,
+  IsEmail,
   IsInt,
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsUUID,
   Min,
   ValidateNested,
 } from 'class-validator';
 
 @Exclude()
-export class FireblocksVaultAccountsQueryDto {
+export class VaultAccountsQueryDto {
   @ApiPropertyOptional({
     description: 'Maximum number of vault accounts',
     example: 50,
@@ -62,7 +65,7 @@ export class FireblocksVaultAccountsQueryDto {
 }
 
 @Exclude()
-export class FireblocksAssetWalletsQueryDto {
+export class AssetWalletsQueryDto {
   @ApiPropertyOptional({
     description: 'Maximum number of asset wallets',
     example: 100,
@@ -103,7 +106,7 @@ export class FireblocksAssetWalletsQueryDto {
 }
 
 @Exclude()
-export class FireblocksAssetsCatalogQueryDto {
+export class AssetsCatalogQueryDto {
   @ApiPropertyOptional({
     description: 'Maximum number of assets',
     example: 200,
@@ -126,7 +129,7 @@ export class FireblocksAssetsCatalogQueryDto {
 }
 
 @Exclude()
-export class FireblocksUserIdentityDto {
+export class UserIdentityDto {
   @ApiProperty({
     description: 'Application user id',
     example: '0a4d4a34-7e02-4ad9-a53f-0f7ef8a3d9bc',
@@ -180,7 +183,28 @@ export class EnsureVaultWalletOptionsDto {
 }
 
 @Exclude()
-export class FireblocksEnsureUserWalletDto {
+export class VaultAccountsByIdsQueryDto {
+  @ApiProperty({
+    description: 'Comma-separated list of Fireblocks vault account ids',
+    example: '1,2,3',
+    type: String,
+  })
+  @Expose()
+  @Transform(({ value }) =>
+    Array.isArray(value)
+      ? value
+      : String(value)
+          .split(',')
+          .map((v) => v.trim())
+          .filter((v) => v.length > 0),
+  )
+  @IsArray()
+  @IsString({ each: true })
+  ids!: string[];
+}
+
+@Exclude()
+export class EnsureUserWalletDto {
   @ApiProperty({ description: 'The asset id that should exist on the vault' })
   @Expose()
   @IsString()
@@ -348,7 +372,7 @@ export class UpdateCustodialWalletDto {
 }
 
 @Exclude()
-export class FireblocksSpecialAddressAssetDto {
+export class SpecialAddressAssetDto {
   @ApiProperty({
     description: 'Asset identifier to create an address for',
     example: 'XRP',
@@ -368,7 +392,7 @@ export class FireblocksSpecialAddressAssetDto {
 }
 
 @Exclude()
-export class FireblocksSpecialAddressesRequestDto {
+export class SpecialAddressesRequestDto {
   @ApiProperty({
     description:
       'Vault account identifier where the addresses should be created',
@@ -380,13 +404,13 @@ export class FireblocksSpecialAddressesRequestDto {
 
   @ApiProperty({
     description: 'Assets that require special deposit addresses',
-    type: () => [FireblocksSpecialAddressAssetDto],
+    type: () => [SpecialAddressAssetDto],
   })
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => FireblocksSpecialAddressAssetDto)
+  @Type(() => SpecialAddressAssetDto)
   @Expose()
-  assets!: FireblocksSpecialAddressAssetDto[];
+  assets!: SpecialAddressAssetDto[];
 
   @ApiPropertyOptional({
     description: 'Customer reference id to attach to each new address',
@@ -490,4 +514,65 @@ export class CreateAdminVaultAccountRequestDto {
   @IsString()
   @Expose()
   idempotencyKey?: string;
+}
+
+@Exclude()
+export class BulkCreateVaultAccountUserDto {
+  @ApiProperty({
+    description: 'User social id (UUID)',
+    example: 'b0f76a18-3c9c-4db9-b9e4-3cbb1f1b4869',
+  })
+  @IsUUID()
+  @Expose()
+  socialId!: string;
+
+  @ApiProperty({
+    description: 'User email',
+    example: 'user@example.com',
+  })
+  @IsEmail()
+  @Expose()
+  email!: string;
+}
+
+@Exclude()
+export class BulkCreateVaultAccountsRequestDto {
+  @ApiProperty({
+    description: 'Users (socialId + email) to create vault accounts for',
+    type: () => [BulkCreateVaultAccountUserDto],
+  })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => BulkCreateVaultAccountUserDto)
+  @Expose()
+  users!: BulkCreateVaultAccountUserDto[];
+
+  @ApiPropertyOptional({
+    description: 'Base asset IDs to enable on each created vault account',
+    example: ['USDC_POLYGON', 'ETH_TEST3'],
+    type: [String],
+  })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @Expose()
+  baseAssetIds?: string[];
+
+  @ApiPropertyOptional({
+    description: 'Hide accounts in Fireblocks Console',
+    example: true,
+  })
+  @IsOptional()
+  @IsBoolean()
+  @Expose()
+  hiddenOnUI?: boolean = true;
+
+  @ApiPropertyOptional({
+    description: 'Enable auto-fuel',
+    example: true,
+  })
+  @IsOptional()
+  @IsBoolean()
+  @Expose()
+  autoFuel?: boolean = true;
 }

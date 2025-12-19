@@ -12,7 +12,11 @@ import { UpdateAccountDto } from './dto/update-account.dto';
 import { AccountRepository } from './infrastructure/persistence/account.repository';
 import { IPaginationOptions } from '../utils/types/pagination-options';
 import { Account } from './domain/account';
-import { AccountStatus, KycStatus } from './types/account-enum.type';
+import {
+  AccountProviderName,
+  AccountStatus,
+  KycStatus,
+} from './types/account-enum.type';
 import { NullableType } from '../utils/types/nullable.type';
 import { AccountDto } from './dto/account.dto';
 import { RoleEnum } from '../roles/roles.enum';
@@ -29,6 +33,55 @@ export class AccountsService {
     // Dependencies here
     private readonly accountRepository: AccountRepository,
   ) {}
+
+  async upsertByProviderAccountId(payload: {
+    providerAccountId: Account['providerAccountId'];
+    providerName: AccountProviderName;
+    user: { id: User['id'] };
+    KycStatus?: KycStatus;
+    label?: Account['label'];
+    metadata?: Account['metadata'];
+    status?: AccountStatus;
+  }): Promise<AccountDto> {
+    const existing = await this.accountRepository.findByProviderAccountId(
+      payload.providerAccountId,
+    );
+
+    if (existing) {
+      const updated = await this.update(existing.id, {
+        KycStatus: payload.KycStatus ?? existing.KycStatus,
+        label: payload.label ?? existing.label,
+        metadata: payload.metadata ?? existing.metadata,
+        status: payload.status ?? existing.status,
+        providerAccountId: payload.providerAccountId,
+        providerName: payload.providerName ?? existing.providerName,
+        user:
+          payload.user ??
+          (existing.user?.id ? { id: existing.user.id } : undefined),
+      });
+
+      if (!updated) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: {
+            account: 'notExists',
+          },
+        });
+      }
+
+      return updated;
+    }
+
+    return this.create({
+      user: payload.user,
+      KycStatus: payload.KycStatus,
+      label: payload.label,
+      metadata: payload.metadata,
+      status: payload.status,
+      providerAccountId: payload.providerAccountId,
+      providerName: payload.providerName,
+    });
+  }
 
   async create(createAccountDto: CreateAccountDto): Promise<AccountDto> {
     // Do not remove comment below.
@@ -66,6 +119,59 @@ export class AccountsService {
     });
 
     return GroupPlainToInstance(AccountDto, account, [RoleEnum.admin]);
+  }
+
+  async createBulk(
+    createAccountDtos: CreateAccountDto[],
+  ): Promise<AccountDto[]> {
+    if (!createAccountDtos?.length) {
+      return [];
+    }
+
+    const userIds = Array.from(
+      new Set(
+        createAccountDtos
+          .map((dto) => dto.user?.id)
+          .filter(
+            (id): id is User['id'] => typeof id !== 'undefined' && id !== null,
+          ),
+      ),
+    );
+    const normalizedUserIds = userIds
+      .map((id) => Number(id))
+      .filter((id) => !Number.isNaN(id));
+    const users = await this.userService.findByIds(normalizedUserIds);
+    const usersById = new Map(users.map((user) => [user.id, user]));
+    const missingUserId = userIds.find((id) => !usersById.has(Number(id)));
+
+    if (typeof missingUserId !== 'undefined') {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: {
+          user: 'notExists',
+        },
+      });
+    }
+
+    const accounts = await this.accountRepository.createMany(
+      createAccountDtos.map((dto) => ({
+        KycStatus: dto.KycStatus ?? KycStatus.PENDING,
+
+        label: dto.label,
+
+        metadata: dto.metadata,
+
+        status: dto.status ?? AccountStatus.ACTIVE,
+
+        providerAccountId: dto.providerAccountId,
+
+        providerName: dto.providerName,
+
+        user: usersById.get(Number(dto.user.id)) as User,
+      })),
+    );
+
+    return GroupPlainToInstances(AccountDto, accounts, [RoleEnum.admin]);
   }
 
   async findAllWithPagination({

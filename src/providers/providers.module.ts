@@ -1,8 +1,8 @@
 // src/providers/providers.module.ts
 import { Module } from '@nestjs/common';
 import { ApiGatewayModule } from '../common/api-gateway/api-gateway.module';
-import { CmcApiConfig } from '../providers/cmc/config/cmc-endpoints.config';
-import { GorushApiConfig } from '../providers/gorush/config/gorush-endpoints.config';
+import { CmcApiConfig } from './cmc/config/cmc-endpoints.config';
+import { GorushApiConfig } from './gorush/config/gorush-endpoints.config';
 
 @Module({
   imports: [

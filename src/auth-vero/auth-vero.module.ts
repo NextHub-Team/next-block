@@ -5,9 +5,10 @@ import { AuthVeroController } from './auth-vero.controller';
 import { AuthModule } from '../auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { VeroPayloadMapper } from './infrastructure/persistence/relational/mappers/vero.mapper';
+import { UsersModule } from '../users/users.module';
 
 @Module({
-  imports: [ConfigModule, AuthModule, JwtModule],
+  imports: [ConfigModule, AuthModule, JwtModule, UsersModule],
   providers: [AuthVeroService, VeroPayloadMapper], // Added VeroMapper here
   exports: [AuthVeroService],
   controllers: [AuthVeroController],

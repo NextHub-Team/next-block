@@ -92,7 +92,7 @@ export class APIDocs {
               font-size: 22px !important;
             }
             h1, h2, h3, h4 {
-              font-size: 26px !important;  /* Increase headings */
+              font-size: 26px !important;  /* Increase headings */ 
             }
           `,
         },
@@ -104,10 +104,36 @@ export class APIDocs {
   }
 
   static async info(app: INestApplication) {
-    let appUrl = await app.getUrl();
-    appUrl = appUrl.replace('[::1]', 'localhost');
-    this.logger.log(`[Swagger] Docs available at: ${appUrl}/docs`);
-    this.logger.log(`[API] Reference available at: ${appUrl}/docs/reference`);
-    this.logger.log(`[OpenAPI] JSON available at: ${appUrl}/openapi.json`);
+    const httpServer = app.getHttpServer?.();
+    if (
+      httpServer &&
+      typeof httpServer.once === 'function' &&
+      httpServer.listening !== true
+    ) {
+      await new Promise<void>((resolve) =>
+        httpServer.once('listening', () => resolve()),
+      );
+    }
+
+    if (!httpServer || httpServer.listening !== true) {
+      this.logger.debug(
+        'Skipping docs URL log because HTTP server is not listening yet',
+      );
+      return;
+    }
+
+    try {
+      let appUrl = await app.getUrl();
+      appUrl = appUrl.replace('[::1]', 'localhost');
+      this.logger.log(`[Swagger] Docs available at: ${appUrl}/docs`);
+      this.logger.log(`[API] Reference available at: ${appUrl}/docs/reference`);
+      this.logger.log(`[OpenAPI] JSON available at: ${appUrl}/openapi.json`);
+    } catch (error: unknown) {
+      this.logger.error(
+        `Unable to resolve app URL for docs: ${
+          (error as any)?.message ?? error
+        }`,
+      );
+    }
   }
 }

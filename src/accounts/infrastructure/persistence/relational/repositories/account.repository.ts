@@ -25,6 +25,23 @@ export class AccountRelationalRepository implements AccountRepository {
     return AccountMapper.toDomain(newEntity);
   }
 
+  async createMany(
+    data: Array<Omit<Account, 'id' | 'createdAt' | 'updatedAt'>>,
+  ): Promise<Account[]> {
+    if (!data?.length) {
+      return [];
+    }
+
+    const persistenceModels = data.map((account) =>
+      this.accountRepository.create(
+        AccountMapper.toPersistence(account as Account),
+      ),
+    );
+    const entities = await this.accountRepository.save(persistenceModels);
+
+    return entities.map((entity) => AccountMapper.toDomain(entity));
+  }
+
   async findAllWithPagination({
     paginationOptions,
   }: {
