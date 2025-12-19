@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Exclude, Expose, Type } from 'class-transformer';
 import {
+  IsArray,
   IsBoolean,
   IsInt,
   IsOptional,
@@ -123,6 +124,67 @@ export class FireblocksCwStatusDto {
   @ValidateNested()
   @Type(() => FireblocksCircuitBreakerDto)
   circuitBreaker!: FireblocksCircuitBreakerDto;
+}
+
+@Exclude()
+export class FireblocksBulkVaultAccountJobDto {
+  @ApiProperty({
+    description: 'Fireblocks job id for the bulk vault account creation task',
+    example: '3f0e8aaf-2b90-4b74-a2d1-0f234a6e2bd3',
+  })
+  @Expose()
+  @IsString()
+  jobId!: string;
+
+  @ApiProperty({
+    description: 'Number of vault accounts requested',
+    example: 3,
+  })
+  @Expose()
+  @IsInt()
+  requested!: number;
+
+  @ApiProperty({
+    description: 'Vault account names submitted to Fireblocks',
+    example: ['custody:user:123', 'custody:user:456'],
+    type: [String],
+  })
+  @Expose()
+  @IsArray()
+  @IsString({ each: true })
+  names!: string[];
+
+  @ApiProperty({
+    description: 'Base asset ids to activate on each new vault account',
+    example: ['USDC_POLYGON'],
+    type: [String],
+  })
+  @Expose()
+  @IsArray()
+  @IsString({ each: true })
+  baseAssetIds!: string[];
+}
+
+@Exclude()
+export class FireblocksBulkVaultAccountsSyncDto {
+  @ApiProperty({
+    description: 'Vault accounts that were found and synced locally',
+    type: () => [FireblocksVaultAccountDto],
+  })
+  @Expose()
+  @ValidateNested({ each: true })
+  @Type(() => FireblocksVaultAccountDto)
+  accounts!: FireblocksVaultAccountDto[];
+
+  @ApiProperty({
+    description: 'Vault account ids that could not be found in Fireblocks',
+    example: ['missing-id-1', 'missing-id-2'],
+    type: [String],
+  })
+  @Expose()
+  @IsArray()
+  @IsString({ each: true })
+  missingIds!: string[];
 }
 
 // ---------------------------------------------------------------------------

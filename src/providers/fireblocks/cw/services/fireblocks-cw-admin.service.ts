@@ -3,6 +3,7 @@ import {
   Inject,
   Injectable,
   NotFoundException,
+  ServiceUnavailableException,
   forwardRef,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -37,6 +38,8 @@ import {
   FireblocksAssetMetadataDto,
   FireblocksAssetCatalogDto,
   FireblocksCustodialWalletDto,
+  FireblocksBulkVaultAccountJobDto,
+  FireblocksBulkVaultAccountsSyncDto,
 } from '../dto/fireblocks-cw-responses.dto';
 import {
   AssetWalletsQueryDto,
@@ -46,6 +49,7 @@ import {
   AssetsCatalogQueryDto,
   CreateAdminVaultAccountRequestDto,
   VaultAccountsByIdsQueryDto,
+  BulkCreateVaultAccountsRequestDto,
 } from '../dto/fireblocks-cw-requests.dto';
 import { AccountsService } from '../../../../accounts/accounts.service';
 import {
@@ -62,6 +66,9 @@ import {
 } from '../../../../utils/transformers/class.transformer';
 import { RoleEnum } from '../../../../roles/roles.enum';
 import { v4 as uuidv4 } from 'uuid';
+import { UsersService } from '../../../../users/users.service';
+
+const BULK_VAULT_CREATE_LIMIT = 100;
 
 /**
  * Consolidated admin service combining vault operations and controller-facing helpers.
@@ -72,6 +79,7 @@ export class FireblocksCwAdminService extends AbstractCwService {
     @Inject(forwardRef(() => FireblocksCwService))
     private readonly fireblocks: FireblocksCwService,
     private readonly accountsService: AccountsService,
+    private readonly usersService: UsersService,
     configService: ConfigService<AllConfigType>,
   ) {
     super(FireblocksCwAdminService.name, configService);
@@ -122,6 +130,9 @@ export class FireblocksCwAdminService extends AbstractCwService {
     command: CreateAdminVaultAccountRequestDto,
   ): Promise<FireblocksVaultAccountDto> {
     this.guardEnabledAndLog();
+    this.logger.debug(
+      `Creating vault account (name=${command.name}, customerRefId=${command.customerRefId})`,
+    );
     const idempotencyKey = this.ensureIdempotencyKey(command.idempotencyKey);
 
     const response = await this.sdk.vaults.createVaultAccount({
@@ -134,13 +145,18 @@ export class FireblocksCwAdminService extends AbstractCwService {
       idempotencyKey,
     });
 
-    const vaultAccountDto = FireblocksVaultResponseMapper.vaultAccount(response);
+    const vaultAccountDto =
+      FireblocksVaultResponseMapper.vaultAccount(response);
 
     await this.createAccountForVault(vaultAccountDto, {
       customerRefId: command.customerRefId,
       name: command.name,
       referenceId: idempotencyKey,
     });
+
+    this.logger.debug(
+      `Vault account created and synced (id=${vaultAccountDto.id})`,
+    );
 
     return vaultAccountDto;
   }
@@ -199,22 +215,25 @@ export class FireblocksCwAdminService extends AbstractCwService {
    */
   async fetchVaultAccountsByIds(
     query: VaultAccountsByIdsQueryDto,
-  ): Promise<FireblocksVaultAccountDto[]> {
+  ): Promise<FireblocksBulkVaultAccountsSyncDto> {
     this.guardEnabledAndLog();
+    this.logger.debug(
+      `Fetching vault accounts by ids (count=${query.ids?.length ?? 0})`,
+    );
     const ids = Array.from(new Set(query.ids ?? [])).filter(
       (id) => typeof id === 'string' && id.trim().length > 0,
     );
 
     const results: FireblocksVaultAccountDto[] = [];
+    const missingIds: string[] = [];
 
     for (const id of ids) {
       try {
         const response = await this.sdk.vaults.getVaultAccount({
           vaultAccountId: id,
         });
-        const vaultAccountDto = FireblocksVaultResponseMapper.vaultAccount(
-          response,
-        );
+        const vaultAccountDto =
+          FireblocksVaultResponseMapper.vaultAccount(response);
 
         await this.createAccountForVault(vaultAccountDto, {
           customerRefId: vaultAccountDto.customerRefId,
@@ -227,13 +246,137 @@ export class FireblocksCwAdminService extends AbstractCwService {
         this.logger.warn(
           `Vault account ${id} not found or not accessible; skipping sync`,
         );
+        missingIds.push(id);
         if (error instanceof Error) {
           this.logger.debug(error.message);
         }
       }
     }
 
-    return results;
+    if (!results.length && missingIds.length) {
+      throw new NotFoundException(
+        `No Fireblocks vault accounts found for provided ids`,
+      );
+    }
+
+    return GroupPlainToInstance(
+      FireblocksBulkVaultAccountsSyncDto,
+      { accounts: results, missingIds },
+      [RoleEnum.admin],
+    );
+  }
+
+  /**
+   * Create Fireblocks vault accounts for multiple users via bulk job (no immediate DB sync).
+   * Fireblocks processes the job asynchronously; DB sync happens when fetching by ids.
+   */
+  async bulkCreateVaultAccountsForUsers(
+    command: BulkCreateVaultAccountsRequestDto,
+  ): Promise<FireblocksBulkVaultAccountJobDto> {
+    this.guardEnabledAndLog();
+    const userRequests = (command.users ?? []).filter(
+      (user) => !!user?.socialId && !!user?.email,
+    );
+
+    if (!userRequests.length) {
+      throw new BadRequestException(
+        'At least one user (socialId + email) is required',
+      );
+    }
+
+    if (!command.baseAssetIds?.length) {
+      throw new BadRequestException('At least one baseAssetId is required');
+    }
+
+    const uniqueRequests = Array.from(
+      new Map(
+        userRequests
+          .map((user) => [user.socialId.trim(), user] as const)
+          .filter(([socialId]) => !!socialId),
+      ).values(),
+    );
+
+    const socialIds = uniqueRequests.map((request) => request.socialId.trim());
+    if (socialIds.length > BULK_VAULT_CREATE_LIMIT) {
+      throw new BadRequestException(
+        `Maximum ${BULK_VAULT_CREATE_LIMIT} users can be processed per request`,
+      );
+    }
+
+    const users = await this.usersService.findBySocialIds(socialIds);
+    const usersBySocialId = new Map(
+      users
+        .filter((user) => !!user.socialId)
+        .map((user) => [user.socialId as string, user]),
+    );
+
+    const missingSocialId = socialIds.find(
+      (socialId) => !usersBySocialId.has(socialId),
+    );
+    if (typeof missingSocialId !== 'undefined') {
+      throw new NotFoundException(
+        `User with socialId ${missingSocialId} not found`,
+      );
+    }
+
+    for (const request of uniqueRequests) {
+      const user = usersBySocialId.get(request.socialId.trim());
+      if (!user?.email) {
+        throw new BadRequestException(
+          `User ${user?.id ?? request.socialId} is missing email; cannot create vault`,
+        );
+      }
+
+      if (
+        request.email &&
+        user.email &&
+        request.email.toLowerCase() !== user.email.toLowerCase()
+      ) {
+        throw new BadRequestException(
+          `Email mismatch for socialId ${request.socialId}: provided ${request.email}, expected ${user.email}`,
+        );
+      }
+    }
+
+    const names = await Promise.all(
+      uniqueRequests.map(async (request) => {
+        const user = usersBySocialId.get(request.socialId.trim());
+        if (!user) {
+          throw new NotFoundException(
+            `User with socialId ${request.socialId} not found`,
+          );
+        }
+
+        return this.fireblocks.buildVaultName(user.id, user.socialId);
+      }),
+    );
+
+    const idempotencyKey = this.ensureIdempotencyKey();
+    const job = await this.bulkCreateVaultAccounts(
+      {
+        count: names.length,
+        baseAssetIds: command.baseAssetIds,
+        names,
+      },
+      idempotencyKey,
+    );
+
+    if (!job?.jobId) {
+      throw new ServiceUnavailableException(
+        'Fireblocks did not return a job id for bulk vault creation',
+      );
+    }
+
+    return GroupPlainToInstance(
+      FireblocksBulkVaultAccountJobDto,
+      {
+        jobId: job.jobId,
+        requested: names.length,
+        names,
+        baseAssetIds: command.baseAssetIds,
+      },
+      [RoleEnum.admin],
+    );
   }
 
   /**
@@ -398,6 +541,9 @@ export class FireblocksCwAdminService extends AbstractCwService {
     addresses: Record<string, FireblocksDepositAddressDto>;
   }> {
     this.guardEnabledAndLog();
+    this.logger.debug(
+      `Ensuring vault addresses by prefix=${vaultNamePrefix} for assets=${assetIds.join(',')}`,
+    );
     const paged = await this.sdk.vaults.getPagedVaultAccounts({
       namePrefix: vaultNamePrefix,
       limit: 1,
@@ -554,6 +700,9 @@ export class FireblocksCwAdminService extends AbstractCwService {
     request: SpecialAddressesRequestDto,
   ): Promise<FireblocksSpecialAddressesResponseDto> {
     this.guardEnabledAndLog();
+    this.logger.debug(
+      `Creating special addresses (vault=${request.vaultAccountId}, assets=${request.assets.length})`,
+    );
 
     const {
       assets,
@@ -678,6 +827,9 @@ export class FireblocksCwAdminService extends AbstractCwService {
     }>,
   ): Promise<FireblocksCustodialWalletDto[]> {
     this.guardEnabledAndLog();
+    this.logger.debug(
+      `Bulk ensure assets+addresses (count=${requests?.length ?? 0})`,
+    );
 
     if (!requests?.length) {
       throw new BadRequestException(
@@ -752,6 +904,9 @@ export class FireblocksCwAdminService extends AbstractCwService {
     requests: Array<{ vaultAccountId: string; assetId: string }>,
   ): Promise<FireblocksCustodialWalletDto[]> {
     this.guardEnabledAndLog();
+    this.logger.debug(
+      `Bulk fetch assets+addresses (count=${requests?.length ?? 0})`,
+    );
 
     if (!requests?.length) {
       throw new BadRequestException(
@@ -908,7 +1063,13 @@ export class FireblocksCwAdminService extends AbstractCwService {
   // ---------------------------------------------------------------------------
   private async createAccountForVault(
     vaultAccount: FireblocksVaultAccountDto,
-    params: { customerRefId?: string; name?: string; referenceId?: string },
+    params: {
+      customerRefId?: string | number;
+      name?: string;
+      referenceId?: string;
+      email?: string | null;
+      socialId?: string | null;
+    },
   ): Promise<void> {
     if (!params.customerRefId) {
       this.logger.warn(
@@ -938,12 +1099,20 @@ export class FireblocksCwAdminService extends AbstractCwService {
 
   private buildAccountMetadata(
     vaultAccount: FireblocksVaultAccountDto,
-    params: { customerRefId?: string; name?: string; referenceId?: string },
+    params: {
+      customerRefId?: string | number;
+      name?: string;
+      referenceId?: string;
+      email?: string | null;
+      socialId?: string | null;
+    },
   ): Record<string, unknown> | undefined {
     const metadata = {
       customerRefId: params.customerRefId ?? vaultAccount.customerRefId,
       name: vaultAccount.name ?? params.name,
       referenceId: params.referenceId,
+      email: params.email,
+      socialId: params.socialId,
     };
 
     const cleaned = Object.fromEntries(

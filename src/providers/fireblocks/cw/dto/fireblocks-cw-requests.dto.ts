@@ -1,12 +1,15 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Exclude, Expose, Type, Transform } from 'class-transformer';
 import {
+  ArrayNotEmpty,
   IsArray,
   IsBoolean,
+  IsEmail,
   IsInt,
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsUUID,
   Min,
   ValidateNested,
 } from 'class-validator';
@@ -511,4 +514,65 @@ export class CreateAdminVaultAccountRequestDto {
   @IsString()
   @Expose()
   idempotencyKey?: string;
+}
+
+@Exclude()
+export class BulkCreateVaultAccountUserDto {
+  @ApiProperty({
+    description: 'User social id (UUID)',
+    example: 'b0f76a18-3c9c-4db9-b9e4-3cbb1f1b4869',
+  })
+  @IsUUID()
+  @Expose()
+  socialId!: string;
+
+  @ApiProperty({
+    description: 'User email',
+    example: 'user@example.com',
+  })
+  @IsEmail()
+  @Expose()
+  email!: string;
+}
+
+@Exclude()
+export class BulkCreateVaultAccountsRequestDto {
+  @ApiProperty({
+    description: 'Users (socialId + email) to create vault accounts for',
+    type: () => [BulkCreateVaultAccountUserDto],
+  })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => BulkCreateVaultAccountUserDto)
+  @Expose()
+  users!: BulkCreateVaultAccountUserDto[];
+
+  @ApiProperty({
+    description: 'Base asset IDs to enable on each created vault account',
+    example: ['USDC_POLYGON', 'ETH_TEST3'],
+    type: [String],
+  })
+  @IsArray()
+  @ArrayNotEmpty()
+  @IsString({ each: true })
+  @Expose()
+  baseAssetIds!: string[];
+
+  @ApiPropertyOptional({
+    description: 'Hide accounts in Fireblocks Console',
+    example: true,
+  })
+  @IsOptional()
+  @IsBoolean()
+  @Expose()
+  hiddenOnUI?: boolean = true;
+
+  @ApiPropertyOptional({
+    description: 'Enable auto-fuel',
+    example: true,
+  })
+  @IsOptional()
+  @IsBoolean()
+  @Expose()
+  autoFuel?: boolean = true;
 }

@@ -84,6 +84,9 @@ export class FireblocksCwClientService {
     user: UserIdentityDto,
     body: CreateUserVaultRequestDto,
   ): Promise<FireblocksVaultAccountDto> {
+    this.logger.debug(
+      `Creating vault account for user=${user.id} (hiddenOnUI=${body.hiddenOnUI ?? true})`,
+    );
     const sdk = this.sdk;
     const idempotencyKey = this.ensureIdempotencyKey(body.idempotencyKey);
 
@@ -100,6 +103,9 @@ export class FireblocksCwClientService {
       (a) => (a as any).name === vaultName,
     ) as VaultAccount | undefined;
     if (existing) {
+      this.logger.debug(
+        `Vault already exists for user=${user.id} (vaultId=${existing.id})`,
+      );
       return GroupPlainToInstance(
         FireblocksVaultAccountDto,
         FireblocksCwMapper.toVaultAccountDto(
@@ -120,6 +126,10 @@ export class FireblocksCwClientService {
       idempotencyKey,
     });
 
+    this.logger.debug(
+      `Created vault for user=${user.id} (vaultId=${(response.data as VaultAccount).id})`,
+    );
+
     return GroupPlainToInstance(
       FireblocksVaultAccountDto,
       FireblocksCwMapper.toVaultAccountDto(
@@ -135,6 +145,9 @@ export class FireblocksCwClientService {
     vaultAccountId: string,
     body: CreateUserVaultAssetRequestDto,
   ): Promise<FireblocksVaultAssetDto> {
+    this.logger.debug(
+      `Ensuring asset for user=${user.id} (vault=${vaultAccountId}, asset=${body.assetId})`,
+    );
     const sdk = this.sdk;
     const idempotencyKey = this.ensureIdempotencyKey(body.idempotencyKey);
     const vault = await sdk.vaults.getVaultAccount({ vaultAccountId });
@@ -167,6 +180,10 @@ export class FireblocksCwClientService {
       idempotencyKey,
     });
 
+    this.logger.debug(
+      `Created vault asset for user=${user.id} (vault=${vaultAccountId}, asset=${body.assetId})`,
+    );
+
     return GroupPlainToInstance(
       FireblocksVaultAssetDto,
       FireblocksCwMapper.toVaultAssetDto(created.data as VaultAsset),
@@ -180,6 +197,9 @@ export class FireblocksCwClientService {
     assetId: string,
     body: CreateUserVaultAddressRequestDto,
   ): Promise<FireblocksCustodialWalletDto> {
+    this.logger.debug(
+      `Ensuring deposit address for user=${user.id} (vault=${vaultAccountId}, asset=${assetId})`,
+    );
     const sdk = this.sdk;
     const idempotencyKey = this.ensureIdempotencyKey(body.idempotencyKey);
     const vaultResp = await sdk.vaults.getVaultAccount({ vaultAccountId });
@@ -227,6 +247,10 @@ export class FireblocksCwClientService {
       idempotencyKey,
     });
 
+    this.logger.debug(
+      `Created deposit address for user=${user.id} (vault=${vaultAccountId}, asset=${assetId})`,
+    );
+
     return FireblocksCwMapper.toCustodialWalletDto({
       vaultAccount,
       vaultAsset,
@@ -254,17 +278,12 @@ export class FireblocksCwClientService {
     userId: string | number,
   ): Promise<FireblocksVaultAccountWalletDto[]> {
     const accounts = await this.listUserVaultAccounts(userId);
-    const wallets: FireblocksVaultAccountWalletDto[] = [];
-    for (const account of accounts) {
-      const assets = account.assets ?? [];
-      for (const asset of assets) {
-        wallets.push({
-          vaultAccount: account,
-          wallet: asset,
-        });
-      }
-    }
-    return wallets;
+    return accounts.flatMap((account) =>
+      (account.assets ?? []).map((asset) => ({
+        vaultAccount: account,
+        wallet: asset,
+      })),
+    );
   }
 
   async listUserVaultAccountWallets(
@@ -309,6 +328,9 @@ export class FireblocksCwClientService {
     assetId: string,
     options?: EnsureVaultWalletOptionsDto,
   ): Promise<FireblocksCustodialWalletDto> {
+    this.logger.debug(
+      `Ensuring vault wallet for user=${user.id} (asset=${assetId})`,
+    );
     const sdk = this.sdk;
     const idempotencyKey = this.ensureIdempotencyKey(options?.idempotencyKey);
 
@@ -339,6 +361,10 @@ export class FireblocksCwClientService {
       idempotencyKey,
     });
 
+    this.logger.debug(
+      `Vault wallet ensured for user=${user.id} (vault=${vaultAccount.id}, asset=${assetId})`,
+    );
+
     return GroupPlainToInstance(
       FireblocksCustodialWalletDto,
       FireblocksCwMapper.toCustodialWalletDto({
@@ -356,6 +382,9 @@ export class FireblocksCwClientService {
   async createVaultWalletForAsset(
     command: CreateVaultWalletRequestDto,
   ): Promise<FireblocksCustodialWalletDto> {
+    this.logger.debug(
+      `Creating vault+wallet (name=${command.name}, asset=${command.assetId})`,
+    );
     const sdk = this.sdk;
     const idempotencyKey = this.ensureIdempotencyKey(command.idempotencyKey);
     const { name, assetId, customerRefId, hiddenOnUI, addressDescription } =

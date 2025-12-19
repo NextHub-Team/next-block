@@ -11,5 +11,7 @@ export enum AccountStatus {
 }
 
 export enum AccountProviderName {
-  FIREBLOCKS= 'fireblocks',
+  FIREBLOCKS = 'fireblocks',
+  INTERLACE = 'interlace',
+  STRIGA = 'striga',
 }

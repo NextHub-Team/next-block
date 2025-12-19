@@ -43,7 +43,7 @@ import {
 import { EnableGuard } from '../../../../common/guards/service-enabled.guard';
 import { FireblocksCwService } from '../fireblocks-cw.service';
 
-@ApiTags('Fireblocks-CW')
+@ApiTags('Fireblocks CW [SERVICES-CLIENT]')
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'), RolesGuard, EnableGuard)
 @RequireEnabled('fireblocks.enable')
