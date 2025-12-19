@@ -4,5 +4,8 @@
   "typescript.preferences.importModuleSpecifier": "relative",
   "github-actions.workflows.pinned.workflows": [
     ".github/workflows/sync-private.yml"
+  ],
+  "cSpell.words": [
+    "STRIGA"
   ]
 }
