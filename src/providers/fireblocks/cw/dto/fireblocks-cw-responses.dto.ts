@@ -163,6 +163,17 @@ export class FireblocksBulkVaultAccountJobDto {
   @IsArray()
   @IsString({ each: true })
   baseAssetIds!: string[];
+
+  @ApiPropertyOptional({
+    description: 'Vault account names that were skipped because they already exist',
+    example: ['custody:user:123'],
+    type: [String],
+  })
+  @Expose()
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  existingVaultNames?: string[];
 }
 
 @Exclude()

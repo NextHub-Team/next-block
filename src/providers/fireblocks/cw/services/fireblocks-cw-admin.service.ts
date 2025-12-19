@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Inject,
   Injectable,
   NotFoundException,
@@ -284,10 +285,6 @@ export class FireblocksCwAdminService extends AbstractCwService {
       );
     }
 
-    if (!command.baseAssetIds?.length) {
-      throw new BadRequestException('At least one baseAssetId is required');
-    }
-
     const uniqueRequests = Array.from(
       new Map(
         userRequests
@@ -351,15 +348,46 @@ export class FireblocksCwAdminService extends AbstractCwService {
       }),
     );
 
-    const idempotencyKey = this.ensureIdempotencyKey();
-    const job = await this.bulkCreateVaultAccounts(
-      {
-        count: names.length,
-        baseAssetIds: command.baseAssetIds,
-        names,
-      },
-      idempotencyKey,
+    const namesToCreate: string[] = [];
+    const existingVaultNames: string[] = [];
+    const existenceChecks = await Promise.all(
+      names.map(async (name) => ({
+        name,
+        exists: await this.vaultExistsByName(name),
+      })),
     );
+    for (const check of existenceChecks) {
+      if (check.exists) {
+        existingVaultNames.push(check.name);
+      } else {
+        namesToCreate.push(check.name);
+      }
+    }
+
+    if (!namesToCreate.length) {
+      throw new ConflictException(
+        'Vault accounts already exist for all provided users',
+      );
+    }
+
+    const idempotencyKey = this.ensureIdempotencyKey();
+    let job: JobCreated;
+    try {
+      job = await this.bulkCreateVaultAccounts(
+        {
+          count: namesToCreate.length,
+          baseAssetIds: command.baseAssetIds ?? [],
+          names: namesToCreate,
+        },
+        idempotencyKey,
+      );
+    } catch (error: unknown) {
+      this.logFireblocksError('start bulk vault account creation', error);
+      throw new ServiceUnavailableException(
+        this.getFireblocksMessage(error) ??
+          'Failed to start bulk vault account creation in Fireblocks',
+      );
+    }
 
     if (!job?.jobId) {
       throw new ServiceUnavailableException(
@@ -371,12 +399,72 @@ export class FireblocksCwAdminService extends AbstractCwService {
       FireblocksBulkVaultAccountJobDto,
       {
         jobId: job.jobId,
-        requested: names.length,
-        names,
-        baseAssetIds: command.baseAssetIds,
+        requested: namesToCreate.length,
+        names: namesToCreate,
+        baseAssetIds: command.baseAssetIds ?? [],
+        existingVaultNames:
+          existingVaultNames.length > 0 ? existingVaultNames : undefined,
       },
       [RoleEnum.admin],
     );
+  }
+
+  private async vaultExistsByName(name: string): Promise<boolean> {
+    try {
+      const paged = await this.sdk.vaults.getPagedVaultAccounts({
+        namePrefix: name,
+        limit: 1,
+      });
+      return !!paged.data?.accounts?.find(
+        (account) => (account as VaultAccount)?.name === name,
+      );
+    } catch (error: unknown) {
+      this.logFireblocksError(`check vault existence (name=${name})`, error);
+      throw new ServiceUnavailableException(
+        'Unable to verify existing vault accounts in Fireblocks',
+      );
+    }
+  }
+
+  private logFireblocksError(action: string, error: unknown): void {
+    const message = error instanceof Error ? error.message : `${error}`;
+    const errObj = error as any;
+    const details =
+      errObj?.response?.data ?? errObj?.data ?? errObj?.response ?? undefined;
+
+    let detailsString = '';
+    try {
+      if (details !== undefined) {
+        detailsString =
+          typeof details === 'string'
+            ? details
+            : JSON.stringify(details, null, 2);
+      }
+    } catch {
+      detailsString = `${details ?? ''}`;
+    }
+
+    this.logger.error(
+      `[Fireblocks] ${action} failed: ${message}${
+        errObj?.response?.status ? ` (status=${errObj.response.status})` : ''
+      }`,
+      detailsString,
+    );
+  }
+
+  private getFireblocksMessage(error: unknown): string | undefined {
+    const errObj = error as any;
+    const candidate =
+      errObj?.response?.data?.errorMessage ??
+      errObj?.response?.data?.message ??
+      errObj?.data?.errorMessage ??
+      errObj?.data?.message ??
+      errObj?.message;
+
+    if (typeof candidate === 'string' && candidate.trim().length > 0) {
+      return candidate;
+    }
+    return undefined;
   }
 
   /**

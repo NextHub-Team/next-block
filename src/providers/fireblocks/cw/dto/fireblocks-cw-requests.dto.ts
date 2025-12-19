@@ -547,16 +547,16 @@ export class BulkCreateVaultAccountsRequestDto {
   @Expose()
   users!: BulkCreateVaultAccountUserDto[];
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Base asset IDs to enable on each created vault account',
     example: ['USDC_POLYGON', 'ETH_TEST3'],
     type: [String],
   })
+  @IsOptional()
   @IsArray()
-  @ArrayNotEmpty()
   @IsString({ each: true })
   @Expose()
-  baseAssetIds!: string[];
+  baseAssetIds?: string[];
 
   @ApiPropertyOptional({
     description: 'Hide accounts in Fireblocks Console',
