@@ -278,10 +278,7 @@ export class AuthService {
       return undefined;
     }
 
-    if (
-      isCurrentUnknown ||
-      normalizedCurrent !== incomingLower
-    ) {
+    if (isCurrentUnknown || normalizedCurrent !== incomingLower) {
       return normalizedIncoming;
     }
 

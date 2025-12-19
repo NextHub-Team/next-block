@@ -21,8 +21,11 @@ import { SwaggerTagRegistry } from './common/api-docs/swagger-tag.registry';
 import { registerTestWebhookListeners } from './webhooks/register-test-webhooks';
 // import { bootstrapSocketIoRedis } from './communication/socketio/adapters/socketio-redis.boostrap';
 import { StandardResponseInterceptor } from './utils/interceptors/message-response.interceptor';
-import { bootstrapQueueDash } from './common/queuedash/queuedash.bootstrap';
-import { bootstrapBullMqQueues } from './common/queuedash/queuedash.bullmq.bootstrap';
+import {
+  bootstrapBullMqQueues,
+  bootstrapQueueDash,
+} from './common/queuedash/queuedash.bootstrap';
+import { QueueDashManager } from './common/queuedash/queuedash.manager';
 import {
   APP_DEFAULT_DOCS_HOST,
   APP_DEFAULT_DOCS_PATH,
@@ -32,17 +35,20 @@ import {
 import { bootstrapAwsSecrets } from './config/aws-secrets-manager.bootstrap';
 
 async function bootstrap() {
+  // --- Secrets & app creation
   await bootstrapAwsSecrets();
   const app = await NestFactory.create(AppModule, {
     cors: true,
     bufferLogs: true,
   });
 
+  // --- Resolve shared services
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
   const configService = app.get(ConfigService<AllConfigType>);
   const rabbitMQService = app.get(RabbitMQService);
   const apiPrefix = configService.getOrThrow('app.apiPrefix', { infer: true });
 
+  // --- Logging & global filters/interceptors/pipes
   const logger = app.get(LoggerService);
   app.useLogger(logger);
   app.useGlobalFilters(
@@ -54,8 +60,7 @@ async function bootstrap() {
   app.setGlobalPrefix(apiPrefix, {
     exclude: ['/'],
   });
-  bootstrapBullMqQueues(app);
-  bootstrapQueueDash(app);
+
   app.enableVersioning({
     type: VersioningType.URI,
   });
@@ -66,6 +71,11 @@ async function bootstrap() {
     new StandardResponseInterceptor(),
   );
 
+  // --- Feature bootstraps (routes/middleware must be registered before listen)
+  bootstrapBullMqQueues(app);
+  bootstrapQueueDash(app);
+
+  // --- API Docs (Swagger/Scalar) configuration
   const docsUrl = configService.get(
     'app.docsUrl',
     `${APP_DEFAULT_DOCS_HOST}:${APP.port}${APP_DEFAULT_DOCS_PATH}`,
@@ -110,11 +120,23 @@ async function bootstrap() {
     .registerToBuilder(builder)
     .build();
   await APIDocs.setup(app, options); // doesn't need use swagger SwaggerModule.setup
-  await app.listen(
-    configService.getOrThrow('app.port', APP_DEFAULT_PORT, { infer: true }),
-    '0.0.0.0',
-  );
-  await APIDocs.info(app);
+  // --- Start HTTP server
+  const httpPort = configService.getOrThrow('app.port', APP_DEFAULT_PORT, {
+    infer: true,
+  });
+  try {
+    await app.listen(httpPort, '0.0.0.0');
+    // --- Post-start info logs (safe to call getUrl after listen)
+    await APIDocs.info(app);
+    await QueueDashManager.info(app);
+  } catch (err) {
+    logger.error(
+      `Failed to start HTTP server on port ${httpPort}: ${
+        (err as any)?.message ?? err
+      }`,
+    );
+    throw err;
+  }
 
   registerTestWebhookListeners(app);
   //
