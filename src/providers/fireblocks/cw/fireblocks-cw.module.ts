@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { RouterModule } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from '../../../users/users.module';
+import { AccountsModule } from '../../../accounts/accounts.module';
 import { FireblocksCwAdminController } from './controllers/fireblocks-cw-admin.controller';
 import { FireblocksCwBaseController } from './fireblocks-cw.controller';
 import { FireblocksCwClientController } from './controllers/fireblocks-cw-client.controller';
@@ -15,6 +16,7 @@ import { EnableGuard } from '../../../common/guards/service-enabled.guard';
   imports: [
     ConfigModule,
     UsersModule,
+    AccountsModule,
     RouterModule.register([
       {
         path: 'fireblocks/cw/service',

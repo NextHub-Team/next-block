@@ -9,6 +9,10 @@ export abstract class AccountRepository {
     data: Omit<Account, 'id' | 'createdAt' | 'updatedAt'>,
   ): Promise<Account>;
 
+  abstract createMany(
+    data: Array<Omit<Account, 'id' | 'createdAt' | 'updatedAt'>>,
+  ): Promise<Account[]>;
+
   abstract findAllWithPagination({
     paginationOptions,
   }: {

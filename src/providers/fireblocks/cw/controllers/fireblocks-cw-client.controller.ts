@@ -23,6 +23,7 @@ import {
   CreateVaultWalletRequestDto,
   CreateUserVaultAssetRequestDto,
   CreateUserVaultAddressRequestDto,
+  EnsureUserWalletDto,
 } from '../dto/fireblocks-cw-requests.dto';
 import {
   FireblocksCustodialWalletDto,
@@ -30,7 +31,6 @@ import {
   FireblocksVaultAccountWalletDto,
   FireblocksVaultAssetDto,
 } from '../dto/fireblocks-cw-responses.dto';
-import { FireblocksEnsureUserWalletDto } from '../dto/fireblocks-cw-requests.dto';
 import { RequestWithUser } from '../../../../utils/types/object.type';
 import { RolesGuard } from '../../../../roles/roles.guard';
 import { Roles } from '../../../../roles/roles.decorator';
@@ -196,7 +196,7 @@ export class FireblocksCwClientController {
   )
   ensureUserWallet(
     @Request() req: RequestWithUser,
-    @Body() command: FireblocksEnsureUserWalletDto,
+    @Body() command: EnsureUserWalletDto,
   ): Promise<FireblocksCustodialWalletDto> {
     const userIdentity = {
       id: req.user.id,

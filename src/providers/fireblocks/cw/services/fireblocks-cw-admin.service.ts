@@ -39,13 +39,20 @@ import {
   FireblocksCustodialWalletDto,
 } from '../dto/fireblocks-cw-responses.dto';
 import {
-  FireblocksAssetWalletsQueryDto,
-  FireblocksVaultAccountsQueryDto,
-  FireblocksSpecialAddressesRequestDto,
+  AssetWalletsQueryDto,
+  VaultAccountsQueryDto,
+  SpecialAddressesRequestDto,
   UpdateCustodialWalletDto,
-  FireblocksAssetsCatalogQueryDto,
+  AssetsCatalogQueryDto,
   CreateAdminVaultAccountRequestDto,
+  VaultAccountsByIdsQueryDto,
 } from '../dto/fireblocks-cw-requests.dto';
+import { AccountsService } from '../../../../accounts/accounts.service';
+import {
+  AccountProviderName,
+  AccountStatus,
+  KycStatus,
+} from '../../../../accounts/types/account-enum.type';
 import { FireblocksCwMapper } from '../helpers/fireblocks-cw.mapper';
 import { AbstractCwService } from '../base/abstract-cw.service';
 import { FireblocksVaultResponseMapper } from '../infrastructure/persistence/relational/mappers/fireblocks-vault-response.mapper';
@@ -64,6 +71,7 @@ export class FireblocksCwAdminService extends AbstractCwService {
   constructor(
     @Inject(forwardRef(() => FireblocksCwService))
     private readonly fireblocks: FireblocksCwService,
+    private readonly accountsService: AccountsService,
     configService: ConfigService<AllConfigType>,
   ) {
     super(FireblocksCwAdminService.name, configService);
@@ -82,7 +90,7 @@ export class FireblocksCwAdminService extends AbstractCwService {
   }
 
   listAssetWallets(
-    query: FireblocksAssetWalletsQueryDto,
+    query: AssetWalletsQueryDto,
   ): Promise<FireblocksPaginatedAssetWalletResponseDto> {
     return this.listAssetWalletsPaged(
       query.limit,
@@ -93,13 +101,13 @@ export class FireblocksCwAdminService extends AbstractCwService {
   }
 
   createSpecialAddresses(
-    body: FireblocksSpecialAddressesRequestDto,
+    body: SpecialAddressesRequestDto,
   ): Promise<FireblocksSpecialAddressesResponseDto> {
     return this.createSpecialAddressesForAssets(body);
   }
 
   listVaultAccounts(
-    query: FireblocksVaultAccountsQueryDto,
+    query: VaultAccountsQueryDto,
   ): Promise<FireblocksVaultAccountsPageDto> {
     return this.listVaultAccountsPaged(
       query.limit,
@@ -126,7 +134,15 @@ export class FireblocksCwAdminService extends AbstractCwService {
       idempotencyKey,
     });
 
-    return FireblocksVaultResponseMapper.vaultAccount(response);
+    const vaultAccountDto = FireblocksVaultResponseMapper.vaultAccount(response);
+
+    await this.createAccountForVault(vaultAccountDto, {
+      customerRefId: command.customerRefId,
+      name: command.name,
+      referenceId: idempotencyKey,
+    });
+
+    return vaultAccountDto;
   }
 
   fetchVaultAccount(
@@ -175,6 +191,49 @@ export class FireblocksCwAdminService extends AbstractCwService {
     this.guardEnabledAndLog();
     const response = await this.sdk.vaults.getVaultAccount({ vaultAccountId });
     return FireblocksVaultResponseMapper.vaultAccount(response);
+  }
+
+  /**
+   * Fetch multiple vault accounts by id, syncing each into the local DB.
+   * Only accounts that exist in Fireblocks are returned.
+   */
+  async fetchVaultAccountsByIds(
+    query: VaultAccountsByIdsQueryDto,
+  ): Promise<FireblocksVaultAccountDto[]> {
+    this.guardEnabledAndLog();
+    const ids = Array.from(new Set(query.ids ?? [])).filter(
+      (id) => typeof id === 'string' && id.trim().length > 0,
+    );
+
+    const results: FireblocksVaultAccountDto[] = [];
+
+    for (const id of ids) {
+      try {
+        const response = await this.sdk.vaults.getVaultAccount({
+          vaultAccountId: id,
+        });
+        const vaultAccountDto = FireblocksVaultResponseMapper.vaultAccount(
+          response,
+        );
+
+        await this.createAccountForVault(vaultAccountDto, {
+          customerRefId: vaultAccountDto.customerRefId,
+          name: vaultAccountDto.name,
+          referenceId: undefined,
+        });
+
+        results.push(vaultAccountDto);
+      } catch (error: unknown) {
+        this.logger.warn(
+          `Vault account ${id} not found or not accessible; skipping sync`,
+        );
+        if (error instanceof Error) {
+          this.logger.debug(error.message);
+        }
+      }
+    }
+
+    return results;
   }
 
   /**
@@ -492,7 +551,7 @@ export class FireblocksCwAdminService extends AbstractCwService {
    * Create special deposit addresses for a set of assets in a vault account.
    */
   async createSpecialAddressesForAssets(
-    request: FireblocksSpecialAddressesRequestDto,
+    request: SpecialAddressesRequestDto,
   ): Promise<FireblocksSpecialAddressesResponseDto> {
     this.guardEnabledAndLog();
 
@@ -562,7 +621,7 @@ export class FireblocksCwAdminService extends AbstractCwService {
    * List supported assets for the workspace (with environment).
    */
   async listSupportedAssets(
-    query: FireblocksAssetsCatalogQueryDto,
+    query: AssetsCatalogQueryDto,
   ): Promise<FireblocksAssetCatalogDto> {
     this.guardEnabledAndLog();
     const response = await this.sdk.blockchainsAssets.listAssets({
@@ -847,6 +906,55 @@ export class FireblocksCwAdminService extends AbstractCwService {
   // ---------------------------------------------------------------------------
   // Helpers
   // ---------------------------------------------------------------------------
+  private async createAccountForVault(
+    vaultAccount: FireblocksVaultAccountDto,
+    params: { customerRefId?: string; name?: string; referenceId?: string },
+  ): Promise<void> {
+    if (!params.customerRefId) {
+      this.logger.warn(
+        `Account sync skipped for vault ${vaultAccount.id}: missing customerRefId`,
+      );
+      return;
+    }
+
+    const metadata = this.buildAccountMetadata(vaultAccount, params);
+    try {
+      await this.accountsService.upsertByProviderAccountId({
+        user: { id: params.customerRefId },
+        KycStatus: KycStatus.VERIFIED,
+        label: 'cw',
+        metadata,
+        status: AccountStatus.ACTIVE,
+        providerAccountId: vaultAccount.id as string,
+        providerName: AccountProviderName.FIREBLOCKS,
+      });
+    } catch (error: unknown) {
+      this.logger.error(
+        `Failed to sync account for vault ${vaultAccount.id}`,
+        error instanceof Error ? error.stack : undefined,
+      );
+    }
+  }
+
+  private buildAccountMetadata(
+    vaultAccount: FireblocksVaultAccountDto,
+    params: { customerRefId?: string; name?: string; referenceId?: string },
+  ): Record<string, unknown> | undefined {
+    const metadata = {
+      customerRefId: params.customerRefId ?? vaultAccount.customerRefId,
+      name: vaultAccount.name ?? params.name,
+      referenceId: params.referenceId,
+    };
+
+    const cleaned = Object.fromEntries(
+      Object.entries(metadata).filter(
+        ([, value]) => value !== undefined && value !== null && value !== '',
+      ),
+    );
+
+    return Object.keys(cleaned).length ? cleaned : undefined;
+  }
+
   private async getOrCreateDepositAddress(params: {
     vaultAccountId: string;
     assetId: string;

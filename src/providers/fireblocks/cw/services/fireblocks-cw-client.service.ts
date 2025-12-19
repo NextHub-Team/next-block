@@ -22,7 +22,7 @@ import { v4 as uuidv4 } from 'uuid';
 import {
   CreateVaultWalletRequestDto,
   EnsureVaultWalletOptionsDto,
-  FireblocksUserIdentityDto,
+  UserIdentityDto,
   CreateUserVaultRequestDto,
   CreateUserVaultAssetRequestDto,
   CreateUserVaultAddressRequestDto,
@@ -73,7 +73,7 @@ export class FireblocksCwClientService {
   }
 
   async ensureUserWallet(
-    user: FireblocksUserIdentityDto,
+    user: UserIdentityDto,
     assetId: string,
     options?: EnsureVaultWalletOptionsDto,
   ): Promise<FireblocksCustodialWalletDto> {
@@ -81,7 +81,7 @@ export class FireblocksCwClientService {
   }
 
   async createVaultAccountForUser(
-    user: FireblocksUserIdentityDto,
+    user: UserIdentityDto,
     body: CreateUserVaultRequestDto,
   ): Promise<FireblocksVaultAccountDto> {
     const sdk = this.sdk;
@@ -131,7 +131,7 @@ export class FireblocksCwClientService {
   }
 
   async createVaultAssetForUser(
-    user: FireblocksUserIdentityDto,
+    user: UserIdentityDto,
     vaultAccountId: string,
     body: CreateUserVaultAssetRequestDto,
   ): Promise<FireblocksVaultAssetDto> {
@@ -175,7 +175,7 @@ export class FireblocksCwClientService {
   }
 
   async createVaultWalletAddressForUser(
-    user: FireblocksUserIdentityDto,
+    user: UserIdentityDto,
     vaultAccountId: string,
     assetId: string,
     body: CreateUserVaultAddressRequestDto,
@@ -305,7 +305,7 @@ export class FireblocksCwClientService {
    * Ensure a user's vault account, asset wallet, and deposit address exist for a specific asset.
    */
   async ensureUserVaultWalletForAsset(
-    user: FireblocksUserIdentityDto,
+    user: UserIdentityDto,
     assetId: string,
     options?: EnsureVaultWalletOptionsDto,
   ): Promise<FireblocksCustodialWalletDto> {

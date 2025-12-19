@@ -27,11 +27,12 @@ import {
   FireblocksAssetMetadataDto,
 } from '../dto/fireblocks-cw-responses.dto';
 import {
-  FireblocksAssetWalletsQueryDto,
-  FireblocksSpecialAddressesRequestDto,
-  FireblocksAssetsCatalogQueryDto,
-  FireblocksVaultAccountsQueryDto,
+  AssetWalletsQueryDto,
+  SpecialAddressesRequestDto,
+  AssetsCatalogQueryDto,
+  VaultAccountsQueryDto,
   CreateAdminVaultAccountRequestDto,
+  VaultAccountsByIdsQueryDto,
 } from '../dto/fireblocks-cw-requests.dto';
 import { RolesGuard } from '../../../../roles/roles.guard';
 import { Roles } from '../../../../roles/roles.decorator';
@@ -58,7 +59,7 @@ export class FireblocksCwAdminController {
   @ApiOkResponse({ type: FireblocksPaginatedAssetWalletResponseDto })
   @ApiOperationRoles('List Fireblocks asset wallets', [RoleEnum.admin])
   async listAssetWallets(
-    @Query() query: FireblocksAssetWalletsQueryDto,
+    @Query() query: AssetWalletsQueryDto,
   ): Promise<FireblocksPaginatedAssetWalletResponseDto> {
     return this.admin.listAssetWallets(query);
   }
@@ -78,7 +79,7 @@ export class FireblocksCwAdminController {
     RoleEnum.admin,
   ])
   async createSpecialAddresses(
-    @Body() body: FireblocksSpecialAddressesRequestDto,
+    @Body() body: SpecialAddressesRequestDto,
   ): Promise<FireblocksSpecialAddressesResponseDto> {
     return this.admin.createSpecialAddresses(body);
   }
@@ -87,9 +88,20 @@ export class FireblocksCwAdminController {
   @ApiOkResponse({ type: FireblocksVaultAccountsPageDto })
   @ApiOperationRoles('List Fireblocks vault accounts', [RoleEnum.admin])
   async listVaultAccounts(
-    @Query() query: FireblocksVaultAccountsQueryDto,
+    @Query() query: VaultAccountsQueryDto,
   ): Promise<FireblocksVaultAccountsPageDto> {
     return this.admin.listVaultAccounts(query);
+  }
+
+  @Get('bulk')
+  @ApiOkResponse({ type: [FireblocksVaultAccountDto] })
+  @ApiOperationRoles('Fetch Fireblocks vault accounts by ids (syncs local DB)', [
+    RoleEnum.admin,
+  ])
+  async fetchVaultAccountsByIds(
+    @Query() query: VaultAccountsByIdsQueryDto,
+  ): Promise<FireblocksVaultAccountDto[]> {
+    return this.admin.fetchVaultAccountsByIds(query);
   }
 
   @Post('accounts')
@@ -139,7 +151,7 @@ export class FireblocksCwAdminController {
   @ApiOkResponse({ type: FireblocksAssetCatalogDto })
   @ApiOperationRoles('List supported assets (Fireblocks)', [RoleEnum.admin])
   async listSupportedAssets(
-    @Query() query: FireblocksAssetsCatalogQueryDto,
+    @Query() query: AssetsCatalogQueryDto,
   ): Promise<FireblocksAssetCatalogDto> {
     return this.admin.listSupportedAssets(query);
   }

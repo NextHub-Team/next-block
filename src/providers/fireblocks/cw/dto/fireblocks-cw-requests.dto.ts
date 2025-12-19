@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Exclude, Expose, Type } from 'class-transformer';
+import { Exclude, Expose, Type, Transform } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
@@ -12,7 +12,7 @@ import {
 } from 'class-validator';
 
 @Exclude()
-export class FireblocksVaultAccountsQueryDto {
+export class VaultAccountsQueryDto {
   @ApiPropertyOptional({
     description: 'Maximum number of vault accounts',
     example: 50,
@@ -62,7 +62,7 @@ export class FireblocksVaultAccountsQueryDto {
 }
 
 @Exclude()
-export class FireblocksAssetWalletsQueryDto {
+export class AssetWalletsQueryDto {
   @ApiPropertyOptional({
     description: 'Maximum number of asset wallets',
     example: 100,
@@ -103,7 +103,7 @@ export class FireblocksAssetWalletsQueryDto {
 }
 
 @Exclude()
-export class FireblocksAssetsCatalogQueryDto {
+export class AssetsCatalogQueryDto {
   @ApiPropertyOptional({
     description: 'Maximum number of assets',
     example: 200,
@@ -126,7 +126,7 @@ export class FireblocksAssetsCatalogQueryDto {
 }
 
 @Exclude()
-export class FireblocksUserIdentityDto {
+export class UserIdentityDto {
   @ApiProperty({
     description: 'Application user id',
     example: '0a4d4a34-7e02-4ad9-a53f-0f7ef8a3d9bc',
@@ -180,7 +180,28 @@ export class EnsureVaultWalletOptionsDto {
 }
 
 @Exclude()
-export class FireblocksEnsureUserWalletDto {
+export class VaultAccountsByIdsQueryDto {
+  @ApiProperty({
+    description: 'Comma-separated list of Fireblocks vault account ids',
+    example: '1,2,3',
+    type: String,
+  })
+  @Expose()
+  @Transform(({ value }) =>
+    Array.isArray(value)
+      ? value
+      : String(value)
+          .split(',')
+          .map((v) => v.trim())
+          .filter((v) => v.length > 0),
+  )
+  @IsArray()
+  @IsString({ each: true })
+  ids!: string[];
+}
+
+@Exclude()
+export class EnsureUserWalletDto {
   @ApiProperty({ description: 'The asset id that should exist on the vault' })
   @Expose()
   @IsString()
@@ -348,7 +369,7 @@ export class UpdateCustodialWalletDto {
 }
 
 @Exclude()
-export class FireblocksSpecialAddressAssetDto {
+export class SpecialAddressAssetDto {
   @ApiProperty({
     description: 'Asset identifier to create an address for',
     example: 'XRP',
@@ -368,7 +389,7 @@ export class FireblocksSpecialAddressAssetDto {
 }
 
 @Exclude()
-export class FireblocksSpecialAddressesRequestDto {
+export class SpecialAddressesRequestDto {
   @ApiProperty({
     description:
       'Vault account identifier where the addresses should be created',
@@ -380,13 +401,13 @@ export class FireblocksSpecialAddressesRequestDto {
 
   @ApiProperty({
     description: 'Assets that require special deposit addresses',
-    type: () => [FireblocksSpecialAddressAssetDto],
+    type: () => [SpecialAddressAssetDto],
   })
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => FireblocksSpecialAddressAssetDto)
+  @Type(() => SpecialAddressAssetDto)
   @Expose()
-  assets!: FireblocksSpecialAddressAssetDto[];
+  assets!: SpecialAddressAssetDto[];
 
   @ApiPropertyOptional({
     description: 'Customer reference id to attach to each new address',
