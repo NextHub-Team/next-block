@@ -40,7 +40,6 @@ import { MessagesModule } from './messages/messages.module';
 import { AddressBooksModule } from './address-books/address-books.module';
 import { WalletsModule } from './wallets/wallets.module';
 import { FireblocksCwWalletsModule } from './fireblocks-cw-wallets/fireblocks-cw-wallets.module';
-import { FireblocksNcwWalletsModule } from './fireblocks-ncw-wallets/fireblocks-ncw-wallets.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
 import { CmcModule } from './providers/cmc/cmc.module';
 import cmcConfig from './providers/cmc/config/cmc-config';
@@ -85,7 +84,6 @@ import { QueueDashModule } from './common/queuedash/queuedash.module';
       ],
       envFilePath: ['.env'],
     }),
-    FireblocksNcwWalletsModule,
     FireblocksCwWalletsModule,
     FireblocksCwModule,
     WalletsModule,
