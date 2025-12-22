@@ -6,6 +6,7 @@ import {
   Column,
 } from 'typeorm';
 import { EntityRelationalHelper } from '../../../../../utils/relational-entity-helper';
+import { FireblocksCwWalletAsset } from '../../../../types/fireblocks-cw-wallet.type';
 
 @Entity({
   name: 'fireblocks_cw_wallet',
@@ -13,15 +14,9 @@ import { EntityRelationalHelper } from '../../../../../utils/relational-entity-h
 export class FireblocksCwWalletEntity extends EntityRelationalHelper {
   @Column({
     nullable: true,
-    type: String,
+    type: 'jsonb',
   })
-  assets?: string | null;
-
-  @Column({
-    nullable: true,
-    type: String,
-  })
-  metadata?: string | null;
+  assets?: FireblocksCwWalletAsset[] | null;
 
   @Column({
     nullable: false,
@@ -51,7 +46,7 @@ export class FireblocksCwWalletEntity extends EntityRelationalHelper {
     nullable: false,
     type: String,
   })
-  referenceId: string;
+  customerRefId: string;
 
   @PrimaryGeneratedColumn('uuid')
   id: string;

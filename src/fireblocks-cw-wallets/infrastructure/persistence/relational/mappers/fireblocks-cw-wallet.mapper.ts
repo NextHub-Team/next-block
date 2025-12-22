@@ -1,13 +1,10 @@
 import { FireblocksCwWallet } from '../../../../domain/fireblocks-cw-wallet';
-
 import { FireblocksCwWalletEntity } from '../entities/fireblocks-cw-wallet.entity';
 
 export class FireblocksCwWalletMapper {
   static toDomain(raw: FireblocksCwWalletEntity): FireblocksCwWallet {
     const domainEntity = new FireblocksCwWallet();
     domainEntity.assets = raw.assets;
-
-    domainEntity.metadata = raw.metadata;
 
     domainEntity.vaultType = raw.vaultType;
 
@@ -17,7 +14,7 @@ export class FireblocksCwWalletMapper {
 
     domainEntity.name = raw.name;
 
-    domainEntity.referenceId = raw.referenceId;
+    domainEntity.customerRefId = raw.customerRefId;
 
     domainEntity.id = raw.id;
     domainEntity.createdAt = raw.createdAt;
@@ -32,8 +29,6 @@ export class FireblocksCwWalletMapper {
     const persistenceEntity = new FireblocksCwWalletEntity();
     persistenceEntity.assets = domainEntity.assets;
 
-    persistenceEntity.metadata = domainEntity.metadata;
-
     persistenceEntity.vaultType = domainEntity.vaultType;
 
     persistenceEntity.autoFuel = domainEntity.autoFuel;
@@ -42,7 +37,7 @@ export class FireblocksCwWalletMapper {
 
     persistenceEntity.name = domainEntity.name;
 
-    persistenceEntity.referenceId = domainEntity.referenceId;
+    persistenceEntity.customerRefId = domainEntity.customerRefId;
 
     if (domainEntity.id) {
       persistenceEntity.id = domainEntity.id;

@@ -1,17 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { FireblocksCwWalletAsset } from '../types/fireblocks-cw-wallet.type';
 
 export class FireblocksCwWallet {
   @ApiProperty({
-    type: () => String,
-    nullable: true,
+    type: () => [FireblocksCwWalletAsset],
+    required: false,
+    example: [
+      {
+        id: 'ETH',
+        status: 'READY',
+        address: '0x8f3C9d1a3bC4F5eA2cC9F9b0E1D5A6b7C8D9E0F1',
+      },
+    ],
   })
-  assets?: string | null;
-
-  @ApiProperty({
-    type: () => String,
-    nullable: true,
-  })
-  metadata?: string | null;
+  assets?: FireblocksCwWalletAsset[] | null;
 
   @ApiProperty({
     type: () => String,
@@ -41,7 +43,7 @@ export class FireblocksCwWallet {
     type: () => String,
     nullable: false,
   })
-  referenceId: string;
+  customerRefId: string;
 
   @ApiProperty({
     type: String,

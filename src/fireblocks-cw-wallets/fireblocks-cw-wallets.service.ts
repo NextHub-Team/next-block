@@ -22,13 +22,10 @@ export class FireblocksCwWalletsService {
   async create(createFireblocksCwWalletDto: CreateFireblocksCwWalletDto) {
     // Do not remove comment below.
     // <creating-property />
-
     return this.fireblocksCwWalletRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
       assets: createFireblocksCwWalletDto.assets,
-
-      metadata: createFireblocksCwWalletDto.metadata,
 
       vaultType: createFireblocksCwWalletDto.vaultType,
 
@@ -38,7 +35,7 @@ export class FireblocksCwWalletsService {
 
       name: createFireblocksCwWalletDto.name,
 
-      referenceId: createFireblocksCwWalletDto.referenceId,
+      customerRefId: createFireblocksCwWalletDto.customerRefId,
     });
   }
 
@@ -94,13 +91,10 @@ export class FireblocksCwWalletsService {
   ) {
     // Do not remove comment below.
     // <updating-property />
-
     return this.fireblocksCwWalletRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
       assets: updateFireblocksCwWalletDto.assets,
-
-      metadata: updateFireblocksCwWalletDto.metadata,
 
       vaultType: updateFireblocksCwWalletDto.vaultType,
 
@@ -110,7 +104,7 @@ export class FireblocksCwWalletsService {
 
       name: updateFireblocksCwWalletDto.name,
 
-      referenceId: updateFireblocksCwWalletDto.referenceId,
+      customerRefId: updateFireblocksCwWalletDto.customerRefId,
     });
   }
 
