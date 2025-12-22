@@ -41,3 +41,5 @@ export const FIREBLOCKS_ENVIRONMENT_BASE_URL: Record<
   PROD_EU: 'https://eu-api.fireblocks.io/v1',
   PROD_EU2: 'https://eu2-api.fireblocks.io/v1',
 };
+
+export const BULK_VAULT_CREATE_LIMIT = 100;

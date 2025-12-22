@@ -27,6 +27,7 @@ import {
   FireblocksAssetMetadataDto,
   FireblocksBulkVaultAccountJobDto,
   FireblocksBulkVaultAccountsSyncDto,
+  FireblocksCustodialWalletDto,
 } from '../dto/fireblocks-cw-responses.dto';
 import {
   AssetWalletsQueryDto,
@@ -36,6 +37,7 @@ import {
   CreateAdminVaultAccountRequestDto,
   VaultAccountsByIdsQueryDto,
   BulkCreateVaultAccountsRequestDto,
+  EnsureVaultWalletRequestDto,
 } from '../dto/fireblocks-cw-requests.dto';
 import { RolesGuard } from '../../../../roles/roles.guard';
 import { Roles } from '../../../../roles/roles.decorator';
@@ -158,6 +160,18 @@ export class FireblocksCwAdminController {
     @Param('assetId') assetId: string,
   ): Promise<FireblocksVaultAssetDto> {
     return this.admin.fetchVaultAsset(vaultAccountId, assetId);
+  }
+
+  @Post('wallets/ensure')
+  @ApiOkResponse({ type: FireblocksCustodialWalletDto })
+  @ApiOperationRoles(
+    'Ensure an asset wallet and deposit address for a vault account',
+    [RoleEnum.admin],
+  )
+  async ensureVaultWallet(
+    @Body() body: EnsureVaultWalletRequestDto,
+  ): Promise<FireblocksCustodialWalletDto> {
+    return this.admin.ensureVaultWallet(body.vaultAccountId, body.assetId);
   }
 
   @Get('assets/catalog')

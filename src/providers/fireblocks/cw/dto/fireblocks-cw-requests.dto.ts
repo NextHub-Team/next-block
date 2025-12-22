@@ -203,21 +203,25 @@ export class VaultAccountsByIdsQueryDto {
 }
 
 @Exclude()
-export class EnsureUserWalletDto {
+export class EnsureWalletDtoBase {
   @ApiProperty({ description: 'The asset id that should exist on the vault' })
   @Expose()
   @IsString()
   assetId!: string;
+}
 
-  @ApiPropertyOptional({
-    description: 'Optional settings applied while ensuring the vault wallet',
-    type: () => EnsureVaultWalletOptionsDto,
+@Exclude()
+export class EnsureUserWalletDto extends EnsureWalletDtoBase {}
+
+@Exclude()
+export class EnsureVaultWalletRequestDto extends EnsureWalletDtoBase {
+  @ApiProperty({
+    description: 'Vault account id to ensure the wallet for',
+    example: '123456789',
   })
   @Expose()
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => EnsureVaultWalletOptionsDto)
-  options?: EnsureVaultWalletOptionsDto;
+  @IsString()
+  vaultAccountId!: string;
 }
 
 @Exclude()

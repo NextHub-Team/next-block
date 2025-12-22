@@ -170,13 +170,13 @@ export class FireblocksCwClientController {
     );
   }
 
-  @Post('wallets')
+  @Post('me/wallets')
   @HttpCode(HttpStatus.CREATED)
   @ApiCreatedResponse({ type: FireblocksCustodialWalletDto })
-  @ApiOperationRoles('Create a Fireblocks vault wallet for an asset', [
-    RoleEnum.admin,
-    RoleEnum.user,
-  ])
+  @ApiOperationRoles(
+    'Create a Fireblocks vault wallet for a current user asset',
+    [RoleEnum.admin, RoleEnum.user],
+  )
   createVaultWallet(
     @Request() req: RequestWithUser,
     @Body() command: CreateVaultWalletRequestDto,
@@ -188,10 +188,10 @@ export class FireblocksCwClientController {
     return this.client.createWallet(payload);
   }
 
-  @Post('wallets/ensure')
+  @Post('me/wallets/ensure')
   @ApiOkResponse({ type: FireblocksCustodialWalletDto })
   @ApiOperationRoles(
-    'Ensure the vault wallet and deposit address for a user asset',
+    'Ensure the vault wallet and deposit address for a current user asset',
     [RoleEnum.admin, RoleEnum.user],
   )
   ensureUserWallet(
@@ -201,10 +201,6 @@ export class FireblocksCwClientController {
     const userIdentity = {
       id: req.user.id,
     };
-    return this.client.ensureUserWallet(
-      userIdentity,
-      command.assetId,
-      command.options,
-    );
+    return this.client.ensureUserWallet(userIdentity, command.assetId);
   }
 }

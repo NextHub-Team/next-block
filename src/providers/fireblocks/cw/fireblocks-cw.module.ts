@@ -7,6 +7,7 @@ import { FireblocksCwAdminController } from './controllers/fireblocks-cw-admin.c
 import { FireblocksCwBaseController } from './fireblocks-cw.controller';
 import { FireblocksCwClientController } from './controllers/fireblocks-cw-client.controller';
 import { FireblocksCwAdminService } from './services/fireblocks-cw-admin.service';
+import { FireblocksCwWorkflowService } from './services/fireblocks-cw-workflow.service';
 import { FireblocksCwClientService } from './services/fireblocks-cw-client.service';
 import { FireblocksCwService } from './fireblocks-cw.service';
 import { FireblocksErrorMapper } from './infrastructure/persistence/relational/mappers/fireblocks-error.mapper';
@@ -38,6 +39,7 @@ import { EnableGuard } from '../../../common/guards/service-enabled.guard';
     FireblocksCwService,
     FireblocksErrorMapper,
     FireblocksCwAdminService,
+    FireblocksCwWorkflowService,
     FireblocksCwClientService,
     EnableGuard,
   ],
@@ -51,6 +53,7 @@ import { EnableGuard } from '../../../common/guards/service-enabled.guard';
     FireblocksCwService,
     FireblocksErrorMapper,
     FireblocksCwAdminService,
+    FireblocksCwWorkflowService,
     FireblocksCwClientService,
   ],
 })
