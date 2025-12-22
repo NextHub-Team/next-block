@@ -1,3 +1,4 @@
+import { AccountsModule } from '../accounts/accounts.module';
 import {
   // do not remove this comment
   Module,
@@ -12,6 +13,8 @@ import { RelationalFireblocksCwWalletPersistenceModule } from './infrastructure/
 
 @Module({
   imports: [
+    AccountsModule,
+
     // do not remove this comment
     RelationalFireblocksCwWalletPersistenceModule,
   ],

@@ -189,11 +189,11 @@ export class AccountsService {
     return GroupPlainToInstances(AccountDto, accounts, [RoleEnum.admin]);
   }
 
-  async findById(
+  async findByIdOrFail(
     id: Account['id'],
-    roles: RoleEnum[] = [RoleEnum.admin],
-  ): Promise<NullableType<AccountDto>> {
-    const account = await this.accountRepository.findById(id);
+    userId?: User['id'],
+  ): Promise<Account> {
+    const account = await this.accountRepository.findById(id, userId);
     if (!account) {
       throw new UnprocessableEntityException({
         status: HttpStatus.UNPROCESSABLE_ENTITY,
@@ -202,6 +202,16 @@ export class AccountsService {
         },
       });
     }
+
+    return account;
+  }
+
+  async findById(
+    id: Account['id'],
+    roles: RoleEnum[] = [RoleEnum.admin],
+  ): Promise<NullableType<AccountDto>> {
+    const account = await this.findByIdOrFail(id);
+
     return GroupPlainToInstance(AccountDto, account, roles);
   }
 

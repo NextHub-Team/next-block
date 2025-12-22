@@ -1,3 +1,5 @@
+import { AccountDto } from '../../accounts/dto/account.dto';
+
 import {
   // decorators here
   IsString,
@@ -5,6 +7,7 @@ import {
   IsOptional,
   IsArray,
   ValidateNested,
+  IsNotEmptyObject,
 } from 'class-validator';
 
 import {
@@ -16,6 +19,15 @@ import { FireblocksCwWalletAsset } from '../types/fireblocks-cw-wallet.type';
 import { Type } from 'class-transformer';
 
 export class CreateFireblocksCwWalletDto {
+  @ApiProperty({
+    required: true,
+    type: () => AccountDto,
+  })
+  @ValidateNested()
+  @Type(() => AccountDto)
+  @IsNotEmptyObject()
+  account: AccountDto;
+
   @ApiProperty({
     required: false,
     type: () => [FireblocksCwWalletAsset],

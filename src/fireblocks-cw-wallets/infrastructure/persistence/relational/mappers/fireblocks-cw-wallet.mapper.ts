@@ -1,9 +1,15 @@
 import { FireblocksCwWallet } from '../../../../domain/fireblocks-cw-wallet';
+import { AccountMapper } from '../../../../../accounts/infrastructure/persistence/relational/mappers/account.mapper';
+
 import { FireblocksCwWalletEntity } from '../entities/fireblocks-cw-wallet.entity';
 
 export class FireblocksCwWalletMapper {
   static toDomain(raw: FireblocksCwWalletEntity): FireblocksCwWallet {
     const domainEntity = new FireblocksCwWallet();
+    if (raw.account) {
+      domainEntity.account = AccountMapper.toDomain(raw.account);
+    }
+
     domainEntity.assets = raw.assets;
 
     domainEntity.vaultType = raw.vaultType;
@@ -27,6 +33,12 @@ export class FireblocksCwWalletMapper {
     domainEntity: FireblocksCwWallet,
   ): FireblocksCwWalletEntity {
     const persistenceEntity = new FireblocksCwWalletEntity();
+    if (domainEntity.account) {
+      persistenceEntity.account = AccountMapper.toPersistence(
+        domainEntity.account,
+      );
+    }
+
     persistenceEntity.assets = domainEntity.assets;
 
     persistenceEntity.vaultType = domainEntity.vaultType;

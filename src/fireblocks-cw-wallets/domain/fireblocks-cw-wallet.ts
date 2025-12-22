@@ -1,7 +1,14 @@
+import { Account } from '../../accounts/domain/account';
 import { ApiProperty } from '@nestjs/swagger';
 import { FireblocksCwWalletAsset } from '../types/fireblocks-cw-wallet.type';
 
 export class FireblocksCwWallet {
+  @ApiProperty({
+    type: () => Account,
+    nullable: false,
+  })
+  account: Account;
+
   @ApiProperty({
     type: () => [FireblocksCwWalletAsset],
     required: false,

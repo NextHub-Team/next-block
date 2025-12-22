@@ -1,9 +1,12 @@
+import { AccountEntity } from '../../../../../accounts/infrastructure/persistence/relational/entities/account.entity';
+
 import {
   CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   Column,
+  ManyToOne,
 } from 'typeorm';
 import { EntityRelationalHelper } from '../../../../../utils/relational-entity-helper';
 import { FireblocksCwWalletAsset } from '../../../../types/fireblocks-cw-wallet.type';
@@ -12,6 +15,9 @@ import { FireblocksCwWalletAsset } from '../../../../types/fireblocks-cw-wallet.
   name: 'fireblocks_cw_wallet',
 })
 export class FireblocksCwWalletEntity extends EntityRelationalHelper {
+  @ManyToOne(() => AccountEntity, { eager: true, nullable: false })
+  account: AccountEntity;
+
   @Column({
     nullable: true,
     type: 'jsonb',

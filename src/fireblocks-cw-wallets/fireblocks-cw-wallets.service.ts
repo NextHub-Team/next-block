@@ -1,3 +1,6 @@
+import { AccountsService } from '../accounts/accounts.service';
+import { Account } from '../accounts/domain/account';
+
 import {
   // common
   Injectable,
@@ -15,6 +18,8 @@ import { TypeMessage } from '../utils/types/message.type';
 @Injectable()
 export class FireblocksCwWalletsService {
   constructor(
+    private readonly accountService: AccountsService,
+
     // Dependencies here
     private readonly fireblocksCwWalletRepository: FireblocksCwWalletRepository,
   ) {}
@@ -22,9 +27,15 @@ export class FireblocksCwWalletsService {
   async create(createFireblocksCwWalletDto: CreateFireblocksCwWalletDto) {
     // Do not remove comment below.
     // <creating-property />
+    const account = await this.accountService.findByIdOrFail(
+      createFireblocksCwWalletDto.account.id,
+    );
+
     return this.fireblocksCwWalletRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
+      account,
+
       assets: createFireblocksCwWalletDto.assets,
 
       vaultType: createFireblocksCwWalletDto.vaultType,
@@ -91,9 +102,19 @@ export class FireblocksCwWalletsService {
   ) {
     // Do not remove comment below.
     // <updating-property />
+    let account: Account | undefined = undefined;
+
+    if (updateFireblocksCwWalletDto.account) {
+      account = await this.accountService.findByIdOrFail(
+        updateFireblocksCwWalletDto.account.id,
+      );
+    }
+
     return this.fireblocksCwWalletRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
+      account,
+
       assets: updateFireblocksCwWalletDto.assets,
 
       vaultType: updateFireblocksCwWalletDto.vaultType,
