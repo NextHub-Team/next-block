@@ -40,17 +40,6 @@ export class AccountDto {
   KycStatus: KycStatus;
 
   @ApiPropertyOptional({
-    description: 'Timestamp of the last successful provider sync',
-    type: String,
-    format: 'date-time',
-  })
-  @IsOptional()
-  @IsDate()
-  @Type(() => Date)
-  @Expose()
-  lastSyncedAt?: Date | null;
-
-  @ApiPropertyOptional({
     description: 'Label displayed in the UI',
     example: 'Main Binance Account',
   })

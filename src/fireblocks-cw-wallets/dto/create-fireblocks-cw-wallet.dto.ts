@@ -12,6 +12,7 @@ import {
   ApiProperty,
 } from '@nestjs/swagger';
 import { FireblocksCwWalletAsset } from '../types/fireblocks-cw-wallet.type';
+
 import { Type } from 'class-transformer';
 
 export class CreateFireblocksCwWalletDto {

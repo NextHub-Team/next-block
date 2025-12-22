@@ -29,11 +29,6 @@ export class AccountEntity extends EntityRelationalHelper {
   })
   KycStatus?: KycStatus;
 
-  @UpdateDateColumn({
-    name: 'lastSyncedAt',
-  })
-  lastSyncedAt?: Date;
-
   @Column({
     nullable: true,
     type: String,

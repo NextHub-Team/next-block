@@ -9,8 +9,6 @@ export class AccountMapper {
     const domainEntity = new Account();
     domainEntity.KycStatus = raw.KycStatus;
 
-    domainEntity.lastSyncedAt = raw.lastSyncedAt;
-
     domainEntity.label = raw.label;
 
     domainEntity.metadata = raw.metadata;
@@ -35,8 +33,6 @@ export class AccountMapper {
   static toPersistence(domainEntity: Account): AccountEntity {
     const persistenceEntity = new AccountEntity();
     persistenceEntity.KycStatus = domainEntity.KycStatus;
-
-    persistenceEntity.lastSyncedAt = domainEntity.lastSyncedAt;
 
     persistenceEntity.label = domainEntity.label;
 

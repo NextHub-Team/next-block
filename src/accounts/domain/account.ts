@@ -16,12 +16,6 @@ export class Account {
   KycStatus?: KycStatus = KycStatus.PENDING;
 
   @ApiProperty({
-    type: () => Date,
-    nullable: false,
-  })
-  lastSyncedAt?: Date;
-
-  @ApiProperty({
     type: () => String,
     nullable: true,
   })

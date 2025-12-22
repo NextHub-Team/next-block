@@ -10,7 +10,6 @@ import {
   IsOptional,
   IsEnum,
   IsObject,
-  IsDate,
   MaxLength,
 } from 'class-validator';
 
@@ -32,17 +31,6 @@ export class BaseAccountPayloadDto {
     message: getEnumErrorMessage(KycStatus, 'KYC status'),
   })
   KycStatus?: KycStatus = KycStatus.PENDING;
-
-  @ApiPropertyOptional({
-    description: 'Timestamp of the latest provider sync',
-    type: String,
-    format: 'date-time',
-    example: '2024-05-12T08:30:00.000Z',
-  })
-  @IsOptional()
-  @IsDate()
-  @Type(() => Date)
-  lastSyncedAt?: Date | null;
 
   @ApiPropertyOptional({
     description: 'Human-friendly label to identify the account',
