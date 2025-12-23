@@ -6,6 +6,9 @@
     ".github/workflows/sync-private.yml"
   ],
   "cSpell.words": [
-    "STRIGA"
+    "MAXLEN",
+    "STRIGA",
+    "timestamptz",
+    "xadd"
   ]
 }

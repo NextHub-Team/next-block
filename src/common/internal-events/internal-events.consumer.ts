@@ -2,9 +2,11 @@ import { Inject, Injectable } from '@nestjs/common';
 import os from 'os';
 import { InternalEventsRedisService } from './internal-events.redis.service';
 import { InternalEventsRegistry } from './internal-events.registry';
-import { INTERNAL_EVENTS_OPTIONS } from './internal-events.constants';
-import { InternalEventMessage, InternalEventsModuleOptions } from './internal-events.types';
+import { INTERNAL_EVENTS_OPTIONS } from './types/internal-events.constants';
+import { InternalEvent } from '../../internal-events/domain/internal-event';
+import { InternalEventsOptions } from './config/internal-events-config.type';
 import { LoggerService } from '../logger/logger.service';
+import { InternalEventMessageDto } from './dto/internal-event-message.dto';
 
 @Injectable()
 export class InternalEventsConsumer {
@@ -17,11 +19,19 @@ export class InternalEventsConsumer {
     private readonly registry: InternalEventsRegistry,
     private readonly loggerService: LoggerService,
     @Inject(INTERNAL_EVENTS_OPTIONS)
-    private readonly options: InternalEventsModuleOptions,
+    private readonly options: InternalEventsOptions,
   ) {}
 
   async onModuleInit() {
-    const redis = this.redisService.getClient();
+    if (!this.options.enable) {
+      this.loggerService.warn(
+        'Internal events are disabled; consumer not started.',
+        InternalEventsConsumer.name,
+      );
+      return;
+    }
+
+    // const redis = this.redisService.getClient();
     const suffix = `${os.hostname()}-${process.pid}-${Math.random()
       .toString(36)
       .slice(2, 8)}`;
@@ -30,11 +40,19 @@ export class InternalEventsConsumer {
     await this.ensureStreamGroup();
 
     this.running = true;
+    this.loggerService.log(
+      `Internal events consumer started name=${this.consumerName}`,
+      InternalEventsConsumer.name,
+    );
     void this.consumeLoop();
   }
 
   onModuleDestroy() {
     this.running = false;
+    this.loggerService.debug(
+      'Internal events consumer stopped',
+      InternalEventsConsumer.name,
+    );
   }
 
   private async ensureStreamGroup() {
@@ -47,6 +65,10 @@ export class InternalEventsConsumer {
         this.options.serviceName,
         '$',
         'MKSTREAM',
+      );
+      this.loggerService.log(
+        `Internal events consumer group created stream=${this.options.streamName} group=${this.options.serviceName}`,
+        InternalEventsConsumer.name,
       );
     } catch (error) {
       const message = (error as Error)?.message ?? String(error);
@@ -142,11 +164,26 @@ export class InternalEventsConsumer {
   private async processMessage(id: string, fields: Record<string, string>) {
     const redis = this.redisService.getClient();
 
-    const message: InternalEventMessage = {
+    const message: InternalEventMessageDto = {
       eventId: fields.eventId,
       eventType: fields.eventType,
       payload: fields.payload ? JSON.parse(fields.payload) : {},
       occurredAt: fields.occurredAt,
+    };
+
+    const occurredAtDate = message.occurredAt
+      ? new Date(message.occurredAt)
+      : new Date();
+
+    const domainEvent: InternalEvent = {
+      eventId: message.eventId,
+      eventType: message.eventType,
+      payload: message.payload ?? {},
+      occurredAt: occurredAtDate,
+      id: message.eventId,
+      createdAt: occurredAtDate,
+      updatedAt: occurredAtDate,
+      publishedAt: null,
     };
 
     const idempotencyKey = `processed:${this.options.serviceName}:${message.eventId}`;
@@ -154,9 +191,9 @@ export class InternalEventsConsumer {
     const setResult = await redis.set(
       idempotencyKey,
       '1',
-      'NX',
       'EX',
       this.options.idempotencyTtlSeconds,
+      'NX',
     );
 
     if (!setResult) {
@@ -178,7 +215,7 @@ export class InternalEventsConsumer {
       }
 
       for (const handler of handlers) {
-        await handler.handle(message);
+        await handler.handle(domainEvent);
       }
 
       await (redis as any).xack(
@@ -188,13 +225,13 @@ export class InternalEventsConsumer {
       );
     } catch (error) {
       await redis.del(idempotencyKey);
-      await this.handleFailure(id, message, error as Error);
+      await this.handleFailure(id, domainEvent, error as Error);
     }
   }
 
   private async handleFailure(
     id: string,
-    message: InternalEventMessage,
+    message: InternalEvent,
     error: Error,
   ) {
     const redis = this.redisService.getClient();
@@ -221,7 +258,7 @@ export class InternalEventsConsumer {
         'payload',
         JSON.stringify(message.payload ?? {}),
         'occurredAt',
-        message.occurredAt,
+        (message.occurredAt ?? new Date()).toISOString(),
         'error',
         error.message,
       );

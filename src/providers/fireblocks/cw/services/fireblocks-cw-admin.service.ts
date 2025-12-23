@@ -11,7 +11,6 @@ import {
   UpdateVaultAccountRequest,
   VaultAccount,
   VaultActionStatus,
-  VaultAsset,
 } from '@fireblocks/ts-sdk';
 import { AllConfigType } from '../../../../config/config.type';
 import { FireblocksCwService } from '../fireblocks-cw.service';

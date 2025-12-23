@@ -1,10 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { InternalEventOutboxEntity } from './entities/internal-event-outbox.entity';
-import { InternalEventsRedisService } from './internal-events.redis.service';
-import { INTERNAL_EVENTS_OPTIONS } from './internal-events.constants';
-import { InternalEventsModuleOptions } from './internal-events.types';
-import { LoggerService } from '../logger/logger.service';
+import { InternalEventsRedisService } from '../internal-events.redis.service';
+import { INTERNAL_EVENTS_OPTIONS } from '../types/internal-events.constants';
+import { InternalEventsOptions } from '../config/internal-events-config.type';
+import { LoggerService } from '../../logger/logger.service';
+import { InternalEventEntity as InternalEventOutboxEntity } from '../../../internal-events/infrastructure/persistence/relational/entities/internal-event.entity';
 
 @Injectable()
 export class InternalEventsDispatcher {
@@ -16,10 +16,21 @@ export class InternalEventsDispatcher {
     private readonly redisService: InternalEventsRedisService,
     private readonly loggerService: LoggerService,
     @Inject(INTERNAL_EVENTS_OPTIONS)
-    private readonly options: InternalEventsModuleOptions,
+    private readonly options: InternalEventsOptions,
   ) {}
 
   onModuleInit() {
+    if (!this.options.enable) {
+      this.loggerService.warn(
+        'Internal events are disabled; dispatcher not started.',
+        InternalEventsDispatcher.name,
+      );
+      return;
+    }
+    this.loggerService.log(
+      `Internal events dispatcher started interval=${this.options.dispatchIntervalMs}ms batchSize=${this.options.dispatchBatchSize}`,
+      InternalEventsDispatcher.name,
+    );
     this.interval = setInterval(() => {
       void this.dispatchOnce();
     }, this.options.dispatchIntervalMs);
@@ -51,6 +62,10 @@ export class InternalEventsDispatcher {
         await this.maybeCleanup();
         return;
       }
+      this.loggerService.debug(
+        `Dispatching ${outboxRows.length} internal events`,
+        InternalEventsDispatcher.name,
+      );
 
       for (const row of outboxRows) {
         const payload = JSON.stringify(row.payload ?? {});
@@ -108,5 +123,9 @@ export class InternalEventsDispatcher {
       .where('publishedAt IS NOT NULL')
       .andWhere('publishedAt < :cutoff', { cutoff })
       .execute();
+    this.loggerService.debug(
+      'Internal events outbox cleanup completed',
+      InternalEventsDispatcher.name,
+    );
   }
 }

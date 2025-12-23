@@ -95,8 +95,38 @@ APPLE_APP_AUDIENCE=[]
 REDIS_CACHE_URL=redis://redis:6379/0
 REDIS_SESSION_URL=redis://redis:6379/1
 REDIS_RATE_LIMIT_URL=redis://redis:6379/2
-REDIS_MSQ_URL=redis://redis:6379/3
+
 REDIS_WORKER_URL=redis://redis:6379/4
+
+########################################
+# Internal Events
+########################################
+INTERNAL_EVENTS_ENABLE=true
+INTERNAL_EVENTS_SERVICE_NAME=api
+INTERNAL_EVENTS_STREAM_NAME=internal.events
+INTERNAL_EVENTS_DLQ_STREAM_NAME=internal.events.dlq
+INTERNAL_EVENTS_REDIS_URL=redis://localhost:6379/5
+# Interval (ms) between dispatch cycles
+INTERNAL_EVENTS_DISPATCH_INTERVAL_MS=10000
+# Max unpublished rows to push per dispatch cycle
+INTERNAL_EVENTS_DISPATCH_BATCH_SIZE=50
+# Days to retain published outbox rows before cleanup
+INTERNAL_EVENTS_OUTBOX_RETENTION_DAYS=60
+# XREADGROUP block timeout (ms)
+INTERNAL_EVENTS_CONSUMER_BLOCK_MS=10000
+# Number of messages to read per XREADGROUP
+INTERNAL_EVENTS_CONSUMER_COUNT=20
+# Idempotency key TTL (seconds)
+INTERNAL_EVENTS_IDEMPOTENCY_TTL_SECONDS=172800
+# Max retries before sending to DLQ
+INTERNAL_EVENTS_MAX_RETRIES=20
+# Milliseconds before pending messages are claimed by another consumer
+INTERNAL_EVENTS_PENDING_CLAIM_AFTER_MS=120000
+# Redis stream MAXLEN (~ trimming). Set blank to disable.
+INTERNAL_EVENTS_STREAM_TRIM_MAX_LEN=2000000
+# Redis retry step (ms) and max backoff (ms)
+INTERNAL_EVENTS_REDIS_RETRY_STEP_MS=60000
+INTERNAL_EVENTS_REDIS_RETRY_MAX_MS=60000
 
 ########################################
 # Secret manager (default:src/config/secrets)

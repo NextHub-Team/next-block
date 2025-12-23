@@ -48,6 +48,7 @@ import awsSecretsManagerConfig from './config/aws-secrets-manager.config';
 import fireblocksConfig from './providers/fireblocks/cw/config/fireblocks.config';
 import { FireblocksCwModule } from './providers/fireblocks/cw/fireblocks-cw.module';
 import queuedashConfig from './common/queuedash/config/queuedash.config';
+import internalEventsConfig from './common/internal-events/config/internal-events.config';
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
@@ -59,8 +60,13 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
 import { AccountsModule } from './accounts/accounts.module';
 import { QueueDashModule } from './common/queuedash/queuedash.module';
 
+import { InternalEventsModule as InternalEventsFeatureModule } from './internal-events/internal-events.module';
+import { InternalEventsModule as InternalEventsCoreModule } from './common/internal-events/internal-events.module';
+
 @Module({
   imports: [
+    InternalEventsCoreModule.forRootAsync(),
+    InternalEventsFeatureModule,
     AccountsModule,
     QueueDashModule,
     ConfigModule.forRoot({
@@ -81,6 +87,7 @@ import { QueueDashModule } from './common/queuedash/queuedash.module';
         awsSecretsManagerConfig,
         fireblocksConfig,
         queuedashConfig,
+        internalEventsConfig,
       ],
       envFilePath: ['.env'],
     }),

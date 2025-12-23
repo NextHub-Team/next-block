@@ -50,8 +50,6 @@ import {
 import { RoleEnum } from '../../../../roles/roles.enum';
 import { BULK_VAULT_CREATE_LIMIT } from '../types/fireblocks-const.type';
 
-
-
 /**
  * Houses multi-step admin workflows that orchestrate Fireblocks calls and local persistence.
  */
