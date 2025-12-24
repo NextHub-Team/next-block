@@ -49,7 +49,12 @@ export class FireblocksCwUserDeletedEventHandler extends InternalEventHandlerBas
     const payload = new UserEventDto(event.payload as Partial<UserEventDto>);
     const eventId = this.id(event);
 
-    this.received(event, eventId, payload, this.fireblocksCwService.getOptions().debugLogging);
+    this.received(
+      event,
+      eventId,
+      payload,
+      this.fireblocksCwService.getOptions().debugLogging,
+    );
 
     try {
       // TODO: Add Fireblocks-specific side-effects (e.g., cleanup user resources).

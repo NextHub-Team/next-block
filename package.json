@@ -10,6 +10,7 @@
     "migration:generate": "npm run typeorm -- --dataSource=src/database/data-source.ts migration:generate",
     "postmigration:generate": "npm run lint -- --fix",
     "migration:create": "npm run typeorm -- migration:create",
+    "premigration:run": "npm run build",
     "migration:run": "npm run typeorm -- --dataSource=src/database/data-source.ts migration:run",
     "migration:revert": "npm run typeorm -- --dataSource=src/database/data-source.ts migration:revert",
     "schema:drop": "npm run typeorm -- --dataSource=src/database/data-source.ts schema:drop",

@@ -190,7 +190,6 @@ export class FireblocksCwService
     return this.fireblocksSdk;
   }
 
-
   async buildVaultName(
     userId: number | string,
     fallbackSocialId?: string | null,
