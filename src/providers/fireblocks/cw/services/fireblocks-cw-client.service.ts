@@ -38,12 +38,13 @@ import {
   FireblocksVaultAssetDto,
 } from '../dto/fireblocks-cw-responses.dto';
 import { FireblocksCwService } from '../fireblocks-cw.service';
-import { FireblocksCwMapper } from '../helpers/fireblocks-cw.mapper';
+import { FireblocksCwMapper } from '../infrastructure/persistence/relational/mappers/fireblocks-cw.mapper';
 import {
   GroupPlainToInstance,
   GroupPlainToInstances,
 } from '../../../../utils/transformers/class.transformer';
 import { RoleEnum } from '../../../../roles/roles.enum';
+import { buildCustomerRefId } from '../helpers/fireblocks-cw.helper';
 
 /**
  * Consolidated Fireblocks client-facing vault service.
@@ -90,11 +91,11 @@ export class FireblocksCwClientService {
     const sdk = this.sdk;
     const idempotencyKey = this.ensureIdempotencyKey(body.idempotencyKey);
 
+    const customerRefId = buildCustomerRefId(user.id, user.socialId);
     const vaultName = await this.fireblocks.buildVaultName(
       user.id,
       user.socialId ?? `${user.id}`,
     );
-    const customerRefId = `${user.id}`;
     const paged = await sdk.vaults.getPagedVaultAccounts({
       namePrefix: vaultName,
       limit: 1,
@@ -334,11 +335,11 @@ export class FireblocksCwClientService {
     const sdk = this.sdk;
     const idempotencyKey = this.ensureIdempotencyKey(options?.idempotencyKey);
 
+    const customerRefId = buildCustomerRefId(user.id, user.socialId);
     const vaultName = await this.fireblocks.buildVaultName(
       user.id,
       user.socialId,
     );
-    const customerRefId = `${user.id}`;
     const vaultAccount = await this.resolveVaultAccount(sdk, {
       vaultName,
       customerRefId,

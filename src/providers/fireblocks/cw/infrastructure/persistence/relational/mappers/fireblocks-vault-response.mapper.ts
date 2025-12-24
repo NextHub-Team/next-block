@@ -6,7 +6,7 @@ import type {
   VaultAccountsPagedResponse,
   VaultAsset,
 } from '@fireblocks/ts-sdk';
-import { FireblocksCwMapper } from '../../../../helpers/fireblocks-cw.mapper';
+import { FireblocksCwMapper } from './fireblocks-cw.mapper';
 import {
   FireblocksPaginatedAssetWalletResponseDto,
   FireblocksVaultAccountsPageDto,

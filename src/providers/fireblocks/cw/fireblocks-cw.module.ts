@@ -3,6 +3,7 @@ import { RouterModule } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from '../../../users/users.module';
 import { AccountsModule } from '../../../accounts/accounts.module';
+import { FireblocksCwWalletsModule } from '../../../fireblocks-cw-wallets/fireblocks-cw-wallets.module';
 import { FireblocksCwAdminController } from './controllers/fireblocks-cw-admin.controller';
 import { FireblocksCwBaseController } from './fireblocks-cw.controller';
 import { FireblocksCwClientController } from './controllers/fireblocks-cw-client.controller';
@@ -32,6 +33,7 @@ import {
     ConfigModule,
     UsersModule,
     AccountsModule,
+    FireblocksCwWalletsModule,
     RouterModule.register([
       {
         path: 'fireblocks/cw/service',

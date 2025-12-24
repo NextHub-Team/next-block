@@ -4,5 +4,9 @@
   // Show npm scripts in the built-in NPM Scripts explorer for quick run/debug.
   "npm.enableScriptExplorer": true,
   // Keep script output readable in the terminal.
-  "npm.runSilent": false
+  "npm.runSilent": false,
+  "cSpell.words": [
+    "AVAXTEST",
+    "Upserting"
+  ]
 }

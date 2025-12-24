@@ -32,3 +32,14 @@ export const isInvalidRequest = (error: any): boolean => {
   const status = error?.response?.status;
   return status === 400 || status === 404 || status === 422;
 };
+
+export const buildCustomerRefId = (
+  userId: string | number,
+  socialId?: string | null,
+): string => {
+  const suffix =
+    typeof socialId === 'string' && socialId.trim().length > 0
+      ? socialId.trim()
+      : `${userId}`;
+  return `user::${suffix}`;
+};

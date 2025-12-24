@@ -15,7 +15,7 @@ import {
   FireblocksUserPortfolioDto,
   FireblocksVaultAccountDto,
   FireblocksVaultAssetDto,
-} from '../dto/fireblocks-cw-responses.dto';
+} from '../../../../dto/fireblocks-cw-responses.dto';
 
 export class FireblocksCwMapper {
   static toVaultAssetDto(

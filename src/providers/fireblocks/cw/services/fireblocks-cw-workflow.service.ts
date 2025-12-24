@@ -40,7 +40,7 @@ import {
   SpecialAddressesRequestDto,
   VaultAccountsByIdsQueryDto,
 } from '../dto/fireblocks-cw-requests.dto';
-import { FireblocksCwMapper } from '../helpers/fireblocks-cw.mapper';
+import { FireblocksCwMapper } from '../infrastructure/persistence/relational/mappers/fireblocks-cw.mapper';
 import { FireblocksVaultResponseMapper } from '../infrastructure/persistence/relational/mappers/fireblocks-vault-response.mapper';
 import { AbstractCwService } from '../base/abstract-cw.service';
 import {

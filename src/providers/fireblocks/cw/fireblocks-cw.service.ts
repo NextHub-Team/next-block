@@ -12,6 +12,7 @@ import { ConfigGet, ConfigGetOrThrow } from '../../../config/config.decorator';
 import { getFireblocksBaseUrl } from './helpers/fireblocks-cw.helper';
 import { FireblocksCwAdminService } from './services/fireblocks-cw-admin.service';
 import { FireblocksCwClientService } from './services/fireblocks-cw-client.service';
+import { FireblocksCwWorkflowService } from './services/fireblocks-cw-workflow.service';
 import { UsersService } from '../../../users/users.service';
 import { FireblocksConfig } from './config/fireblocks-config.type';
 import {
@@ -116,6 +117,7 @@ export class FireblocksCwService
   private fireblocksSdk?: Fireblocks;
   public admin!: FireblocksCwAdminService;
   public client!: FireblocksCwClientService;
+  public workflow!: FireblocksCwWorkflowService;
 
   constructor(
     private readonly configService: ConfigService<AllConfigType>,
@@ -147,6 +149,9 @@ export class FireblocksCwService
       strict: false,
     });
     this.client = this.moduleRef.get(FireblocksCwClientService, {
+      strict: false,
+    });
+    this.workflow = this.moduleRef.get(FireblocksCwWorkflowService, {
       strict: false,
     });
 
