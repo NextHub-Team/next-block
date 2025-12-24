@@ -128,18 +128,21 @@ export class InternalEventsRedisService implements OnModuleDestroy {
       }
     });
     // Initiate the connection after listeners are in place
-    void this.client.connect().catch((err) => {
-      this.loggerService.error(
-        `Internal events Redis initial connect failed: ${this.formatFriendlyError(err)}`,
-        undefined,
-        InternalEventsRedisService.name,
-      );
-    }).then(() => {
-      this.loggerService.log(
-        `Internal events Redis initial connection established (url=${this.redisUrl})`,
-        InternalEventsRedisService.name,
-      );
-    });
+    void this.client
+      .connect()
+      .catch((err) => {
+        this.loggerService.error(
+          `Internal events Redis initial connect failed: ${this.formatFriendlyError(err)}`,
+          undefined,
+          InternalEventsRedisService.name,
+        );
+      })
+      .then(() => {
+        this.loggerService.log(
+          `Internal events Redis initial connection established (url=${this.redisUrl})`,
+          InternalEventsRedisService.name,
+        );
+      });
     this.loggerService.debug(
       'Internal events Redis client initialized',
       InternalEventsRedisService.name,
@@ -171,6 +174,7 @@ export class InternalEventsRedisService implements OnModuleDestroy {
   private safeRedisHost(): string | undefined {
     try {
       return new URL(this.redisUrl).hostname;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
       return undefined;
     }

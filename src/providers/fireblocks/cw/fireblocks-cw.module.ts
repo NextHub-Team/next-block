@@ -12,6 +12,10 @@ import { FireblocksCwClientService } from './services/fireblocks-cw-client.servi
 import { FireblocksCwService } from './fireblocks-cw.service';
 import { FireblocksErrorMapper } from './infrastructure/persistence/relational/mappers/fireblocks-error.mapper';
 import { EnableGuard } from '../../../common/guards/service-enabled.guard';
+import {
+  FireblocksCwUserAddedEventHandler,
+  FireblocksCwUserDeletedEventHandler,
+} from './events/fireblocks-cw-user.event.handler';
 
 // TODO: 1) Verify Fireblocks error messages are surfaced in responses
 // TODO: 2) Check and test bulk permissions in the Fireblocks console
@@ -41,6 +45,8 @@ import { EnableGuard } from '../../../common/guards/service-enabled.guard';
     FireblocksCwAdminService,
     FireblocksCwWorkflowService,
     FireblocksCwClientService,
+    FireblocksCwUserAddedEventHandler,
+    FireblocksCwUserDeletedEventHandler,
     EnableGuard,
   ],
   controllers: [

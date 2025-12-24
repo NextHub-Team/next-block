@@ -1,6 +1,7 @@
 import {
   HttpStatus,
   Injectable,
+  Logger,
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -19,12 +20,20 @@ import { Role } from '../roles/domain/role';
 import { Status } from '../statuses/domain/status';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DeepPartial } from '../utils/types/deep-partial.type';
+import { InternalEventsService } from '../common/internal-events/internal-events.service';
+import { DataSource } from 'typeorm';
+import { UserInternalEvent } from './events/user-internal.event';
+import { InternalEventPayload } from '../common/internal-events/types/internal-events.type';
 
 @Injectable()
 export class UsersService {
+  private readonly logger = new Logger(UsersService.name);
+
   constructor(
     private readonly usersRepository: UserRepository,
     private readonly filesService: FilesService,
+    private readonly internalEventsService: InternalEventsService,
+    private readonly dataSource: DataSource,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
@@ -114,7 +123,7 @@ export class UsersService {
       };
     }
 
-    return this.usersRepository.create({
+    const createdUser = await this.usersRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
       firstName: createUserDto.firstName,
@@ -127,6 +136,10 @@ export class UsersService {
       provider: createUserDto.provider ?? AuthProvidersEnum.email,
       socialId: createUserDto.socialId,
     });
+
+    await this.emitUserEvents([UserInternalEvent.created(createdUser)]);
+
+    return createdUser;
   }
 
   findManyWithPagination({
@@ -314,13 +327,60 @@ export class UsersService {
     return this.usersRepository.updateMany(payloads);
   }
 
-  createMany(
+  async createMany(
     data: Omit<User, 'id' | 'createdAt' | 'deletedAt' | 'updatedAt'>[],
   ): Promise<User[]> {
-    return this.usersRepository.createMany(data);
+    const createdUsers = await this.usersRepository.createMany(data);
+
+    await this.emitUserEvents(
+      createdUsers.map((user) => UserInternalEvent.created(user)),
+    );
+
+    return createdUsers;
   }
 
   async remove(id: User['id']): Promise<void> {
+    const existingUser = await this.findById(id);
     await this.usersRepository.remove(id);
+
+    if (existingUser) {
+      await this.emitUserEvents([UserInternalEvent.deleted(existingUser)]);
+    }
+  }
+
+  private async emitUserEvents(
+    events: Array<UserInternalEvent | null | undefined>,
+  ): Promise<void> {
+    const eventsToEmit = events.filter(
+      (event): event is UserInternalEvent => !!event,
+    );
+
+    if (!eventsToEmit.length) {
+      return;
+    }
+
+    try {
+      await Promise.all(
+        eventsToEmit.map((event) =>
+          this.internalEventsService.emit(this.dataSource.manager, {
+            eventType: event.eventType,
+            payload: { ...event.payload } as InternalEventPayload,
+          }),
+        ),
+      );
+    } catch (error) {
+      const message = (error as Error)?.message ?? String(error);
+      if (message.includes('Internal events are disabled')) {
+        this.logger.warn(
+          `Internal events are disabled; skipping emit for: ${eventsToEmit
+            .map((event) => event.eventType)
+            .join(', ')}`,
+        );
+        return;
+      }
+
+      this.logger.error(`Failed to emit internal events: ${message}`);
+      throw error;
+    }
   }
 }

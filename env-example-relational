@@ -20,6 +20,7 @@ DATABASE_USERNAME=postgres
 DATABASE_PASSWORD=Q7r9T3pL
 DATABASE_NAME=vault
 DATABASE_SYNCHRONIZE=false
+DATABASE_LOGGING=true # Toggle TypeORM query logging (dev default: true)
 DATABASE_MAX_CONNECTIONS=100
 DATABASE_SSL_ENABLED=false
 DATABASE_REJECT_UNAUTHORIZED=false
@@ -111,7 +112,7 @@ INTERNAL_EVENTS_DISPATCH_INTERVAL_MS=10000
 # Max unpublished rows to push per dispatch cycle
 INTERNAL_EVENTS_DISPATCH_BATCH_SIZE=50
 # Days to retain published outbox rows before cleanup
-INTERNAL_EVENTS_OUTBOX_RETENTION_DAYS=60
+INTERNAL_EVENTS_OUTBOX_RETENTION_DAYS=7 # Dev-friendly short retention
 # XREADGROUP block timeout (ms)
 INTERNAL_EVENTS_CONSUMER_BLOCK_MS=10000
 # Number of messages to read per XREADGROUP
@@ -122,8 +123,8 @@ INTERNAL_EVENTS_IDEMPOTENCY_TTL_SECONDS=172800
 INTERNAL_EVENTS_MAX_RETRIES=20
 # Milliseconds before pending messages are claimed by another consumer
 INTERNAL_EVENTS_PENDING_CLAIM_AFTER_MS=120000
-# Redis stream MAXLEN (~ trimming). Set blank to disable.
-INTERNAL_EVENTS_STREAM_TRIM_MAX_LEN=2000000
+# Redis stream MAXLEN (~ trimming). Set blank to disable. Dev-friendly cap.
+INTERNAL_EVENTS_STREAM_TRIM_MAX_LEN=100
 # Redis retry step (ms) and max backoff (ms)
 INTERNAL_EVENTS_REDIS_RETRY_STEP_MS=60000
 INTERNAL_EVENTS_REDIS_RETRY_MAX_MS=60000

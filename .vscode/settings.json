@@ -6,9 +6,14 @@
     ".github/workflows/sync-private.yml"
   ],
   "cSpell.words": [
+    "BUSYGROUP",
     "MAXLEN",
+    "MKSTREAM",
     "STRIGA",
     "timestamptz",
-    "xadd"
+    "xack",
+    "xadd",
+    "xautoclaim",
+    "xreadgroup"
   ]
 }

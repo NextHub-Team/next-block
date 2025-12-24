@@ -22,9 +22,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       }),
       dropSchema: false,
       keepConnectionAlive: true,
-      logging:
-        this.configService.get('app.nodeEnv', { infer: true }) !==
-        NodeEnv.PRODUCTION,
+      logging: this.resolveLogging(),
       entities: [__dirname + '/../**/*.entity{.ts,.js}'],
       migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
       cli: {
@@ -54,5 +52,18 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
           : undefined,
       },
     } as TypeOrmModuleOptions;
+  }
+
+  private resolveLogging(): boolean {
+    const explicit = this.configService.get('database.logging', {
+      infer: true,
+    });
+    if (typeof explicit === 'boolean') {
+      return explicit;
+    }
+    return (
+      this.configService.get('app.nodeEnv', { infer: true }) !==
+      NodeEnv.PRODUCTION
+    );
   }
 }

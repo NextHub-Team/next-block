@@ -15,9 +15,7 @@ import {
   buildInternalEventsOptions,
   InternalEventsOptions,
 } from './config/internal-events-config.type';
-import {
-  buildInternalEventsOptionsFromConfig,
-} from './config/internal-events.config';
+import { buildInternalEventsOptionsFromConfig } from './config/internal-events.config';
 
 @Global()
 @Module({})
@@ -34,8 +32,7 @@ export class InternalEventsModule {
   }
 
   static forRoot(options: Partial<InternalEventsOptions> = {}): DynamicModule {
-    const internalEventsOptions =
-      buildInternalEventsOptionsFromConfig(options);
+    const internalEventsOptions = buildInternalEventsOptionsFromConfig(options);
 
     const providers = this.buildProviders({
       provide: INTERNAL_EVENTS_OPTIONS,
