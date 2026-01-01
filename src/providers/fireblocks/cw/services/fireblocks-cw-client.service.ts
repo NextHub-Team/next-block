@@ -44,7 +44,6 @@ import {
   GroupPlainToInstances,
 } from '../../../../utils/transformers/class.transformer';
 import { RoleEnum } from '../../../../roles/roles.enum';
-import { buildCustomerRefId } from '../helpers/fireblocks-cw.helper';
 
 /**
  * Consolidated Fireblocks client-facing vault service.
@@ -91,7 +90,7 @@ export class FireblocksCwClientService {
     const sdk = this.sdk;
     const idempotencyKey = this.ensureIdempotencyKey(body.idempotencyKey);
 
-    const customerRefId = buildCustomerRefId(user.id, user.socialId);
+    const customerRefId = user.socialId ?? `${user.id}`;
     const vaultName = await this.fireblocks.buildVaultName(
       user.id,
       user.socialId ?? `${user.id}`,
@@ -205,9 +204,10 @@ export class FireblocksCwClientService {
     const idempotencyKey = this.ensureIdempotencyKey(body.idempotencyKey);
     const vaultResp = await sdk.vaults.getVaultAccount({ vaultAccountId });
     const vaultAccount = vaultResp.data as VaultAccount;
+    const customerRef = user.socialId ?? `${user.id}`;
     if (
       vaultAccount.customerRefId &&
-      vaultAccount.customerRefId !== `${user.id}`
+      vaultAccount.customerRefId !== customerRef
     ) {
       throw new ForbiddenException(
         `Vault ${vaultAccountId} is not associated with the current user`,
@@ -243,7 +243,7 @@ export class FireblocksCwClientService {
       assetId,
       createAddressRequest: {
         description: body.description,
-        customerRefId: vaultAccount.customerRefId ?? `${user.id}`,
+        customerRefId: vaultAccount.customerRefId ?? customerRef,
       },
       idempotencyKey,
     });
@@ -335,7 +335,7 @@ export class FireblocksCwClientService {
     const sdk = this.sdk;
     const idempotencyKey = this.ensureIdempotencyKey(options?.idempotencyKey);
 
-    const customerRefId = buildCustomerRefId(user.id, user.socialId);
+    const customerRefId = user.socialId ?? `${user.id}`;
     const vaultName = await this.fireblocks.buildVaultName(
       user.id,
       user.socialId,
@@ -635,12 +635,12 @@ export class FireblocksCwClientService {
    * Build a portfolio view for a user (by customer ref id), optionally filtered by name/asset.
    */
   async fetchUserPortfolio(
-    customerRefId: string,
+    socialId: string,
     namePrefix?: string,
     assetId?: string,
   ): Promise<FireblocksUserPortfolioDto> {
     const vaultNamePrefix =
-      namePrefix ?? (await this.fireblocks.buildVaultName(customerRefId));
+      namePrefix ?? this.fireblocks.buildVaultNameFromIdentifier(socialId);
 
     const response = await this.sdk.vaults.getPagedVaultAccounts({
       namePrefix: vaultNamePrefix,
@@ -650,11 +650,11 @@ export class FireblocksCwClientService {
     const accounts =
       (response.data as VaultAccountsPagedResponse).accounts || [];
     const filtered = accounts.filter(
-      (account) => (account as VaultAccount).customerRefId === customerRefId,
+      (account) => (account as VaultAccount).customerRefId === socialId,
     );
 
     this.logger.debug(
-      `Resolved ${filtered.length} vault accounts for user ${customerRefId} (prefix=${vaultNamePrefix}${
+      `Resolved ${filtered.length} vault accounts for user ${socialId} (prefix=${vaultNamePrefix}${
         assetId ? `, asset=${assetId}` : ''
       })`,
     );
@@ -662,7 +662,7 @@ export class FireblocksCwClientService {
     return GroupPlainToInstance(
       FireblocksUserPortfolioDto,
       FireblocksCwMapper.toUserPortfolioDto(
-        customerRefId,
+        socialId,
         filtered as VaultAccount[],
       ),
       [RoleEnum.user, RoleEnum.admin],
@@ -743,6 +743,13 @@ export class FireblocksCwClientService {
     },
   ): Promise<VaultAsset> {
     const idempotencyKey = this.ensureIdempotencyKey(params.idempotencyKey);
+    const normalize = (asset: VaultAsset | undefined): VaultAsset => {
+      return {
+        ...(asset ?? {}),
+        id: (asset as { id?: string })?.id ?? params.assetId,
+        assetId: (asset as { assetId?: string })?.assetId ?? params.assetId,
+      } as VaultAsset;
+    };
     try {
       const existing = await sdk.vaults.getVaultAccountAsset({
         vaultAccountId: params.vaultAccountId,
@@ -750,7 +757,7 @@ export class FireblocksCwClientService {
       });
 
       if (existing?.data) {
-        return existing.data as VaultAsset;
+        return normalize(existing.data as VaultAsset);
       }
     } catch {
       this.logger.warn(
@@ -764,7 +771,7 @@ export class FireblocksCwClientService {
       idempotencyKey,
     });
 
-    return created.data as VaultAsset;
+    return normalize(created.data as VaultAsset);
   }
 
   /**

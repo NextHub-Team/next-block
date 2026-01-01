@@ -69,6 +69,13 @@ export class FireblocksVaultResponseMapper {
       FireblocksCwMapper.toVaultAssetDto(wallet as VaultAsset),
     );
     dto.assetWallets = wallets;
+    const paging = (response.data as PaginatedAssetWalletResponse).paging;
+    if (paging) {
+      dto.paging = {
+        before: paging.before,
+        after: paging.after,
+      };
+    }
 
     return GroupPlainToInstance(
       FireblocksPaginatedAssetWalletResponseDto,

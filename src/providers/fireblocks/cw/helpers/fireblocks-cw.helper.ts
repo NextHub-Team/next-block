@@ -29,8 +29,21 @@ export const isPendingPolicy = (error: any): boolean =>
   error?.response?.data?.status === 'PENDING_AUTHORIZATION';
 
 export const isInvalidRequest = (error: any): boolean => {
-  const status = error?.response?.status;
-  return status === 400 || status === 404 || status === 422;
+  const status =
+    error?.response?.status ??
+    error?.response?.statusCode ??
+    error?.status ??
+    error?.statusCode;
+  const code = error?.response?.data?.code ?? error?.data?.code;
+  return (
+    status === 400 ||
+    status === 404 ||
+    status === 422 ||
+    code === 11001 ||
+    code === '11001' ||
+    code === 1504 ||
+    code === '1504'
+  );
 };
 
 export const buildCustomerRefId = (

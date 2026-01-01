@@ -22,16 +22,28 @@ export class FireblocksCwMapper {
     asset: VaultAsset,
     roles: RoleEnum[] = [],
   ): FireblocksVaultAssetDto {
+    const assetId =
+      (asset as { assetId?: string; id?: string }).assetId ?? asset.id;
+    const vaultId =
+      (asset as { vaultId?: string }).vaultId ??
+      (asset as { vaultAccountId?: string }).vaultAccountId;
     return GroupPlainToInstance(
       FireblocksVaultAssetDto,
       {
-        id: asset.id,
+        id: assetId ?? asset.id,
+        assetId: assetId ?? asset.id,
+        vaultId,
         total: asset.total as string | undefined,
         available: asset.available as string | undefined,
         lockedAmount: asset.lockedAmount as string | undefined,
         pending: asset.pending as string | undefined,
         totalStaked: asset.staked as string | undefined,
-        balance: asset.balance as string | undefined, //TODO: Update from next Fireblocks SDK version
+        balance: asset.balance as string | undefined, //TODO: Update from next Fireblocks   SDK version
+        frozen: (asset as { frozen?: string }).frozen,
+        blockHeight: (asset as { blockHeight?: string }).blockHeight,
+        blockHash: (asset as { blockHash?: string }).blockHash,
+        creationTimestamp: (asset as { creationTimestamp?: string })
+          .creationTimestamp,
       },
       roles,
     );
@@ -65,6 +77,7 @@ export class FireblocksCwMapper {
       {
         address: address?.address,
         tag: address?.tag,
+        description: (address as { description?: string }).description,
         customerRefId: (address as { customerRefId?: string }).customerRefId,
       },
       roles,
@@ -138,14 +151,14 @@ export class FireblocksCwMapper {
   }
 
   static toUserPortfolioDto(
-    userRefId: string,
+    socialId: string,
     vaultAccounts: VaultAccount[],
     roles: RoleEnum[] = [],
   ): FireblocksUserPortfolioDto {
     return GroupPlainToInstance(
       FireblocksUserPortfolioDto,
       {
-        userRefId,
+        socialId,
         vaultAccounts: vaultAccounts.map((account) =>
           this.toVaultAccountDto(
             account,

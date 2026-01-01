@@ -2,11 +2,14 @@ import {
   Body,
   Controller,
   Get,
+  HttpStatus,
   Param,
   Post,
   Query,
+  Res,
   UseGuards,
 } from '@nestjs/common';
+import { Response } from 'express';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
@@ -38,6 +41,8 @@ import {
   VaultAccountsByIdsQueryDto,
   BulkCreateVaultAccountsRequestDto,
   EnsureVaultWalletRequestDto,
+  VaultAccountParamDto,
+  VaultAccountAssetParamDto,
 } from '../dto/fireblocks-cw-requests.dto';
 import { RolesGuard } from '../../../../roles/roles.guard';
 import { Roles } from '../../../../roles/roles.decorator';
@@ -69,13 +74,15 @@ export class FireblocksCwAdminController {
     return this.admin.listAssetWallets(query);
   }
 
-  @Get('users/:userId/portfolio')
+  @Get('users/:socialId/portfolio')
   @ApiOkResponse({ type: FireblocksUserPortfolioDto })
-  @ApiOperationRoles('Get Fireblocks user portfolio', [RoleEnum.admin])
+  @ApiOperationRoles('Get Fireblocks user portfolio (by social id)', [
+    RoleEnum.admin,
+  ])
   async getUserPortfolio(
-    @Param('userId') userId: string,
+    @Param('socialId') socialId: string,
   ): Promise<FireblocksUserPortfolioDto> {
-    return this.admin.getUserWallets(userId);
+    return this.admin.getUserWallets(socialId);
   }
 
   @Post('addresses')
@@ -121,11 +128,15 @@ export class FireblocksCwAdminController {
 
   @Post('accounts')
   @ApiCreatedResponse({ type: FireblocksVaultAccountDto })
+  @ApiOkResponse({ type: FireblocksVaultAccountDto })
   @ApiOperationRoles('Create a Fireblocks vault account', [RoleEnum.admin])
   async createVaultAccount(
     @Body() body: CreateAdminVaultAccountRequestDto,
+    @Res({ passthrough: true }) res: Response,
   ): Promise<FireblocksVaultAccountDto> {
-    return this.admin.createVaultAccount(body); // Creates vault and immediately syncs to local DB
+    const { account, created } = await this.admin.createVaultAccount(body);
+    res.status(created ? HttpStatus.CREATED : HttpStatus.OK);
+    return account; // Creates vault and immediately syncs to local DB (or returns existing)
   }
 
   @Get(':vaultAccountId')
@@ -137,9 +148,9 @@ export class FireblocksCwAdminController {
   @ApiOkResponse({ type: FireblocksVaultAccountDto })
   @ApiOperationRoles('Fetch a Fireblocks vault account', [RoleEnum.admin])
   async fetchVaultAccount(
-    @Param('vaultAccountId') vaultAccountId: string,
+    @Param() params: VaultAccountParamDto,
   ): Promise<FireblocksVaultAccountDto> {
-    return this.admin.fetchVaultAccount(vaultAccountId);
+    return this.admin.fetchVaultAccount(`${params.vaultAccountId}`);
   }
 
   @Get(':vaultAccountId/assets/:assetId')
@@ -156,22 +167,37 @@ export class FireblocksCwAdminController {
   @ApiOkResponse({ type: FireblocksVaultAssetDto })
   @ApiOperationRoles('Fetch a vault account asset', [RoleEnum.admin])
   async fetchVaultAsset(
-    @Param('vaultAccountId') vaultAccountId: string,
-    @Param('assetId') assetId: string,
+    @Param() params: VaultAccountAssetParamDto,
   ): Promise<FireblocksVaultAssetDto> {
-    return this.admin.fetchVaultAsset(vaultAccountId, assetId);
+    return this.admin.fetchVaultAsset(
+      `${params.vaultAccountId}`,
+      params.assetId,
+    );
   }
 
   @Post('wallets/ensure')
-  @ApiOkResponse({ type: FireblocksCustodialWalletDto })
+  @ApiOkResponse({
+    description: 'Wallet/address already existed',
+    type: FireblocksCustodialWalletDto,
+  })
+  @ApiCreatedResponse({
+    description: 'Wallet/address was created',
+    type: FireblocksCustodialWalletDto,
+  })
   @ApiOperationRoles(
     'Ensure an asset wallet and deposit address for a vault account',
     [RoleEnum.admin],
   )
   async ensureVaultWallet(
     @Body() body: EnsureVaultWalletRequestDto,
+    @Res({ passthrough: true }) res: Response,
   ): Promise<FireblocksCustodialWalletDto> {
-    return this.admin.ensureVaultWallet(body.vaultAccountId, body.assetId);
+    const { wallet, created } = await this.admin.ensureVaultWallet(
+      body.vaultAccountId,
+      body.assetId,
+    );
+    res.status(created ? HttpStatus.CREATED : HttpStatus.OK);
+    return wallet;
   }
 
   @Get('assets/catalog')

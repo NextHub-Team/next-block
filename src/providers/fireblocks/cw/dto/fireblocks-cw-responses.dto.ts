@@ -210,6 +210,24 @@ export class FireblocksVaultAssetDto {
   id!: string;
 
   @ApiPropertyOptional({
+    description: 'Alias for asset identifier returned by Fireblocks (assetId)',
+    example: 'BTC',
+  })
+  @IsOptional()
+  @IsString()
+  @Expose()
+  assetId?: string;
+
+  @ApiPropertyOptional({
+    description: 'Vault account id that owns this asset wallet',
+    example: '123456789',
+  })
+  @IsOptional()
+  @IsString()
+  @Expose()
+  vaultId?: string;
+
+  @ApiPropertyOptional({
     description: 'Total balance',
     example: '1.75293485',
   })
@@ -273,7 +291,7 @@ export class FireblocksVaultAccountDto {
 
   @ApiProperty({
     description: 'Vault account name',
-    example: 'custody-user-019a3bf6',
+    example: 'user:0a7346d0-4611-11ef-8342-6760128cffdb',
   })
   @IsString()
   @Expose()
@@ -318,7 +336,7 @@ export class FireblocksVaultAccountDto {
 export class FireblocksDepositAddressDto {
   @ApiProperty({
     description: 'Deposit address',
-    example: 'bc1qxy2kgdygjrsqtzq2n0yrf1234p83kkfjhx0wlh',
+    example: '0x4b9C3f8A8eD5F0b9e6f3A6F3eD7e9a4C2b1d0e5f', // sample EVM address
   })
   @IsString()
   @Expose()
@@ -520,12 +538,12 @@ export class FireblocksBlockchainDto {
 @Exclude()
 export class FireblocksUserPortfolioDto {
   @ApiProperty({
-    description: 'User reference id associated to the vault accounts',
-    example: 'd13bd918-938a-4a5b-8b28-4fa3437ea5ce',
+    description: 'User social id / customerRefId used for vault accounts',
+    example: 'auth0|64efb1d3c1f0c9123456789a',
   })
   @IsString()
   @Expose()
-  userRefId!: string;
+  socialId!: string;
 
   @ApiProperty({
     description: 'Vault accounts tied to the user',
@@ -560,6 +578,29 @@ export class FireblocksVaultAccountsPageDto {
 }
 
 @Exclude()
+export class FireblocksPagingDto {
+  @ApiPropertyOptional({
+    description:
+      'Cursor to fetch the previous page (pass as ?before=... on next request)',
+    example: 'cursor_prev_abc123',
+  })
+  @Expose()
+  @IsOptional()
+  @IsString()
+  before?: string;
+
+  @ApiPropertyOptional({
+    description:
+      'Cursor to fetch the next page (pass as ?after=... on next request)',
+    example: 'cursor_next_xyz789',
+  })
+  @Expose()
+  @IsOptional()
+  @IsString()
+  after?: string;
+}
+
+@Exclude()
 export class FireblocksPaginatedAssetWalletResponseDto {
   @ApiPropertyOptional({
     description: 'Wallets in the page',
@@ -568,6 +609,15 @@ export class FireblocksPaginatedAssetWalletResponseDto {
   @Expose()
   @Type(() => FireblocksVaultAssetDto)
   assetWallets?: FireblocksVaultAssetDto[];
+
+  @ApiPropertyOptional({
+    description: 'Paging cursors from Fireblocks',
+    type: () => FireblocksPagingDto,
+  })
+  @Expose()
+  @ValidateNested()
+  @Type(() => FireblocksPagingDto)
+  paging?: FireblocksPagingDto;
 }
 
 @Exclude()

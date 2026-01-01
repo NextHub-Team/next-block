@@ -42,6 +42,7 @@ import {
 } from '../dto/fireblocks-cw-requests.dto';
 import { FireblocksCwMapper } from '../infrastructure/persistence/relational/mappers/fireblocks-cw.mapper';
 import { FireblocksVaultResponseMapper } from '../infrastructure/persistence/relational/mappers/fireblocks-vault-response.mapper';
+import { FireblocksErrorMapper } from '../infrastructure/persistence/relational/mappers/fireblocks-error.mapper';
 import { AbstractCwService } from '../base/abstract-cw.service';
 import {
   GroupPlainToInstance,
@@ -60,6 +61,7 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
     private readonly fireblocks: FireblocksCwService,
     private readonly accountsService: AccountsService,
     private readonly usersService: UsersService,
+    private readonly errorMapper: FireblocksErrorMapper,
     configService: ConfigService<AllConfigType>,
   ) {
     super(FireblocksCwWorkflowService.name, configService);
@@ -70,34 +72,48 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
     return this.fireblocks.getSdk();
   }
 
+  /**
+   * Ensure a vault account has the requested asset wallet and a deposit address.
+   * Returns a flag indicating whether creation occurred.
+   */
   async ensureVaultWalletWorkflow(
     vaultAccountId: string,
     assetId: string,
-  ): Promise<FireblocksCustodialWalletDto> {
+  ): Promise<{ wallet: FireblocksCustodialWalletDto; created: boolean }> {
     this.guardEnabledAndLog();
     this.logger.debug(
       `Ensuring vault wallet (vault=${vaultAccountId}, asset=${assetId})`,
     );
     const idempotencyKey = this.ensureIdempotencyKey();
 
-    const vaultAccountResponse = await this.sdk.vaults.getVaultAccount({
-      vaultAccountId,
-    });
-    const vaultAccount = vaultAccountResponse.data as VaultAccount;
+    let vaultAccount: VaultAccount;
+    try {
+      const vaultAccountResponse = await this.sdk.vaults.getVaultAccount({
+        vaultAccountId,
+      });
+      vaultAccount = vaultAccountResponse.data as VaultAccount;
+    } catch (error: unknown) {
+      throw this.errorMapper.toHttpException(
+        error,
+        `Failed to fetch vault account ${vaultAccountId} from Fireblocks`,
+      );
+    }
 
-    const vaultAsset = await this.ensureVaultAsset(
+    const vaultAssetResult = await this.ensureVaultAsset(
       vaultAccountId,
       assetId,
       idempotencyKey,
     );
+    const vaultAsset = vaultAssetResult.asset;
 
-    const depositAddress = await this.getOrCreateDepositAddress({
+    const depositAddressResult = await this.getOrCreateDepositAddress({
       vaultAccountId,
       assetId,
       customerRefId: vaultAccount.customerRefId ?? vaultAccount.name,
       idempotencyKey,
       createIfMissing: true,
     });
+    const depositAddress = depositAddressResult.address;
 
     if (!depositAddress) {
       throw new BadRequestException(
@@ -105,7 +121,7 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
       );
     }
 
-    return GroupPlainToInstance(
+    const wallet = GroupPlainToInstance(
       FireblocksCustodialWalletDto,
       FireblocksCwMapper.toCustodialWalletDto({
         vaultAccount,
@@ -114,8 +130,17 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
       }),
       [RoleEnum.admin],
     );
+
+    return {
+      wallet,
+      created: vaultAssetResult.created || depositAddressResult.created,
+    };
   }
 
+  /**
+   * Fetch multiple Fireblocks vault accounts by id and sync any found locally.
+   * Missing ids are collected and returned.
+   */
   async fetchVaultAccountsByIdsWorkflow(
     query: VaultAccountsByIdsQueryDto,
   ): Promise<FireblocksBulkVaultAccountsSyncDto> {
@@ -169,19 +194,53 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
     );
   }
 
+  /**
+   * Create or return an existing vault account for the given socialId; sync to DB.
+   */
   async createVaultAccountWorkflow(
     command: CreateAdminVaultAccountRequestDto,
-  ): Promise<FireblocksVaultAccountDto> {
+  ): Promise<{ account: FireblocksVaultAccountDto; created: boolean }> {
     this.guardEnabledAndLog();
+    const socialId = command.socialId;
+    const name = this.fireblocks.buildVaultNameFromIdentifier(socialId);
+    const customerRefId = socialId;
     this.logger.debug(
-      `Creating vault account (name=${command.name}, customerRefId=${command.customerRefId})`,
+      `Creating vault account (name=${name}, customerRefId=${customerRefId})`,
     );
     const idempotencyKey = this.ensureIdempotencyKey(command.idempotencyKey);
 
+    // If the vault already exists for this socialId/name, return it instead of creating a duplicate.
+    const existingResp = await this.sdk.vaults.getPagedVaultAccounts({
+      namePrefix: name,
+      limit: 1,
+    });
+    const existingAccount = existingResp.data?.accounts?.find(
+      (account) =>
+        account.name === name ||
+        (account as VaultAccount).customerRefId === customerRefId,
+    ) as VaultAccount | undefined;
+
+    if (existingAccount) {
+      const existingDto = FireblocksCwMapper.toVaultAccountDto(
+        existingAccount,
+        existingAccount.assets as VaultAsset[] | undefined,
+      );
+      await this.createAccountForVault(existingDto, {
+        customerRefId,
+        name,
+        referenceId: idempotencyKey,
+        socialId,
+      });
+      this.logger.debug(
+        `Vault account already exists; returning existing (id=${existingAccount.id})`,
+      );
+      return { account: existingDto, created: false };
+    }
+
     const response = await this.sdk.vaults.createVaultAccount({
       createVaultAccountRequest: {
-        name: command.name,
-        customerRefId: command.customerRefId,
+        name,
+        customerRefId,
         hiddenOnUI: command.hiddenOnUI ?? true,
         autoFuel: command.autoFuel ?? false,
       },
@@ -192,18 +251,22 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
       FireblocksVaultResponseMapper.vaultAccount(response);
 
     await this.createAccountForVault(vaultAccountDto, {
-      customerRefId: command.customerRefId,
-      name: command.name,
+      customerRefId,
+      name,
       referenceId: idempotencyKey,
+      socialId,
     });
 
     this.logger.debug(
       `Vault account created and synced (id=${vaultAccountDto.id})`,
     );
 
-    return vaultAccountDto;
+    return { account: vaultAccountDto, created: true };
   }
 
+  /**
+   * Kick off a Fireblocks bulk vault account creation job for multiple users.
+   */
   async bulkCreateVaultAccountsForUsersWorkflow(
     command: BulkCreateVaultAccountsRequestDto,
   ): Promise<FireblocksBulkVaultAccountJobDto> {
@@ -343,18 +406,36 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
     );
   }
 
+  /**
+   * Build a portfolio of vault accounts for a user (by socialId/customerRefId).
+   */
   async buildUserPortfolioWorkflow(
-    customerRefId: string,
+    socialId: string,
   ): Promise<FireblocksUserPortfolioDto> {
-    const response = await this.sdk.vaults.getPagedVaultAccounts({
-      namePrefix: customerRefId,
+    // Prefer fetching by the expected vault name; fall back to customerRefId match
+    const vaultName = this.fireblocks.buildVaultNameFromIdentifier(socialId);
+
+    // 1) Try by vault name prefix (exact match)
+    const byName = await this.sdk.vaults.getPagedVaultAccounts({
+      namePrefix: vaultName,
+      limit: 1,
     });
-    const accounts = ((response.data?.accounts as VaultAccount[]) || []).filter(
-      (account) => account.customerRefId === customerRefId,
+    let accounts = ((byName.data?.accounts as VaultAccount[]) || []).filter(
+      (account) => account.name === vaultName,
     );
 
+    // 2) Fallback: query by socialId/customerRefId prefix if not found by name
+    if (accounts.length === 0) {
+      const byCustomerRef = await this.sdk.vaults.getPagedVaultAccounts({
+        namePrefix: socialId,
+      });
+      accounts = (
+        (byCustomerRef.data?.accounts as VaultAccount[]) || []
+      ).filter((account) => account.customerRefId === socialId);
+    }
+
     const dto = FireblocksCwMapper.toUserPortfolioDto(
-      customerRefId,
+      socialId,
       accounts as VaultAccount[],
     );
 
@@ -363,6 +444,9 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
     ]);
   }
 
+  /**
+   * Ensure a vault (by name prefix) has deposit addresses for the provided assets.
+   */
   async ensureVaultAddressesForAssetsWorkflow(
     vaultNamePrefix: string,
     assetIds: string[],
@@ -421,6 +505,9 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
     };
   }
 
+  /**
+   * Create special deposit addresses for a set of assets on a vault account.
+   */
   async createSpecialAddressesWorkflow(
     request: SpecialAddressesRequestDto,
   ): Promise<FireblocksSpecialAddressesResponseDto> {
@@ -443,54 +530,67 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
       );
     }
 
-    const vaultAccountResponse = await this.sdk.vaults.getVaultAccount({
-      vaultAccountId,
-    });
-
-    const vaultAccount = vaultAccountResponse.data as VaultAccount;
-    const vaultAccountDto = FireblocksCwMapper.toVaultAccountDto(
-      vaultAccount,
-      vaultAccount.assets as VaultAsset[] | undefined,
-    );
-
-    const createdAddresses: FireblocksSpecialAddressItemDto[] = [];
-
-    for (const asset of assets) {
-      await this.ensureVaultAsset(
+    try {
+      const vaultAccountResponse = await this.sdk.vaults.getVaultAccount({
         vaultAccountId,
-        asset.assetId,
-        idempotencyKey,
+      });
+
+      const vaultAccount = vaultAccountResponse.data as VaultAccount;
+      const vaultAccountDto = FireblocksCwMapper.toVaultAccountDto(
+        vaultAccount,
+        vaultAccount.assets as VaultAsset[] | undefined,
       );
 
-      const depositAddress =
-        await this.sdk.vaults.createVaultAccountAssetAddress({
+      const createdAddresses: FireblocksSpecialAddressItemDto[] = [];
+
+      for (const asset of assets) {
+        await this.ensureVaultAsset(
           vaultAccountId,
-          assetId: asset.assetId,
-          createAddressRequest: {
-            description: asset.description ?? addressDescription,
-            customerRefId,
-          },
+          asset.assetId,
           idempotencyKey,
+        );
+
+        const depositAddress =
+          await this.sdk.vaults.createVaultAccountAssetAddress({
+            vaultAccountId,
+            assetId: asset.assetId,
+            createAddressRequest: {
+              description: asset.description ?? addressDescription,
+              customerRefId,
+            },
+            idempotencyKey,
+          });
+
+        createdAddresses.push({
+          assetId: asset.assetId,
+          depositAddress: FireblocksCwMapper.toDepositAddressDto(
+            depositAddress.data,
+          ),
         });
+      }
 
-      createdAddresses.push({
-        assetId: asset.assetId,
-        depositAddress: FireblocksCwMapper.toDepositAddressDto(
-          depositAddress.data,
-        ),
-      });
+      return GroupPlainToInstance(
+        FireblocksSpecialAddressesResponseDto,
+        {
+          vaultAccount: vaultAccountDto,
+          addresses: createdAddresses,
+        },
+        [RoleEnum.admin],
+      );
+    } catch (error) {
+      this.logger.error(
+        `Failed to create special addresses (vault=${vaultAccountId}): ${error instanceof Error ? error.message : error}`,
+      );
+      throw this.errorMapper.toHttpException(
+        error,
+        'Fireblocks rejected address creation request',
+      );
     }
-
-    return GroupPlainToInstance(
-      FireblocksSpecialAddressesResponseDto,
-      {
-        vaultAccount: vaultAccountDto,
-        addresses: createdAddresses,
-      },
-      [RoleEnum.admin],
-    );
   }
 
+  /**
+   * Ensure multiple vault/asset pairs each have an asset wallet and deposit address.
+   */
   async bulkEnsureVaultAssetsAndAddressesWorkflow(
     requests: Array<{
       vaultAccountId: string;
@@ -516,13 +616,20 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
 
     for (const request of requests) {
       const cachedVault = vaultCache.get(request.vaultAccountId);
-      const vaultAccount =
-        cachedVault ??
-        ((
-          await this.sdk.vaults.getVaultAccount({
+      let vaultAccount: VaultAccount | undefined = cachedVault;
+      if (!vaultAccount) {
+        try {
+          const response = await this.sdk.vaults.getVaultAccount({
             vaultAccountId: request.vaultAccountId,
-          })
-        )?.data as VaultAccount);
+          });
+          vaultAccount = response.data as VaultAccount;
+        } catch (error: unknown) {
+          throw this.errorMapper.toHttpException(
+            error,
+            `Failed to fetch vault account ${request.vaultAccountId} from Fireblocks`,
+          );
+        }
+      }
 
       if (!vaultAccount) {
         throw new NotFoundException(
@@ -533,13 +640,13 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
       vaultCache.set(request.vaultAccountId, vaultAccount);
       const idempotencyKey = this.ensureIdempotencyKey(request.idempotencyKey);
 
-      const vaultAsset = await this.ensureVaultAsset(
+      const { asset: vaultAsset } = await this.ensureVaultAsset(
         request.vaultAccountId,
         request.assetId,
         idempotencyKey,
       );
 
-      const depositAddress = await this.getOrCreateDepositAddress({
+      const { address: depositAddress } = await this.getOrCreateDepositAddress({
         vaultAccountId: request.vaultAccountId,
         assetId: request.assetId,
         customerRefId:
@@ -571,6 +678,9 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
     ]);
   }
 
+  /**
+   * Fetch wallets and deposit addresses for multiple vault/asset pairs (no creation).
+   */
   async bulkFetchVaultAssetsWithAddressesWorkflow(
     requests: Array<{ vaultAccountId: string; assetId: string }>,
   ): Promise<FireblocksCustodialWalletDto[]> {
@@ -590,13 +700,20 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
 
     for (const request of requests) {
       const cachedVault = vaultCache.get(request.vaultAccountId);
-      const vaultAccount =
-        cachedVault ??
-        ((
-          await this.sdk.vaults.getVaultAccount({
+      let vaultAccount: VaultAccount | undefined = cachedVault;
+      if (!vaultAccount) {
+        try {
+          const resp = await this.sdk.vaults.getVaultAccount({
             vaultAccountId: request.vaultAccountId,
-          })
-        )?.data as VaultAccount);
+          });
+          vaultAccount = resp.data as VaultAccount;
+        } catch (error: unknown) {
+          throw this.errorMapper.toHttpException(
+            error,
+            `Failed to fetch vault account ${request.vaultAccountId} from Fireblocks`,
+          );
+        }
+      }
 
       if (!vaultAccount) {
         throw new NotFoundException(
@@ -606,13 +723,21 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
 
       vaultCache.set(request.vaultAccountId, vaultAccount);
 
-      const vaultAssetResponse = await this.sdk.vaults.getVaultAccountAsset({
-        vaultAccountId: request.vaultAccountId,
-        assetId: request.assetId,
-      });
-      const vaultAsset = vaultAssetResponse.data as VaultAsset;
+      let vaultAsset: VaultAsset;
+      try {
+        const vaultAssetResponse = await this.sdk.vaults.getVaultAccountAsset({
+          vaultAccountId: request.vaultAccountId,
+          assetId: request.assetId,
+        });
+        vaultAsset = vaultAssetResponse.data as VaultAsset;
+      } catch (error: unknown) {
+        throw this.errorMapper.toHttpException(
+          error,
+          `Failed to fetch asset ${request.assetId} for vault ${request.vaultAccountId}`,
+        );
+      }
 
-      const depositAddress = await this.getOrCreateDepositAddress({
+      const { address: depositAddress } = await this.getOrCreateDepositAddress({
         vaultAccountId: request.vaultAccountId,
         assetId: request.assetId,
       });
@@ -735,18 +860,11 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
     vaultAccount: FireblocksVaultAccountDto,
     params: {
       customerRefId?: string | number;
-      name?: string;
-      referenceId?: string;
-      email?: string | null;
-      socialId?: string | null;
     },
   ): Record<string, unknown> | undefined {
     const metadata = {
       customerRefId: params.customerRefId ?? vaultAccount.customerRefId,
-      name: vaultAccount.name ?? params.name,
-      referenceId: params.referenceId,
-      email: params.email,
-      socialId: params.socialId,
+      name: vaultAccount.name,
     };
 
     const cleaned = Object.fromEntries(
@@ -765,7 +883,7 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
     description?: string;
     idempotencyKey?: string;
     createIfMissing?: boolean;
-  }): Promise<CreateAddressResponse | undefined> {
+  }): Promise<{ address?: CreateAddressResponse; created: boolean }> {
     try {
       const response =
         await this.sdk.vaults.getVaultAccountAssetAddressesPaginated({
@@ -776,7 +894,7 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
 
       const existing = response.data?.addresses?.[0];
       if (existing?.address) {
-        return existing as CreateAddressResponse;
+        return { address: existing as CreateAddressResponse, created: false };
       }
     } catch (error: unknown) {
       this.logger.warn(
@@ -788,34 +906,52 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
     }
 
     if (!params.createIfMissing) {
-      return undefined;
+      return { address: undefined, created: false };
     }
 
-    const created = await this.sdk.vaults.createVaultAccountAssetAddress({
-      vaultAccountId: params.vaultAccountId,
-      assetId: params.assetId,
-      createAddressRequest: {
-        customerRefId: params.customerRefId,
-        description: params.description,
-      },
-      idempotencyKey: params.idempotencyKey,
-    });
+    try {
+      const created = await this.sdk.vaults.createVaultAccountAssetAddress({
+        vaultAccountId: params.vaultAccountId,
+        assetId: params.assetId,
+        createAddressRequest: {
+          customerRefId: params.customerRefId,
+          description: params.description,
+        },
+        idempotencyKey: params.idempotencyKey,
+      });
 
-    return created.data as CreateAddressResponse;
+      return { address: created.data as CreateAddressResponse, created: true };
+    } catch (error: unknown) {
+      throw this.errorMapper.toHttpException(
+        error,
+        `Failed to create deposit address for vault ${params.vaultAccountId} (${params.assetId})`,
+      );
+    }
   }
 
   private async ensureVaultAsset(
     vaultAccountId: string,
     assetId: string,
     idempotencyKey?: string,
-  ): Promise<VaultAsset> {
+  ): Promise<{ asset: VaultAsset; created: boolean }> {
+    const normalize = (asset: VaultAsset | undefined): VaultAsset => {
+      return {
+        ...(asset ?? {}),
+        id: (asset as { id?: string })?.id ?? assetId,
+        assetId: (asset as { assetId?: string })?.assetId ?? assetId,
+      } as VaultAsset;
+    };
+
     try {
       const response = await this.sdk.vaults.getVaultAccountAsset({
         vaultAccountId,
         assetId,
       });
       if (response?.data) {
-        return response.data as VaultAsset;
+        return {
+          asset: normalize(response.data as VaultAsset),
+          created: false,
+        };
       }
     } catch (error: unknown) {
       this.logger.warn(
@@ -826,13 +962,24 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
       }
     }
 
-    const created = await this.sdk.vaults.createVaultAccountAsset({
-      vaultAccountId,
-      assetId,
-      idempotencyKey,
-    });
+    try {
+      const created = await this.sdk.vaults.createVaultAccountAsset({
+        vaultAccountId,
+        assetId,
+        idempotencyKey,
+      });
 
-    return created.data as VaultAsset;
+      return { asset: normalize(created.data as VaultAsset), created: true };
+    } catch (error: unknown) {
+      this.logger.error(
+        `Failed to create asset ${assetId} for vault ${vaultAccountId}`,
+        error instanceof Error ? error.message : `${error}`,
+      );
+      throw this.errorMapper.toHttpException(
+        error,
+        `Failed to create asset ${assetId} for vault ${vaultAccountId}`,
+      );
+    }
   }
 
   private ensureIdempotencyKey(key?: string): string {

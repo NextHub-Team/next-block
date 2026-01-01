@@ -28,7 +28,7 @@ import {
 import { infinityPagination } from '../utils/infinity-pagination';
 import { FindAllInternalEventsDto } from './dto/find-all-internal-events.dto';
 
-@ApiTags('Internalevents')
+@ApiTags('Internal-events')
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
 @Controller({

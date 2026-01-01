@@ -6,10 +6,9 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ModuleRef } from '@nestjs/core';
-import { Fireblocks } from '@fireblocks/ts-sdk';
+import { Fireblocks, BasePath } from '@fireblocks/ts-sdk';
 import { AllConfigType } from '../../../config/config.type';
 import { ConfigGet, ConfigGetOrThrow } from '../../../config/config.decorator';
-import { getFireblocksBaseUrl } from './helpers/fireblocks-cw.helper';
 import { FireblocksCwAdminService } from './services/fireblocks-cw-admin.service';
 import { FireblocksCwClientService } from './services/fireblocks-cw-client.service';
 import { FireblocksCwWorkflowService } from './services/fireblocks-cw-workflow.service';
@@ -213,10 +212,40 @@ export class FireblocksCwService
     return `${normalizedPrefix}${suffix}`;
   }
 
+  /**
+   * Build a vault name directly from an identifier (socialId/userId) without DB lookups.
+   */
+  buildVaultNameFromIdentifier(identifier: string): string {
+    const configuredPrefix =
+      (this.options.vaultNamePrefix ?? FIREBLOCKS_CW_VAULT_NAME_PREFIX) || '';
+    const basePrefix =
+      configuredPrefix.trim().length > 0
+        ? configuredPrefix.trim()
+        : FIREBLOCKS_CW_VAULT_NAME_PREFIX;
+    const normalizedPrefix = basePrefix.endsWith(':')
+      ? basePrefix
+      : `${basePrefix}:`;
+    return `${normalizedPrefix}${identifier}`;
+  }
+
+  private resolveBasePath(env: FireblocksEnvironmentType): string {
+    switch (env) {
+      case FireblocksEnvironmentType.PROD_US:
+        return BasePath.US;
+      case FireblocksEnvironmentType.PROD_EU:
+        return BasePath.EU;
+      case FireblocksEnvironmentType.PROD_EU2:
+        return BasePath.EU2;
+      case FireblocksEnvironmentType.SANDBOX:
+      default:
+        return BasePath.Sandbox;
+    }
+  }
+
   // eslint-disable-next-line @typescript-eslint/require-await
   private async initializeSdk(): Promise<void> {
     this.logger.log('Starting Fireblocks SDK initialization (async mode)...');
-    const baseUrl = getFireblocksBaseUrl(this.options.envType);
+    const baseUrl = this.resolveBasePath(this.options.envType);
 
     try {
       this.fireblocksSdk = new Fireblocks({

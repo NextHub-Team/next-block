@@ -47,6 +47,7 @@ import {
   GroupPlainToInstances,
 } from '../../../../utils/transformers/class.transformer';
 import { RoleEnum } from '../../../../roles/roles.enum';
+import { FireblocksErrorMapper } from '../infrastructure/persistence/relational/mappers/fireblocks-error.mapper';
 
 /**
  * Consolidated admin service combining vault operations and controller-facing helpers.
@@ -57,6 +58,7 @@ export class FireblocksCwAdminService extends AbstractCwService {
     @Inject(forwardRef(() => FireblocksCwService))
     private readonly fireblocks: FireblocksCwService,
     private readonly workflow: FireblocksCwWorkflowService,
+    private readonly errorMapper: FireblocksErrorMapper,
     configService: ConfigService<AllConfigType>,
   ) {
     super(FireblocksCwAdminService.name, configService);
@@ -70,8 +72,8 @@ export class FireblocksCwAdminService extends AbstractCwService {
   // ---------------------------------------------------------------------------
   // Controller-facing helpers (previously wrappers)
   // ---------------------------------------------------------------------------
-  async getUserWallets(userId: string): Promise<FireblocksUserPortfolioDto> {
-    return this.workflow.buildUserPortfolioWorkflow(userId);
+  async getUserWallets(socialId: string): Promise<FireblocksUserPortfolioDto> {
+    return this.workflow.buildUserPortfolioWorkflow(socialId);
   }
 
   listAssetWallets(
@@ -105,7 +107,7 @@ export class FireblocksCwAdminService extends AbstractCwService {
 
   async createVaultAccount(
     command: CreateAdminVaultAccountRequestDto,
-  ): Promise<FireblocksVaultAccountDto> {
+  ): Promise<{ account: FireblocksVaultAccountDto; created: boolean }> {
     return this.workflow.createVaultAccountWorkflow(command);
   }
 
@@ -128,7 +130,7 @@ export class FireblocksCwAdminService extends AbstractCwService {
   async ensureVaultWallet(
     vaultAccountId: string,
     assetId: string,
-  ): Promise<FireblocksCustodialWalletDto> {
+  ): Promise<{ wallet: FireblocksCustodialWalletDto; created: boolean }> {
     return this.workflow.ensureVaultWalletWorkflow(vaultAccountId, assetId);
   }
 
@@ -163,8 +165,17 @@ export class FireblocksCwAdminService extends AbstractCwService {
     vaultAccountId: string,
   ): Promise<FireblocksVaultAccountDto> {
     this.guardEnabledAndLog();
-    const response = await this.sdk.vaults.getVaultAccount({ vaultAccountId });
-    return FireblocksVaultResponseMapper.vaultAccount(response);
+    try {
+      const response = await this.sdk.vaults.getVaultAccount({
+        vaultAccountId,
+      });
+      return FireblocksVaultResponseMapper.vaultAccount(response);
+    } catch (error: unknown) {
+      throw this.errorMapper.toHttpException(
+        error,
+        'Failed to fetch Fireblocks vault account',
+      );
+    }
   }
 
   /**
@@ -195,12 +206,19 @@ export class FireblocksCwAdminService extends AbstractCwService {
     assetId: string,
   ): Promise<FireblocksVaultAssetDto> {
     this.guardEnabledAndLog();
-    const response = await this.sdk.vaults.getVaultAccountAsset({
-      vaultAccountId,
-      assetId,
-    });
+    try {
+      const response = await this.sdk.vaults.getVaultAccountAsset({
+        vaultAccountId,
+        assetId,
+      });
 
-    return FireblocksVaultResponseMapper.vaultAsset(response);
+      return FireblocksVaultResponseMapper.vaultAsset(response);
+    } catch (error: unknown) {
+      throw this.errorMapper.toHttpException(
+        error,
+        'Failed to fetch vault account asset from Fireblocks',
+      );
+    }
   }
 
   /**

@@ -24,6 +24,8 @@ import {
   CreateUserVaultAssetRequestDto,
   CreateUserVaultAddressRequestDto,
   EnsureUserWalletDto,
+  VaultAccountAssetParamDto,
+  VaultAccountParamDto,
 } from '../dto/fireblocks-cw-requests.dto';
 import {
   FireblocksCustodialWalletDto,
@@ -103,9 +105,12 @@ export class FireblocksCwClientController {
   )
   listMyVaultAccountWallets(
     @Request() req: RequestWithUser,
-    @Param('vaultAccountId') vaultAccountId: string,
+    @Param() params: VaultAccountParamDto,
   ): Promise<FireblocksVaultAssetDto[]> {
-    return this.client.listUserVaultAccountWallets(req.user.id, vaultAccountId);
+    return this.client.listUserVaultAccountWallets(
+      req.user.id,
+      `${params.vaultAccountId}`,
+    );
   }
 
   @Post('me/accounts/:vaultAccountId/wallets')
@@ -117,10 +122,14 @@ export class FireblocksCwClientController {
   )
   createMyVaultWallet(
     @Request() req: RequestWithUser,
-    @Param('vaultAccountId') vaultAccountId: string,
+    @Param() params: VaultAccountParamDto,
     @Body() body: CreateUserVaultAssetRequestDto,
   ): Promise<FireblocksVaultAssetDto> {
-    return this.client.createVaultAssetForUser(req.user, vaultAccountId, body);
+    return this.client.createVaultAssetForUser(
+      req.user,
+      `${params.vaultAccountId}`,
+      body,
+    );
   }
 
   @Get('me/accounts/:vaultAccountId/wallets/:assetId')
@@ -139,13 +148,12 @@ export class FireblocksCwClientController {
   )
   getMyVaultAccountWallet(
     @Request() req: RequestWithUser,
-    @Param('vaultAccountId') vaultAccountId: string,
-    @Param('assetId') assetId: string,
+    @Param() params: VaultAccountAssetParamDto,
   ): Promise<FireblocksVaultAssetDto> {
     return this.client.getUserVaultAccountWallet(
       req.user.id,
-      vaultAccountId,
-      assetId,
+      `${params.vaultAccountId}`,
+      params.assetId,
     );
   }
 
@@ -158,14 +166,13 @@ export class FireblocksCwClientController {
   )
   createMyWalletAddress(
     @Request() req: RequestWithUser,
-    @Param('vaultAccountId') vaultAccountId: string,
-    @Param('assetId') assetId: string,
+    @Param() params: VaultAccountAssetParamDto,
     @Body() body: CreateUserVaultAddressRequestDto,
   ): Promise<FireblocksCustodialWalletDto> {
     return this.client.createVaultWalletAddressForUser(
       req.user,
-      vaultAccountId,
-      assetId,
+      `${params.vaultAccountId}`,
+      params.assetId,
       body,
     );
   }

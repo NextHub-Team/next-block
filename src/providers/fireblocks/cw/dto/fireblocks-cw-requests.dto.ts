@@ -476,20 +476,12 @@ export class CreateUserVaultRequestDto {
 @Exclude()
 export class CreateAdminVaultAccountRequestDto {
   @ApiProperty({
-    description: 'Vault account name',
-    example: 'custody:user:019a3bf6',
+    description: 'User social id to derive name/customerRefId',
+    example: '0a7346d0-4611-11ef-8342-6760128cffdb',
   })
   @IsString()
   @Expose()
-  name!: string;
-
-  @ApiProperty({
-    description: 'Customer reference id to attach',
-    example: 'd13bd918-938a-4a5b-8b28-4fa3437ea5ce',
-  })
-  @IsString()
-  @Expose()
-  customerRefId!: string;
+  socialId!: string;
 
   @ApiPropertyOptional({
     description: 'Hide account in Fireblocks Console',
@@ -517,6 +509,30 @@ export class CreateAdminVaultAccountRequestDto {
   @IsString()
   @Expose()
   idempotencyKey?: string;
+}
+
+@Exclude()
+export class VaultAccountParamDto {
+  @ApiProperty({
+    description: 'Fireblocks vault account id (numeric)',
+    example: '183',
+  })
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  @Expose()
+  vaultAccountId!: number;
+}
+
+@Exclude()
+export class VaultAccountAssetParamDto extends VaultAccountParamDto {
+  @ApiProperty({
+    description: 'Asset identifier within the vault account',
+    example: 'ETH_TEST5',
+  })
+  @IsString()
+  @Expose()
+  assetId!: string;
 }
 
 @Exclude()

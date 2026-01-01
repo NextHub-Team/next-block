@@ -27,6 +27,7 @@ import {
 // TODO: 7) Add admin bulk wallet creation
 // TODO: 8) Persist wallet data from Fireblocks to DB during asset creation
 // TODO: 9) Detect recovered wallets and skip duplicate creation by asset id
+// TODO: 10) Add test coverage for /api/v1/fireblocks/cw/service/vaults/accounts/bulk and ensure Fireblocks account permissions are set for bulk testing
 
 @Module({
   imports: [

@@ -1,5 +1,4 @@
-# NestJS REST API boilerplate 
-
+# NestJS REST API boilerplate
 
 ## Features
 
@@ -16,4 +15,3 @@
 - [x] E2E and units tests.
 - [x] Docker.
 - [x] CI (Github Actions).
-

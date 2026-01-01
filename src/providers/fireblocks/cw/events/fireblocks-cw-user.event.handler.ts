@@ -125,7 +125,7 @@ export class FireblocksCwUserAddedEventHandler extends InternalEventHandlerBase 
         account,
         assets: [
           {
-            id: wallet.vaultAsset.id,
+            id: wallet.vaultAsset.assetId ?? wallet.vaultAsset.id,
             status: FireblocksCwUserAddedEventHandler.DEFAULT_WALLET_STATUS,
             address: wallet.depositAddress.address,
           },
