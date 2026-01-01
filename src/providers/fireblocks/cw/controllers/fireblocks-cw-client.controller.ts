@@ -30,7 +30,6 @@ import {
 import {
   FireblocksCustodialWalletDto,
   FireblocksVaultAccountDto,
-  FireblocksVaultAccountWalletDto,
   FireblocksVaultAssetDto,
 } from '../dto/fireblocks-cw-responses.dto';
 import { RequestWithUser } from '../../../../utils/types/object.type';
@@ -82,15 +81,15 @@ export class FireblocksCwClientController {
   }
 
   @Get('me/wallets')
-  @ApiOkResponse({ type: FireblocksVaultAccountWalletDto, isArray: true })
+  @ApiOkResponse({ type: FireblocksCustodialWalletDto, isArray: true })
   @ApiOperationRoles('List all Fireblocks vault wallets for the current user', [
     RoleEnum.admin,
     RoleEnum.user,
   ])
   listMyVaultWallets(
     @Request() req: RequestWithUser,
-  ): Promise<FireblocksVaultAccountWalletDto[]> {
-    return this.client.listUserVaultWallets(req.user.id);
+  ): Promise<FireblocksCustodialWalletDto[]> {
+    return this.client.listUserVaultWallets(req.user);
   }
 
   @Get('me/accounts/:vaultAccountId/wallets')
@@ -98,7 +97,7 @@ export class FireblocksCwClientController {
     name: 'vaultAccountId',
     description: 'Target vault account id',
   })
-  @ApiOkResponse({ type: FireblocksVaultAssetDto, isArray: true })
+  @ApiOkResponse({ type: FireblocksCustodialWalletDto, isArray: true })
   @ApiOperationRoles(
     'List wallets within a specific Fireblocks vault account for the current user',
     [RoleEnum.admin, RoleEnum.user],
@@ -106,9 +105,9 @@ export class FireblocksCwClientController {
   listMyVaultAccountWallets(
     @Request() req: RequestWithUser,
     @Param() params: VaultAccountParamDto,
-  ): Promise<FireblocksVaultAssetDto[]> {
+  ): Promise<FireblocksCustodialWalletDto[]> {
     return this.client.listUserVaultAccountWallets(
-      req.user.id,
+      req.user,
       `${params.vaultAccountId}`,
     );
   }
@@ -141,7 +140,7 @@ export class FireblocksCwClientController {
     name: 'assetId',
     description: 'Asset identifier within the vault account',
   })
-  @ApiOkResponse({ type: FireblocksVaultAssetDto })
+  @ApiOkResponse({ type: FireblocksCustodialWalletDto })
   @ApiOperationRoles(
     'Fetch a specific wallet in a Fireblocks vault account for the current user',
     [RoleEnum.admin, RoleEnum.user],
@@ -149,9 +148,9 @@ export class FireblocksCwClientController {
   getMyVaultAccountWallet(
     @Request() req: RequestWithUser,
     @Param() params: VaultAccountAssetParamDto,
-  ): Promise<FireblocksVaultAssetDto> {
+  ): Promise<FireblocksCustodialWalletDto> {
     return this.client.getUserVaultAccountWallet(
-      req.user.id,
+      req.user,
       `${params.vaultAccountId}`,
       params.assetId,
     );
@@ -205,9 +204,6 @@ export class FireblocksCwClientController {
     @Request() req: RequestWithUser,
     @Body() command: EnsureUserWalletDto,
   ): Promise<FireblocksCustodialWalletDto> {
-    const userIdentity = {
-      id: req.user.id,
-    };
-    return this.client.ensureUserWallet(userIdentity, command.assetId);
+    return this.client.ensureUserWallet(req.user, command.assetId);
   }
 }

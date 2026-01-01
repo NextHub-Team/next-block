@@ -34,7 +34,6 @@ import {
   FireblocksDepositAddressDto,
   FireblocksUserPortfolioDto,
   FireblocksVaultAccountDto,
-  FireblocksVaultAccountWalletDto,
   FireblocksVaultAssetDto,
 } from '../dto/fireblocks-cw-responses.dto';
 import { FireblocksCwService } from '../fireblocks-cw.service';
@@ -261,9 +260,16 @@ export class FireblocksCwClientService {
   }
 
   async listUserVaultAccounts(
-    userId: string | number,
+    user: UserIdentityDto | (string | number),
   ): Promise<FireblocksVaultAccountDto[]> {
-    const portfolio = await this.getUserPortfolio(userId);
+    const { id, socialId } =
+      typeof user === 'object' ? user : { id: user, socialId: undefined };
+    const portfolio = await this.getUserPortfolio(
+      id,
+      undefined,
+      undefined,
+      socialId,
+    );
     return portfolio.vaultAccounts ?? [];
   }
 
@@ -271,45 +277,104 @@ export class FireblocksCwClientService {
     userId: string | number,
     namePrefix?: string,
     assetId?: string,
+    socialId?: string | null,
   ): Promise<FireblocksUserPortfolioDto> {
-    return this.fetchUserPortfolio(`${userId}`, namePrefix, assetId);
+    const ref = socialId ?? `${userId}`;
+    return this.fetchUserPortfolio(ref, namePrefix, assetId);
   }
 
   async listUserVaultWallets(
-    userId: string | number,
-  ): Promise<FireblocksVaultAccountWalletDto[]> {
-    const accounts = await this.listUserVaultAccounts(userId);
-    return accounts.flatMap((account) =>
-      (account.assets ?? []).map((asset) => ({
-        vaultAccount: account,
-        wallet: asset,
-      })),
-    );
+    user: UserIdentityDto | (string | number),
+  ): Promise<FireblocksCustodialWalletDto[]> {
+    const accounts = await this.listUserVaultAccounts(user);
+    const ref =
+      typeof user === 'object' ? (user.socialId ?? `${user.id}`) : `${user}`;
+
+    const results: FireblocksCustodialWalletDto[] = [];
+    for (const account of accounts) {
+      for (const asset of account.assets ?? []) {
+        const depositAddress = await this.resolveDepositAddress(this.sdk, {
+          vaultAccountId: account.id,
+          assetId: asset.assetId ?? asset.id,
+          customerRefId: ref,
+        });
+        results.push(
+          FireblocksCwMapper.toCustodialWalletDto({
+            vaultAccount: FireblocksCwMapper.toVaultAccountDto(
+              account as any,
+              account.assets as any,
+            ),
+            vaultAsset: FireblocksCwMapper.toVaultAssetDto(asset as any),
+            depositAddress,
+            roles: [RoleEnum.user, RoleEnum.admin],
+          }),
+        );
+      }
+    }
+    return results;
   }
 
   async listUserVaultAccountWallets(
-    userId: string | number,
+    user: UserIdentityDto | (string | number),
     vaultAccountId: string,
-  ): Promise<FireblocksVaultAssetDto[]> {
-    const account = await this.getUserVaultAccount(userId, vaultAccountId);
-    return account.assets ?? [];
+  ): Promise<FireblocksCustodialWalletDto[]> {
+    const account = await this.getUserVaultAccount(user, vaultAccountId);
+    const ref =
+      typeof user === 'object' ? (user.socialId ?? `${user.id}`) : `${user}`;
+    const results: FireblocksCustodialWalletDto[] = [];
+    for (const asset of account.assets ?? []) {
+      const depositAddress = await this.resolveDepositAddress(this.sdk, {
+        vaultAccountId,
+        assetId: asset.assetId ?? asset.id,
+        customerRefId: ref,
+      });
+      results.push(
+        FireblocksCwMapper.toCustodialWalletDto({
+          vaultAccount: FireblocksCwMapper.toVaultAccountDto(
+            account as any,
+            account.assets as any,
+          ),
+          vaultAsset: FireblocksCwMapper.toVaultAssetDto(asset as any),
+          depositAddress,
+          roles: [RoleEnum.user, RoleEnum.admin],
+        }),
+      );
+    }
+    return results;
   }
 
   async getUserVaultAccountWallet(
-    userId: string | number,
+    user: UserIdentityDto | (string | number),
     vaultAccountId: string,
     assetId: string,
-  ): Promise<FireblocksVaultAssetDto> {
-    await this.getUserVaultAccount(userId, vaultAccountId);
-    return this.fetchVaultAccountAsset(vaultAccountId, assetId);
+  ): Promise<FireblocksCustodialWalletDto> {
+    const account = await this.getUserVaultAccount(user, vaultAccountId);
+    const asset = await this.fetchVaultAccountAsset(vaultAccountId, assetId);
+    const ref =
+      typeof user === 'object' ? (user.socialId ?? `${user.id}`) : `${user}`;
+    const depositAddress = await this.resolveDepositAddress(this.sdk, {
+      vaultAccountId,
+      assetId,
+      customerRefId: ref,
+    });
+    return FireblocksCwMapper.toCustodialWalletDto({
+      vaultAccount: FireblocksCwMapper.toVaultAccountDto(
+        account as any,
+        account.assets as any,
+      ),
+      vaultAsset: asset,
+      depositAddress,
+      roles: [RoleEnum.user, RoleEnum.admin],
+    });
   }
 
   private async getUserVaultAccount(
-    userId: string | number,
+    user: UserIdentityDto | (string | number),
     vaultAccountId: string,
   ): Promise<FireblocksVaultAccountDto> {
     const account = await this.fetchVaultAccountById(vaultAccountId);
-    const normalized = `${userId}`;
+    const normalized =
+      typeof user === 'object' ? (user.socialId ?? `${user.id}`) : `${user}`;
     if (account.customerRefId !== normalized) {
       throw new ForbiddenException(
         `Vault account ${vaultAccountId} is not associated with the current user`,
