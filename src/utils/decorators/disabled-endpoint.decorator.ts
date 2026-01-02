@@ -10,11 +10,7 @@ import {
   mixin,
 } from '@nestjs/common';
 import { Logger } from '@nestjs/common';
-import {
-  ApiExcludeEndpoint,
-  ApiOperation,
-  ApiResponse,
-} from '@nestjs/swagger';
+import { ApiExcludeEndpoint, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { throwError } from 'rxjs';
 
 interface DisabledEndpointOptions {
