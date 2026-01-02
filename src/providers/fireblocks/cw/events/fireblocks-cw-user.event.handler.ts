@@ -96,25 +96,18 @@ export class FireblocksCwUserAddedEventHandler extends InternalEventHandlerBase 
         buildCustomerRefId(user.id, user.socialId ?? payload.socialId);
 
       this.logger.debug(
-        `[trace=${eventId}] UpSerting account providerId=${wallet.vaultAccount.id} customerRefId=${customerRefId}`,
+        `[trace=${eventId}] UpSerting account accountId=${wallet.vaultAccount.id} customerRefId=${customerRefId}`,
       );
       // Persist/update local account pointing to the Fireblocks vault.
-      const account = await this.accountsService.upsertByProviderAccountId({
-        providerAccountId: wallet.vaultAccount.id,
+      const account = await this.accountsService.upsertByAccountId({
+        accountId: wallet.vaultAccount.id,
         providerName: AccountProviderName.FIREBLOCKS,
         user: { id: user.id },
         KycStatus: KycStatus.VERIFIED,
         label: FireblocksCwUserAddedEventHandler.ACCOUNT_LABEL,
-        metadata: this.cleanMetadata({
-          name: wallet.vaultAccount.name ?? vaultName,
-          customerRefId,
-          assetId: wallet.vaultAsset.id,
-          address: wallet.depositAddress.address,
-          tag: wallet.depositAddress.tag,
-          socialId: user.socialId ?? payload.socialId ?? undefined,
-          email: user.email ?? payload.email,
-        }),
         status: AccountStatus.ACTIVE,
+        customerRefId,
+        name: wallet.vaultAccount.name ?? vaultName,
       });
 
       this.logger.debug(
@@ -148,21 +141,6 @@ export class FireblocksCwUserAddedEventHandler extends InternalEventHandlerBase 
       );
       this.failed(event, eventId, error);
     }
-  }
-
-  private cleanMetadata(
-    metadata: Record<string, string | number | null | undefined>,
-  ): Record<string, string | number> | undefined {
-    const cleaned = Object.fromEntries(
-      Object.entries(metadata).filter(
-        ([, value]) =>
-          value !== undefined &&
-          value !== null &&
-          !(typeof value === 'string' && value.trim().length === 0),
-      ),
-    ) as Record<string, string | number>;
-
-    return Object.keys(cleaned).length ? cleaned : undefined;
   }
 }
 

@@ -35,7 +35,7 @@ import {
 } from './dto/query-account.dto';
 import {
   AccountIdParamDto,
-  AccountProviderAccountIdParamDto,
+  AccountAccountIdParamDto,
   AccountProviderNameParamDto,
   AccountSocialIdParamDto,
   AccountUserIdParamDto,
@@ -45,6 +45,7 @@ import { RolesGuard } from '../roles/roles.guard';
 import { Roles } from '../roles/roles.decorator';
 import { ApiOperationRoles } from '../utils/decorators/swagger.decorator';
 import { RequestWithUser } from '../utils/types/object.type';
+import { DisabledEndpoint } from '../utils/decorators/disabled-endpoint.decorator';
 
 @ApiTags('Accounts')
 @ApiBearerAuth()
@@ -61,6 +62,7 @@ export class AccountsController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiCreatedResponse({ type: AccountDto })
+  @DisabledEndpoint({ markDeprecated: true })
   async create(
     @Body() createAccountDto: CreateAccountDto,
   ): Promise<AccountDto> {
@@ -113,7 +115,7 @@ export class AccountsController {
       req.user.id,
       query.label,
       query.status,
-      query.providerAccountId,
+      query.accountId,
       [RoleEnum.user],
     );
   }
@@ -189,7 +191,7 @@ export class AccountsController {
       query.userId,
       query.label,
       query.status,
-      query.providerAccountId,
+      query.accountId,
     );
   }
 
@@ -217,7 +219,7 @@ export class AccountsController {
       params.userId,
       query.label,
       query.status,
-      query.providerAccountId,
+      query.accountId,
     );
   }
 
@@ -261,13 +263,13 @@ export class AccountsController {
 
   @Roles(RoleEnum.admin)
   @ApiOperationRoles('Find account by provider account ID', [RoleEnum.admin])
-  @Get('providers/:providerAccountId')
+  @Get('providers/:accountId')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: AccountDto })
-  async findByProviderAccountId(
-    @Param() params: AccountProviderAccountIdParamDto,
+  async findByAccountId(
+    @Param() params: AccountAccountIdParamDto,
   ): Promise<AccountDto | null> {
-    return this.accountsService.findByAccountId(params.providerAccountId);
+    return this.accountsService.findByAccountId(params.accountId);
   }
 
   @Roles(RoleEnum.admin)
@@ -286,6 +288,7 @@ export class AccountsController {
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: AccountDto })
+  @DisabledEndpoint({ markDeprecated: true })
   async update(
     @Param() params: AccountIdParamDto,
     @Body() updateAccountDto: UpdateAccountDto,

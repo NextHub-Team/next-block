@@ -33,15 +33,19 @@ export abstract class AccountRepository {
     providerName: Account['providerName'],
   ): Promise<NullableType<Account>>;
 
-  abstract findByProviderAccountId(
-    providerAccountId: Account['providerAccountId'],
+  abstract findByAccountId(
+    accountId: Account['accountId'],
   ): Promise<NullableType<Account>>;
+
+  abstract findByProviderName(
+    providerName: Account['providerName'],
+  ): Promise<Account[]>;
 
   abstract filter(
     userId?: User['id'],
     label?: Account['label'],
     status?: Account['status'],
-    providerAccountId?: Account['providerAccountId'],
+    accountId?: Account['accountId'],
   ): Promise<Account[]>;
 
   abstract findActives(userId?: User['id']): Promise<Account[]>;

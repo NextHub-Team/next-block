@@ -2,7 +2,6 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsDate,
   IsEnum,
-  IsObject,
   IsOptional,
   IsString,
   IsUUID,
@@ -11,7 +10,6 @@ import {
 } from 'class-validator';
 import { Exclude, Expose, Type } from 'class-transformer';
 import { UserDto } from '../../users/dto/user.dto';
-import { JsonObject } from '../../utils/types/object.type';
 import {
   AccountProviderName,
   AccountStatus,
@@ -29,6 +27,24 @@ export class AccountDto {
   @IsUUID()
   @Expose()
   id: string;
+
+  @ApiPropertyOptional({
+    description: 'Customer reference identifier provided by upstream systems',
+    type: String,
+  })
+  @IsOptional()
+  @IsString()
+  @Expose()
+  customerRefId?: string | null;
+
+  @ApiPropertyOptional({
+    description: 'Display name for the account',
+    type: String,
+  })
+  @IsOptional()
+  @IsString()
+  @Expose()
+  name?: string | null;
 
   @ApiProperty({
     description: 'KYC status synced from the provider',
@@ -49,15 +65,6 @@ export class AccountDto {
   @Expose(RoleGroups([RoleEnum.user, RoleEnum.admin]))
   label?: string | null;
 
-  @ApiPropertyOptional({
-    description: 'Additional metadata stored alongside the account',
-    type: () => Object,
-  })
-  @IsOptional()
-  @IsObject()
-  @Expose(RoleGroups([RoleEnum.user, RoleEnum.admin]))
-  metadata?: JsonObject | null;
-
   @ApiProperty({
     description: 'Operational status of the account record',
     enum: AccountStatus,
@@ -73,7 +80,7 @@ export class AccountDto {
   @IsString()
   @MaxLength(255)
   @Expose()
-  providerAccountId: string;
+  accountId: string;
 
   @ApiProperty({
     description: 'Provider name registered in the platform',

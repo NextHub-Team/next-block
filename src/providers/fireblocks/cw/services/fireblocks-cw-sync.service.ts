@@ -13,10 +13,7 @@ import {
   FireblocksCustodialWalletDto,
   FireblocksVaultAccountDto,
 } from '../dto/fireblocks-cw-responses.dto';
-import {
-  cleanMetadata,
-  normalizeNumericUserId,
-} from '../helpers/fireblocks-cw-service.helper';
+import { normalizeNumericUserId } from '../helpers/fireblocks-cw-service.helper';
 
 /**
  * Centralizes persistence of Fireblocks vault account and wallet data into local repositories.
@@ -39,8 +36,6 @@ export class FireblocksCwSyncService {
     userId?: string | number;
     socialId?: string | null;
     email?: string | null;
-    label?: string;
-    metadata?: Record<string, unknown>;
     kycStatus?: KycStatus;
     status?: AccountStatus;
     customerRefId?: string | number;
@@ -85,23 +80,19 @@ export class FireblocksCwSyncService {
       throw new BadRequestException('Invalid user info: missing user id');
     }
 
-    const metadata = cleanMetadata({
-      customerRefId,
-      name: params.vaultAccount.name,
-      socialId: params.socialId ?? undefined,
-      email: params.email ?? undefined,
-      ...params.metadata,
-    });
+    const label = 'cw';
+    const accountName = params.vaultAccount.name ?? `${customerRefId}`;
 
     try {
-      const account = await this.accountsService.upsertByProviderAccountId({
-        providerAccountId: params.vaultAccount.id,
+      const account = await this.accountsService.upsertByAccountId({
+        accountId: params.vaultAccount.id,
         providerName: AccountProviderName.FIREBLOCKS,
         user: { id: userId },
         KycStatus: params.kycStatus ?? KycStatus.VERIFIED,
-        label: params.label ?? 'cw',
-        metadata,
+        label,
         status: params.status ?? AccountStatus.ACTIVE,
+        customerRefId: `${customerRefId}`,
+        name: accountName,
       });
 
       this.logger.log(
@@ -125,10 +116,8 @@ export class FireblocksCwSyncService {
     userId?: string | number;
     socialId?: string | null;
     email?: string | null;
-    label?: string;
     vaultType?: string;
     assetStatus?: string;
-    metadata?: Record<string, unknown>;
   }): Promise<FireblocksCwWallet | undefined> {
     this.logger.debug(
       `Syncing Fireblocks wallet vault=${params.wallet.vaultAccount.id} asset=${params.wallet.vaultAsset.assetId ?? params.wallet.vaultAsset.id}`,
@@ -139,17 +128,10 @@ export class FireblocksCwSyncService {
       userId: params.userId,
       socialId: params.socialId,
       email: params.email,
-      label: params.label,
-      metadata: cleanMetadata({
-        ...params.metadata,
-        name: params.wallet.vaultAccount.name,
-        customerRefId:
-          params.wallet.vaultAccount.customerRefId ?? params.userId,
-        assetId:
-          params.wallet.vaultAsset.assetId ?? params.wallet.vaultAsset.id,
-        address: params.wallet.depositAddress.address,
-        tag: params.wallet.depositAddress.tag,
-      }),
+      customerRefId:
+        params.wallet.vaultAccount.customerRefId ??
+        params.userId ??
+        params.wallet.vaultAccount.name,
     });
 
     if (!account) {

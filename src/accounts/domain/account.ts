@@ -1,6 +1,5 @@
 import { User } from '../../users/domain/user';
 import { ApiProperty } from '@nestjs/swagger';
-import { JsonObject } from '../../utils/types/object.type';
 import {
   AccountProviderName,
   AccountStatus,
@@ -8,6 +7,18 @@ import {
 } from '../types/account-enum.type';
 
 export class Account {
+  @ApiProperty({
+    type: () => String,
+    nullable: true,
+  })
+  customerRefId: string | null;
+
+  @ApiProperty({
+    type: () => String,
+    nullable: true,
+  })
+  name: string | null;
+
   @ApiProperty({
     enum: KycStatus,
     default: KycStatus.PENDING,
@@ -22,12 +33,6 @@ export class Account {
   label?: string | null;
 
   @ApiProperty({
-    type: Object,
-    nullable: true,
-  })
-  metadata?: JsonObject | null;
-
-  @ApiProperty({
     enum: AccountStatus,
     default: AccountStatus.ACTIVE,
     nullable: false,
@@ -38,7 +43,7 @@ export class Account {
     type: () => String,
     nullable: false,
   })
-  providerAccountId: string;
+  accountId: string;
 
   @ApiProperty({
     enum: AccountProviderName,

@@ -27,6 +27,7 @@ import {
 } from '../utils/dto/infinity-pagination-response.dto';
 import { infinityPagination } from '../utils/infinity-pagination';
 import { FindAllTransactionsDto } from './dto/find-all-transactions.dto';
+import { DisabledEndpoint } from '../utils/decorators/disabled-endpoint.decorator';
 
 @ApiTags('Transactions')
 @ApiBearerAuth()
@@ -42,6 +43,7 @@ export class TransactionsController {
   @ApiCreatedResponse({
     type: Transaction,
   })
+  @DisabledEndpoint({ markDeprecated: true })
   create(@Body() createTransactionDto: CreateTransactionDto) {
     return this.transactionsService.create(createTransactionDto);
   }
@@ -92,6 +94,7 @@ export class TransactionsController {
   @ApiOkResponse({
     type: Transaction,
   })
+  @DisabledEndpoint({ markDeprecated: true })
   update(
     @Param('id') id: string,
     @Body() updateTransactionDto: UpdateTransactionDto,

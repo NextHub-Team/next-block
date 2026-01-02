@@ -14,12 +14,23 @@ import {
   AccountStatus,
   KycStatus,
 } from '../../../../types/account-enum.type';
-import { JsonObject } from '../../../../../utils/types/object.type';
 
 @Entity({
   name: 'account',
 })
 export class AccountEntity extends EntityRelationalHelper {
+  @Column({
+    nullable: true,
+    type: String,
+  })
+  customerRefId: string | null;
+
+  @Column({
+    nullable: true,
+    type: String,
+  })
+  name: string | null;
+
   @Column({
     nullable: false,
     type: 'enum',
@@ -36,12 +47,6 @@ export class AccountEntity extends EntityRelationalHelper {
   label?: string | null;
 
   @Column({
-    nullable: true,
-    type: 'jsonb',
-  })
-  metadata?: JsonObject | null;
-
-  @Column({
     nullable: false,
     type: 'enum',
     enum: AccountStatus,
@@ -54,7 +59,7 @@ export class AccountEntity extends EntityRelationalHelper {
     nullable: false,
     type: String,
   })
-  providerAccountId: string;
+  accountId: string;
 
   @Column({
     nullable: false,

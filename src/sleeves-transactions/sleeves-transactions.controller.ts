@@ -27,8 +27,9 @@ import {
 } from '../utils/dto/infinity-pagination-response.dto';
 import { infinityPagination } from '../utils/infinity-pagination';
 import { FindAllSleevesTransactionsDto } from './dto/find-all-sleeves-transactions.dto';
+import { DisabledEndpoint } from '../utils/decorators/disabled-endpoint.decorator';
 
-@ApiTags('Sleevestransactions')
+@ApiTags('Sleeves-Transactions')
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
 @Controller({
@@ -44,6 +45,7 @@ export class SleevesTransactionsController {
   @ApiCreatedResponse({
     type: SleevesTransaction,
   })
+  @DisabledEndpoint({ markDeprecated: true })
   create(@Body() createSleevesTransactionDto: CreateSleevesTransactionDto) {
     return this.sleevesTransactionsService.create(createSleevesTransactionDto);
   }
@@ -94,6 +96,7 @@ export class SleevesTransactionsController {
   @ApiOkResponse({
     type: SleevesTransaction,
   })
+  @DisabledEndpoint({ markDeprecated: true })
   update(
     @Param('id') id: string,
     @Body() updateSleevesTransactionDto: UpdateSleevesTransactionDto,
