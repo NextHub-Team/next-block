@@ -30,8 +30,8 @@ import { RegisterApiTag } from '../common/api-docs/decorators/register-api-tag.d
 
 @RegisterApiTag(
   'Fireblocks-CW',
-  'Direct Custody Wallets managed by Fireblocks',
-  'https://developers.fireblocks.com/docs/create-direct-custody-wallets',
+  'Custody Wallets managed by Fireblocks',
+  // 'https://developers.fireblocks.com/docs/create-direct-custody-wallets',
 )
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))

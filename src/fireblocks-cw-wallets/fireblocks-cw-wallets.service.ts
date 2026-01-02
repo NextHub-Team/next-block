@@ -1,5 +1,6 @@
 import { AccountsService } from '../accounts/accounts.service';
 import { Account } from '../accounts/domain/account';
+import { FireblocksCwWalletAsset } from './types/fireblocks-cw-wallet.type';
 
 import {
   // common
@@ -95,6 +96,51 @@ export class FireblocksCwWalletsService {
     return this.fireblocksCwWalletRepository.findByIds(ids);
   }
 
+  async findByAccountId(accountId: Account['id']) {
+    return this.fireblocksCwWalletRepository.findByAccountId(accountId);
+  }
+
+  async upsertByAccountId(payload: {
+    accountId: Account['id'];
+    assets?: FireblocksCwWalletAsset[] | null;
+    vaultType?: FireblocksCwWallet['vaultType'];
+    autoFuel?: FireblocksCwWallet['autoFuel'];
+    hiddenOnUI?: FireblocksCwWallet['hiddenOnUI'];
+    name?: FireblocksCwWallet['name'];
+    customerRefId?: FireblocksCwWallet['customerRefId'];
+  }): Promise<FireblocksCwWallet> {
+    const account = await this.accountService.findByIdOrFail(payload.accountId);
+    const existing = await this.fireblocksCwWalletRepository.findByAccountId(
+      account.id,
+    );
+
+    const mergedAssets = this.mergeAssets(existing?.assets, payload.assets);
+    const base: Omit<FireblocksCwWallet, 'id' | 'createdAt' | 'updatedAt'> = {
+      account,
+      assets: mergedAssets,
+      vaultType: payload.vaultType ?? existing?.vaultType ?? 'SYSTEM',
+      autoFuel: payload.autoFuel ?? existing?.autoFuel ?? false,
+      hiddenOnUI: payload.hiddenOnUI ?? existing?.hiddenOnUI ?? true,
+      name: payload.name ?? existing?.name ?? 'Fireblocks Vault',
+      customerRefId:
+        payload.customerRefId ??
+        existing?.customerRefId ??
+        `${account.id}`.toString(),
+    };
+
+    if (existing) {
+      const updated = await this.fireblocksCwWalletRepository.update(
+        existing.id,
+        base,
+      );
+      if (updated) {
+        return updated;
+      }
+    }
+
+    return this.fireblocksCwWalletRepository.create(base);
+  }
+
   async update(
     id: FireblocksCwWallet['id'],
 
@@ -164,5 +210,31 @@ export class FireblocksCwWalletsService {
 
   remove(id: FireblocksCwWallet['id']) {
     return this.fireblocksCwWalletRepository.remove(id);
+  }
+
+  private mergeAssets(
+    existing?: FireblocksCwWalletAsset[] | null,
+    incoming?: FireblocksCwWalletAsset[] | null,
+  ): FireblocksCwWalletAsset[] | null | undefined {
+    if (!incoming || incoming.length === 0) {
+      return existing ?? incoming;
+    }
+
+    const merged = new Map<string, FireblocksCwWalletAsset>();
+    for (const asset of existing ?? []) {
+      if (asset?.id) {
+        merged.set(asset.id, asset);
+      }
+    }
+
+    for (const asset of incoming) {
+      if (!asset?.id) {
+        continue;
+      }
+      const current = merged.get(asset.id);
+      merged.set(asset.id, { ...current, ...asset });
+    }
+
+    return Array.from(merged.values());
   }
 }

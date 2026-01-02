@@ -12,6 +12,10 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
+export {
+  VaultAccountParamDto,
+  VaultAccountAssetParamDto,
+} from './fireblocks-cw-base.dto';
 
 @Exclude()
 export class VaultAccountsQueryDto {
@@ -509,30 +513,6 @@ export class CreateAdminVaultAccountRequestDto {
   @IsString()
   @Expose()
   idempotencyKey?: string;
-}
-
-@Exclude()
-export class VaultAccountParamDto {
-  @ApiProperty({
-    description: 'Fireblocks vault account id (numeric)',
-    example: '183',
-  })
-  @Type(() => Number)
-  @IsInt()
-  @Min(0)
-  @Expose()
-  vaultAccountId!: number;
-}
-
-@Exclude()
-export class VaultAccountAssetParamDto extends VaultAccountParamDto {
-  @ApiProperty({
-    description: 'Asset identifier within the vault account',
-    example: 'ETH_TEST5',
-  })
-  @IsString()
-  @Expose()
-  assetId!: string;
 }
 
 @Exclude()
