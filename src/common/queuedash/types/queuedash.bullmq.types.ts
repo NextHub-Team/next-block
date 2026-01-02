@@ -27,10 +27,10 @@ export type BullMqQueueBinding = {
 };
 
 export const DEFAULT_QUEUES: QueueDefinition[] = [
-  { name: 'login-events', displayName: 'Login Events' },
+  { name: 'login-tasks', displayName: 'Login Tasks' },
   {
-    name: 'contract-address-events',
-    displayName: 'Contract Address Events',
+    name: 'contract-address-tasks',
+    displayName: 'Contract Address Tasks',
   },
-  { name: 'account-events', displayName: 'Account Events' },
+  { name: 'account-tasks', displayName: 'Account Tasks' },
 ];

@@ -18,7 +18,6 @@ import {
   VaultAccountsPagedResponse,
   VaultAsset,
 } from '@fireblocks/ts-sdk';
-import { v4 as uuidv4 } from 'uuid';
 import {
   CreateVaultWalletRequestDto,
   EnsureVaultWalletOptionsDto,
@@ -38,6 +37,7 @@ import {
 } from '../dto/fireblocks-cw-responses.dto';
 import { FireblocksCwService } from '../fireblocks-cw.service';
 import { FireblocksCwMapper } from '../infrastructure/persistence/relational/mappers/fireblocks-cw.mapper';
+import { ensureIdempotencyKey } from '../helpers/fireblocks-cw-service.helper';
 import { FireblocksCwSyncService } from './fireblocks-cw-sync.service';
 import {
   GroupPlainToInstance,
@@ -89,7 +89,7 @@ export class FireblocksCwClientService {
       `Creating vault account for user=${user.id} (hiddenOnUI=${body.hiddenOnUI ?? true})`,
     );
     const sdk = this.sdk;
-    const idempotencyKey = this.ensureIdempotencyKey(body.idempotencyKey);
+    const idempotencyKey = ensureIdempotencyKey(body.idempotencyKey);
 
     const customerRefId = user.socialId ?? `${user.id}`;
     const vaultName = await this.fireblocks.buildVaultName(
@@ -158,7 +158,7 @@ export class FireblocksCwClientService {
       `Ensuring asset for user=${user.id} (vault=${vaultAccountId}, asset=${body.assetId})`,
     );
     const sdk = this.sdk;
-    const idempotencyKey = this.ensureIdempotencyKey(body.idempotencyKey);
+    const idempotencyKey = ensureIdempotencyKey(body.idempotencyKey);
     const vault = await sdk.vaults.getVaultAccount({ vaultAccountId });
     const vaultData = vault.data as VaultAccount;
     if (vaultData.customerRefId && vaultData.customerRefId !== `${user.id}`) {
@@ -221,7 +221,7 @@ export class FireblocksCwClientService {
       `Ensuring deposit address for user=${user.id} (vault=${vaultAccountId}, asset=${assetId})`,
     );
     const sdk = this.sdk;
-    const idempotencyKey = this.ensureIdempotencyKey(body.idempotencyKey);
+    const idempotencyKey = ensureIdempotencyKey(body.idempotencyKey);
     const vaultResp = await sdk.vaults.getVaultAccount({ vaultAccountId });
     const vaultAccount = vaultResp.data as VaultAccount;
     const customerRef = user.socialId ?? `${user.id}`;
@@ -424,7 +424,7 @@ export class FireblocksCwClientService {
       `Ensuring vault wallet for user=${user.id} (asset=${assetId})`,
     );
     const sdk = this.sdk;
-    const idempotencyKey = this.ensureIdempotencyKey(options?.idempotencyKey);
+    const idempotencyKey = ensureIdempotencyKey(options?.idempotencyKey);
 
     const customerRefId = user.socialId ?? `${user.id}`;
     const vaultName = await this.fireblocks.buildVaultName(
@@ -482,7 +482,7 @@ export class FireblocksCwClientService {
       `Creating vault+wallet (name=${command.name}, asset=${command.assetId})`,
     );
     const sdk = this.sdk;
-    const idempotencyKey = this.ensureIdempotencyKey(command.idempotencyKey);
+    const idempotencyKey = ensureIdempotencyKey(command.idempotencyKey);
     const { name, assetId, customerRefId, hiddenOnUI, addressDescription } =
       command;
 
@@ -843,7 +843,7 @@ export class FireblocksCwClientService {
       idempotencyKey?: string;
     },
   ): Promise<VaultAccount> {
-    const idempotencyKey = this.ensureIdempotencyKey(params.idempotencyKey);
+    const idempotencyKey = ensureIdempotencyKey(params.idempotencyKey);
     const paged = await sdk.vaults.getPagedVaultAccounts({
       namePrefix: params.vaultName,
       limit: 1,
@@ -900,7 +900,7 @@ export class FireblocksCwClientService {
       idempotencyKey?: string;
     },
   ): Promise<VaultAsset> {
-    const idempotencyKey = this.ensureIdempotencyKey(params.idempotencyKey);
+    const idempotencyKey = ensureIdempotencyKey(params.idempotencyKey);
     const normalize = (asset: VaultAsset | undefined): VaultAsset => {
       return {
         ...(asset ?? {}),
@@ -945,7 +945,7 @@ export class FireblocksCwClientService {
       idempotencyKey?: string;
     },
   ): Promise<CreateAddressResponse> {
-    const idempotencyKey = this.ensureIdempotencyKey(params.idempotencyKey);
+    const idempotencyKey = ensureIdempotencyKey(params.idempotencyKey);
     try {
       const existing = await sdk.vaults.getVaultAccountAssetAddressesPaginated({
         vaultAccountId: params.vaultAccountId,
@@ -985,13 +985,5 @@ export class FireblocksCwClientService {
     });
 
     return created.data as CreateAddressResponse;
-  }
-
-  /**
-   * Return provided idempotency key or generate a UUID to guarantee safe retries.
-   */
-  private ensureIdempotencyKey(key?: string): string {
-    if (key && key.trim().length > 0) return key.trim();
-    return uuidv4();
   }
 }

@@ -1,6 +1,7 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { AccountsService } from '../../../../accounts/accounts.service';
 import { AccountDto } from '../../../../accounts/dto/account.dto';
+import { UsersService } from '../../../../users/users.service';
 import {
   AccountProviderName,
   AccountStatus,
@@ -12,6 +13,10 @@ import {
   FireblocksCustodialWalletDto,
   FireblocksVaultAccountDto,
 } from '../dto/fireblocks-cw-responses.dto';
+import {
+  cleanMetadata,
+  normalizeNumericUserId,
+} from '../helpers/fireblocks-cw-service.helper';
 
 /**
  * Centralizes persistence of Fireblocks vault account and wallet data into local repositories.
@@ -23,6 +28,7 @@ export class FireblocksCwSyncService {
   constructor(
     private readonly accountsService: AccountsService,
     private readonly fireblocksCwWalletsService: FireblocksCwWalletsService,
+    private readonly usersService: UsersService,
   ) {}
 
   /**
@@ -43,12 +49,28 @@ export class FireblocksCwSyncService {
       `Syncing Fireblocks account ${params.vaultAccount.id} (customerRefId=${params.customerRefId ?? params.vaultAccount.customerRefId ?? 'none'})`,
     );
 
+    const hasSocialId =
+      typeof params.socialId === 'string' &&
+      params.socialId.trim().length > 0 &&
+      params.socialId !== 'null';
+    if (!hasSocialId && typeof params.userId !== 'undefined') {
+      const message = `Invalid user info for vault ${params.vaultAccount.id}: invalid social id`;
+      this.logger.error(message);
+      throw new BadRequestException('Invalid user info: invalid social id');
+    }
+
     const customerRefId =
       params.customerRefId ??
       params.vaultAccount.customerRefId ??
       params.userId ??
       params.socialId ??
       params.vaultAccount.name;
+    const userId = await this.resolveUserId({
+      userId: params.userId,
+      customerRefId: params.customerRefId ?? params.vaultAccount.customerRefId,
+      socialId: params.socialId,
+      vaultAccount: params.vaultAccount,
+    });
 
     if (!customerRefId) {
       this.logger.warn(
@@ -57,7 +79,13 @@ export class FireblocksCwSyncService {
       return undefined;
     }
 
-    const metadata = this.cleanMetadata({
+    if (typeof userId === 'undefined') {
+      const message = `Invalid user info for vault ${params.vaultAccount.id}: missing numeric user id (customerRefId=${params.customerRefId ?? params.vaultAccount.customerRefId ?? 'none'}, socialId=${params.socialId ?? params.vaultAccount.customerRefId ?? 'none'})`;
+      this.logger.error(message);
+      throw new BadRequestException('Invalid user info: missing user id');
+    }
+
+    const metadata = cleanMetadata({
       customerRefId,
       name: params.vaultAccount.name,
       socialId: params.socialId ?? undefined,
@@ -69,7 +97,7 @@ export class FireblocksCwSyncService {
       const account = await this.accountsService.upsertByProviderAccountId({
         providerAccountId: params.vaultAccount.id,
         providerName: AccountProviderName.FIREBLOCKS,
-        user: { id: customerRefId },
+        user: { id: userId },
         KycStatus: params.kycStatus ?? KycStatus.VERIFIED,
         label: params.label ?? 'cw',
         metadata,
@@ -77,7 +105,7 @@ export class FireblocksCwSyncService {
       });
 
       this.logger.log(
-        `Synced Fireblocks account ${params.vaultAccount.id} to user ${customerRefId}`,
+        `Synced Fireblocks account ${params.vaultAccount.id} to user ${userId}`,
       );
       return account;
     } catch (error) {
@@ -112,7 +140,7 @@ export class FireblocksCwSyncService {
       socialId: params.socialId,
       email: params.email,
       label: params.label,
-      metadata: this.cleanMetadata({
+      metadata: cleanMetadata({
         ...params.metadata,
         name: params.wallet.vaultAccount.name,
         customerRefId:
@@ -164,23 +192,50 @@ export class FireblocksCwSyncService {
     }
   }
 
-  private cleanMetadata(
-    metadata: Record<string, unknown>,
-  ): Record<string, unknown> | undefined {
-    const cleaned = Object.fromEntries(
-      Object.entries(metadata).filter(([_, value]) => {
-        if (value === null || value === undefined) {
-          return false;
-        }
+  private async resolveUserId(params: {
+    userId?: string | number;
+    customerRefId?: string | number;
+    socialId?: string | null;
+    vaultAccount?: FireblocksVaultAccountDto;
+  }): Promise<number | undefined> {
+    const numericCandidates = [
+      params.userId,
+      params.customerRefId,
+      params.vaultAccount?.customerRefId,
+    ];
 
-        if (typeof value === 'string' && value.trim().length === 0) {
-          return false;
-        }
+    for (const candidate of numericCandidates) {
+      const normalized = normalizeNumericUserId(candidate);
+      if (typeof normalized !== 'undefined') {
+        return normalized;
+      }
+    }
 
-        return true;
-      }),
+    const socialCandidates = [
+      params.socialId,
+      typeof params.customerRefId === 'string'
+        ? params.customerRefId
+        : undefined,
+      typeof params.vaultAccount?.customerRefId === 'string'
+        ? params.vaultAccount.customerRefId
+        : undefined,
+    ].filter(
+      (value): value is string =>
+        typeof value === 'string' && value.trim().length > 0,
     );
 
-    return Object.keys(cleaned).length ? cleaned : undefined;
+    for (const socialId of socialCandidates) {
+      const user = await this.usersService.findBySocialId(socialId);
+      if (typeof user?.id !== 'undefined') {
+        const normalizedUserId = normalizeNumericUserId(
+          user.id as number | string,
+        );
+        if (typeof normalizedUserId !== 'undefined') {
+          return normalizedUserId;
+        }
+      }
+    }
+
+    return undefined;
   }
 }

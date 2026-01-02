@@ -14,7 +14,6 @@ import {
   VaultAccount,
   VaultAsset,
 } from '@fireblocks/ts-sdk';
-import { v4 as uuidv4 } from 'uuid';
 import { AllConfigType } from '../../../../config/config.type';
 import { UsersService } from '../../../../users/users.service';
 import { FireblocksCwService } from '../fireblocks-cw.service';
@@ -40,6 +39,11 @@ import { FireblocksVaultResponseMapper } from '../infrastructure/persistence/rel
 import { FireblocksErrorMapper } from '../infrastructure/persistence/relational/mappers/fireblocks-error.mapper';
 import { AbstractCwService } from '../base/abstract-cw.service';
 import {
+  ensureIdempotencyKey,
+  getFireblocksMessage,
+  logFireblocksError,
+} from '../helpers/fireblocks-cw-service.helper';
+import {
   GroupPlainToInstance,
   GroupPlainToInstances,
 } from '../../../../utils/transformers/class.transformer';
@@ -57,7 +61,7 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
     private readonly persistence: FireblocksCwSyncService,
     private readonly usersService: UsersService,
     private readonly errorMapper: FireblocksErrorMapper,
-    configService: ConfigService<AllConfigType>,
+  configService: ConfigService<AllConfigType>,
   ) {
     super(FireblocksCwWorkflowService.name, configService);
   }
@@ -79,7 +83,7 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
     this.logger.debug(
       `Ensuring vault wallet (vault=${vaultAccountId}, asset=${assetId})`,
     );
-    const idempotencyKey = this.ensureIdempotencyKey();
+    const idempotencyKey = ensureIdempotencyKey();
 
     let vaultAccount: VaultAccount;
     try {
@@ -210,7 +214,7 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
     this.logger.debug(
       `Creating vault account (name=${name}, customerRefId=${customerRefId})`,
     );
-    const idempotencyKey = this.ensureIdempotencyKey(command.idempotencyKey);
+    const idempotencyKey = ensureIdempotencyKey(command.idempotencyKey);
 
     // If the vault already exists for this socialId/name, return it instead of creating a duplicate.
     const existingResp = await this.sdk.vaults.getPagedVaultAccounts({
@@ -369,7 +373,7 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
       );
     }
 
-    const idempotencyKey = this.ensureIdempotencyKey();
+    const idempotencyKey = ensureIdempotencyKey();
     let job: JobCreated;
     try {
       const response = await this.sdk.vaults.createMultipleAccounts({
@@ -382,9 +386,9 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
       });
       job = response.data as JobCreated;
     } catch (error: unknown) {
-      this.logFireblocksError('start bulk vault account creation', error);
+      logFireblocksError(this.logger, 'start bulk vault account creation', error);
       throw new ServiceUnavailableException(
-        this.getFireblocksMessage(error) ??
+        getFireblocksMessage(error) ??
           'Failed to start bulk vault account creation in Fireblocks',
       );
     }
@@ -667,7 +671,7 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
       }
 
       vaultCache.set(request.vaultAccountId, vaultAccount);
-      const idempotencyKey = this.ensureIdempotencyKey(request.idempotencyKey);
+      const idempotencyKey = ensureIdempotencyKey(request.idempotencyKey);
 
       const { asset: vaultAsset } = await this.ensureVaultAsset(
         request.vaultAccountId,
@@ -813,52 +817,11 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
         (account) => (account as VaultAccount)?.name === name,
       );
     } catch (error: unknown) {
-      this.logFireblocksError(`check vault existence (name=${name})`, error);
+      logFireblocksError(this.logger, `check vault existence (name=${name})`, error);
       throw new ServiceUnavailableException(
         'Unable to verify existing vault accounts in Fireblocks',
       );
     }
-  }
-
-  private logFireblocksError(action: string, error: unknown): void {
-    const message = error instanceof Error ? error.message : `${error}`;
-    const errObj = error as any;
-    const details =
-      errObj?.response?.data ?? errObj?.data ?? errObj?.response ?? undefined;
-
-    let detailsString = '';
-    try {
-      if (details !== undefined) {
-        detailsString =
-          typeof details === 'string'
-            ? details
-            : JSON.stringify(details, null, 2);
-      }
-    } catch {
-      detailsString = `${details ?? ''}`;
-    }
-
-    this.logger.error(
-      `[Fireblocks] ${action} failed: ${message}${
-        errObj?.response?.status ? ` (status=${errObj.response.status})` : ''
-      }`,
-      detailsString,
-    );
-  }
-
-  private getFireblocksMessage(error: unknown): string | undefined {
-    const errObj = error as any;
-    const candidate =
-      errObj?.response?.data?.errorMessage ??
-      errObj?.response?.data?.message ??
-      errObj?.data?.errorMessage ??
-      errObj?.data?.message ??
-      errObj?.message;
-
-    if (typeof candidate === 'string' && candidate.trim().length > 0) {
-      return candidate;
-    }
-    return undefined;
   }
 
   private async getOrCreateDepositAddress(params: {
@@ -967,10 +930,4 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
     }
   }
 
-  private ensureIdempotencyKey(key?: string): string {
-    if (key && key.trim().length > 0) {
-      return key.trim();
-    }
-    return uuidv4();
-  }
 }
