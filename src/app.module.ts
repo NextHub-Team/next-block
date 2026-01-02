@@ -67,8 +67,11 @@ import { TransactionsModule } from './transactions/transactions.module';
 
 import { SleevesTransactionsModule } from './sleeves-transactions/sleeves-transactions.module';
 
+import { SleevesModule } from './sleeves/sleeves.module';
+
 @Module({
   imports: [
+    SleevesModule,
     SleevesTransactionsModule,
     TransactionsModule,
     InternalEventsCoreModule.forRootAsync(),
