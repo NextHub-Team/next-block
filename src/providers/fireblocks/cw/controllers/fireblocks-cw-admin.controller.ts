@@ -220,6 +220,6 @@ export class FireblocksCwAdminController {
   async fetchAssetMetadata(
     @Param('assetId') assetId: string,
   ): Promise<FireblocksAssetMetadataDto> {
-    return this.admin.fetchAssetMetadata(assetId);
+    return this.admin.getAssetMetadata(assetId);
   }
 }

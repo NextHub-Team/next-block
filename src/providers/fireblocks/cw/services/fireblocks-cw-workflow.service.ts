@@ -16,14 +16,9 @@ import {
 } from '@fireblocks/ts-sdk';
 import { v4 as uuidv4 } from 'uuid';
 import { AllConfigType } from '../../../../config/config.type';
-import { AccountsService } from '../../../../accounts/accounts.service';
-import {
-  AccountProviderName,
-  AccountStatus,
-  KycStatus,
-} from '../../../../accounts/types/account-enum.type';
 import { UsersService } from '../../../../users/users.service';
 import { FireblocksCwService } from '../fireblocks-cw.service';
+import { FireblocksCwSyncService } from './fireblocks-cw-sync.service';
 import {
   FireblocksSpecialAddressItemDto,
   FireblocksSpecialAddressesResponseDto,
@@ -59,7 +54,7 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
   constructor(
     @Inject(forwardRef(() => FireblocksCwService))
     private readonly fireblocks: FireblocksCwService,
-    private readonly accountsService: AccountsService,
+    private readonly persistence: FireblocksCwSyncService,
     private readonly usersService: UsersService,
     private readonly errorMapper: FireblocksErrorMapper,
     configService: ConfigService<AllConfigType>,
@@ -131,6 +126,15 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
       [RoleEnum.admin],
     );
 
+    await this.persistence.syncWallet({
+      wallet,
+      userId: vaultAccount.customerRefId,
+      socialId: vaultAccount.customerRefId,
+    });
+    this.logger.log(
+      `Ensured vault wallet locally vault=${vaultAccountId} asset=${assetId}`,
+    );
+
     return {
       wallet,
       created: vaultAssetResult.created || depositAddressResult.created,
@@ -163,10 +167,9 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
         const vaultAccountDto =
           FireblocksVaultResponseMapper.vaultAccount(response);
 
-        await this.createAccountForVault(vaultAccountDto, {
+        await this.persistence.syncAccount({
+          vaultAccount: vaultAccountDto,
           customerRefId: vaultAccountDto.customerRefId,
-          name: vaultAccountDto.name,
-          referenceId: undefined,
         });
 
         results.push(vaultAccountDto);
@@ -225,10 +228,10 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
         existingAccount,
         existingAccount.assets as VaultAsset[] | undefined,
       );
-      await this.createAccountForVault(existingDto, {
+      await this.persistence.syncAccount({
+        vaultAccount: existingDto,
         customerRefId,
-        name,
-        referenceId: idempotencyKey,
+        userId: customerRefId,
         socialId,
       });
       this.logger.debug(
@@ -250,10 +253,10 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
     const vaultAccountDto =
       FireblocksVaultResponseMapper.vaultAccount(response);
 
-    await this.createAccountForVault(vaultAccountDto, {
+    await this.persistence.syncAccount({
+      vaultAccount: vaultAccountDto,
       customerRefId,
-      name,
-      referenceId: idempotencyKey,
+      userId: customerRefId,
       socialId,
     });
 
@@ -474,7 +477,7 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
     const addresses: Record<string, FireblocksDepositAddressDto> = {};
 
     for (const assetId of assetIds) {
-      await this.ensureVaultAsset(
+      const { asset: vaultAsset } = await this.ensureVaultAsset(
         vaultAccount.id as string,
         assetId,
         options?.idempotencyKey,
@@ -491,9 +494,23 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
           idempotencyKey: options?.idempotencyKey,
         });
 
-      addresses[assetId] = FireblocksCwMapper.toDepositAddressDto(
+      const depositAddressDto = FireblocksCwMapper.toDepositAddressDto(
         depositAddress.data,
       );
+
+      const wallet = FireblocksCwMapper.toCustodialWalletDto({
+        vaultAccount,
+        vaultAsset,
+        depositAddress: depositAddress.data as CreateAddressResponse,
+      });
+
+      await this.persistence.syncWallet({
+        wallet,
+        userId: vaultAccount.customerRefId,
+        socialId: vaultAccount.customerRefId,
+      });
+
+      addresses[assetId] = depositAddressDto;
     }
 
     return {
@@ -544,7 +561,7 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
       const createdAddresses: FireblocksSpecialAddressItemDto[] = [];
 
       for (const asset of assets) {
-        await this.ensureVaultAsset(
+        const { asset: vaultAsset } = await this.ensureVaultAsset(
           vaultAccountId,
           asset.assetId,
           idempotencyKey,
@@ -560,6 +577,18 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
             },
             idempotencyKey,
           });
+
+        const wallet = FireblocksCwMapper.toCustodialWalletDto({
+          vaultAccount,
+          vaultAsset,
+          depositAddress: depositAddress.data as CreateAddressResponse,
+        });
+
+        await this.persistence.syncWallet({
+          wallet,
+          userId: vaultAccount.customerRefId,
+          socialId: vaultAccount.customerRefId,
+        });
 
         createdAddresses.push({
           assetId: asset.assetId,
@@ -664,13 +693,19 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
         );
       }
 
-      results.push(
-        FireblocksCwMapper.toCustodialWalletDto({
-          vaultAccount,
-          vaultAsset,
-          depositAddress,
-        }),
-      );
+      const wallet = FireblocksCwMapper.toCustodialWalletDto({
+        vaultAccount,
+        vaultAsset,
+        depositAddress,
+      });
+
+      await this.persistence.syncWallet({
+        wallet,
+        userId: vaultAccount.customerRefId ?? request.customerRefId,
+        socialId: vaultAccount.customerRefId,
+      });
+
+      results.push(wallet);
     }
 
     return GroupPlainToInstances(FireblocksCustodialWalletDto, results, [
@@ -748,13 +783,19 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
         );
       }
 
-      results.push(
-        FireblocksCwMapper.toCustodialWalletDto({
-          vaultAccount,
-          vaultAsset,
-          depositAddress,
-        }),
-      );
+      const wallet = FireblocksCwMapper.toCustodialWalletDto({
+        vaultAccount,
+        vaultAsset,
+        depositAddress,
+      });
+
+      await this.persistence.syncWallet({
+        wallet,
+        userId: vaultAccount.customerRefId,
+        socialId: vaultAccount.customerRefId,
+      });
+
+      results.push(wallet);
     }
 
     return GroupPlainToInstances(FireblocksCustodialWalletDto, results, [
@@ -818,62 +859,6 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
       return candidate;
     }
     return undefined;
-  }
-
-  private async createAccountForVault(
-    vaultAccount: FireblocksVaultAccountDto,
-    params: {
-      customerRefId?: string | number;
-      name?: string;
-      referenceId?: string;
-      email?: string | null;
-      socialId?: string | null;
-    },
-  ): Promise<void> {
-    if (!params.customerRefId) {
-      this.logger.warn(
-        `Account sync skipped for vault ${vaultAccount.id}: missing customerRefId`,
-      );
-      return;
-    }
-
-    const metadata = this.buildAccountMetadata(vaultAccount, params);
-    try {
-      await this.accountsService.upsertByProviderAccountId({
-        user: { id: params.customerRefId },
-        KycStatus: KycStatus.VERIFIED,
-        label: 'cw',
-        metadata,
-        status: AccountStatus.ACTIVE,
-        providerAccountId: vaultAccount.id as string,
-        providerName: AccountProviderName.FIREBLOCKS,
-      });
-    } catch (error: unknown) {
-      this.logger.error(
-        `Failed to sync account for vault ${vaultAccount.id}`,
-        error instanceof Error ? error.stack : undefined,
-      );
-    }
-  }
-
-  private buildAccountMetadata(
-    vaultAccount: FireblocksVaultAccountDto,
-    params: {
-      customerRefId?: string | number;
-    },
-  ): Record<string, unknown> | undefined {
-    const metadata = {
-      customerRefId: params.customerRefId ?? vaultAccount.customerRefId,
-      name: vaultAccount.name,
-    };
-
-    const cleaned = Object.fromEntries(
-      Object.entries(metadata).filter(
-        ([, value]) => value !== undefined && value !== null && value !== '',
-      ),
-    );
-
-    return Object.keys(cleaned).length ? cleaned : undefined;
   }
 
   private async getOrCreateDepositAddress(params: {

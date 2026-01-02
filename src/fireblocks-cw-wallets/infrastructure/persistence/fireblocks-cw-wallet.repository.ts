@@ -22,6 +22,10 @@ export abstract class FireblocksCwWalletRepository {
     ids: FireblocksCwWallet['id'][],
   ): Promise<FireblocksCwWallet[]>;
 
+  abstract findByAccountId(
+    accountId: FireblocksCwWallet['account']['id'],
+  ): Promise<NullableType<FireblocksCwWallet>>;
+
   abstract update(
     id: FireblocksCwWallet['id'],
     payload: DeepPartial<FireblocksCwWallet>,

@@ -58,6 +58,16 @@ export class FireblocksCwWalletRelationalRepository
     return entities.map((entity) => FireblocksCwWalletMapper.toDomain(entity));
   }
 
+  async findByAccountId(
+    accountId: FireblocksCwWallet['account']['id'],
+  ): Promise<NullableType<FireblocksCwWallet>> {
+    const entity = await this.fireblocksCwWalletRepository.findOne({
+      where: { account: { id: accountId } },
+    });
+
+    return entity ? FireblocksCwWalletMapper.toDomain(entity) : null;
+  }
+
   async update(
     id: FireblocksCwWallet['id'],
     payload: Partial<FireblocksCwWallet>,

@@ -15,6 +15,7 @@ import {
 import { AllConfigType } from '../../../../config/config.type';
 import { FireblocksCwService } from '../fireblocks-cw.service';
 import { FireblocksCwWorkflowService } from './fireblocks-cw-workflow.service';
+import { FireblocksCwSyncService } from './fireblocks-cw-sync.service';
 import {
   FireblocksSpecialAddressesResponseDto,
   FireblocksPaginatedAssetWalletResponseDto,
@@ -58,6 +59,7 @@ export class FireblocksCwAdminService extends AbstractCwService {
     @Inject(forwardRef(() => FireblocksCwService))
     private readonly fireblocks: FireblocksCwService,
     private readonly workflow: FireblocksCwWorkflowService,
+    private readonly persistence: FireblocksCwSyncService,
     private readonly errorMapper: FireblocksErrorMapper,
     configService: ConfigService<AllConfigType>,
   ) {
@@ -114,14 +116,14 @@ export class FireblocksCwAdminService extends AbstractCwService {
   fetchVaultAccount(
     vaultAccountId: string,
   ): Promise<FireblocksVaultAccountDto> {
-    return this.fetchVaultAccountById(vaultAccountId);
+    return this.getVaultAccountById(vaultAccountId);
   }
 
   fetchVaultAsset(
     vaultAccountId: string,
     assetId: string,
   ): Promise<FireblocksVaultAssetDto> {
-    return this.fetchVaultAccountAsset(vaultAccountId, assetId);
+    return this.getVaultAccountAsset(vaultAccountId, assetId);
   }
 
   /**
@@ -161,10 +163,11 @@ export class FireblocksCwAdminService extends AbstractCwService {
   /**
    * Fetch a vault account by id.
    */
-  async fetchVaultAccountById(
+  async getVaultAccountById(
     vaultAccountId: string,
   ): Promise<FireblocksVaultAccountDto> {
     this.guardEnabledAndLog();
+    this.logger.debug(`Fetching Fireblocks vault account ${vaultAccountId}`);
     try {
       const response = await this.sdk.vaults.getVaultAccount({
         vaultAccountId,
@@ -201,7 +204,7 @@ export class FireblocksCwAdminService extends AbstractCwService {
   /**
    * Fetch a specific asset wallet under a vault account.
    */
-  async fetchVaultAccountAsset(
+  async getVaultAccountAsset(
     vaultAccountId: string,
     assetId: string,
   ): Promise<FireblocksVaultAssetDto> {
@@ -238,12 +241,27 @@ export class FireblocksCwAdminService extends AbstractCwService {
     updates: UpdateCustodialWalletDto,
   ): Promise<FireblocksVaultAccountDto> {
     this.guardEnabledAndLog();
+    this.logger.log(
+      `Updating vault account ${vaultAccountId} details (autoFuel=${updates.autoFuel}, hiddenOnUI=${updates.hiddenOnUI})`,
+    );
     const response = await this.sdk.vaults.updateVaultAccount({
       vaultAccountId,
       updateVaultAccountRequest: updates as UpdateVaultAccountRequest,
     });
 
-    return FireblocksCwMapper.toVaultAccountDto(response.data as VaultAccount);
+    const dto = FireblocksCwMapper.toVaultAccountDto(
+      response.data as VaultAccount,
+    );
+
+    await this.persistence.syncAccount({
+      vaultAccount: dto,
+      customerRefId: dto.customerRefId,
+    });
+    this.logger.debug(
+      `Vault account ${vaultAccountId} updated and persisted locally`,
+    );
+
+    return dto;
   }
 
   /**
@@ -255,11 +273,16 @@ export class FireblocksCwAdminService extends AbstractCwService {
     idempotencyKey?: string,
   ): Promise<VaultActionStatus> {
     this.guardEnabledAndLog();
+    this.logger.log(
+      `Setting vault account ${vaultAccountId} customerRefId=${customerRefId}`,
+    );
     const response = await this.sdk.vaults.setVaultAccountCustomerRefId({
       vaultAccountId,
       idempotencyKey,
       setCustomerRefIdRequest: { customerRefId },
     });
+
+    await this.syncAccountLocally(vaultAccountId);
 
     return response.data as VaultActionStatus;
   }
@@ -273,11 +296,16 @@ export class FireblocksCwAdminService extends AbstractCwService {
     idempotencyKey?: string,
   ): Promise<VaultActionStatus> {
     this.guardEnabledAndLog();
+    this.logger.log(
+      `Updating vault account ${vaultAccountId} autoFuel=${autoFuel}`,
+    );
     const response = await this.sdk.vaults.setVaultAccountAutoFuel({
       vaultAccountId,
       idempotencyKey,
       setAutoFuelRequest: { autoFuel },
     });
+
+    await this.syncAccountLocally(vaultAccountId);
 
     return response.data as VaultActionStatus;
   }
@@ -290,10 +318,13 @@ export class FireblocksCwAdminService extends AbstractCwService {
     idempotencyKey?: string,
   ): Promise<VaultActionStatus> {
     this.guardEnabledAndLog();
+    this.logger.log(`Hiding vault account ${vaultAccountId} from UI`);
     const response = await this.sdk.vaults.hideVaultAccount({
       vaultAccountId,
       idempotencyKey,
     });
+
+    await this.syncAccountLocally(vaultAccountId);
 
     return response.data as VaultActionStatus;
   }
@@ -306,10 +337,13 @@ export class FireblocksCwAdminService extends AbstractCwService {
     idempotencyKey?: string,
   ): Promise<VaultActionStatus> {
     this.guardEnabledAndLog();
+    this.logger.log(`Unhiding vault account ${vaultAccountId} from UI`);
     const response = await this.sdk.vaults.unhideVaultAccount({
       vaultAccountId,
       idempotencyKey,
     });
+
+    await this.syncAccountLocally(vaultAccountId);
 
     return response.data as VaultActionStatus;
   }
@@ -384,6 +418,9 @@ export class FireblocksCwAdminService extends AbstractCwService {
     idempotencyKey?: string,
   ): Promise<VaultActionStatus> {
     this.guardEnabledAndLog();
+    this.logger.log(
+      `Updating deposit address ${addressId} for vault ${vaultAccountId}/${assetId}`,
+    );
     const request: UpdateVaultAccountAssetAddressRequest | undefined =
       description ? { description } : undefined;
 
@@ -394,6 +431,8 @@ export class FireblocksCwAdminService extends AbstractCwService {
       updateVaultAccountAssetAddressRequest: request,
       idempotencyKey,
     });
+
+    await this.refreshWalletFromVault(vaultAccountId, assetId);
 
     return response.data as VaultActionStatus;
   }
@@ -409,6 +448,9 @@ export class FireblocksCwAdminService extends AbstractCwService {
     idempotencyKey?: string,
   ): Promise<VaultActionStatus> {
     this.guardEnabledAndLog();
+    this.logger.log(
+      `Setting customerRefId on deposit address ${addressId} for vault ${vaultAccountId}/${assetId}`,
+    );
     const response = await this.sdk.vaults.setCustomerRefIdForAddress({
       vaultAccountId,
       assetId,
@@ -416,6 +458,8 @@ export class FireblocksCwAdminService extends AbstractCwService {
       idempotencyKey,
       setCustomerRefIdForAddressRequest: { customerRefId },
     });
+
+    await this.refreshWalletFromVault(vaultAccountId, assetId);
 
     return response.data as VaultActionStatus;
   }
@@ -462,9 +506,7 @@ export class FireblocksCwAdminService extends AbstractCwService {
   /**
    * Fetch metadata for a specific asset.
    */
-  async fetchAssetMetadata(
-    assetId: string,
-  ): Promise<FireblocksAssetMetadataDto> {
+  async getAssetMetadata(assetId: string): Promise<FireblocksAssetMetadataDto> {
     this.guardEnabledAndLog();
     const response = await this.sdk.blockchainsAssets.getAsset({ id: assetId });
     return GroupPlainToInstance(
@@ -561,5 +603,36 @@ export class FireblocksCwAdminService extends AbstractCwService {
       });
 
     return response.data as CreateMultipleDepositAddressesJobStatus;
+  }
+
+  private async syncAccountLocally(vaultAccountId: string): Promise<void> {
+    try {
+      const vaultAccount = await this.getVaultAccountById(vaultAccountId);
+      await this.persistence.syncAccount({
+        vaultAccount,
+        customerRefId: vaultAccount.customerRefId,
+      });
+    } catch (error) {
+      this.logger.warn(
+        `Unable to sync local account for vault ${vaultAccountId}`,
+        error instanceof Error ? error.message : `${error}`,
+      );
+    }
+  }
+
+  private async refreshWalletFromVault(
+    vaultAccountId: string,
+    assetId: string,
+  ): Promise<void> {
+    try {
+      await this.workflow.bulkFetchVaultAssetsWithAddressesWorkflow([
+        { vaultAccountId, assetId },
+      ]);
+    } catch (error) {
+      this.logger.warn(
+        `Unable to refresh local wallet for vault ${vaultAccountId}/${assetId}`,
+        error instanceof Error ? error.message : `${error}`,
+      );
+    }
   }
 }
