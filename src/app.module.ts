@@ -63,8 +63,11 @@ import { QueueDashModule } from './common/queuedash/queuedash.module';
 import { InternalEventsModule as InternalEventsFeatureModule } from './internal-events/internal-events.module';
 import { InternalEventsModule as InternalEventsCoreModule } from './common/internal-events/internal-events.module';
 
+import { TransactionsModule } from './transactions/transactions.module';
+
 @Module({
   imports: [
+    TransactionsModule,
     InternalEventsCoreModule.forRootAsync(),
     InternalEventsFeatureModule,
     AccountsModule,

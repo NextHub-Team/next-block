@@ -22,7 +22,7 @@ export const cleanMetadata = (
   metadata: Record<string, unknown>,
 ): Record<string, unknown> | undefined => {
   const cleaned = Object.fromEntries(
-    Object.entries(metadata).filter(([_, value]) => {
+    Object.entries(metadata).filter(([, value]) => {
       if (value === null || value === undefined) {
         return false;
       }

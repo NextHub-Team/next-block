@@ -61,7 +61,7 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
     private readonly persistence: FireblocksCwSyncService,
     private readonly usersService: UsersService,
     private readonly errorMapper: FireblocksErrorMapper,
-  configService: ConfigService<AllConfigType>,
+    configService: ConfigService<AllConfigType>,
   ) {
     super(FireblocksCwWorkflowService.name, configService);
   }
@@ -386,7 +386,11 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
       });
       job = response.data as JobCreated;
     } catch (error: unknown) {
-      logFireblocksError(this.logger, 'start bulk vault account creation', error);
+      logFireblocksError(
+        this.logger,
+        'start bulk vault account creation',
+        error,
+      );
       throw new ServiceUnavailableException(
         getFireblocksMessage(error) ??
           'Failed to start bulk vault account creation in Fireblocks',
@@ -817,7 +821,11 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
         (account) => (account as VaultAccount)?.name === name,
       );
     } catch (error: unknown) {
-      logFireblocksError(this.logger, `check vault existence (name=${name})`, error);
+      logFireblocksError(
+        this.logger,
+        `check vault existence (name=${name})`,
+        error,
+      );
       throw new ServiceUnavailableException(
         'Unable to verify existing vault accounts in Fireblocks',
       );
@@ -929,5 +937,4 @@ export class FireblocksCwWorkflowService extends AbstractCwService {
       );
     }
   }
-
 }
