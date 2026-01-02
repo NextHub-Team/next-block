@@ -65,8 +65,11 @@ import { InternalEventsModule as InternalEventsCoreModule } from './common/inter
 
 import { TransactionsModule } from './transactions/transactions.module';
 
+import { SleevesTransactionsModule } from './sleeves-transactions/sleeves-transactions.module';
+
 @Module({
   imports: [
+    SleevesTransactionsModule,
     TransactionsModule,
     InternalEventsCoreModule.forRootAsync(),
     InternalEventsFeatureModule,
