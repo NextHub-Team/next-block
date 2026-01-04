@@ -15,16 +15,22 @@ export class SleevesService {
     private readonly sleevesRepository: SleevesRepository,
   ) {}
 
-  async create(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    createSleevesDto: CreateSleevesDto,
-  ) {
+  async create(createSleevesDto: CreateSleevesDto) {
     // Do not remove comment below.
     // <creating-property />
 
     return this.sleevesRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
+      tag: createSleevesDto.tag,
+
+      chainName: createSleevesDto.chainName,
+
+      name: createSleevesDto.name,
+
+      contractAddress: createSleevesDto.contractAddress,
+
+      sleeveId: createSleevesDto.sleeveId,
     });
   }
 
@@ -51,7 +57,7 @@ export class SleevesService {
 
   async update(
     id: Sleeves['id'],
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     updateSleevesDto: UpdateSleevesDto,
   ) {
     // Do not remove comment below.
@@ -60,6 +66,15 @@ export class SleevesService {
     return this.sleevesRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
+      tag: updateSleevesDto.tag,
+
+      chainName: updateSleevesDto.chainName,
+
+      name: updateSleevesDto.name,
+
+      contractAddress: updateSleevesDto.contractAddress,
+
+      sleeveId: updateSleevesDto.sleeveId,
     });
   }
 
