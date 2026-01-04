@@ -29,6 +29,7 @@ const createDisabledInterceptor = (
   class DisabledEndpointInterceptor implements NestInterceptor {
     private readonly logger = new Logger(DisabledEndpointInterceptor.name);
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     intercept(context: ExecutionContext, _next: CallHandler) {
       const req = context.switchToHttp().getRequest();
       const path = req?.originalUrl ?? req?.url ?? 'unknown';

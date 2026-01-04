@@ -7,17 +7,12 @@ export interface SubWalletPort {
   readonly provider: Wallet['provider'];
 
   /**
-   * Provision or return a blockchain address for the wallet.
-   */
-  createAddress?(wallet: Wallet): Promise<unknown>;
-
-  /**
    * Fetch current balances for the wallet.
    */
   getBalance?(wallet: Wallet): Promise<unknown>;
 
   /**
-   * Initiate a transfer for the wallet.
+   * Fetch the address associated with the wallet.
    */
-  initiateTransfer?(wallet: Wallet, payload: unknown): Promise<unknown>;
+  getAddress?(wallet: Wallet): Promise<string>;
 }

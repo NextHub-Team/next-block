@@ -22,9 +22,7 @@ import { InternalEventHandlerBase } from '../../../../common/internal-events/bas
 @InternalEventHandler(VERO_LOGIN_USER_ADDED_EVENT)
 export class FireblocksCwUserAddedEventHandler extends InternalEventHandlerBase {
   private static readonly BASE_ASSET_ID = 'AVAXTEST';
-  private static readonly DEFAULT_WALLET_STATUS = 'READY';
   private static readonly ACCOUNT_LABEL = 'cw';
-  private static readonly WALLET_VAULT_TYPE = 'SYSTEM';
 
   constructor(
     private readonly fireblocksCwService: FireblocksCwService,
@@ -116,18 +114,8 @@ export class FireblocksCwUserAddedEventHandler extends InternalEventHandlerBase 
       // Save wallet record with deposit address for the ensured asset.
       await this.fireblocksCwWalletsService.create({
         account,
-        assets: [
-          {
-            id: wallet.vaultAsset.assetId ?? wallet.vaultAsset.id,
-            status: FireblocksCwUserAddedEventHandler.DEFAULT_WALLET_STATUS,
-            address: wallet.depositAddress.address,
-          },
-        ],
-        vaultType: FireblocksCwUserAddedEventHandler.WALLET_VAULT_TYPE,
-        autoFuel: wallet.vaultAccount.autoFuel ?? false,
-        hiddenOnUI: wallet.vaultAccount.hiddenOnUI ?? true,
-        name: wallet.vaultAccount.name ?? vaultName,
-        customerRefId,
+        assetId: wallet.vaultAsset.assetId ?? wallet.vaultAsset.id,
+        address: wallet.depositAddress.address,
       });
 
       this.logger.log(

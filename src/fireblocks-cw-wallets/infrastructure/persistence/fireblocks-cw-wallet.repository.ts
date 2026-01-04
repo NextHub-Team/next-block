@@ -24,7 +24,12 @@ export abstract class FireblocksCwWalletRepository {
 
   abstract findByAccountId(
     accountId: FireblocksCwWallet['account']['id'],
-  ): Promise<NullableType<FireblocksCwWallet>>;
+  ): Promise<FireblocksCwWallet[]>;
+
+  abstract findByAccountIdAndAssetId(params: {
+    accountId: FireblocksCwWallet['account']['id'];
+    assetId: FireblocksCwWallet['assetId'];
+  }): Promise<NullableType<FireblocksCwWallet>>;
 
   abstract update(
     id: FireblocksCwWallet['id'],

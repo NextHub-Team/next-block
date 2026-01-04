@@ -116,8 +116,6 @@ export class FireblocksCwSyncService {
     userId?: string | number;
     socialId?: string | null;
     email?: string | null;
-    vaultType?: string;
-    assetStatus?: string;
   }): Promise<FireblocksCwWallet | undefined> {
     this.logger.debug(
       `Syncing Fireblocks wallet vault=${params.wallet.vaultAccount.id} asset=${params.wallet.vaultAsset.assetId ?? params.wallet.vaultAsset.id}`,
@@ -144,21 +142,8 @@ export class FireblocksCwSyncService {
     try {
       const wallet = await this.fireblocksCwWalletsService.upsertByAccountId({
         accountId: account.id,
-        assets: [
-          {
-            id: assetId,
-            status: params.assetStatus ?? 'READY',
-            address: params.wallet.depositAddress.address,
-          },
-        ],
-        vaultType: params.vaultType,
-        autoFuel: params.wallet.vaultAccount.autoFuel,
-        hiddenOnUI: params.wallet.vaultAccount.hiddenOnUI,
-        name: params.wallet.vaultAccount.name,
-        customerRefId:
-          params.wallet.vaultAccount.customerRefId ??
-          params.wallet.vaultAccount.name ??
-          `${account.id}`,
+        assetId,
+        address: params.wallet.depositAddress.address,
       });
 
       this.logger.log(
