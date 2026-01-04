@@ -1,4 +1,3 @@
-import { FireblocksCwWalletsModule } from '../fireblocks-cw-wallets/fireblocks-cw-wallets.module';
 import { SleevesModule } from '../sleeves/sleeves.module';
 import {
   // do not remove this comment
@@ -10,8 +9,6 @@ import { RelationalSleevesTransactionPersistenceModule } from './infrastructure/
 
 @Module({
   imports: [
-    FireblocksCwWalletsModule,
-
     SleevesModule,
 
     // do not remove this comment

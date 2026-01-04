@@ -1,5 +1,3 @@
-import { FireblocksCwWalletDto } from '../../fireblocks-cw-wallets/dto/fireblocks-cw-wallet.dto';
-
 import { SleevesDto } from '../../sleeves/dto/sleeves.dto';
 import { getEnumErrorMessage } from '../../utils/helpers/enum.helper';
 import {
@@ -29,15 +27,6 @@ import {
 } from '@nestjs/swagger';
 
 export class CreateSleevesTransactionDto {
-  @ApiProperty({
-    required: true,
-    type: () => FireblocksCwWalletDto,
-  })
-  @ValidateNested()
-  @Type(() => FireblocksCwWalletDto)
-  @IsNotEmptyObject()
-  wallet: FireblocksCwWalletDto;
-
   @ApiProperty({
     required: false,
     enum: SleevesTransactionType,
