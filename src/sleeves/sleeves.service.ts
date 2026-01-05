@@ -22,6 +22,8 @@ export class SleevesService {
     return this.sleevesRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
+      envType: createSleevesDto.envType,
+
       tag: createSleevesDto.tag,
 
       chainName: createSleevesDto.chainName,
@@ -66,6 +68,8 @@ export class SleevesService {
     return this.sleevesRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
+      envType: updateSleevesDto.envType,
+
       tag: updateSleevesDto.tag,
 
       chainName: updateSleevesDto.chainName,

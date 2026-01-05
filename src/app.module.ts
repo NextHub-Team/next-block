@@ -38,7 +38,6 @@ import { SocketIoModule } from './communication/socketio/socketio.module';
 import { PassphrasesModule } from './passphrases/passphrases.module';
 import { MessagesModule } from './messages/messages.module';
 import { AddressBooksModule } from './address-books/address-books.module';
-import { WalletsModule } from './wallets/wallets.module';
 import { FireblocksCwWalletsModule } from './fireblocks-cw-wallets/fireblocks-cw-wallets.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
 import { CmcModule } from './providers/cmc/cmc.module';
@@ -99,7 +98,6 @@ import { SleevesModule } from './sleeves/sleeves.module';
     }),
     FireblocksCwWalletsModule,
     FireblocksCwModule,
-    WalletsModule,
     MessagesModule,
     PassphrasesModule,
     AddressBooksModule,

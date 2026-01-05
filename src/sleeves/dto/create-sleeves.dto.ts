@@ -1,16 +1,19 @@
-import {
-  // decorators here
-
-  IsString,
-  IsOptional,
-} from 'class-validator';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
 
 import {
   // decorators here
   ApiProperty,
 } from '@nestjs/swagger';
+import { SleevesEnvType } from '../types/sleeves-enum.type';
 
 export class CreateSleevesDto {
+  @ApiProperty({
+    required: true,
+    enum: SleevesEnvType,
+  })
+  @IsEnum(SleevesEnvType)
+  envType: SleevesEnvType;
+
   @ApiProperty({
     required: false,
     type: () => String,

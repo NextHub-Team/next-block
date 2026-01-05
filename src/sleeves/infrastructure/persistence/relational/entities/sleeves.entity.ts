@@ -6,11 +6,21 @@ import {
   Column,
 } from 'typeorm';
 import { EntityRelationalHelper } from '../../../../../utils/relational-entity-helper';
+import { SleevesEnvType } from '../../../types/sleeves-env-type.enum';
 
 @Entity({
   name: 'sleeves',
 })
 export class SleevesEntity extends EntityRelationalHelper {
+  @Column({
+    nullable: false,
+    type: 'enum',
+    enum: SleevesEnvType,
+    enumName: 'sleeves_env_type_enum',
+    default: SleevesEnvType.Testnet,
+  })
+  envType: SleevesEnvType;
+
   @Column({
     nullable: true,
     type: String,

@@ -20,30 +20,6 @@ export class AddInternalEvent1766565777262 implements MigrationInterface {
       `CREATE TABLE "internal_event" ("payload" jsonb NOT NULL DEFAULT '{}'::jsonb, "eventType" character varying NOT NULL, "publishedAt" TIMESTAMP WITH TIME ZONE, "id" uuid NOT NULL DEFAULT uuid_generate_v4(), "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_c2e73e0b218f2b87dc27cc33b33" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
-      `ALTER TABLE "fireblocks_cw_wallet" DROP COLUMN "metadata"`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "fireblocks_cw_wallet" DROP COLUMN "referenceId"`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "fireblocks_cw_wallet" ADD "customerRefId" character varying NOT NULL`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "fireblocks_cw_wallet" ADD "accountId" uuid NOT NULL`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "wallet" ALTER COLUMN "active" DROP NOT NULL`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "wallet" ALTER COLUMN "active" SET DEFAULT false`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "fireblocks_cw_wallet" DROP COLUMN "assets"`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "fireblocks_cw_wallet" ADD "assets" jsonb`,
-    );
-    await queryRunner.query(
       `ALTER TABLE "account" ADD CONSTRAINT "FK_60328bf27019ff5498c4b977421" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
     );
     await queryRunner.query(
@@ -57,30 +33,6 @@ export class AddInternalEvent1766565777262 implements MigrationInterface {
     );
     await queryRunner.query(
       `ALTER TABLE "account" DROP CONSTRAINT "FK_60328bf27019ff5498c4b977421"`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "fireblocks_cw_wallet" DROP COLUMN "assets"`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "fireblocks_cw_wallet" ADD "assets" character varying`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "wallet" ALTER COLUMN "active" DROP DEFAULT`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "wallet" ALTER COLUMN "active" SET NOT NULL`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "fireblocks_cw_wallet" DROP COLUMN "accountId"`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "fireblocks_cw_wallet" DROP COLUMN "customerRefId"`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "fireblocks_cw_wallet" ADD "referenceId" character varying NOT NULL`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "fireblocks_cw_wallet" ADD "metadata" character varying`,
     );
     await queryRunner.query(`DROP TABLE "internal_event"`);
     await queryRunner.query(`DROP TABLE "account"`);

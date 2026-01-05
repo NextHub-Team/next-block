@@ -1,6 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { SleevesEnvType } from '../types/sleeves-enum.type';
 
 export class Sleeves {
+  @ApiProperty({
+    enum: SleevesEnvType,
+    nullable: false,
+  })
+  envType: SleevesEnvType;
+
   @ApiProperty({
     type: () => String,
     nullable: true,

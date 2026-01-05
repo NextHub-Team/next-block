@@ -1,10 +1,13 @@
 import { Sleeves } from '../../../../domain/sleeves';
+import { SleevesEnvType } from '../../../types/sleeves-env-type.enum';
 
 import { SleevesEntity } from '../entities/sleeves.entity';
 
 export class SleevesMapper {
   static toDomain(raw: SleevesEntity): Sleeves {
     const domainEntity = new Sleeves();
+    domainEntity.envType = raw.envType as SleevesEnvType;
+
     domainEntity.tag = raw.tag;
 
     domainEntity.chainName = raw.chainName;
@@ -24,6 +27,8 @@ export class SleevesMapper {
 
   static toPersistence(domainEntity: Sleeves): SleevesEntity {
     const persistenceEntity = new SleevesEntity();
+    persistenceEntity.envType = domainEntity.envType;
+
     persistenceEntity.tag = domainEntity.tag;
 
     persistenceEntity.chainName = domainEntity.chainName;

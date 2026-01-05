@@ -11,20 +11,20 @@ This module wraps the outbox + Redis Streams workflow for cross-module events in
 ## Emitting an event
 
 ```ts
-// apps/wallets/wallets.service.ts (example)
+// apps/accounts/accounts.service.ts (example)
 @Injectable()
-export class WalletsService {
+export class AccountsService {
   constructor(
     private readonly dataSource: DataSource,
     private readonly internalEvents: InternalEventsService,
   ) {}
 
-  async createWallet(): Promise<void> {
+  async createAccount(): Promise<void> {
     await this.dataSource.transaction(async (manager) => {
-      // ... persist wallet first
+      // ... persist account first
       await this.internalEvents.emit(manager, {
-        eventType: 'wallet.created',
-        payload: { walletId: 'b67b7c40-6cf5-4b1b-bad2-f117722a905f' },
+        eventType: 'account.created',
+        payload: { accountId: 'b67b7c40-6cf5-4b1b-bad2-f117722a905f' },
       });
     });
   }
@@ -35,8 +35,8 @@ export class WalletsService {
 
 ```ts
 @Injectable()
-@InternalEventHandler('wallet.created')
-export class WalletCreatedHandler {
+@InternalEventHandler('account.created')
+export class AccountCreatedHandler {
   async handle(event: InternalEvent) {
     // event.payload contains the object passed to emit()
     // add your side-effects or projections here
