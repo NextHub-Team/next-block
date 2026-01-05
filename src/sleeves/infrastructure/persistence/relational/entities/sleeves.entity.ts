@@ -6,7 +6,8 @@ import {
   Column,
 } from 'typeorm';
 import { EntityRelationalHelper } from '../../../../../utils/relational-entity-helper';
-import { SleevesEnvType } from '../../../types/sleeves-env-type.enum';
+import { SleevesEnvType } from 'src/sleeves/types/sleeves-enum.type';
+
 
 @Entity({
   name: 'sleeves',

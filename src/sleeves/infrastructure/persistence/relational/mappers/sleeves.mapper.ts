@@ -1,6 +1,5 @@
+import { SleevesEnvType } from 'src/sleeves/types/sleeves-enum.type';
 import { Sleeves } from '../../../../domain/sleeves';
-import { SleevesEnvType } from '../../../types/sleeves-env-type.enum';
-
 import { SleevesEntity } from '../entities/sleeves.entity';
 
 export class SleevesMapper {
