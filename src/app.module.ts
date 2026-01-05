@@ -38,7 +38,6 @@ import { SocketIoModule } from './communication/socketio/socketio.module';
 import { PassphrasesModule } from './passphrases/passphrases.module';
 import { MessagesModule } from './messages/messages.module';
 import { AddressBooksModule } from './address-books/address-books.module';
-import { WalletsModule } from './wallets/wallets.module';
 import { FireblocksCwWalletsModule } from './fireblocks-cw-wallets/fireblocks-cw-wallets.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
 import { CmcModule } from './providers/cmc/cmc.module';
@@ -63,8 +62,14 @@ import { QueueDashModule } from './common/queuedash/queuedash.module';
 import { InternalEventsModule as InternalEventsFeatureModule } from './internal-events/internal-events.module';
 import { InternalEventsModule as InternalEventsCoreModule } from './common/internal-events/internal-events.module';
 
+import { SleevesTransactionsModule } from './sleeves-transactions/sleeves-transactions.module';
+
+import { SleevesModule } from './sleeves/sleeves.module';
+
 @Module({
   imports: [
+    SleevesModule,
+    SleevesTransactionsModule,
     InternalEventsCoreModule.forRootAsync(),
     InternalEventsFeatureModule,
     AccountsModule,
@@ -93,7 +98,6 @@ import { InternalEventsModule as InternalEventsCoreModule } from './common/inter
     }),
     FireblocksCwWalletsModule,
     FireblocksCwModule,
-    WalletsModule,
     MessagesModule,
     PassphrasesModule,
     AddressBooksModule,

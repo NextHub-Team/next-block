@@ -7,15 +7,17 @@ import { AccountEntity } from '../entities/account.entity';
 export class AccountMapper {
   static toDomain(raw: AccountEntity): Account {
     const domainEntity = new Account();
+    domainEntity.customerRefId = raw.customerRefId;
+
+    domainEntity.name = raw.name;
+
     domainEntity.KycStatus = raw.KycStatus;
 
     domainEntity.label = raw.label;
 
-    domainEntity.metadata = raw.metadata;
-
     domainEntity.status = raw.status;
 
-    domainEntity.providerAccountId = raw.providerAccountId;
+    domainEntity.accountId = raw.accountId;
 
     domainEntity.providerName = raw.providerName;
 
@@ -32,15 +34,17 @@ export class AccountMapper {
 
   static toPersistence(domainEntity: Account): AccountEntity {
     const persistenceEntity = new AccountEntity();
+    persistenceEntity.customerRefId = domainEntity.customerRefId;
+
+    persistenceEntity.name = domainEntity.name;
+
     persistenceEntity.KycStatus = domainEntity.KycStatus;
 
     persistenceEntity.label = domainEntity.label;
 
-    persistenceEntity.metadata = domainEntity.metadata;
-
     persistenceEntity.status = domainEntity.status;
 
-    persistenceEntity.providerAccountId = domainEntity.providerAccountId;
+    persistenceEntity.accountId = domainEntity.accountId;
 
     persistenceEntity.providerName = domainEntity.providerName;
 

@@ -15,22 +15,25 @@ import {
 } from '../../../../accounts/types/account-enum.type';
 import { FireblocksCwWalletsService } from '../../../../fireblocks-cw-wallets/fireblocks-cw-wallets.service';
 import { FireblocksCwService } from '../fireblocks-cw.service';
+import { FireblocksCwWorkflowService } from '../services/fireblocks-cw-workflow.service';
 import { buildCustomerRefId } from '../helpers/fireblocks-cw.helper';
+import { ensureIdempotencyKey } from '../helpers/fireblocks-cw-service.helper';
 import { InternalEventHandlerBase } from '../../../../common/internal-events/base/internal-event-handler.base';
+import { AuthProvidersEnum } from '../../../../auth/auth-providers.enum';
+import { VaultAccount } from '@fireblocks/ts-sdk';
 
 @Injectable()
 @InternalEventHandler(VERO_LOGIN_USER_ADDED_EVENT)
 export class FireblocksCwUserAddedEventHandler extends InternalEventHandlerBase {
   private static readonly BASE_ASSET_ID = 'AVAXTEST';
-  private static readonly DEFAULT_WALLET_STATUS = 'READY';
   private static readonly ACCOUNT_LABEL = 'cw';
-  private static readonly WALLET_VAULT_TYPE = 'SYSTEM';
 
   constructor(
     private readonly fireblocksCwService: FireblocksCwService,
     private readonly usersService: UsersService,
     private readonly accountsService: AccountsService,
     private readonly fireblocksCwWalletsService: FireblocksCwWalletsService,
+    private readonly fireblocksCwWorkflowService: FireblocksCwWorkflowService,
   ) {
     super(FireblocksCwUserAddedEventHandler.name);
   }
@@ -71,70 +74,137 @@ export class FireblocksCwUserAddedEventHandler extends InternalEventHandlerBase 
         throw new Error(message);
       }
 
-      this.logger.debug(
-        `[trace=${eventId}] Building vault name for user=${user.id} socialId=${user.socialId ?? payload.socialId ?? 'none'}`,
+      if (user.provider !== AuthProvidersEnum.vero) {
+        this.logger.debug(
+          `[trace=${eventId}] User ${user.id} provider=${user.provider} not eligible for Fireblocks CW provisioning; skipping.`,
+        );
+        this.processed(event, eventId);
+        return;
+      }
+
+      const socialId = user.socialId ?? payload.socialId;
+      if (!socialId) {
+        const message = `Missing socialId for user ${user.id}; cannot create Fireblocks vault`;
+        this.logger.error(`[trace=${eventId}] ${message}`);
+        throw new Error(message);
+      }
+
+      let account = await this.accountsService.findBySocialIdAndProviderName(
+        socialId,
+        AccountProviderName.FIREBLOCKS,
       );
-      const vaultName = await this.fireblocksCwService.buildVaultName(
-        user.id,
-        user.socialId ?? payload.socialId,
-      );
+      let vaultAccountId: string | undefined =
+        (account?.accountId as string | undefined) ?? undefined;
+
+      if (!account) {
+        this.logger.debug(
+          `[trace=${eventId}] Building vault name for user=${user.id} socialId=${socialId}`,
+        );
+        const vaultName = buildCustomerRefId(user.id, socialId);
+        const customerRefId = socialId;
+
+        this.logger.debug(
+          `[trace=${eventId}] Searching Fireblocks vault by name=${vaultName}`,
+        );
+        this.fireblocksCwService.isReady();
+        const sdk = this.fireblocksCwService.getSdk();
+        const paged = await sdk.vaults.getPagedVaultAccounts({
+          namePrefix: vaultName,
+          limit: 1,
+        });
+        const existingVault = (paged.data?.accounts ?? []).find(
+          (fbAccount) =>
+            (fbAccount as VaultAccount)?.name === vaultName ||
+            (fbAccount as VaultAccount)?.customerRefId === customerRefId,
+        ) as VaultAccount | undefined;
+
+        let vaultAccount = existingVault;
+        if (existingVault) {
+          this.logger.debug(
+            `[trace=${eventId}] Found Fireblocks vault ${existingVault.id} for user ${user.id}`,
+          );
+        } else {
+          this.logger.debug(
+            `[trace=${eventId}] Creating Fireblocks vault for user=${user.id} customerRefId=${customerRefId}`,
+          );
+          const created = await sdk.vaults.createVaultAccount({
+            createVaultAccountRequest: {
+              name: vaultName,
+              customerRefId,
+              hiddenOnUI: true,
+              autoFuel: false,
+            },
+            idempotencyKey: ensureIdempotencyKey(),
+          });
+          vaultAccount = created.data as VaultAccount;
+          this.logger.log(
+            `[trace=${eventId}] Created Fireblocks vault account ${vaultAccount.id} for user ${user.id}`,
+          );
+        }
+
+        if (!vaultAccount?.id) {
+          const message = `Failed to resolve or create Fireblocks vault for user ${user.id}`;
+          this.logger.error(`[trace=${eventId}] ${message}`);
+          throw new Error(message);
+        }
+
+        this.logger.debug(
+          `[trace=${eventId}] UpSerting account accountId=${vaultAccount.id} customerRefId=${customerRefId}`,
+        );
+        account = await this.accountsService.upsertByAccountId({
+          accountId: vaultAccount.id as string,
+          providerName: AccountProviderName.FIREBLOCKS,
+          user: { id: user.id },
+          KycStatus: KycStatus.VERIFIED,
+          label: FireblocksCwUserAddedEventHandler.ACCOUNT_LABEL,
+          status: AccountStatus.ACTIVE,
+          customerRefId,
+          name: (vaultAccount as VaultAccount).name ?? vaultName,
+        });
+        vaultAccountId = vaultAccount.id as string;
+      } else {
+        this.logger.debug(
+          `[trace=${eventId}] Fireblocks account already exists for user ${user.id}; checking wallet state.`,
+        );
+        vaultAccountId = account.accountId as string;
+      }
+
+      if (!account?.id || !vaultAccountId) {
+        const message = `Unable to resolve Fireblocks account record for user ${user.id}`;
+        this.logger.error(`[trace=${eventId}] ${message}`);
+        throw new Error(message);
+      }
 
       this.logger.debug(
         `[trace=${eventId}] Ensuring Fireblocks vault+wallet for asset=${FireblocksCwUserAddedEventHandler.BASE_ASSET_ID}`,
       );
-      // Ensure Fireblocks vault + AVAXTEST wallet + deposit address.
-      const wallet = await this.fireblocksCwService.client.ensureUserWallet(
-        { id: user.id, socialId: user.socialId ?? payload.socialId },
-        FireblocksCwUserAddedEventHandler.BASE_ASSET_ID,
-        {
-          hiddenOnUI: true,
-        },
+      const existingWallets =
+        await this.fireblocksCwWalletsService.findByAccountId(account.id);
+      const walletAlreadyStored = existingWallets.some(
+        (wallet) =>
+          wallet.assetId === FireblocksCwUserAddedEventHandler.BASE_ASSET_ID,
       );
+      if (walletAlreadyStored) {
+        this.logger.debug(
+          `[trace=${eventId}] Wallet already exists locally for asset=${FireblocksCwUserAddedEventHandler.BASE_ASSET_ID}; skipping Fireblocks ensure.`,
+        );
+        this.processed(event, eventId);
+        return;
+      }
 
-      const customerRefId =
-        wallet.vaultAccount.customerRefId ??
-        buildCustomerRefId(user.id, user.socialId ?? payload.socialId);
+      const ensuredWallet =
+        await this.fireblocksCwWorkflowService.ensureVaultWalletWorkflow(
+          vaultAccountId,
+          FireblocksCwUserAddedEventHandler.BASE_ASSET_ID,
+        );
 
-      this.logger.debug(
-        `[trace=${eventId}] UpSerting account providerId=${wallet.vaultAccount.id} customerRefId=${customerRefId}`,
-      );
-      // Persist/update local account pointing to the Fireblocks vault.
-      const account = await this.accountsService.upsertByProviderAccountId({
-        providerAccountId: wallet.vaultAccount.id,
-        providerName: AccountProviderName.FIREBLOCKS,
-        user: { id: user.id },
-        KycStatus: KycStatus.VERIFIED,
-        label: FireblocksCwUserAddedEventHandler.ACCOUNT_LABEL,
-        metadata: this.cleanMetadata({
-          name: wallet.vaultAccount.name ?? vaultName,
-          customerRefId,
-          assetId: wallet.vaultAsset.id,
-          address: wallet.depositAddress.address,
-          tag: wallet.depositAddress.tag,
-          socialId: user.socialId ?? payload.socialId ?? undefined,
-          email: user.email ?? payload.email,
-        }),
-        status: AccountStatus.ACTIVE,
-      });
-
-      this.logger.debug(
-        `[trace=${eventId}] Persisting wallet for asset=${wallet.vaultAsset.id} address=${wallet.depositAddress.address}`,
-      );
-      // Save wallet record with deposit address for the ensured asset.
-      await this.fireblocksCwWalletsService.create({
-        account,
-        assets: [
-          {
-            id: wallet.vaultAsset.assetId ?? wallet.vaultAsset.id,
-            status: FireblocksCwUserAddedEventHandler.DEFAULT_WALLET_STATUS,
-            address: wallet.depositAddress.address,
-          },
-        ],
-        vaultType: FireblocksCwUserAddedEventHandler.WALLET_VAULT_TYPE,
-        autoFuel: wallet.vaultAccount.autoFuel ?? false,
-        hiddenOnUI: wallet.vaultAccount.hiddenOnUI ?? true,
-        name: wallet.vaultAccount.name ?? vaultName,
-        customerRefId,
+      // Ensure local wallet record exists for the ensured asset/address.
+      await this.fireblocksCwWalletsService.upsertByAccountId({
+        accountId: account.id,
+        assetId:
+          ensuredWallet.wallet.vaultAsset.assetId ??
+          ensuredWallet.wallet.vaultAsset.id,
+        address: ensuredWallet.wallet.depositAddress.address,
       });
 
       this.logger.log(
@@ -148,21 +218,6 @@ export class FireblocksCwUserAddedEventHandler extends InternalEventHandlerBase 
       );
       this.failed(event, eventId, error);
     }
-  }
-
-  private cleanMetadata(
-    metadata: Record<string, string | number | null | undefined>,
-  ): Record<string, string | number> | undefined {
-    const cleaned = Object.fromEntries(
-      Object.entries(metadata).filter(
-        ([, value]) =>
-          value !== undefined &&
-          value !== null &&
-          !(typeof value === 'string' && value.trim().length === 0),
-      ),
-    ) as Record<string, string | number>;
-
-    return Object.keys(cleaned).length ? cleaned : undefined;
   }
 }
 

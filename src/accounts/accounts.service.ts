@@ -34,27 +34,35 @@ export class AccountsService {
     private readonly accountRepository: AccountRepository,
   ) {}
 
-  async upsertByProviderAccountId(payload: {
-    providerAccountId: Account['providerAccountId'];
+  async upsertByAccountId(payload: {
+    accountId: Account['accountId'];
     providerName: AccountProviderName;
     user: { id: User['id'] };
     KycStatus?: KycStatus;
     label?: Account['label'];
-    metadata?: Account['metadata'];
     status?: AccountStatus;
+    customerRefId?: Account['customerRefId'];
+    name?: Account['name'];
   }): Promise<AccountDto> {
-    const existing = await this.accountRepository.findByProviderAccountId(
-      payload.providerAccountId,
+    const existing = await this.accountRepository.findByAccountId(
+      payload.accountId,
     );
 
     if (existing) {
+      this.ensureFireblocksRequiredFields({
+        providerName: payload.providerName ?? existing.providerName,
+        customerRefId: payload.customerRefId ?? existing.customerRefId,
+        name: payload.name ?? existing.name,
+      });
+
       const updated = await this.update(existing.id, {
         KycStatus: payload.KycStatus ?? existing.KycStatus,
         label: payload.label ?? existing.label,
-        metadata: payload.metadata ?? existing.metadata,
         status: payload.status ?? existing.status,
-        providerAccountId: payload.providerAccountId,
+        accountId: payload.accountId,
         providerName: payload.providerName ?? existing.providerName,
+        customerRefId: payload.customerRefId ?? existing.customerRefId,
+        name: payload.name ?? existing.name,
         user:
           payload.user ??
           (existing.user?.id ? { id: existing.user.id } : undefined),
@@ -72,20 +80,32 @@ export class AccountsService {
       return updated;
     }
 
+    this.ensureFireblocksRequiredFields({
+      providerName: payload.providerName,
+      customerRefId: payload.customerRefId,
+      name: payload.name,
+    });
+
     return this.create({
       user: payload.user,
       KycStatus: payload.KycStatus,
       label: payload.label,
-      metadata: payload.metadata,
       status: payload.status,
-      providerAccountId: payload.providerAccountId,
+      accountId: payload.accountId,
       providerName: payload.providerName,
+      customerRefId: payload.customerRefId,
+      name: payload.name,
     });
   }
 
   async create(createAccountDto: CreateAccountDto): Promise<AccountDto> {
     // Do not remove comment below.
     // <creating-property />
+    this.ensureFireblocksRequiredFields({
+      providerName: createAccountDto.providerName,
+      customerRefId: createAccountDto.customerRefId,
+      name: createAccountDto.name,
+    });
 
     const userObject = await this.userService.findById(
       createAccountDto.user.id,
@@ -103,15 +123,17 @@ export class AccountsService {
     const account = await this.accountRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
+      customerRefId: createAccountDto.customerRefId ?? null,
+
+      name: createAccountDto.name ?? null,
+
       KycStatus: createAccountDto.KycStatus ?? KycStatus.PENDING,
 
       label: createAccountDto.label,
 
-      metadata: createAccountDto.metadata,
-
       status: createAccountDto.status ?? AccountStatus.ACTIVE,
 
-      providerAccountId: createAccountDto.providerAccountId,
+      accountId: createAccountDto.accountId,
 
       providerName: createAccountDto.providerName,
 
@@ -153,17 +175,27 @@ export class AccountsService {
       });
     }
 
+    createAccountDtos.forEach((dto) =>
+      this.ensureFireblocksRequiredFields({
+        providerName: dto.providerName,
+        customerRefId: dto.customerRefId,
+        name: dto.name,
+      }),
+    );
+
     const accounts = await this.accountRepository.createMany(
       createAccountDtos.map((dto) => ({
+        customerRefId: dto.customerRefId ?? null,
+
+        name: dto.name ?? null,
+
         KycStatus: dto.KycStatus ?? KycStatus.PENDING,
 
         label: dto.label,
 
-        metadata: dto.metadata,
-
         status: dto.status ?? AccountStatus.ACTIVE,
 
-        providerAccountId: dto.providerAccountId,
+        accountId: dto.accountId,
 
         providerName: dto.providerName,
 
@@ -251,14 +283,14 @@ export class AccountsService {
     userId?: User['id'],
     label?: Account['label'],
     status?: Account['status'],
-    providerAccountId?: Account['providerAccountId'],
+    accountId?: Account['accountId'],
     roles: RoleEnum[] = [RoleEnum.admin],
   ): Promise<AccountDto[]> {
     const accounts = await this.accountRepository.filter(
       userId,
       label,
       status,
-      providerAccountId,
+      accountId,
     );
     return GroupPlainToInstances(AccountDto, accounts, roles);
   }
@@ -285,11 +317,10 @@ export class AccountsService {
   }
 
   async findByAccountId(
-    providerAccountId: Account['providerAccountId'],
+    accountId: Account['accountId'],
     roles: RoleEnum[] = [RoleEnum.admin],
   ): Promise<NullableType<AccountDto>> {
-    const account =
-      await this.accountRepository.findByProviderAccountId(providerAccountId);
+    const account = await this.accountRepository.findByAccountId(accountId);
     return account ? GroupPlainToInstance(AccountDto, account, roles) : null;
   }
 
@@ -298,6 +329,15 @@ export class AccountsService {
     roles: RoleEnum[] = [RoleEnum.admin],
   ): Promise<AccountDto[]> {
     const accounts = await this.accountRepository.findByUserSocialId(socialId);
+    return GroupPlainToInstances(AccountDto, accounts, roles);
+  }
+
+  async findByProviderName(
+    providerName: Account['providerName'],
+    roles: RoleEnum[] = [RoleEnum.admin],
+  ): Promise<AccountDto[]> {
+    const accounts =
+      await this.accountRepository.findByProviderName(providerName);
     return GroupPlainToInstances(AccountDto, accounts, roles);
   }
 
@@ -340,6 +380,16 @@ export class AccountsService {
     // Do not remove comment below.
     // <updating-property />
 
+    const existing = await this.accountRepository.findById(id);
+    if (!existing) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: {
+          account: 'notExists',
+        },
+      });
+    }
+
     let user: User | undefined = undefined;
 
     if (updateAccountDto.user) {
@@ -357,22 +407,46 @@ export class AccountsService {
       user = userObject;
     }
 
+    const payload: Partial<Account> = {};
+    if (typeof updateAccountDto.customerRefId !== 'undefined') {
+      payload.customerRefId = updateAccountDto.customerRefId;
+    }
+    if (typeof updateAccountDto.name !== 'undefined') {
+      payload.name = updateAccountDto.name;
+    }
+    if (typeof updateAccountDto.KycStatus !== 'undefined') {
+      payload.KycStatus = updateAccountDto.KycStatus;
+    }
+    if (typeof updateAccountDto.label !== 'undefined') {
+      payload.label = updateAccountDto.label;
+    }
+    if (typeof updateAccountDto.status !== 'undefined') {
+      payload.status = updateAccountDto.status;
+    }
+    if (typeof updateAccountDto.accountId !== 'undefined') {
+      payload.accountId = updateAccountDto.accountId;
+    }
+    if (typeof updateAccountDto.providerName !== 'undefined') {
+      payload.providerName = updateAccountDto.providerName;
+    }
+    if (user) {
+      payload.user = user;
+    }
+
+    const nextProviderName = payload.providerName ?? existing.providerName;
+    const nextCustomerRefId = payload.customerRefId ?? existing.customerRefId;
+    const nextName = payload.name ?? existing.name;
+
+    this.ensureFireblocksRequiredFields({
+      providerName: nextProviderName,
+      customerRefId: nextCustomerRefId,
+      name: nextName,
+    });
+
     const account = await this.accountRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
-      KycStatus: updateAccountDto.KycStatus,
-
-      label: updateAccountDto.label,
-
-      metadata: updateAccountDto.metadata,
-
-      status: updateAccountDto.status,
-
-      providerAccountId: updateAccountDto.providerAccountId,
-
-      providerName: updateAccountDto.providerName,
-
-      user,
+      ...payload,
     });
 
     return account
@@ -382,5 +456,34 @@ export class AccountsService {
 
   remove(id: Account['id']) {
     return this.accountRepository.remove(id);
+  }
+
+  private ensureFireblocksRequiredFields(params: {
+    providerName?: AccountProviderName;
+    customerRefId?: Account['customerRefId'];
+    name?: Account['name'];
+  }) {
+    if (params.providerName !== AccountProviderName.FIREBLOCKS) {
+      return;
+    }
+
+    const hasCustomerRefId =
+      typeof params.customerRefId === 'string'
+        ? params.customerRefId.trim().length > 0
+        : !!params.customerRefId;
+    const hasName =
+      typeof params.name === 'string'
+        ? params.name.trim().length > 0
+        : !!params.name;
+
+    if (!hasCustomerRefId || !hasName) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: {
+          customerRefId: hasCustomerRefId ? undefined : 'requiredForFireblocks',
+          name: hasName ? undefined : 'requiredForFireblocks',
+        },
+      });
+    }
   }
 }

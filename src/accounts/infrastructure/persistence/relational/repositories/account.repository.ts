@@ -108,21 +108,31 @@ export class AccountRelationalRepository implements AccountRepository {
     return entity ? AccountMapper.toDomain(entity) : null;
   }
 
-  async findByProviderAccountId(
-    providerAccountId: Account['providerAccountId'],
+  async findByAccountId(
+    accountId: Account['accountId'],
   ): Promise<NullableType<Account>> {
     const entity = await this.accountRepository.findOne({
-      where: { providerAccountId },
+      where: { accountId },
     });
 
     return entity ? AccountMapper.toDomain(entity) : null;
+  }
+
+  async findByProviderName(
+    providerName: Account['providerName'],
+  ): Promise<Account[]> {
+    const entities = await this.accountRepository.find({
+      where: { providerName },
+    });
+
+    return entities.map((entity) => AccountMapper.toDomain(entity));
   }
 
   async filter(
     userId?: User['id'],
     label?: Account['label'],
     status?: Account['status'],
-    providerAccountId?: Account['providerAccountId'],
+    accountId?: Account['accountId'],
   ): Promise<Account[]> {
     const whereClause: any = {};
 
@@ -135,8 +145,8 @@ export class AccountRelationalRepository implements AccountRepository {
     if (typeof status !== 'undefined') {
       whereClause.status = status;
     }
-    if (typeof providerAccountId !== 'undefined') {
-      whereClause.providerAccountId = providerAccountId;
+    if (typeof accountId !== 'undefined') {
+      whereClause.accountId = accountId;
     }
 
     const entities = await this.accountRepository.find({

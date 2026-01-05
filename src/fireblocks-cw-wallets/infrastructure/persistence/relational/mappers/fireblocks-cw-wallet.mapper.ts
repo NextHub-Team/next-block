@@ -10,17 +10,8 @@ export class FireblocksCwWalletMapper {
       domainEntity.account = AccountMapper.toDomain(raw.account);
     }
 
-    domainEntity.assets = raw.assets;
-
-    domainEntity.vaultType = raw.vaultType;
-
-    domainEntity.autoFuel = raw.autoFuel;
-
-    domainEntity.hiddenOnUI = raw.hiddenOnUI;
-
-    domainEntity.name = raw.name;
-
-    domainEntity.customerRefId = raw.customerRefId;
+    domainEntity.assetId = raw.assetId;
+    domainEntity.address = raw.address;
 
     domainEntity.id = raw.id;
     domainEntity.createdAt = raw.createdAt;
@@ -39,17 +30,8 @@ export class FireblocksCwWalletMapper {
       );
     }
 
-    persistenceEntity.assets = domainEntity.assets;
-
-    persistenceEntity.vaultType = domainEntity.vaultType;
-
-    persistenceEntity.autoFuel = domainEntity.autoFuel;
-
-    persistenceEntity.hiddenOnUI = domainEntity.hiddenOnUI;
-
-    persistenceEntity.name = domainEntity.name;
-
-    persistenceEntity.customerRefId = domainEntity.customerRefId;
+    persistenceEntity.assetId = domainEntity.assetId;
+    persistenceEntity.address = domainEntity.address;
 
     if (domainEntity.id) {
       persistenceEntity.id = domainEntity.id;

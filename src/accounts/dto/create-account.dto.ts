@@ -1,6 +1,6 @@
 import { UserDto } from '../../users/dto/user.dto';
-import { JsonObject } from '../../utils/types/object.type';
 import { getEnumErrorMessage } from '../../utils/helpers/enum.helper';
+
 import { Type } from 'class-transformer';
 
 import {
@@ -9,7 +9,6 @@ import {
   IsString,
   IsOptional,
   IsEnum,
-  IsObject,
   MaxLength,
 } from 'class-validator';
 
@@ -43,15 +42,6 @@ export class BaseAccountPayloadDto {
   label?: string | null;
 
   @ApiPropertyOptional({
-    description: 'Arbitrary metadata that describes the account',
-    type: () => Object,
-    example: { tier: 'gold', region: 'US' },
-  })
-  @IsOptional()
-  @IsObject()
-  metadata?: JsonObject | null;
-
-  @ApiPropertyOptional({
     description: 'Operational status of the account',
     enum: AccountStatus,
     default: AccountStatus.ACTIVE,
@@ -69,7 +59,7 @@ export class BaseAccountPayloadDto {
   })
   @IsString()
   @MaxLength(255)
-  providerAccountId: string;
+  accountId: string;
 
   @ApiProperty({
     description: 'Provider that manages the account',
@@ -84,6 +74,22 @@ export class BaseAccountPayloadDto {
 export class CreateAccountUserDto extends BaseAccountPayloadDto {}
 
 export class CreateAccountDto extends BaseAccountPayloadDto {
+  @ApiPropertyOptional({
+    required: false,
+    type: () => String,
+  })
+  @IsOptional()
+  @IsString()
+  customerRefId?: string | null;
+
+  @ApiPropertyOptional({
+    required: false,
+    type: () => String,
+  })
+  @IsOptional()
+  @IsString()
+  name?: string | null;
+
   @ApiProperty({
     description: 'User that will own the account',
     type: () => UserDto,

@@ -29,7 +29,7 @@ export class FilterAccountsDto {
   })
   @IsOptional()
   @IsString()
-  providerAccountId?: string;
+  accountId?: string;
 }
 
 export class FilterAccountsAdminDto extends FilterAccountsDto {

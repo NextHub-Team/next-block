@@ -60,9 +60,20 @@ export class FireblocksCwWalletRelationalRepository
 
   async findByAccountId(
     accountId: FireblocksCwWallet['account']['id'],
-  ): Promise<NullableType<FireblocksCwWallet>> {
-    const entity = await this.fireblocksCwWalletRepository.findOne({
+  ): Promise<FireblocksCwWallet[]> {
+    const entities = await this.fireblocksCwWalletRepository.find({
       where: { account: { id: accountId } },
+    });
+
+    return entities.map((entity) => FireblocksCwWalletMapper.toDomain(entity));
+  }
+
+  async findByAccountIdAndAssetId(params: {
+    accountId: FireblocksCwWallet['account']['id'];
+    assetId: FireblocksCwWallet['assetId'];
+  }): Promise<NullableType<FireblocksCwWallet>> {
+    const entity = await this.fireblocksCwWalletRepository.findOne({
+      where: { account: { id: params.accountId }, assetId: params.assetId },
     });
 
     return entity ? FireblocksCwWalletMapper.toDomain(entity) : null;

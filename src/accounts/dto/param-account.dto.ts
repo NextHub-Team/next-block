@@ -32,14 +32,14 @@ export class AccountSocialIdParamDto {
   socialId: string;
 }
 
-export class AccountProviderAccountIdParamDto {
+export class AccountAccountIdParamDto {
   @ApiProperty({
     description: 'Provider account identifier used to reference the account',
     type: String,
     example: 'acct_1234567890',
   })
   @IsString()
-  providerAccountId: string;
+  accountId: string;
 }
 
 export class AccountProviderNameParamDto {

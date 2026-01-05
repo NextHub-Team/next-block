@@ -54,6 +54,39 @@ export class APIDocs {
       border-color: #f43f5e !important; /* Red for DELETE */
     }
 
+    /* Disabled endpoints (Deprecated marker) */
+    .swagger-ui .opblock.deprecated,
+    .swagger-ui .opblock.is-deprecated,
+    .swagger-ui .opblock.opblock-deprecated {
+      border-color: #9ca3af !important;
+      background: #f3f4f6 !important;
+    }
+    .swagger-ui .opblock.deprecated .opblock-summary,
+    .swagger-ui .opblock.is-deprecated .opblock-summary,
+    .swagger-ui .opblock.opblock-deprecated .opblock-summary {
+      border-color: #9ca3af !important;
+      background: #e5e7eb !important;
+    }
+    .swagger-ui .opblock.deprecated .opblock-summary-method,
+    .swagger-ui .opblock.is-deprecated .opblock-summary-method,
+    .swagger-ui .opblock.opblock-deprecated .opblock-summary-method {
+      background-color: #6b7280 !important;
+      color: #f9fafb !important;
+    }
+    .swagger-ui .opblock.deprecated .opblock-summary-path,
+    .swagger-ui .opblock.is-deprecated .opblock-summary-path,
+    .swagger-ui .opblock.opblock-deprecated .opblock-summary-path,
+    .swagger-ui .opblock.deprecated .opblock-summary-description,
+    .swagger-ui .opblock.is-deprecated .opblock-summary-description,
+    .swagger-ui .opblock.opblock-deprecated .opblock-summary-description {
+      color: #4b5563 !important;
+    }
+    .swagger-ui .opblock.deprecated .opblock-summary-control:after,
+    .swagger-ui .opblock.is-deprecated .opblock-summary-control:after,
+    .swagger-ui .opblock.opblock-deprecated .opblock-summary-control:after {
+      color: #4b5563 !important;
+    }
+
     /* Hide Swagger Top Bar */
     .swagger-ui .topbar {
       display: none !important;
