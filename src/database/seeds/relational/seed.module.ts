@@ -10,8 +10,11 @@ import { UserSeedModule } from './user/user-seed.module';
 import databaseConfig from '../../config/database.config';
 import appConfig from '../../../config/app.config';
 
+import { AssetRegistrySeedModule } from './asset-registry/asset-registry-seed.module';
+
 @Module({
   imports: [
+    AssetRegistrySeedModule,
     RoleSeedModule,
     StatusSeedModule,
     UserSeedModule,

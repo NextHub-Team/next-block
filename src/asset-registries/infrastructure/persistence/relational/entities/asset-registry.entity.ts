@@ -6,26 +6,29 @@ import {
   Column,
 } from 'typeorm';
 import { EntityRelationalHelper } from '../../../../../utils/relational-entity-helper';
-import { SleevesEnvType } from 'src/sleeves/types/sleeves-enum.type';
+import { AssetRegistryProviderName } from '../../../../types/asset-registry-enum.type';
 
 @Entity({
-  name: 'sleeves',
+  name: 'asset_registry',
 })
-export class SleevesEntity extends EntityRelationalHelper {
+export class AssetRegistryEntity extends EntityRelationalHelper {
   @Column({
-    nullable: false,
-    type: 'enum',
-    enum: SleevesEnvType,
-    enumName: 'sleeves_env_type_enum',
-    default: SleevesEnvType.Testnet,
+    nullable: true,
+    type: String,
   })
-  envType: SleevesEnvType;
+  description?: string | null;
 
   @Column({
     nullable: true,
     type: String,
   })
-  tag?: string | null;
+  providerName?: AssetRegistryProviderName | null;
+
+  @Column({
+    nullable: true,
+    type: String,
+  })
+  envType?: string | null;
 
   @Column({
     nullable: false,
@@ -37,19 +40,7 @@ export class SleevesEntity extends EntityRelationalHelper {
     nullable: false,
     type: String,
   })
-  name: string;
-
-  @Column({
-    nullable: false,
-    type: String,
-  })
-  contractAddress: string;
-
-  @Column({
-    nullable: false,
-    type: String,
-  })
-  sleeveId: string;
+  assetId: string;
 
   @PrimaryGeneratedColumn('uuid')
   id: string;

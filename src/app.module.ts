@@ -61,13 +61,14 @@ import { QueueDashModule } from './common/queuedash/queuedash.module';
 
 import { InternalEventsModule as InternalEventsFeatureModule } from './internal-events/internal-events.module';
 import { InternalEventsModule as InternalEventsCoreModule } from './common/internal-events/internal-events.module';
-
 import { SleevesTransactionsModule } from './sleeves-transactions/sleeves-transactions.module';
-
 import { SleevesModule } from './sleeves/sleeves.module';
+import { AssetRegistriesModule } from './asset-registries/asset-registries.module';
 
 @Module({
   imports: [
+    AssetRegistriesModule,
+    AssetRegistriesModule,
     SleevesModule,
     SleevesTransactionsModule,
     InternalEventsCoreModule.forRootAsync(),
