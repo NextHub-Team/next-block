@@ -1,18 +1,28 @@
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { AssetRegistryDto } from '../../asset-registries/dto/asset-registry.dto';
+
+import {
+  IsNotEmptyObject,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 
 import {
   // decorators here
   ApiProperty,
 } from '@nestjs/swagger';
-import { SleevesEnvType } from '../types/sleeves-enum.type';
+
+import { Type } from 'class-transformer';
 
 export class CreateSleevesDto {
   @ApiProperty({
     required: true,
-    enum: SleevesEnvType,
+    type: () => AssetRegistryDto,
   })
-  @IsEnum(SleevesEnvType)
-  envType: SleevesEnvType;
+  @ValidateNested()
+  @Type(() => AssetRegistryDto)
+  @IsNotEmptyObject()
+  asset: AssetRegistryDto;
 
   @ApiProperty({
     required: false,
@@ -27,21 +37,7 @@ export class CreateSleevesDto {
     type: () => String,
   })
   @IsString()
-  chainName: string;
-
-  @ApiProperty({
-    required: true,
-    type: () => String,
-  })
-  @IsString()
   name: string;
-
-  @ApiProperty({
-    required: true,
-    type: () => String,
-  })
-  @IsString()
-  contractAddress: string;
 
   @ApiProperty({
     required: true,

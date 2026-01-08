@@ -1,19 +1,18 @@
-import { SleevesEnvType } from 'src/sleeves/types/sleeves-enum.type';
+import { AssetRegistryMapper } from '../../../../../asset-registries/infrastructure/persistence/relational/mappers/asset-registry.mapper';
+
 import { Sleeves } from '../../../../domain/sleeves';
 import { SleevesEntity } from '../entities/sleeves.entity';
 
 export class SleevesMapper {
   static toDomain(raw: SleevesEntity): Sleeves {
     const domainEntity = new Sleeves();
-    domainEntity.envType = raw.envType as SleevesEnvType;
+    if (raw.asset) {
+      domainEntity.asset = AssetRegistryMapper.toDomain(raw.asset);
+    }
 
     domainEntity.tag = raw.tag;
 
-    domainEntity.chainName = raw.chainName;
-
     domainEntity.name = raw.name;
-
-    domainEntity.contractAddress = raw.contractAddress;
 
     domainEntity.sleeveId = raw.sleeveId;
 
@@ -26,15 +25,15 @@ export class SleevesMapper {
 
   static toPersistence(domainEntity: Sleeves): SleevesEntity {
     const persistenceEntity = new SleevesEntity();
-    persistenceEntity.envType = domainEntity.envType;
+    if (domainEntity.asset) {
+      persistenceEntity.asset = AssetRegistryMapper.toPersistence(
+        domainEntity.asset,
+      );
+    }
 
     persistenceEntity.tag = domainEntity.tag;
 
-    persistenceEntity.chainName = domainEntity.chainName;
-
     persistenceEntity.name = domainEntity.name;
-
-    persistenceEntity.contractAddress = domainEntity.contractAddress;
 
     persistenceEntity.sleeveId = domainEntity.sleeveId;
 

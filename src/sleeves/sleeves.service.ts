@@ -1,6 +1,11 @@
+import { AssetRegistriesService } from '../asset-registries/asset-registries.service';
+import { AssetRegistry } from '../asset-registries/domain/asset-registry';
+
 import {
   // common
   Injectable,
+  HttpStatus,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { CreateSleevesDto } from './dto/create-sleeves.dto';
 import { UpdateSleevesDto } from './dto/update-sleeves.dto';
@@ -11,6 +16,8 @@ import { Sleeves } from './domain/sleeves';
 @Injectable()
 export class SleevesService {
   constructor(
+    private readonly assetRegistryService: AssetRegistriesService,
+
     // Dependencies here
     private readonly sleevesRepository: SleevesRepository,
   ) {}
@@ -18,19 +25,27 @@ export class SleevesService {
   async create(createSleevesDto: CreateSleevesDto) {
     // Do not remove comment below.
     // <creating-property />
+    const assetObject = await this.assetRegistryService.findById(
+      createSleevesDto.asset.id,
+    );
+    if (!assetObject) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: {
+          asset: 'notExists',
+        },
+      });
+    }
+    const asset = assetObject;
 
     return this.sleevesRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
-      envType: createSleevesDto.envType,
+      asset,
 
       tag: createSleevesDto.tag,
 
-      chainName: createSleevesDto.chainName,
-
       name: createSleevesDto.name,
-
-      contractAddress: createSleevesDto.contractAddress,
 
       sleeveId: createSleevesDto.sleeveId,
     });
@@ -64,19 +79,31 @@ export class SleevesService {
   ) {
     // Do not remove comment below.
     // <updating-property />
+    let asset: AssetRegistry | undefined = undefined;
+
+    if (updateSleevesDto.asset) {
+      const assetObject = await this.assetRegistryService.findById(
+        updateSleevesDto.asset.id,
+      );
+      if (!assetObject) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: {
+            asset: 'notExists',
+          },
+        });
+      }
+      asset = assetObject;
+    }
 
     return this.sleevesRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
-      envType: updateSleevesDto.envType,
+      asset,
 
       tag: updateSleevesDto.tag,
 
-      chainName: updateSleevesDto.chainName,
-
       name: updateSleevesDto.name,
-
-      contractAddress: updateSleevesDto.contractAddress,
 
       sleeveId: updateSleevesDto.sleeveId,
     });

@@ -1,25 +1,21 @@
+import { AssetRegistryEntity } from '../../../../../asset-registries/infrastructure/persistence/relational/entities/asset-registry.entity';
+
 import {
   CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   Column,
+  ManyToOne,
 } from 'typeorm';
 import { EntityRelationalHelper } from '../../../../../utils/relational-entity-helper';
-import { SleevesEnvType } from 'src/sleeves/types/sleeves-enum.type';
 
 @Entity({
   name: 'sleeves',
 })
 export class SleevesEntity extends EntityRelationalHelper {
-  @Column({
-    nullable: false,
-    type: 'enum',
-    enum: SleevesEnvType,
-    enumName: 'sleeves_env_type_enum',
-    default: SleevesEnvType.Testnet,
-  })
-  envType: SleevesEnvType;
+  @ManyToOne(() => AssetRegistryEntity, { eager: true, nullable: false })
+  asset: AssetRegistryEntity;
 
   @Column({
     nullable: true,
@@ -31,19 +27,7 @@ export class SleevesEntity extends EntityRelationalHelper {
     nullable: false,
     type: String,
   })
-  chainName: string;
-
-  @Column({
-    nullable: false,
-    type: String,
-  })
   name: string;
-
-  @Column({
-    nullable: false,
-    type: String,
-  })
-  contractAddress: string;
 
   @Column({
     nullable: false,

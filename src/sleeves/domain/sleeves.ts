@@ -1,12 +1,12 @@
+import { AssetRegistry } from '../../asset-registries/domain/asset-registry';
 import { ApiProperty } from '@nestjs/swagger';
-import { SleevesEnvType } from '../types/sleeves-enum.type';
 
 export class Sleeves {
   @ApiProperty({
-    enum: SleevesEnvType,
+    type: () => AssetRegistry,
     nullable: false,
   })
-  envType: SleevesEnvType;
+  asset: AssetRegistry;
 
   @ApiProperty({
     type: () => String,
@@ -18,19 +18,7 @@ export class Sleeves {
     type: () => String,
     nullable: false,
   })
-  chainName: string;
-
-  @ApiProperty({
-    type: () => String,
-    nullable: false,
-  })
   name: string;
-
-  @ApiProperty({
-    type: () => String,
-    nullable: false,
-  })
-  contractAddress: string;
 
   @ApiProperty({
     type: () => String,

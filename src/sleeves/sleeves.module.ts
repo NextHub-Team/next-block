@@ -1,3 +1,4 @@
+import { AssetRegistriesModule } from '../asset-registries/asset-registries.module';
 import {
   // do not remove this comment
   Module,
@@ -8,6 +9,8 @@ import { RelationalSleevesPersistenceModule } from './infrastructure/persistence
 
 @Module({
   imports: [
+    AssetRegistriesModule,
+
     // do not remove this comment
     RelationalSleevesPersistenceModule,
   ],
