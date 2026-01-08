@@ -17,6 +17,20 @@ import { Type } from 'class-transformer';
 export class CreateSleevesDto {
   @ApiProperty({
     required: true,
+    type: () => String,
+  })
+  @IsString()
+  ContractName: string;
+
+  @ApiProperty({
+    required: true,
+    type: () => String,
+  })
+  @IsString()
+  contractAddress: string;
+
+  @ApiProperty({
+    required: true,
     type: () => AssetRegistryDto,
   })
   @ValidateNested()

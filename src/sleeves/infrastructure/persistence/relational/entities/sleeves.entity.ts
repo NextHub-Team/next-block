@@ -14,6 +14,18 @@ import { EntityRelationalHelper } from '../../../../../utils/relational-entity-h
   name: 'sleeves',
 })
 export class SleevesEntity extends EntityRelationalHelper {
+  @Column({
+    nullable: false,
+    type: String,
+  })
+  ContractName: string;
+
+  @Column({
+    nullable: false,
+    type: String,
+  })
+  contractAddress: string;
+
   @ManyToOne(() => AssetRegistryEntity, { eager: true, nullable: false })
   asset: AssetRegistryEntity;
 

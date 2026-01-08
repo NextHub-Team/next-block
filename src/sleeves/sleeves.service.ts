@@ -25,6 +25,7 @@ export class SleevesService {
   async create(createSleevesDto: CreateSleevesDto) {
     // Do not remove comment below.
     // <creating-property />
+
     const assetObject = await this.assetRegistryService.findById(
       createSleevesDto.asset.id,
     );
@@ -41,6 +42,10 @@ export class SleevesService {
     return this.sleevesRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
+      ContractName: createSleevesDto.ContractName,
+
+      contractAddress: createSleevesDto.contractAddress,
+
       asset,
 
       tag: createSleevesDto.tag,
@@ -79,6 +84,7 @@ export class SleevesService {
   ) {
     // Do not remove comment below.
     // <updating-property />
+
     let asset: AssetRegistry | undefined = undefined;
 
     if (updateSleevesDto.asset) {
@@ -99,6 +105,10 @@ export class SleevesService {
     return this.sleevesRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
+      ContractName: updateSleevesDto.ContractName,
+
+      contractAddress: updateSleevesDto.contractAddress,
+
       asset,
 
       tag: updateSleevesDto.tag,

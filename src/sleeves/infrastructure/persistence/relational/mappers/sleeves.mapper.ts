@@ -6,6 +6,10 @@ import { SleevesEntity } from '../entities/sleeves.entity';
 export class SleevesMapper {
   static toDomain(raw: SleevesEntity): Sleeves {
     const domainEntity = new Sleeves();
+    domainEntity.ContractName = raw.ContractName;
+
+    domainEntity.contractAddress = raw.contractAddress;
+
     if (raw.asset) {
       domainEntity.asset = AssetRegistryMapper.toDomain(raw.asset);
     }
@@ -25,6 +29,10 @@ export class SleevesMapper {
 
   static toPersistence(domainEntity: Sleeves): SleevesEntity {
     const persistenceEntity = new SleevesEntity();
+    persistenceEntity.ContractName = domainEntity.ContractName;
+
+    persistenceEntity.contractAddress = domainEntity.contractAddress;
+
     if (domainEntity.asset) {
       persistenceEntity.asset = AssetRegistryMapper.toPersistence(
         domainEntity.asset,

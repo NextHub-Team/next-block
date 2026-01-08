@@ -1,3 +1,5 @@
+import { FireblocksCwWalletEntity } from '../../../../../fireblocks-cw-wallets/infrastructure/persistence/relational/entities/fireblocks-cw-wallet.entity';
+
 import { SleevesEntity } from '../../../../../sleeves/infrastructure/persistence/relational/entities/sleeves.entity';
 
 import {
@@ -18,6 +20,9 @@ import {
   name: 'sleeves_transaction',
 })
 export class SleevesTransactionEntity extends EntityRelationalHelper {
+  @ManyToOne(() => FireblocksCwWalletEntity, { eager: true, nullable: false })
+  wallet: FireblocksCwWalletEntity;
+
   @Column({
     nullable: false,
     type: 'enum',

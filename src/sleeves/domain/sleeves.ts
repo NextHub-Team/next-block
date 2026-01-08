@@ -3,6 +3,18 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class Sleeves {
   @ApiProperty({
+    type: () => String,
+    nullable: false,
+  })
+  ContractName: string;
+
+  @ApiProperty({
+    type: () => String,
+    nullable: false,
+  })
+  contractAddress: string;
+
+  @ApiProperty({
     type: () => AssetRegistry,
     nullable: false,
   })
