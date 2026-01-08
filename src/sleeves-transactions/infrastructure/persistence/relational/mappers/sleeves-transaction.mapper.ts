@@ -1,4 +1,6 @@
 import { SleevesTransaction } from '../../../../domain/sleeves-transaction';
+import { FireblocksCwWalletMapper } from '../../../../../fireblocks-cw-wallets/infrastructure/persistence/relational/mappers/fireblocks-cw-wallet.mapper';
+
 import { SleevesMapper } from '../../../../../sleeves/infrastructure/persistence/relational/mappers/sleeves.mapper';
 
 import { SleevesTransactionEntity } from '../entities/sleeves-transaction.entity';
@@ -10,6 +12,9 @@ import {
 export class SleevesTransactionMapper {
   static toDomain(raw: SleevesTransactionEntity): SleevesTransaction {
     const domainEntity = new SleevesTransaction();
+    if (raw.wallet) {
+      domainEntity.wallet = FireblocksCwWalletMapper.toDomain(raw.wallet);
+    }
 
     domainEntity.type = raw.type ?? SleevesTransactionType.TRANSFER_IN;
 
@@ -37,6 +42,11 @@ export class SleevesTransactionMapper {
     domainEntity: SleevesTransaction,
   ): SleevesTransactionEntity {
     const persistenceEntity = new SleevesTransactionEntity();
+    if (domainEntity.wallet) {
+      persistenceEntity.wallet = FireblocksCwWalletMapper.toPersistence(
+        domainEntity.wallet,
+      );
+    }
 
     persistenceEntity.type =
       domainEntity.type ?? SleevesTransactionType.TRANSFER_IN;

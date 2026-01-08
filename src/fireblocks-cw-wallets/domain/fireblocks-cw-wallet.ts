@@ -1,7 +1,14 @@
+import { SleevesTransaction } from '../../sleeves-transactions/domain/sleeves-transaction';
 import { Account } from '../../accounts/domain/account';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class FireblocksCwWallet {
+  @ApiProperty({
+    type: () => [SleevesTransaction],
+    nullable: true,
+  })
+  SleevesTransactions?: SleevesTransaction[] | null;
+
   @ApiProperty({
     type: () => Account,
     nullable: false,

@@ -1,7 +1,9 @@
+import { SleevesTransactionsModule } from '../sleeves-transactions/sleeves-transactions.module';
 import { AccountsModule } from '../accounts/accounts.module';
 import {
   // do not remove this comment
   Module,
+  forwardRef,
 } from '@nestjs/common';
 import { FireblocksCwWalletsService } from './fireblocks-cw-wallets.service';
 import { FireblocksCwWalletsController } from './fireblocks-cw-wallets.controller';
@@ -13,6 +15,8 @@ import { RelationalFireblocksCwWalletPersistenceModule } from './infrastructure/
 
 @Module({
   imports: [
+    forwardRef(() => SleevesTransactionsModule),
+
     AccountsModule,
 
     // do not remove this comment

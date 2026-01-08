@@ -1,3 +1,5 @@
+import { SleevesTransactionEntity } from '../../../../../sleeves-transactions/infrastructure/persistence/relational/entities/sleeves-transaction.entity';
+
 import { AccountEntity } from '../../../../../accounts/infrastructure/persistence/relational/entities/account.entity';
 
 import {
@@ -7,6 +9,7 @@ import {
   UpdateDateColumn,
   Column,
   ManyToOne,
+  OneToMany,
 } from 'typeorm';
 import { EntityRelationalHelper } from '../../../../../utils/relational-entity-helper';
 
@@ -14,6 +17,13 @@ import { EntityRelationalHelper } from '../../../../../utils/relational-entity-h
   name: 'fireblocks_cw_wallet',
 })
 export class FireblocksCwWalletEntity extends EntityRelationalHelper {
+  @OneToMany(
+    () => SleevesTransactionEntity,
+    (childEntity) => childEntity.wallet,
+    { eager: true, nullable: true },
+  )
+  SleevesTransactions?: SleevesTransactionEntity[] | null;
+
   @ManyToOne(() => AccountEntity, { eager: true, nullable: false })
   account: AccountEntity;
 

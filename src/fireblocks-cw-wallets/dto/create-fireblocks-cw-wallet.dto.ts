@@ -1,3 +1,5 @@
+import { SleevesTransactionDto } from '../../sleeves-transactions/dto/sleeves-transaction.dto';
+
 import { AccountDto } from '../../accounts/dto/account.dto';
 
 import {
@@ -15,6 +17,8 @@ import {
 import { Type } from 'class-transformer';
 
 export class CreateFireblocksCwWalletDto {
+  SleevesTransactions?: SleevesTransactionDto[] | null;
+
   @ApiProperty({
     required: true,
     type: () => AccountDto,

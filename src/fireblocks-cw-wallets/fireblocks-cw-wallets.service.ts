@@ -1,3 +1,6 @@
+import { SleevesTransactionsService } from '../sleeves-transactions/sleeves-transactions.service';
+import { SleevesTransaction } from '../sleeves-transactions/domain/sleeves-transaction';
+
 import { AccountsService } from '../accounts/accounts.service';
 import { Account } from '../accounts/domain/account';
 import {
@@ -5,6 +8,8 @@ import {
   Injectable,
   HttpStatus,
   UnprocessableEntityException,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { CreateFireblocksCwWalletDto } from './dto/create-fireblocks-cw-wallet.dto';
 import { UpdateFireblocksCwWalletDto } from './dto/update-fireblocks-cw-wallet.dto';
@@ -17,6 +22,9 @@ import { TypeMessage } from '../utils/types/message.type';
 @Injectable()
 export class FireblocksCwWalletsService {
   constructor(
+    @Inject(forwardRef(() => SleevesTransactionsService))
+    private readonly sleevesTransactionService: SleevesTransactionsService,
+
     private readonly accountService: AccountsService,
 
     // Dependencies here
@@ -26,6 +34,32 @@ export class FireblocksCwWalletsService {
   async create(createFireblocksCwWalletDto: CreateFireblocksCwWalletDto) {
     // Do not remove comment below.
     // <creating-property />
+    let SleevesTransactions: SleevesTransaction[] | null | undefined =
+      undefined;
+
+    if (createFireblocksCwWalletDto.SleevesTransactions) {
+      const SleevesTransactionsObjects =
+        await this.sleevesTransactionService.findByIds(
+          createFireblocksCwWalletDto.SleevesTransactions.map(
+            (entity) => entity.id,
+          ),
+        );
+      if (
+        SleevesTransactionsObjects.length !==
+        createFireblocksCwWalletDto.SleevesTransactions.length
+      ) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: {
+            SleevesTransactions: 'notExists',
+          },
+        });
+      }
+      SleevesTransactions = SleevesTransactionsObjects;
+    } else if (createFireblocksCwWalletDto.SleevesTransactions === null) {
+      SleevesTransactions = null;
+    }
+
     const account = await this.accountService.findByIdOrFail(
       createFireblocksCwWalletDto.account.id,
     );
@@ -33,6 +67,8 @@ export class FireblocksCwWalletsService {
     return this.fireblocksCwWalletRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
+      SleevesTransactions,
+
       account,
 
       assetId: createFireblocksCwWalletDto.assetId,
@@ -128,6 +164,32 @@ export class FireblocksCwWalletsService {
   ) {
     // Do not remove comment below.
     // <updating-property />
+    let SleevesTransactions: SleevesTransaction[] | null | undefined =
+      undefined;
+
+    if (updateFireblocksCwWalletDto.SleevesTransactions) {
+      const SleevesTransactionsObjects =
+        await this.sleevesTransactionService.findByIds(
+          updateFireblocksCwWalletDto.SleevesTransactions.map(
+            (entity) => entity.id,
+          ),
+        );
+      if (
+        SleevesTransactionsObjects.length !==
+        updateFireblocksCwWalletDto.SleevesTransactions.length
+      ) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: {
+            SleevesTransactions: 'notExists',
+          },
+        });
+      }
+      SleevesTransactions = SleevesTransactionsObjects;
+    } else if (updateFireblocksCwWalletDto.SleevesTransactions === null) {
+      SleevesTransactions = null;
+    }
+
     let account: Account | undefined = undefined;
 
     if (updateFireblocksCwWalletDto.account) {
@@ -139,6 +201,8 @@ export class FireblocksCwWalletsService {
     return this.fireblocksCwWalletRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
+      SleevesTransactions,
+
       account,
 
       assetId: updateFireblocksCwWalletDto.assetId,

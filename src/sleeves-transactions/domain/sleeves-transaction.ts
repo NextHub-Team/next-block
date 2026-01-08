@@ -1,3 +1,4 @@
+import { FireblocksCwWallet } from '../../fireblocks-cw-wallets/domain/fireblocks-cw-wallet';
 import { Sleeves } from '../../sleeves/domain/sleeves';
 import { ApiProperty } from '@nestjs/swagger';
 import {
@@ -6,6 +7,12 @@ import {
 } from '../types/sleeves-transaction-enum.type';
 
 export class SleevesTransaction {
+  @ApiProperty({
+    type: () => FireblocksCwWallet,
+    nullable: false,
+  })
+  wallet?: FireblocksCwWallet;
+
   @ApiProperty({
     enum: SleevesTransactionType,
     default: SleevesTransactionType.TRANSFER_IN,
