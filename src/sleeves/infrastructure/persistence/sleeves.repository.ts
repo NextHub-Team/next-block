@@ -18,10 +18,22 @@ export abstract class SleevesRepository {
 
   abstract findByIds(ids: Sleeves['id'][]): Promise<Sleeves[]>;
 
+  abstract findBySleeveId(
+    sleeveId: Sleeves['sleeveId'],
+  ): Promise<NullableType<Sleeves>>;
+
+  abstract findAllByAsset(asset: Sleeves['asset']): Promise<Sleeves[]>;
+
   abstract update(
     id: Sleeves['id'],
     payload: DeepPartial<Sleeves>,
   ): Promise<Sleeves | null>;
 
   abstract remove(id: Sleeves['id']): Promise<void>;
+
+  abstract filter(
+    contractName?: Sleeves['contractName'],
+    tag?: Sleeves['tag'],
+    name?: Sleeves['name'],
+  ): Promise<Sleeves[]>;
 }

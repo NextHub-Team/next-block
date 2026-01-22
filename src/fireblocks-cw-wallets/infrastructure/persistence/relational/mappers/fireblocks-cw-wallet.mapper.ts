@@ -8,12 +8,12 @@ import { FireblocksCwWalletEntity } from '../entities/fireblocks-cw-wallet.entit
 export class FireblocksCwWalletMapper {
   static toDomain(raw: FireblocksCwWalletEntity): FireblocksCwWallet {
     const domainEntity = new FireblocksCwWallet();
-    if (raw.SleevesTransactions) {
-      domainEntity.SleevesTransactions = raw.SleevesTransactions.map((item) =>
+    if (raw.sleevesTransactions) {
+      domainEntity.sleevesTransactions = raw.sleevesTransactions.map((item) =>
         SleevesTransactionMapper.toDomain(item),
       );
-    } else if (raw.SleevesTransactions === null) {
-      domainEntity.SleevesTransactions = null;
+    } else if (raw.sleevesTransactions === null) {
+      domainEntity.sleevesTransactions = null;
     }
 
     if (raw.account) {
@@ -34,13 +34,13 @@ export class FireblocksCwWalletMapper {
     domainEntity: FireblocksCwWallet,
   ): FireblocksCwWalletEntity {
     const persistenceEntity = new FireblocksCwWalletEntity();
-    if (domainEntity.SleevesTransactions) {
-      persistenceEntity.SleevesTransactions =
-        domainEntity.SleevesTransactions.map((item) =>
+    if (domainEntity.sleevesTransactions) {
+      persistenceEntity.sleevesTransactions =
+        domainEntity.sleevesTransactions.map((item) =>
           SleevesTransactionMapper.toPersistence(item),
         );
-    } else if (domainEntity.SleevesTransactions === null) {
-      persistenceEntity.SleevesTransactions = null;
+    } else if (domainEntity.sleevesTransactions === null) {
+      persistenceEntity.sleevesTransactions = null;
     }
 
     if (domainEntity.account) {

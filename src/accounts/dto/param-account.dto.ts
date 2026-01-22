@@ -31,17 +31,6 @@ export class AccountSocialIdParamDto {
   @IsString()
   socialId: string;
 }
-
-export class AccountAccountIdParamDto {
-  @ApiProperty({
-    description: 'Provider account identifier used to reference the account',
-    type: String,
-    example: 'acct_1234567890',
-  })
-  @IsString()
-  accountId: string;
-}
-
 export class AccountProviderNameParamDto {
   @ApiProperty({
     description: 'Account provider name',
@@ -49,4 +38,24 @@ export class AccountProviderNameParamDto {
   })
   @IsEnum(AccountProviderName)
   providerName: AccountProviderName;
+}
+
+export class AccountAccountIdParamDto extends AccountProviderNameParamDto {
+  @ApiProperty({
+    description: 'Provider account identifier used to reference the account',
+    type: String,
+    example: '42',
+  })
+  @IsString()
+  accountId: string;
+}
+
+export class AccountAccountNameParamDto {
+  @ApiProperty({
+    description: 'Account name',
+    type: String,
+    example: 'user:d21f0a37-4d7e-42b2-9c5e-07aa1d3d76f0',
+  })
+  @IsString()
+  name: string;
 }

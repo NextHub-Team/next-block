@@ -16,7 +16,7 @@ import {
 import { FireblocksCwWalletsService } from '../../../../fireblocks-cw-wallets/fireblocks-cw-wallets.service';
 import { FireblocksCwService } from '../fireblocks-cw.service';
 import { FireblocksCwWorkflowService } from '../services/fireblocks-cw-workflow.service';
-import { buildCustomerRefId } from '../helpers/fireblocks-cw.helper';
+import { buildVaultName } from '../helpers/fireblocks-cw.helper';
 import { ensureIdempotencyKey } from '../helpers/fireblocks-cw-service.helper';
 import { InternalEventHandlerBase } from '../../../../common/internal-events/base/internal-event-handler.base';
 import { AuthProvidersEnum } from '../../../../auth/auth-providers.enum';
@@ -100,7 +100,7 @@ export class FireblocksCwUserAddedEventHandler extends InternalEventHandlerBase 
         this.logger.debug(
           `[trace=${eventId}] Building vault name for user=${user.id} socialId=${socialId}`,
         );
-        const vaultName = buildCustomerRefId(user.id, socialId);
+        const vaultName = buildVaultName(user.id, socialId);
         const customerRefId = socialId;
 
         this.logger.debug(

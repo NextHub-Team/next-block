@@ -61,6 +61,14 @@ export abstract class AccountRepository {
     providerName: Account['providerName'],
   ): Promise<NullableType<Account>>;
 
+  abstract findByName(name: Account['name']): Promise<NullableType<Account>>;
+
+  abstract findBySocialId(
+    userId: User['id'],
+    socialId: User['socialId'],
+    providerName: Account['providerName'],
+  ): Promise<NullableType<Account>>;
+
   abstract update(
     id: Account['id'],
     payload: DeepPartial<Account>,

@@ -20,7 +20,7 @@ export class CreateSleevesDto {
     type: () => String,
   })
   @IsString()
-  ContractName: string;
+  contractName: string;
 
   @ApiProperty({
     required: true,

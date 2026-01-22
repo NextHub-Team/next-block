@@ -31,7 +31,7 @@ import { RolesGuard } from '../roles/roles.guard';
 import { Roles } from '../roles/roles.decorator';
 import { RoleEnum } from '../roles/roles.enum';
 
-@ApiTags('Assetregistries')
+@ApiTags('Asset-Registry')
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 @Roles(RoleEnum.admin)
@@ -113,5 +113,17 @@ export class AssetRegistriesController {
   })
   remove(@Param('id') id: string) {
     return this.assetRegistriesService.remove(id);
+  }
+  @Get('providers/:providerName')
+  @ApiParam({
+    name: 'providerName',
+    type: AssetRegistry['providerName'],
+    required: true,
+  })
+  @ApiOkResponse({ type: AssetRegistry, isArray: true })
+  findByProviderName(
+    @Param('providerName') providerName: AssetRegistry['providerName'],
+  ) {
+    return this.assetRegistriesService.findByProviderName(providerName);
   }
 }

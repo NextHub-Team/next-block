@@ -76,4 +76,46 @@ export class SleevesRelationalRepository implements SleevesRepository {
   async remove(id: Sleeves['id']): Promise<void> {
     await this.sleevesRepository.delete(id);
   }
+
+  async findAllByAsset(asset: Sleeves['asset']): Promise<Sleeves[]> {
+    const entities = await this.sleevesRepository.find({
+      where: { asset: { assetId: asset.assetId } },
+      relations: ['asset'],
+    });
+
+    return entities.map((entity) => SleevesMapper.toDomain(entity));
+  }
+  async filter(
+    contractName?: Sleeves['contractName'],
+    tag?: Sleeves['tag'],
+    name?: Sleeves['name'],
+  ): Promise<Sleeves[]> {
+    const where: any = {};
+
+    if (contractName !== undefined) {
+      where.contractName = contractName;
+    }
+    if (tag !== undefined) {
+      where.tag = tag;
+    }
+    if (name !== undefined) {
+      where.name = name;
+    }
+
+    const entities = await this.sleevesRepository.find({
+      where,
+    });
+    return entities.map((entity) => SleevesMapper.toDomain(entity));
+  }
+  async findBySleeveId(
+    sleeveId: Sleeves['sleeveId'],
+  ): Promise<NullableType<Sleeves>> {
+    const where = { sleeveId };
+
+    const entity = await this.sleevesRepository.findOne({
+      where,
+    });
+
+    return entity ? SleevesMapper.toDomain(entity) : null;
+  }
 }

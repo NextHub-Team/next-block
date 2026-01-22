@@ -17,6 +17,16 @@ export class AssetRegistryRelationalRepository
     private readonly assetRegistryRepository: Repository<AssetRegistryEntity>,
   ) {}
 
+  async findByAssetId(
+    assetId: AssetRegistry['assetId'],
+  ): Promise<NullableType<AssetRegistry>> {
+    const entity = await this.assetRegistryRepository.findOne({
+      where: { assetId },
+    });
+
+    return entity ? AssetRegistryMapper.toDomain(entity) : null;
+  }
+
   async create(data: AssetRegistry): Promise<AssetRegistry> {
     const persistenceModel = AssetRegistryMapper.toPersistence(data);
     const newEntity = await this.assetRegistryRepository.save(
@@ -79,8 +89,17 @@ export class AssetRegistryRelationalRepository
 
     return AssetRegistryMapper.toDomain(updatedEntity);
   }
-
   async remove(id: AssetRegistry['id']): Promise<void> {
     await this.assetRegistryRepository.delete(id);
+  }
+  async findByProviderName(
+    providerName: AssetRegistry['providerName'],
+  ): Promise<AssetRegistry[]> {
+    const where: any = { providerName: providerName };
+    const entities = await this.assetRegistryRepository.find({
+      where,
+    });
+
+    return entities.map((entity) => AssetRegistryMapper.toDomain(entity));
   }
 }

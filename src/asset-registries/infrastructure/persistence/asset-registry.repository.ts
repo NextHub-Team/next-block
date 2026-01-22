@@ -25,5 +25,13 @@ export abstract class AssetRegistryRepository {
     payload: DeepPartial<AssetRegistry>,
   ): Promise<AssetRegistry | null>;
 
+  abstract findByProviderName(
+    providerName: AssetRegistry['providerName'],
+  ): Promise<AssetRegistry[]>;
+
   abstract remove(id: AssetRegistry['id']): Promise<void>;
+
+  abstract findByAssetId(
+    assetId: AssetRegistry['assetId'],
+  ): Promise<NullableType<AssetRegistry>>;
 }

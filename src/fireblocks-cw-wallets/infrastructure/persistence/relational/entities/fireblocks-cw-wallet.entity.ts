@@ -22,7 +22,7 @@ export class FireblocksCwWalletEntity extends EntityRelationalHelper {
     (childEntity) => childEntity.wallet,
     { eager: true, nullable: true },
   )
-  SleevesTransactions?: SleevesTransactionEntity[] | null;
+  sleevesTransactions?: SleevesTransactionEntity[] | null;
 
   @ManyToOne(() => AccountEntity, { eager: true, nullable: false })
   account: AccountEntity;

@@ -18,7 +18,7 @@ export class SleevesEntity extends EntityRelationalHelper {
     nullable: false,
     type: String,
   })
-  ContractName: string;
+  contractName: string;
 
   @Column({
     nullable: false,

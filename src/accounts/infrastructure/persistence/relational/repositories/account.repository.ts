@@ -8,7 +8,12 @@ import { AccountRepository } from '../../account.repository';
 import { AccountMapper } from '../mappers/account.mapper';
 import { IPaginationOptions } from '../../../../../utils/types/pagination-options';
 import { User } from '../../../../../users/domain/user';
-import { AccountStatus } from '../../../../types/account-enum.type';
+import {
+  AccountProviderName,
+  AccountStatus,
+} from '../../../../types/account-enum.type';
+import { buildVaultName } from 'src/providers/fireblocks/cw/helpers/fireblocks-cw.helper';
+import { isEmpty } from 'src/utils/helpers/string.helper';
 
 @Injectable()
 export class AccountRelationalRepository implements AccountRepository {
@@ -229,6 +234,59 @@ export class AccountRelationalRepository implements AccountRepository {
         },
         providerName,
       },
+    });
+
+    return entity ? AccountMapper.toDomain(entity) : null;
+  }
+
+  async findByName(name: Account['name']): Promise<NullableType<Account>> {
+    if (!name) {
+      return null;
+    }
+
+    const entity = await this.accountRepository.findOne({
+      where: {
+        name,
+      },
+    });
+
+    return entity ? AccountMapper.toDomain(entity) : null;
+  }
+
+  async findBySocialId(
+    userId: User['id'],
+    socialId: User['socialId'],
+    providerName: Account['providerName'],
+  ): Promise<NullableType<Account>> {
+    if (!socialId || !providerName) {
+      return null;
+    }
+    let name = '';
+
+    switch (providerName) {
+      case AccountProviderName.FIREBLOCKS:
+        name = buildVaultName(userId, socialId);
+        break;
+
+      default:
+        break;
+    }
+
+    const entity = await this.accountRepository.findOne({
+      where: isEmpty(name)
+        ? {
+            user: {
+              socialId,
+            },
+            providerName,
+          }
+        : {
+            user: {
+              socialId,
+            },
+            name,
+            providerName,
+          },
     });
 
     return entity ? AccountMapper.toDomain(entity) : null;

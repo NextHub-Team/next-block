@@ -46,7 +46,7 @@ export const isInvalidRequest = (error: any): boolean => {
   );
 };
 
-export const buildCustomerRefId = (
+export const buildVaultName = (
   userId: string | number,
   socialId?: string | null,
 ): string => {

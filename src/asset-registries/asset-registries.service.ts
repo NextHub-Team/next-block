@@ -19,7 +19,7 @@ export class AssetRegistriesService {
     // Do not remove comment below.
     // <creating-property />
 
-    return this.assetRegistryRepository.create({
+    return await this.assetRegistryRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
       description: createAssetRegistryDto.description,
@@ -54,6 +54,11 @@ export class AssetRegistriesService {
   findByIds(ids: AssetRegistry['id'][]) {
     return this.assetRegistryRepository.findByIds(ids);
   }
+  async findByProviderName(
+    providerName: AssetRegistry['providerName'],
+  ): Promise<AssetRegistry[]> {
+    return await this.assetRegistryRepository.findByProviderName(providerName);
+  }
 
   async update(
     id: AssetRegistry['id'],
@@ -80,5 +85,8 @@ export class AssetRegistriesService {
 
   remove(id: AssetRegistry['id']) {
     return this.assetRegistryRepository.remove(id);
+  }
+  findByAssetId(id: AssetRegistry['assetId']) {
+    return this.assetRegistryRepository.findByAssetId(id);
   }
 }

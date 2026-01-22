@@ -17,7 +17,7 @@ import {
 import { Type } from 'class-transformer';
 
 export class CreateFireblocksCwWalletDto {
-  SleevesTransactions?: SleevesTransactionDto[] | null;
+  sleevesTransactions?: SleevesTransactionDto[] | null;
 
   @ApiProperty({
     required: true,

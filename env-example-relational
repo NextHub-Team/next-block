@@ -78,7 +78,7 @@ QUEUEDASH_LOG_REQUESTS=true
 
 # Optional: register a demo Bull queue so QueueDash UI shows something.
 # Requires Redis (default here: redis://redis:6379).
-QUEUEDASH_DEMO_QUEUE_ENABLE=true
+QUEUEDASH_DEMO_QUEUE_ENABLE=false
 QUEUEDASH_REDIS_URL=redis://redis:6379
 QUEUEDASH_DEMO_QUEUE_NAME=report-queue
 QUEUEDASH_DEMO_QUEUE_DISPLAY_NAME=Reports

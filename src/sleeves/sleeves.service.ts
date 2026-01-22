@@ -12,6 +12,8 @@ import { UpdateSleevesDto } from './dto/update-sleeves.dto';
 import { SleevesRepository } from './infrastructure/persistence/sleeves.repository';
 import { IPaginationOptions } from '../utils/types/pagination-options';
 import { Sleeves } from './domain/sleeves';
+import { FilterSleevesDto } from './dto/filter-sleeves.dto';
+import { SleevesDto } from './dto/sleeves.dto';
 
 @Injectable()
 export class SleevesService {
@@ -42,7 +44,7 @@ export class SleevesService {
     return this.sleevesRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
-      ContractName: createSleevesDto.ContractName,
+      contractName: createSleevesDto.contractName,
 
       contractAddress: createSleevesDto.contractAddress,
 
@@ -105,7 +107,7 @@ export class SleevesService {
     return this.sleevesRepository.update(id, {
       // Do not remove comment below.
       // <updating-property-payload />
-      ContractName: updateSleevesDto.ContractName,
+      contractName: updateSleevesDto.contractName,
 
       contractAddress: updateSleevesDto.contractAddress,
 
@@ -121,5 +123,30 @@ export class SleevesService {
 
   remove(id: Sleeves['id']) {
     return this.sleevesRepository.remove(id);
+  }
+
+  async filter(filters: FilterSleevesDto): Promise<SleevesDto[]> {
+    return await this.sleevesRepository.filter(
+      filters.contractName,
+      filters.tag,
+      filters.name,
+    );
+  }
+
+  async findBySleeveId(sleeveId: Sleeves['sleeveId']) {
+    return this.sleevesRepository.findBySleeveId(sleeveId);
+  }
+  async findByAsset(assetId: string): Promise<SleevesDto[]> {
+    const assetObject = await this.assetRegistryService.findByAssetId(assetId);
+    if (!assetObject) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: {
+          asset: 'notExists',
+        },
+      });
+    }
+    const asset = assetObject;
+    return await this.sleevesRepository.findAllByAsset(asset);
   }
 }

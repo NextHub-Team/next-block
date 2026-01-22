@@ -179,10 +179,10 @@ export class FireblocksCwClientController {
   @Post('me/wallets')
   @HttpCode(HttpStatus.CREATED)
   @ApiCreatedResponse({ type: FireblocksCustodialWalletDto })
-  @ApiOperationRoles(
-    'Create a Fireblocks vault wallet for a current user asset',
-    [RoleEnum.admin, RoleEnum.user],
-  )
+  @ApiOperationRoles('Create a Fireblocks vault wallet for a current user', [
+    RoleEnum.admin,
+    RoleEnum.user,
+  ])
   createVaultWallet(
     @Request() req: RequestWithUser,
     @Body() command: CreateVaultWalletRequestDto,
@@ -197,7 +197,7 @@ export class FireblocksCwClientController {
   @Post('me/wallets/ensure')
   @ApiOkResponse({ type: FireblocksCustodialWalletDto })
   @ApiOperationRoles(
-    'Ensure the vault wallet and deposit address for a current user asset',
+    'Ensure the vault wallet and deposit address for a current user',
     [RoleEnum.admin, RoleEnum.user],
   )
   ensureUserWallet(

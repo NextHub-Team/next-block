@@ -22,7 +22,7 @@ import {
 export class SleevesTransactionEntity extends EntityRelationalHelper {
   @ManyToOne(
     () => FireblocksCwWalletEntity,
-    (parentEntity) => parentEntity.SleevesTransactions,
+    (parentEntity) => parentEntity.sleevesTransactions,
     { eager: false, nullable: false },
   )
   wallet?: FireblocksCwWalletEntity;

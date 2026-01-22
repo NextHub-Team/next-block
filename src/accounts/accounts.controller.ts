@@ -39,6 +39,7 @@ import {
   AccountProviderNameParamDto,
   AccountSocialIdParamDto,
   AccountUserIdParamDto,
+  AccountAccountNameParamDto,
 } from './dto/param-account.dto';
 import { RoleEnum } from '../roles/roles.enum';
 import { RolesGuard } from '../roles/roles.guard';
@@ -224,6 +225,17 @@ export class AccountsController {
   }
 
   @Roles(RoleEnum.admin)
+  @ApiOperationRoles('Get account By name', [RoleEnum.admin])
+  @Get('name/:name')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: AccountDto, isArray: true })
+  async findByName(
+    @Param() params: AccountAccountNameParamDto,
+  ): Promise<AccountDto | null> {
+    return this.accountsService.findByName(params.name);
+  }
+
+  @Roles(RoleEnum.admin)
   @ApiOperationRoles('Get active accounts', [RoleEnum.admin])
   @Get('actives')
   @HttpCode(HttpStatus.OK)
@@ -243,7 +255,7 @@ export class AccountsController {
 
   @Roles(RoleEnum.admin)
   @ApiOperationRoles('Count active accounts', [RoleEnum.admin])
-  @Get('actives/count')
+  @Get('count/actives')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: Number })
   countActives(@Query('userId') userId?: number) {

@@ -6,7 +6,7 @@ export class Sleeves {
     type: () => String,
     nullable: false,
   })
-  ContractName: string;
+  contractName: string;
 
   @ApiProperty({
     type: () => String,

@@ -6,7 +6,7 @@ import { SleevesEntity } from '../entities/sleeves.entity';
 export class SleevesMapper {
   static toDomain(raw: SleevesEntity): Sleeves {
     const domainEntity = new Sleeves();
-    domainEntity.ContractName = raw.ContractName;
+    domainEntity.contractName = raw.contractName;
 
     domainEntity.contractAddress = raw.contractAddress;
 
@@ -29,7 +29,7 @@ export class SleevesMapper {
 
   static toPersistence(domainEntity: Sleeves): SleevesEntity {
     const persistenceEntity = new SleevesEntity();
-    persistenceEntity.ContractName = domainEntity.ContractName;
+    persistenceEntity.contractName = domainEntity.contractName;
 
     persistenceEntity.contractAddress = domainEntity.contractAddress;
 

@@ -486,4 +486,34 @@ export class AccountsService {
       });
     }
   }
+
+  async findByName(
+    name: Account['name'],
+    roles: RoleEnum[] = [RoleEnum.admin],
+  ): Promise<NullableType<AccountDto>> {
+    const account = await this.accountRepository.findByName(name);
+    return account ? GroupPlainToInstance(AccountDto, account, roles) : null;
+  }
+
+  async findBySocialId(
+    socialId: User['socialId'],
+    providerName: Account['providerName'],
+    roles: RoleEnum[] = [RoleEnum.admin],
+  ): Promise<NullableType<AccountDto>> {
+    const user = await this.userService.findBySocialId(socialId);
+    if (!user) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: {
+          user: 'notExists',
+        },
+      });
+    }
+    const account = await this.accountRepository.findBySocialId(
+      user.id,
+      socialId,
+      providerName,
+    );
+    return account ? GroupPlainToInstance(AccountDto, account, roles) : null;
+  }
 }

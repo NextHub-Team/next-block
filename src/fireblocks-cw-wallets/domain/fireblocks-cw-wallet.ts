@@ -7,7 +7,7 @@ export class FireblocksCwWallet {
     type: () => [SleevesTransaction],
     nullable: true,
   })
-  SleevesTransactions?: SleevesTransaction[] | null;
+  sleevesTransactions?: SleevesTransaction[] | null;
 
   @ApiProperty({
     type: () => Account,
