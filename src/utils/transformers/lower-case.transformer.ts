@@ -1,6 +1,8 @@
 import { TransformFnParams } from 'class-transformer/types/interfaces';
 import { MaybeType } from '../types/maybe.type';
 
-export const lowerCaseTransformer = (
+export function lowerCaseTransformer(
   params: TransformFnParams,
-): MaybeType<string> => params.value?.toLowerCase().trim();
+): MaybeType<string> {
+  return params.value?.toLowerCase().trim();
+}

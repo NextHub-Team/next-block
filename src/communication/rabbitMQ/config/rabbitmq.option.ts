@@ -11,9 +11,9 @@ import {
  * Create a base RabbitMQ configuration that can be modified per service.
  * @param configService - NestJS ConfigService to fetch dynamic configurations
  */
-export const createRabbitMQBaseOptions = (
+export function createRabbitMQBaseOptions(
   configService: ConfigService,
-): RmqOptions => {
+): RmqOptions {
   // Retrieve RabbitMQ URLs from configuration
   const rabbitmqUrlsRaw = configService.get<string | string[]>(
     'rabbitMQ.rabbitmqUrls',
@@ -50,17 +50,17 @@ export const createRabbitMQBaseOptions = (
         }) ?? RMQ_PERSISTENT,
     },
   };
-};
+}
 
 /**
  * Modify the RabbitMQ configuration dynamically based on the service needs.
  * @param baseOptions - The base RabbitMQ configuration
  * @param options - Customizable options (queue name, exchange name, routing key)
  */
-export const updateRabbitMQOptions = (
+export function updateRabbitMQOptions(
   baseOptions: RmqOptions,
   options: { queueName: string; exchangeName: string; routingKey: string },
-): RmqOptions => {
+): RmqOptions {
   return {
     transport: Transport.RMQ,
     options: {
@@ -70,4 +70,4 @@ export const updateRabbitMQOptions = (
       routingKey: options.routingKey,
     },
   };
-};
+}

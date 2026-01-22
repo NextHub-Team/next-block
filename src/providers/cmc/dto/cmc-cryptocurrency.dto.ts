@@ -1,12 +1,17 @@
 // -----------------------------------------------------------------------------
-// CMC — Cryptocurrency DTOs (deduplicated, OOP-structured)
+// CMC - Cryptocurrency DTOs (v1)
 // Covers responses for:
-//  v2: quotes/latest, quotes/historical, ohlcv/latest, ohlcv/historical,
-//      market-pairs/latest, price-performance-stats/latest
-//  v1: map, info, listings/(latest|historical), quotes/(latest|historical),
-//      ohlcv/(latest|historical), price-performance-stats/latest,
-//      categories, category, airdrops, airdrop,
-//      trending/(latest|most-visited|gainers-losers)
+//  - map
+//  - info
+//  - listings/latest
+//  - quotes/latest
+//  - quotes/historical
+//  - ohlcv/latest
+//  - ohlcv/historical
+//  - market-pairs/latest
+//  - trending/latest
+//  - trending/most-visited
+//  - trending/gainers-losers
 // -----------------------------------------------------------------------------
 
 import { Exclude, Expose, Type } from 'class-transformer';
@@ -29,10 +34,9 @@ import {
 } from '@nestjs/swagger';
 
 import { CmcEnvelopeDto, CmcStatusDto } from './cmc-base.response.dto';
-import { CmcKeyedMap } from '../utils/cmc-helper';
 
 // -----------------------------------------------------------------------------
-// Reusable building blocks (single source of truth)
+// Reusable building blocks
 // -----------------------------------------------------------------------------
 
 @Exclude()
@@ -241,162 +245,7 @@ export class CmcAssetBaseDto {
 }
 
 // -----------------------------------------------------------------------------
-// QUOTES — latest (v2)
-// -----------------------------------------------------------------------------
-
-@Exclude()
-export class CmcCryptoQuotesLatestAssetDto extends CmcAssetBaseDto {
-  @ApiProperty({
-    description: 'Per-convert quotes (map keyed by convert symbol)',
-    type: Object,
-  })
-  @IsObject()
-  @ValidateNested({ each: true })
-  @Type(() => CmcQuoteCurrencyLatestDto)
-  @Expose()
-  quote!: Record<string, CmcQuoteCurrencyLatestDto>;
-
-  @ApiPropertyOptional({ example: '2018-08-09T21:56:28.000Z' })
-  @IsOptional()
-  @IsString()
-  @IsDateString()
-  @Expose()
-  last_updated?: string;
-
-  @ApiPropertyOptional({ example: 331 })
-  @IsOptional()
-  @IsInt()
-  @Expose()
-  num_market_pairs?: number;
-}
-
-@Exclude()
-@ApiExtraModels(CmcCryptoQuotesLatestAssetDto, CmcStatusDto)
-export class CmcCryptoQuotesLatestV2Dto extends CmcEnvelopeDto<
-  CmcKeyedMap<CmcCryptoQuotesLatestAssetDto>
-> {
-  @ApiProperty({
-    description: 'Keyed by id/symbol',
-    type: Object,
-  })
-  @Expose()
-  data!: CmcKeyedMap<CmcCryptoQuotesLatestAssetDto>;
-
-  @ApiProperty({ type: () => CmcStatusDto })
-  @ValidateNested()
-  @Type(() => CmcStatusDto)
-  @Expose()
-  status!: CmcStatusDto;
-}
-
-// -----------------------------------------------------------------------------
-// QUOTES — historical (v2/v3)
-// -----------------------------------------------------------------------------
-
-@Exclude()
-export class CmcCryptoQuotePointDto extends CmcQuoteCurrencyBaseDto {
-  @ApiProperty({ example: 6242.29 })
-  @IsNumber()
-  @Expose()
-  price!: number;
-
-  @ApiPropertyOptional({ example: 4681670000 })
-  @IsOptional()
-  @IsNumber()
-  @Expose()
-  volume_24h?: number;
-
-  @ApiPropertyOptional({ example: 106800038746.48 })
-  @IsOptional()
-  @IsNumber()
-  @Expose()
-  market_cap?: number;
-
-  @ApiPropertyOptional({ example: 4681670000 })
-  @IsOptional()
-  @IsNumber()
-  @Expose()
-  circulating_supply?: number;
-
-  @ApiPropertyOptional({ example: 4681670000 })
-  @IsOptional()
-  @IsNumber()
-  @Expose()
-  total_supply?: number;
-
-  @ApiPropertyOptional({ example: '2018-06-22T19:29:37.000Z' })
-  @IsOptional()
-  @IsString()
-  @IsDateString()
-  @Expose()
-  timestamp?: string;
-}
-
-@Exclude()
-export class CmcCryptoQuotesHistoricalPointDto {
-  @ApiProperty({ example: '2018-06-22T19:29:37.000Z' })
-  @IsString()
-  @IsDateString()
-  @Expose()
-  timestamp!: string;
-
-  @ApiProperty({
-    description: 'Per-convert quotes (map keyed by convert symbol)',
-    type: Object,
-  })
-  @IsObject()
-  @ValidateNested({ each: true })
-  @Type(() => CmcCryptoQuotePointDto)
-  @Expose()
-  quote!: Record<string, CmcCryptoQuotePointDto>;
-}
-
-@Exclude()
-export class CmcCryptoQuotesHistoricalAssetDto {
-  @ApiProperty({ example: 1 })
-  @IsInt()
-  @Expose()
-  id!: number;
-
-  @ApiProperty({ example: 'Bitcoin' })
-  @IsString()
-  @Expose()
-  name!: string;
-
-  @ApiProperty({ example: 'BTC' })
-  @IsString()
-  @Expose()
-  symbol!: string;
-
-  @ApiProperty({ type: () => [CmcCryptoQuotesHistoricalPointDto] })
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => CmcCryptoQuotesHistoricalPointDto)
-  @Expose()
-  quotes!: CmcCryptoQuotesHistoricalPointDto[];
-}
-
-@Exclude()
-@ApiExtraModels(CmcCryptoQuotesHistoricalAssetDto, CmcStatusDto)
-export class CmcCryptoQuotesHistoricalV2Dto extends CmcEnvelopeDto<CmcCryptoQuotesHistoricalAssetDto> {
-  @ApiProperty({ type: () => CmcCryptoQuotesHistoricalAssetDto })
-  @ValidateNested()
-  @Type(() => CmcCryptoQuotesHistoricalAssetDto)
-  @Expose()
-  data!: CmcCryptoQuotesHistoricalAssetDto;
-
-  @ApiProperty({ type: () => CmcStatusDto })
-  @ValidateNested()
-  @Type(() => CmcStatusDto)
-  @Expose()
-  status!: CmcStatusDto;
-}
-
-// v3 mirrors v2 in your payloads
-export class CmcCryptoQuotesHistoricalV3Dto extends CmcCryptoQuotesHistoricalV2Dto {}
-
-// -----------------------------------------------------------------------------
-// OHLCV — shared point (used by v1 & v2)
+// OHLCV - shared points
 // -----------------------------------------------------------------------------
 
 @Exclude()
@@ -438,94 +287,6 @@ export class CmcOhlcvPointBaseDto {
   @Expose()
   last_updated?: string;
 }
-
-// -----------------------------------------------------------------------------
-// OHLCV — latest (v2)
-// -----------------------------------------------------------------------------
-
-@Exclude()
-export class CmcCryptoOhlcvLatestAssetDto {
-  @ApiProperty({ example: 1 })
-  @IsInt()
-  @Expose()
-  id!: number;
-
-  @ApiProperty({ example: 'Bitcoin' })
-  @IsString()
-  @Expose()
-  name!: string;
-
-  @ApiProperty({ example: 'BTC' })
-  @IsString()
-  @Expose()
-  symbol!: string;
-
-  @ApiPropertyOptional({ example: '2018-09-10T18:54:00.000Z' })
-  @IsOptional()
-  @IsString()
-  @IsDateString()
-  @Expose()
-  last_updated?: string;
-
-  @ApiPropertyOptional({ example: '2018-09-10T00:00:00.000Z' })
-  @IsOptional()
-  @IsString()
-  @IsDateString()
-  @Expose()
-  time_open?: string;
-
-  @ApiPropertyOptional({ example: null })
-  @IsOptional()
-  @Expose()
-  time_close?: string | null;
-
-  @ApiPropertyOptional({ example: '2018-09-10T00:00:00.000Z' })
-  @IsOptional()
-  @IsString()
-  @IsDateString()
-  @Expose()
-  time_high?: string;
-
-  @ApiPropertyOptional({ example: '2018-09-10T00:00:00.000Z' })
-  @IsOptional()
-  @IsString()
-  @IsDateString()
-  @Expose()
-  time_low?: string;
-
-  @ApiProperty({
-    description: 'Per-convert OHLCV (map keyed by convert symbol)',
-    type: Object,
-  })
-  @IsObject()
-  @ValidateNested({ each: true })
-  @Type(() => CmcOhlcvPointBaseDto)
-  @Expose()
-  quote!: Record<string, CmcOhlcvPointBaseDto>;
-}
-
-@Exclude()
-@ApiExtraModels(CmcCryptoOhlcvLatestAssetDto, CmcStatusDto)
-export class CmcCryptoOhlcvLatestV2Dto extends CmcEnvelopeDto<
-  Record<string, CmcCryptoOhlcvLatestAssetDto>
-> {
-  @ApiProperty({
-    description: 'Keyed by id as string',
-    type: Object,
-  })
-  @Expose()
-  data!: Record<string, CmcCryptoOhlcvLatestAssetDto>;
-
-  @ApiProperty({ type: () => CmcStatusDto })
-  @ValidateNested()
-  @Type(() => CmcStatusDto)
-  @Expose()
-  status!: CmcStatusDto;
-}
-
-// -----------------------------------------------------------------------------
-// OHLCV — historical (v2)
-// -----------------------------------------------------------------------------
 
 @Exclude()
 export class CmcCryptoOhlcvHistoricalPointDto {
@@ -575,49 +336,8 @@ export class CmcCryptoOhlcvHistoricalPointDto {
   >;
 }
 
-@Exclude()
-export class CmcCryptoOhlcvHistoricalAssetDto {
-  @ApiProperty({ example: 1 })
-  @IsInt()
-  @Expose()
-  id!: number;
-
-  @ApiProperty({ example: 'Bitcoin' })
-  @IsString()
-  @Expose()
-  name!: string;
-
-  @ApiProperty({ example: 'BTC' })
-  @IsString()
-  @Expose()
-  symbol!: string;
-
-  @ApiProperty({ type: () => [CmcCryptoOhlcvHistoricalPointDto] })
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => CmcCryptoOhlcvHistoricalPointDto)
-  @Expose()
-  quotes!: CmcCryptoOhlcvHistoricalPointDto[];
-}
-
-@Exclude()
-@ApiExtraModels(CmcCryptoOhlcvHistoricalAssetDto, CmcStatusDto)
-export class CmcCryptoOhlcvHistoricalV2Dto extends CmcEnvelopeDto<CmcCryptoOhlcvHistoricalAssetDto> {
-  @ApiProperty({ type: () => CmcCryptoOhlcvHistoricalAssetDto })
-  @ValidateNested()
-  @Type(() => CmcCryptoOhlcvHistoricalAssetDto)
-  @Expose()
-  data!: CmcCryptoOhlcvHistoricalAssetDto;
-
-  @ApiProperty({ type: () => CmcStatusDto })
-  @ValidateNested()
-  @Type(() => CmcStatusDto)
-  @Expose()
-  status!: CmcStatusDto;
-}
-
 // -----------------------------------------------------------------------------
-// MARKET PAIRS — latest (v2)
+// Market pairs - shared items
 // -----------------------------------------------------------------------------
 
 @Exclude()
@@ -747,171 +467,8 @@ export class CmcCryptoMarketPairItemDto {
   quote!: CmcCryptoMarketPairQuoteDto;
 }
 
-@Exclude()
-export class CmcCryptoMarketPairsLatestDataDto {
-  @ApiProperty({ example: 1 })
-  @IsInt()
-  @Expose()
-  id!: number;
-
-  @ApiProperty({ example: 'Bitcoin' })
-  @IsString()
-  @Expose()
-  name!: string;
-
-  @ApiProperty({ example: 'BTC' })
-  @IsString()
-  @Expose()
-  symbol!: string;
-
-  @ApiProperty({ example: 7526 })
-  @IsInt()
-  @Expose()
-  num_market_pairs!: number;
-
-  @ApiProperty({ type: () => [CmcCryptoMarketPairItemDto] })
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => CmcCryptoMarketPairItemDto)
-  @Expose()
-  market_pairs!: CmcCryptoMarketPairItemDto[];
-}
-
-@Exclude()
-@ApiExtraModels(CmcCryptoMarketPairsLatestDataDto, CmcStatusDto)
-export class CmcCryptoMarketPairsLatestV2Dto extends CmcEnvelopeDto<CmcCryptoMarketPairsLatestDataDto> {
-  @ApiProperty({ type: () => CmcCryptoMarketPairsLatestDataDto })
-  @ValidateNested()
-  @Type(() => CmcCryptoMarketPairsLatestDataDto)
-  @Expose()
-  data!: CmcCryptoMarketPairsLatestDataDto;
-
-  @ApiProperty({ type: () => CmcStatusDto })
-  @ValidateNested()
-  @Type(() => CmcStatusDto)
-  @Expose()
-  status!: CmcStatusDto;
-}
-
 // -----------------------------------------------------------------------------
-// PPS — price performance stats latest (v2)
-// -----------------------------------------------------------------------------
-
-@Exclude()
-export class CmcCryptoPpsPeriodQuoteDto {
-  @ApiProperty({ example: 135.3000030517578 })
-  @IsNumber()
-  @Expose()
-  open!: number;
-
-  @ApiProperty({ example: 20088.99609375 })
-  @IsNumber()
-  @Expose()
-  high!: number;
-
-  @ApiProperty({ example: 65.5260009765625 })
-  @IsNumber()
-  @Expose()
-  low!: number;
-
-  @ApiProperty({ example: 65.5260009765625 })
-  @IsNumber()
-  @Expose()
-  close!: number;
-
-  @ApiProperty({ example: '2013-04-28T00:00:00.000Z' })
-  @IsString()
-  @IsDateString()
-  @Expose()
-  open_timestamp!: string;
-
-  @ApiProperty({ example: '2017-12-17T12:19:14.000Z' })
-  @IsString()
-  @IsDateString()
-  @Expose()
-  high_timestamp!: string;
-
-  @ApiProperty({ example: '2013-07-05T18:56:01.000Z' })
-  @IsString()
-  @IsDateString()
-  @Expose()
-  low_timestamp!: string;
-
-  @ApiProperty({ example: '2019-08-22T01:52:18.618Z' })
-  @IsString()
-  @IsDateString()
-  @Expose()
-  close_timestamp!: string;
-
-  @ApiProperty({ example: 7223.718930042746 })
-  @IsNumber()
-  @Expose()
-  percent_change!: number;
-
-  @ApiProperty({ example: 9773.691932798241 })
-  @IsNumber()
-  @Expose()
-  price_change!: number;
-}
-
-@Exclude()
-export class CmcCryptoPpsAssetDto {
-  @ApiProperty({ example: 1 })
-  @IsInt()
-  @Expose()
-  id!: number;
-
-  @ApiProperty({ example: 'Bitcoin' })
-  @IsString()
-  @Expose()
-  name!: string;
-
-  @ApiProperty({ example: 'BTC' })
-  @IsString()
-  @Expose()
-  symbol!: string;
-
-  @ApiProperty({ example: 'bitcoin' })
-  @IsString()
-  @Expose()
-  slug!: string;
-
-  @ApiProperty({ example: '2019-08-22T01:51:32.000Z' })
-  @IsString()
-  @IsDateString()
-  @Expose()
-  last_updated!: string;
-
-  @ApiProperty({
-    description: 'Periods (e.g., all_time); nested quotes by convert symbol',
-    type: Object,
-  })
-  @IsObject()
-  @Expose()
-  periods!: Record<string, any>;
-}
-
-@Exclude()
-@ApiExtraModels(CmcCryptoPpsAssetDto, CmcStatusDto)
-export class CmcCryptoPpsLatestV2Dto extends CmcEnvelopeDto<
-  Record<string, CmcCryptoPpsAssetDto>
-> {
-  @ApiProperty({
-    description: 'Keyed by id as string',
-    type: Object,
-  })
-  @Expose()
-  data!: Record<string, CmcCryptoPpsAssetDto>;
-
-  @ApiProperty({ type: () => CmcStatusDto })
-  @ValidateNested()
-  @Type(() => CmcStatusDto)
-  @Expose()
-  status!: CmcStatusDto;
-}
-
-// -----------------------------------------------------------------------------
-// TRENDING (v1) — reuse base + quote
+// Trending
 // -----------------------------------------------------------------------------
 
 @Exclude()
@@ -959,11 +516,12 @@ export class CmcTrendingLatestV1Dto extends CmcEnvelopeDto<
   @Expose()
   status!: CmcStatusDto;
 }
+
 export class CmcTrendingMostVisitedV1Dto extends CmcTrendingLatestV1Dto {}
 export class CmcTrendingGainersLosersV1Dto extends CmcTrendingLatestV1Dto {}
 
 // -----------------------------------------------------------------------------
-// v1 — crypto map, info, listings, quotes, ohlcv, pps, categories, airdrops
+// v1 - map, info, listings, quotes, ohlcv, market pairs
 // -----------------------------------------------------------------------------
 
 // Map
@@ -1079,7 +637,6 @@ export class CmcCryptoListingsLatestV1Dto extends CmcEnvelopeDto<
   @Expose()
   status!: CmcStatusDto;
 }
-export class CmcCryptoListingsHistoricalV1Dto extends CmcCryptoListingsLatestV1Dto {}
 
 // Quotes latest (v1)
 @Exclude()
@@ -1190,7 +747,7 @@ export class CmcCryptoQuotesHistoricalV1Dto extends CmcEnvelopeDto<CmcCryptoQuot
   status!: CmcStatusDto;
 }
 
-// Market pairs latest (v1) — reuse v2 item types where similar structure exists
+// Market pairs latest (v1)
 @Exclude()
 export class CmcMarketPairsDataV1Dto {
   @ApiProperty({ example: 1 })
@@ -1236,7 +793,7 @@ export class CmcCryptoMarketPairsLatestV1Dto extends CmcEnvelopeDto<CmcMarketPai
   status!: CmcStatusDto;
 }
 
-// OHLCV latest (v1) — reuse OHLCV point base
+// OHLCV latest (v1)
 @Exclude()
 export class CmcOhlcvLatestAssetV1Dto {
   @ApiProperty({ example: 1 })
@@ -1308,7 +865,7 @@ export class CmcCryptoOhlcvLatestV1Dto extends CmcEnvelopeDto<
   status!: CmcStatusDto;
 }
 
-// OHLCV historical (v1) — reuse v2 historical point shape (compatible)
+// OHLCV historical (v1)
 @Exclude()
 export class CmcOhlcvHistoricalAssetV1Dto {
   @ApiProperty({ example: 1 })
@@ -1341,176 +898,6 @@ export class CmcCryptoOhlcvHistoricalV1Dto extends CmcEnvelopeDto<CmcOhlcvHistor
   @Type(() => CmcOhlcvHistoricalAssetV1Dto)
   @Expose()
   data!: CmcOhlcvHistoricalAssetV1Dto;
-
-  @ApiProperty({ type: () => CmcStatusDto })
-  @ValidateNested()
-  @Type(() => CmcStatusDto)
-  @Expose()
-  status!: CmcStatusDto;
-}
-
-// PPS latest (v1) — reuse PPS period and wrap
-@Exclude()
-export class CmcPpsAssetV1Dto {
-  @ApiProperty({ example: 1 })
-  @IsInt()
-  @Expose()
-  id!: number;
-
-  @ApiProperty({ example: 'Bitcoin' })
-  @IsString()
-  @Expose()
-  name!: string;
-
-  @ApiProperty({ example: 'BTC' })
-  @IsString()
-  @Expose()
-  symbol!: string;
-
-  @ApiProperty({ example: 'bitcoin' })
-  @IsString()
-  @Expose()
-  slug!: string;
-
-  @ApiProperty({ example: '2019-08-22T01:51:32.000Z' })
-  @IsString()
-  @IsDateString()
-  @Expose()
-  last_updated!: string;
-
-  @ApiProperty({
-    description: 'Periods (e.g., all_time) with quote per convert',
-    type: Object,
-  })
-  @IsObject()
-  @Expose()
-  periods!: Record<string, any>;
-}
-
-@Exclude()
-@ApiExtraModels(CmcPpsAssetV1Dto, CmcStatusDto)
-export class CmcCryptoPpsLatestV1Dto extends CmcEnvelopeDto<
-  Record<string, CmcPpsAssetV1Dto>
-> {
-  @ApiProperty({
-    description: 'Keyed by id as string',
-    type: Object,
-  })
-  @IsObject()
-  @Expose()
-  data!: Record<string, CmcPpsAssetV1Dto>;
-
-  @ApiProperty({ type: () => CmcStatusDto })
-  @ValidateNested()
-  @Type(() => CmcStatusDto)
-  @Expose()
-  status!: CmcStatusDto;
-}
-
-// Categories & Category
-@Exclude()
-export class CmcCategoryItemV1Dto {
-  @ApiProperty({ example: '1' })
-  @IsString()
-  @Expose()
-  id!: string;
-
-  @ApiProperty({ example: 'DeFi' })
-  @IsString()
-  @Expose()
-  name!: string;
-
-  @ApiPropertyOptional({ example: 'Decentralized Finance protocols' })
-  @IsOptional()
-  @IsString()
-  @Expose()
-  description?: string;
-}
-
-@Exclude()
-@ApiExtraModels(CmcCategoryItemV1Dto, CmcStatusDto)
-export class CmcCryptoCategoriesV1Dto extends CmcEnvelopeDto<
-  CmcCategoryItemV1Dto[]
-> {
-  @ApiProperty({ type: () => [CmcCategoryItemV1Dto] })
-  @ValidateNested({ each: true })
-  @Type(() => CmcCategoryItemV1Dto)
-  @Expose()
-  data!: CmcCategoryItemV1Dto[];
-
-  @ApiProperty({ type: () => CmcStatusDto })
-  @ValidateNested()
-  @Type(() => CmcStatusDto)
-  @Expose()
-  status!: CmcStatusDto;
-}
-
-@Exclude()
-export class CmcCryptoCategoryV1Dto extends CmcEnvelopeDto<CmcCategoryItemV1Dto> {
-  @ApiProperty({ type: () => CmcCategoryItemV1Dto })
-  @ValidateNested()
-  @Type(() => CmcCategoryItemV1Dto)
-  @Expose()
-  data!: CmcCategoryItemV1Dto;
-
-  @ApiProperty({ type: () => CmcStatusDto })
-  @ValidateNested()
-  @Type(() => CmcStatusDto)
-  @Expose()
-  status!: CmcStatusDto;
-}
-
-// Airdrops
-@Exclude()
-export class CmcAirdropItemV1Dto {
-  @ApiProperty({ example: '42' })
-  @IsString()
-  @Expose()
-  id!: string;
-
-  @ApiProperty({ example: 'ProjectX Airdrop' })
-  @IsString()
-  @Expose()
-  title!: string;
-
-  @ApiPropertyOptional({ example: 'Claim by Sep 30' })
-  @IsOptional()
-  @IsString()
-  @Expose()
-  subtitle?: string;
-
-  @ApiPropertyOptional({ example: 'active' })
-  @IsOptional()
-  @IsString()
-  @Expose()
-  status?: string;
-}
-
-@Exclude()
-@ApiExtraModels(CmcAirdropItemV1Dto, CmcStatusDto)
-export class CmcCryptoAirdropsV1Dto extends CmcEnvelopeDto<
-  CmcAirdropItemV1Dto[]
-> {
-  @ApiProperty({ type: () => [CmcAirdropItemV1Dto] })
-  @ValidateNested({ each: true })
-  @Type(() => CmcAirdropItemV1Dto)
-  @Expose()
-  data!: CmcAirdropItemV1Dto[];
-
-  @ApiProperty({ type: () => CmcStatusDto })
-  @ValidateNested()
-  @Type(() => CmcStatusDto)
-  @Expose()
-  status!: CmcStatusDto;
-}
-
-@Exclude()
-export class CmcCryptoAirdropV1Dto extends CmcEnvelopeDto<CmcAirdropItemV1Dto> {
-  @ApiProperty({ type: () => CmcAirdropItemV1Dto })
-  @ValidateNested()
-  @Type(() => CmcAirdropItemV1Dto)
-  @Expose()
-  data!: CmcAirdropItemV1Dto;
 
   @ApiProperty({ type: () => CmcStatusDto })
   @ValidateNested()

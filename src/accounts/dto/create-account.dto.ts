@@ -29,7 +29,7 @@ export class BaseAccountPayloadDto {
   @IsEnum(KycStatus, {
     message: getEnumErrorMessage(KycStatus, 'KYC status'),
   })
-  KycStatus?: KycStatus = KycStatus.PENDING;
+  kycStatus?: KycStatus = KycStatus.PENDING;
 
   @ApiPropertyOptional({
     description: 'Human-friendly label to identify the account',

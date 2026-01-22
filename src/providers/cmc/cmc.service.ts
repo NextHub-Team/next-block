@@ -14,106 +14,43 @@ import { GroupPlainToInstance } from 'src/utils/transformers/class.transformer';
 // DTOs
 import { CmcKeyInfoDto } from './dto/cmc-info.dto';
 import {
-  CmcGlobalMetricsQueryDto,
+  CmcBlockchainStatisticsLatestQueryDto,
+  CmcCryptoInfoQueryDto,
+  CmcCryptoListingsLatestQueryDto,
+  CmcCryptoMapQueryDto,
+  CmcCryptoMarketPairsLatestV1QueryDto,
+  CmcCryptoOhlcvHistoricalV1QueryDto,
+  CmcCryptoOhlcvLatestV1QueryDto,
+  CmcCryptoQuotesHistoricalV1QueryDto,
+  CmcCryptoQuotesLatestV1QueryDto,
+  CmcFearAndGreedHistoricalQueryDto,
+  CmcFiatMapQueryDto,
   CmcGlobalMetricsHistoricalQueryDto,
+  CmcGlobalMetricsQueryDto,
+  CmcPriceConversionV1QueryDto,
+  CmcTrendingQueryDto,
 } from './dto/cmc-base.query.dto';
 import {
-  CmcGlobalMetricsQuotesLatestDto,
   CmcGlobalMetricsQuotesHistoricalDto,
+  CmcGlobalMetricsQuotesLatestDto,
 } from './dto/cmc-global-metrics.dto';
-// import {
-//   CmcGlobalMetricsQuotesHistoricalDto,
-//   CmcGlobalMetricsQuotesLatestDto,
-// } from './dto/cmc-global-metrics.dto';
-// import {
-//   CmcToolsPriceConversionV1Dto,
-//   CmcToolsPriceConversionV2Dto,
-//   CmcToolsPostmanDto,
-// } from './dto/cmc-tools.dto';
-// import { CmcFiatMapDto } from './dto/cmc-fiat.dto';
-// import { CmcBlockchainStatisticsLatestDto } from './dto/cmc-blockchain.dto';
-// import {
-//   CmcFearAndGreedHistoricalDto,
-//   CmcFearAndGreedLatestDto,
-// } from './dto/cmc-fear-and-greed.dto';
-// import { CmcIndexHistoricalDto, CmcIndexLatestDto } from './dto/cmc-index.dto';
-// import {
-//   CmcCryptoQuotesLatestV2Dto,
-//   CmcCryptoQuotesHistoricalV2Dto,
-//   CmcCryptoQuotesHistoricalV3Dto,
-//   CmcCryptoOhlcvLatestV2Dto,
-//   CmcCryptoOhlcvHistoricalV2Dto,
-//   CmcCryptoMarketPairsLatestV2Dto,
-//   CmcCryptoPpsLatestV2Dto,
-//   CmcTrendingLatestV1Dto,
-//   CmcTrendingMostVisitedV1Dto,
-//   CmcTrendingGainersLosersV1Dto,
-//   CmcCryptoCategoryV1Dto,
-//   CmcCryptoAirdropV1Dto,
-//   CmcCryptoAirdropsV1Dto,
-//   CmcCryptoCategoriesV1Dto,
-//   CmcCryptoPpsLatestV1Dto,
-//   CmcCryptoOhlcvHistoricalV1Dto,
-//   CmcCryptoOhlcvLatestV1Dto,
-//   CmcCryptoMarketPairsLatestV1Dto,
-//   CmcCryptoQuotesHistoricalV1Dto,
-//   CmcCryptoQuotesLatestV1Dto,
-//   CmcCryptoListingsLatestV1Dto,
-//   CmcCryptoInfoV1Dto,
-//   CmcCryptoMapV1Dto,
-//   CmcCryptoListingsHistoricalV1Dto,
-// } from './dto/cmc-cryptocurrency.dto';
-// import {
-//   CmcExchangeMapDto,
-//   CmcExchangeInfoDto,
-//   CmcExchangeListingsLatestDto,
-//   CmcExchangeQuotesLatestDto,
-//   CmcExchangeQuotesHistoricalDto,
-//   CmcExchangeMarketPairsLatestDto,
-//   CmcExchangeAssetsDto,
-// } from './dto/cmc-exchange.dto';
-//
-// // Query DTOs
-// import {
-//   CmcBlockchainStatisticsLatestQueryDto,
-//   CmcCryptoAirdropQueryDto,
-//   CmcCryptoAirdropsQueryDto,
-//   CmcCryptoCategoriesQueryDto,
-//   CmcCryptoCategoryQueryDto,
-//   CmcCryptoInfoQueryDto,
-//   CmcCryptoListingsHistoricalQueryDto,
-//   CmcCryptoListingsLatestQueryDto,
-//   CmcCryptoMapQueryDto,
-//   CmcCryptoMarketPairsLatestV1QueryDto,
-//   CmcCryptoOhlcvHistoricalV1QueryDto,
-//   CmcCryptoOhlcvLatestV1QueryDto,
-//   CmcCryptoPpsLatestV1QueryDto,
-//   CmcCryptoQuotesHistoricalV1QueryDto,
-//   CmcCryptoQuotesLatestV1QueryDto,
-//   CmcExchangeAssetsQueryDto,
-//   CmcExchangeInfoQueryDto,
-//   CmcExchangeListingsLatestQueryDto,
-//   CmcExchangeMapQueryDto,
-//   CmcExchangeMarketPairsLatestQueryDto,
-//   CmcExchangeQuotesHistoricalQueryDto,
-//   CmcExchangeQuotesLatestQueryDto,
-//   CmcFearAndGreedHistoricalQueryDto,
-//   CmcFiatMapQueryDto,
-//   CmcGlobalMetricsHistoricalQueryDto,
-//   CmcGlobalMetricsQueryDto,
-//   CmcIndexHistoricalQueryDto,
-//   CmcMarketPairsLatestV2QueryDto,
-//   CmcOhlcvHistoricalV2QueryDto,
-//   CmcOhlcvLatestV2QueryDto,
-//   CmcPpsLatestV2QueryDto,
-//   CmcPriceConversionV1QueryDto,
-//   CmcPriceConversionV2QueryDto,
-//   CmcQuotesHistoricalV2QueryDto,
-//   CmcQuotesHistoricalV3QueryDto,
-//   CmcQuotesLatestQueryDto,
-//   CmcTrendingQueryDto,
-// } from './dto/cmc-base.query.dto';
-// import { CmcEnvelopeDto } from './dto/cmc-base.response.dto';
+import { CmcToolsPriceConversionV1Dto } from './dto/cmc-tools.dto';
+import { CmcFiatMapDto } from './dto/cmc-fiat.dto';
+import { CmcBlockchainStatisticsLatestDto } from './dto/cmc-blockchain.dto';
+import { CmcFearAndGreedHistoricalDto } from './dto/cmc-fear-and-greed.dto';
+import {
+  CmcCryptoInfoV1Dto,
+  CmcCryptoListingsLatestV1Dto,
+  CmcCryptoMapV1Dto,
+  CmcCryptoMarketPairsLatestV1Dto,
+  CmcCryptoOhlcvHistoricalV1Dto,
+  CmcCryptoOhlcvLatestV1Dto,
+  CmcCryptoQuotesHistoricalV1Dto,
+  CmcCryptoQuotesLatestV1Dto,
+  CmcTrendingGainersLosersV1Dto,
+  CmcTrendingLatestV1Dto,
+  CmcTrendingMostVisitedV1Dto,
+} from './dto/cmc-cryptocurrency.dto';
 
 @Injectable()
 export class CmcService extends BaseToggleableService implements OnModuleInit {
@@ -197,7 +134,7 @@ export class CmcService extends BaseToggleableService implements OnModuleInit {
     const payload = await this.apiClient.getKeyInfo();
     return GroupPlainToInstance(CmcKeyInfoDto, payload, [RoleEnum.admin]);
   }
-  //
+
   // ---------------------------------------------------------------------------
   // Global Metrics
   // ---------------------------------------------------------------------------
@@ -241,819 +178,186 @@ export class CmcService extends BaseToggleableService implements OnModuleInit {
     ]);
   }
 
-  //   // ---------------------------------------------------------------------------
-  //   // Tools
-  //   // ---------------------------------------------------------------------------
-  //   async priceConversionV1(
-  //     q: CmcPriceConversionV1QueryDto,
-  //   ): Promise<CmcToolsPriceConversionV1Dto> {
-  //     this.guard();
-  //     const fn = this.apiClient.priceConversionV1;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message: 'CMC endpoint "tools/price-conversion(v1)" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const params = { ...(q ?? {}) };
-  //     if (!params.convert) params.convert = this.defaultFiat;
-  //     const raw = await fn({ params });
-  //     return GroupPlainToInstance(CmcToolsPriceConversionV1Dto, raw, [
-  //       RoleEnum.admin,
-  //     ]);
-  //   }
-  //
-  //   async priceConversionV2(
-  //     q: CmcPriceConversionV2QueryDto,
-  //   ): Promise<CmcToolsPriceConversionV2Dto> {
-  //     this.guard();
-  //     const fn = this.apiClient.priceConversionV2;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message: 'CMC endpoint "tools/price-conversion(v2)" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const params = { ...(q ?? {}) };
-  //     if (!params.convert) params.convert = this.defaultFiat;
-  //     const raw = await fn({ params });
-  //     return GroupPlainToInstance(CmcToolsPriceConversionV2Dto, raw, [
-  //       RoleEnum.admin,
-  //     ]);
-  //   }
-  //
-  //   async postman(): Promise<CmcToolsPostmanDto> {
-  //     this.guard();
-  //     const fn = this.apiClient.postman;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message: 'CMC endpoint "tools/postman" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const raw = await fn({ params: {} });
-  //     return GroupPlainToInstance(CmcToolsPostmanDto, raw, [RoleEnum.admin]);
-  //   }
-  //
-  //   // ---------------------------------------------------------------------------
-  //   // Fiat
-  //   // ---------------------------------------------------------------------------
-  //   async getFiatMap(q: CmcFiatMapQueryDto): Promise<CmcFiatMapDto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getFiatMap;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message: 'CMC endpoint "fiat/map" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const raw = await fn({ params: q ?? {} });
-  //     return GroupPlainToInstance(CmcFiatMapDto, raw, [RoleEnum.admin]);
-  //   }
-  //
-  //   // ---------------------------------------------------------------------------
-  //   // Blockchain
-  //   // ---------------------------------------------------------------------------
-  //   async getBlockchainStatisticsLatest(
-  //     q: CmcBlockchainStatisticsLatestQueryDto,
-  //   ): Promise<CmcBlockchainStatisticsLatestDto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getBlockchainStatisticsLatest;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message:
-  //           'CMC endpoint "blockchain/statistics/latest" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const raw = await fn({ params: q ?? {} });
-  //     return GroupPlainToInstance(CmcBlockchainStatisticsLatestDto, raw, [
-  //       RoleEnum.admin,
-  //     ]);
-  //   }
-  //
-  //   // ---------------------------------------------------------------------------
-  //   // Fear & Greed
-  //   // ---------------------------------------------------------------------------
-  //   async getFearAndGreedLatest(): Promise<CmcFearAndGreedLatestDto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getFearAndGreedLatest;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message: 'CMC endpoint "fear-and-greed/latest" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const raw = await fn({ params: {} });
-  //     return GroupPlainToInstance(CmcFearAndGreedLatestDto, raw, [
-  //       RoleEnum.admin,
-  //     ]);
-  //   }
-  //
-  //   async getFearAndGreedHistorical(
-  //     q: CmcFearAndGreedHistoricalQueryDto,
-  //   ): Promise<CmcFearAndGreedHistoricalDto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getFearAndGreedHistorical;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message: 'CMC endpoint "fear-and-greed/historical" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const raw = await fn({ params: q ?? {} });
-  //     return GroupPlainToInstance(CmcFearAndGreedHistoricalDto, raw, [
-  //       RoleEnum.admin,
-  //     ]);
-  //   }
-  //
-  //   // ---------------------------------------------------------------------------
-  //   // Index (CMC20 / CMC100)
-  //   // ---------------------------------------------------------------------------
-  //   async getIndexCmc20Latest(): Promise<CmcIndexLatestDto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getIndexCmc20Latest;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message: 'CMC endpoint "index/cmc20-latest" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const raw = await fn({ params: {} });
-  //     return GroupPlainToInstance(CmcIndexLatestDto, raw, [RoleEnum.admin]);
-  //   }
-  //
-  //   async getIndexCmc20Historical(
-  //     q: CmcIndexHistoricalQueryDto,
-  //   ): Promise<CmcIndexHistoricalDto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getIndexCmc20Historical;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message: 'CMC endpoint "index/cmc20-historical" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const raw = await fn({ params: q ?? {} });
-  //     return GroupPlainToInstance(CmcIndexHistoricalDto, raw, [RoleEnum.admin]);
-  //   }
-  //
-  //   async getIndexCmc100Latest(): Promise<CmcIndexLatestDto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getIndexCmc100Latest;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message: 'CMC endpoint "index/cmc100-latest" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const raw = await fn({ params: {} });
-  //     return GroupPlainToInstance(CmcIndexLatestDto, raw, [RoleEnum.admin]);
-  //   }
-  //
-  //   async getIndexCmc100Historical(
-  //     q: CmcIndexHistoricalQueryDto,
-  //   ): Promise<CmcIndexHistoricalDto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getIndexCmc100Historical;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message: 'CMC endpoint "index/cmc100-historical" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const raw = await fn({ params: q ?? {} });
-  //     return GroupPlainToInstance(CmcIndexHistoricalDto, raw, [RoleEnum.admin]);
-  //   }
-  //
-  //   // ---------------------------------------------------------------------------
-  //   // Cryptocurrency v2/v3
-  //   // ---------------------------------------------------------------------------
-  //   async getQuotesLatestV2(
-  //     q: CmcQuotesLatestQueryDto,
-  //   ): Promise<CmcCryptoQuotesLatestV2Dto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getQuotesLatestV2;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message:
-  //           'CMC endpoint "cryptocurrency/quotes/latest(v2)" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const params = { ...(q ?? {}) };
-  //     if (!params.convert) params.convert = this.defaultFiat;
-  //     const raw = await fn({ params });
-  //     return GroupPlainToInstance(CmcCryptoQuotesLatestV2Dto, raw, [
-  //       RoleEnum.admin,
-  //     ]);
-  //   }
-  //
-  //   async getQuotesHistoricalV2(
-  //     q: CmcQuotesHistoricalV2QueryDto,
-  //   ): Promise<CmcCryptoQuotesHistoricalV2Dto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getQuotesHistoricalV2;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message:
-  //           'CMC endpoint "cryptocurrency/quotes/historical(v2)" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const params = { ...(q ?? {}) };
-  //     if (!params.convert) params.convert = this.defaultFiat;
-  //     const raw = await fn({ params });
-  //     return GroupPlainToInstance(CmcCryptoQuotesHistoricalV2Dto, raw, [
-  //       RoleEnum.admin,
-  //     ]);
-  //   }
-  //
-  //   async getQuotesHistoricalV3(
-  //     q: CmcQuotesHistoricalV3QueryDto,
-  //   ): Promise<CmcCryptoQuotesHistoricalV3Dto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getQuotesHistoricalV3;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message:
-  //           'CMC endpoint "cryptocurrency/quotes/historical(v3)" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const params = { ...(q ?? {}) };
-  //     if (!params.convert) params.convert = this.defaultFiat;
-  //     const raw = await fn({ params });
-  //     return GroupPlainToInstance(CmcCryptoQuotesHistoricalV3Dto, raw, [
-  //       RoleEnum.admin,
-  //     ]);
-  //   }
-  //
-  //   async getOhlcvLatestV2(
-  //     q: CmcOhlcvLatestV2QueryDto,
-  //   ): Promise<CmcCryptoOhlcvLatestV2Dto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getOhlcvLatestV2;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message:
-  //           'CMC endpoint "cryptocurrency/ohlcv/latest(v2)" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const params = { ...(q ?? {}) };
-  //     if (!params.convert) params.convert = this.defaultFiat;
-  //     const raw = await fn({ params });
-  //     return GroupPlainToInstance(CmcCryptoOhlcvLatestV2Dto, raw, [
-  //       RoleEnum.admin,
-  //     ]);
-  //   }
-  //
-  //   async getOhlcvHistoricalV2(
-  //     q: CmcOhlcvHistoricalV2QueryDto,
-  //   ): Promise<CmcCryptoOhlcvHistoricalV2Dto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getOhlcvHistoricalV2;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message:
-  //           'CMC endpoint "cryptocurrency/ohlcv/historical(v2)" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const params = { ...(q ?? {}) };
-  //     if (!params.convert) params.convert = this.defaultFiat;
-  //     const raw = await fn({ params });
-  //     return GroupPlainToInstance(CmcCryptoOhlcvHistoricalV2Dto, raw, [
-  //       RoleEnum.admin,
-  //     ]);
-  //   }
-  //
-  //   async getMarketPairsLatestV2(
-  //     q: CmcMarketPairsLatestV2QueryDto,
-  //   ): Promise<CmcCryptoMarketPairsLatestV2Dto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getMarketPairsLatestV2;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message:
-  //           'CMC endpoint "cryptocurrency/market-pairs/latest(v2)" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const params = { ...(q ?? {}) };
-  //     if (!params.convert) params.convert = this.defaultFiat;
-  //     const raw = await fn({ params });
-  //     return GroupPlainToInstance(CmcCryptoMarketPairsLatestV2Dto, raw, [
-  //       RoleEnum.admin,
-  //     ]);
-  //   }
-  //
-  //   async getPricePerformanceStatsLatestV2(
-  //     q: CmcPpsLatestV2QueryDto,
-  //   ): Promise<CmcCryptoPpsLatestV2Dto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getPricePerformanceStatsLatestV2;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message:
-  //           'CMC endpoint "cryptocurrency/pps/latest(v2)" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const params = { ...(q ?? {}) };
-  //     if (!params.convert) params.convert = this.defaultFiat;
-  //     const raw = await fn({ params });
-  //     return GroupPlainToInstance(CmcCryptoPpsLatestV2Dto, raw, [RoleEnum.admin]);
-  //   }
-  //
-  //   // ---------------------------------------------------------------------------
-  //   // Cryptocurrency v1
-  //   // ---------------------------------------------------------------------------
-  //   async getCryptoMap(q: CmcCryptoMapQueryDto): Promise<CmcCryptoMapV1Dto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getCryptoMap;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message: 'CMC endpoint "cryptocurrency/map" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const raw = await fn({ params: q ?? {} });
-  //     return GroupPlainToInstance(CmcCryptoMapV1Dto, raw, [RoleEnum.admin]);
-  //   }
-  //
-  //   async getCryptoInfo(q: CmcCryptoInfoQueryDto): Promise<CmcCryptoInfoV1Dto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getCryptoInfo;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message: 'CMC endpoint "cryptocurrency/info" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const raw = await fn({ params: q ?? {} });
-  //     return GroupPlainToInstance(CmcCryptoInfoV1Dto, raw, [RoleEnum.admin]);
-  //   }
-  //
-  //   async getCryptoListingsLatest(
-  //     q: CmcCryptoListingsLatestQueryDto,
-  //   ): Promise<CmcCryptoListingsLatestV1Dto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getCryptoListingsLatest;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message:
-  //           'CMC endpoint "cryptocurrency/listings/latest" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const params = { ...(q ?? {}) };
-  //     if (!params.convert) params.convert = this.defaultFiat;
-  //     const raw = await fn({ params });
-  //     return GroupPlainToInstance(CmcCryptoListingsLatestV1Dto, raw, [
-  //       RoleEnum.admin,
-  //     ]);
-  //   }
-  //
-  //   async getCryptoListingsHistorical(
-  //     q: CmcCryptoListingsHistoricalQueryDto,
-  //   ): Promise<CmcCryptoListingsHistoricalV1Dto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getCryptoListingsHistorical;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message:
-  //           'CMC endpoint "cryptocurrency/listings/historical" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const params = { ...(q ?? {}) };
-  //     if (!params.convert) params.convert = this.defaultFiat;
-  //     const raw = await fn({ params });
-  //     return GroupPlainToInstance(CmcCryptoListingsHistoricalV1Dto, raw, [
-  //       RoleEnum.admin,
-  //     ]);
-  //   }
-  //
-  //   async getQuotesLatest(
-  //     q: CmcCryptoQuotesLatestV1QueryDto,
-  //   ): Promise<CmcCryptoQuotesLatestV1Dto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getQuotesLatest;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message:
-  //           'CMC endpoint "cryptocurrency/quotes/latest(v1)" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const params = { ...(q ?? {}) };
-  //     if (!params.convert) params.convert = this.defaultFiat;
-  //     const raw = await fn({ params });
-  //     return GroupPlainToInstance(CmcCryptoQuotesLatestV1Dto, raw, [
-  //       RoleEnum.admin,
-  //     ]);
-  //   }
-  //
-  //   async getQuotesHistorical(
-  //     q: CmcCryptoQuotesHistoricalV1QueryDto,
-  //   ): Promise<CmcCryptoQuotesHistoricalV1Dto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getQuotesHistorical;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message:
-  //           'CMC endpoint "cryptocurrency/quotes/historical(v1)" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const params = { ...(q ?? {}) };
-  //     if (!params.convert) params.convert = this.defaultFiat;
-  //     const raw = await fn({ params });
-  //     return GroupPlainToInstance(CmcCryptoQuotesHistoricalV1Dto, raw, [
-  //       RoleEnum.admin,
-  //     ]);
-  //   }
-  //
-  //   async getMarketPairsLatest(
-  //     q: CmcCryptoMarketPairsLatestV1QueryDto,
-  //   ): Promise<CmcCryptoMarketPairsLatestV1Dto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getMarketPairsLatest;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message:
-  //           'CMC endpoint "cryptocurrency/market-pairs/latest(v1)" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const params = { ...(q ?? {}) };
-  //     if (!params.convert) params.convert = this.defaultFiat;
-  //     const raw = await fn({ params });
-  //     return GroupPlainToInstance(CmcCryptoMarketPairsLatestV1Dto, raw, [
-  //       RoleEnum.admin,
-  //     ]);
-  //   }
-  //
-  //   async getOhlcvLatest(
-  //     q: CmcCryptoOhlcvLatestV1QueryDto,
-  //   ): Promise<CmcCryptoOhlcvLatestV1Dto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getOhlcvLatest;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message:
-  //           'CMC endpoint "cryptocurrency/ohlcv/latest(v1)" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const params = { ...(q ?? {}) };
-  //     if (!params.convert) params.convert = this.defaultFiat;
-  //     const raw = await fn({ params });
-  //     return GroupPlainToInstance(CmcCryptoOhlcvLatestV1Dto, raw, [
-  //       RoleEnum.admin,
-  //     ]);
-  //   }
-  //
-  //   async getOhlcvHistorical(
-  //     q: CmcCryptoOhlcvHistoricalV1QueryDto,
-  //   ): Promise<CmcCryptoOhlcvHistoricalV1Dto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getOhlcvHistorical;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message:
-  //           'CMC endpoint "cryptocurrency/ohlcv/historical(v1)" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const params = { ...(q ?? {}) };
-  //     if (!params.convert) params.convert = this.defaultFiat;
-  //     const raw = await fn({ params });
-  //     return GroupPlainToInstance(CmcCryptoOhlcvHistoricalV1Dto, raw, [
-  //       RoleEnum.admin,
-  //     ]);
-  //   }
-  //
-  //   async getPricePerformanceStatsLatest(
-  //     q: CmcCryptoPpsLatestV1QueryDto,
-  //   ): Promise<CmcCryptoPpsLatestV1Dto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getPricePerformanceStatsLatest;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message:
-  //           'CMC endpoint "cryptocurrency/price-performance-stats/latest(v1)" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const params = { ...(q ?? {}) };
-  //     if (!params.convert) params.convert = this.defaultFiat;
-  //     const raw = await fn({ params });
-  //     return GroupPlainToInstance(CmcCryptoPpsLatestV1Dto, raw, [RoleEnum.admin]);
-  //   }
-  //
-  //   async getCategories(
-  //     q: CmcCryptoCategoriesQueryDto,
-  //   ): Promise<CmcCryptoCategoriesV1Dto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getCategories;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message: 'CMC endpoint "cryptocurrency/categories" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const raw = await fn({ params: q ?? {} });
-  //     return GroupPlainToInstance(CmcCryptoCategoriesV1Dto, raw, [
-  //       RoleEnum.admin,
-  //     ]);
-  //   }
-  //
-  //   async getCategory(
-  //     q: CmcCryptoCategoryQueryDto,
-  //   ): Promise<CmcCryptoCategoryV1Dto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getCategory;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message: 'CMC endpoint "cryptocurrency/category" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const raw = await fn({ params: q ?? {} });
-  //     return GroupPlainToInstance(CmcCryptoCategoryV1Dto, raw, [RoleEnum.admin]);
-  //   }
-  //
-  //   async getAirdrops(
-  //     q: CmcCryptoAirdropsQueryDto,
-  //   ): Promise<CmcCryptoAirdropsV1Dto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getAirdrops;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message: 'CMC endpoint "cryptocurrency/airdrops" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const raw = await fn({ params: q ?? {} });
-  //     return GroupPlainToInstance(CmcCryptoAirdropsV1Dto, raw, [RoleEnum.admin]);
-  //   }
-  //
-  //   async getAirdrop(
-  //     q: CmcCryptoAirdropQueryDto,
-  //   ): Promise<CmcCryptoAirdropV1Dto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getAirdrop;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message: 'CMC endpoint "cryptocurrency/airdrop" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const raw = await fn({ params: q ?? {} });
-  //     return GroupPlainToInstance(CmcCryptoAirdropV1Dto, raw, [RoleEnum.admin]);
-  //   }
-  //
-  //   // ---------------------------------------------------------------------------
-  //   // Cryptocurrency — Trending
-  //   // ---------------------------------------------------------------------------
-  //   async getTrendingLatest(
-  //     q: CmcTrendingQueryDto,
-  //   ): Promise<CmcTrendingLatestV1Dto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getTrendingLatest;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message:
-  //           'CMC endpoint "cryptocurrency/trending/latest" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const raw = await fn({ params: q ?? {} });
-  //     return GroupPlainToInstance(CmcTrendingLatestV1Dto, raw, [RoleEnum.admin]);
-  //   }
-  //
-  //   async getTrendingMostVisited(
-  //     q: CmcTrendingQueryDto,
-  //   ): Promise<CmcTrendingMostVisitedV1Dto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getTrendingMostVisited;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message:
-  //           'CMC endpoint "cryptocurrency/trending/most-visited" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const raw = await fn({ params: q ?? {} });
-  //     return GroupPlainToInstance(CmcTrendingMostVisitedV1Dto, raw, [
-  //       RoleEnum.admin,
-  //     ]);
-  //   }
-  //
-  //   async getTrendingGainersLosers(
-  //     q: CmcTrendingQueryDto,
-  //   ): Promise<CmcTrendingGainersLosersV1Dto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getTrendingGainersLosers;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message:
-  //           'CMC endpoint "cryptocurrency/trending/gainers-losers" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const raw = await fn({ params: q ?? {} });
-  //     return GroupPlainToInstance(CmcTrendingGainersLosersV1Dto, raw, [
-  //       RoleEnum.admin,
-  //     ]);
-  //   }
-  //
-  //   // ---------------------------------------------------------------------------
-  //   // Exchange
-  //   // ---------------------------------------------------------------------------
-  //   async getExchangeMap(q: CmcExchangeMapQueryDto): Promise<CmcExchangeMapDto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getExchangeMap;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message: 'CMC endpoint "exchange/map" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const raw = await fn({ params: q ?? {} });
-  //     return GroupPlainToInstance(CmcExchangeMapDto, raw, [RoleEnum.admin]);
-  //   }
-  //
-  //   async getExchangeInfo(
-  //     q: CmcExchangeInfoQueryDto,
-  //   ): Promise<CmcExchangeInfoDto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getExchangeInfo;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message: 'CMC endpoint "exchange/info" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const raw = await fn({ params: q ?? {} });
-  //     return GroupPlainToInstance(CmcExchangeInfoDto, raw, [RoleEnum.admin]);
-  //   }
-  //
-  //   async getExchangeListingsLatest(
-  //     q: CmcExchangeListingsLatestQueryDto,
-  //   ): Promise<CmcExchangeListingsLatestDto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getExchangeListingsLatest;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message: 'CMC endpoint "exchange/listings/latest" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const params = { ...(q ?? {}) };
-  //     if (!params.convert) params.convert = this.defaultFiat;
-  //     const raw = await fn({ params });
-  //     return GroupPlainToInstance(CmcExchangeListingsLatestDto, raw, [
-  //       RoleEnum.admin,
-  //     ]);
-  //   }
-  //
-  //   async getExchangeQuotesLatest(
-  //     q: CmcExchangeQuotesLatestQueryDto,
-  //   ): Promise<CmcExchangeQuotesLatestDto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getExchangeQuotesLatest;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message: 'CMC endpoint "exchange/quotes/latest" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const params = { ...(q ?? {}) };
-  //     if (!params.convert) params.convert = this.defaultFiat;
-  //     const raw = await fn({ params });
-  //     return GroupPlainToInstance(CmcExchangeQuotesLatestDto, raw, [
-  //       RoleEnum.admin,
-  //     ]);
-  //   }
-  //
-  //   async getExchangeQuotesHistorical(
-  //     q: CmcExchangeQuotesHistoricalQueryDto,
-  //   ): Promise<CmcExchangeQuotesHistoricalDto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getExchangeQuotesHistorical;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message: 'CMC endpoint "exchange/quotes/historical" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const params = { ...(q ?? {}) };
-  //     if (!params.convert) params.convert = this.defaultFiat;
-  //     const raw = await fn({ params });
-  //     return GroupPlainToInstance(CmcExchangeQuotesHistoricalDto, raw, [
-  //       RoleEnum.admin,
-  //     ]);
-  //   }
-  //
-  //   async getExchangeMarketPairsLatest(
-  //     q: CmcExchangeMarketPairsLatestQueryDto,
-  //   ): Promise<CmcExchangeMarketPairsLatestDto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getExchangeMarketPairsLatest;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message:
-  //           'CMC endpoint "exchange/market-pairs/latest" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const params = { ...(q ?? {}) };
-  //     if (!params.convert) params.convert = this.defaultFiat;
-  //     const raw = await fn({ params });
-  //     return GroupPlainToInstance(CmcExchangeMarketPairsLatestDto, raw, [
-  //       RoleEnum.admin,
-  //     ]);
-  //   }
-  //
-  //   async getExchangeAssets(
-  //     q: CmcExchangeAssetsQueryDto,
-  //   ): Promise<CmcExchangeAssetsDto> {
-  //     this.guard();
-  //     const fn = this.apiClient.getExchangeAssets;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message: 'CMC endpoint "exchange/assets" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const raw = await fn({ params: q ?? {} });
-  //     return GroupPlainToInstance(CmcExchangeAssetsDto, raw, [RoleEnum.admin]);
-  //   }
-  //
-  //   // ---------------------------------------------------------------------------
-  //   // Generic tools mapping (optional)
-  //   // ---------------------------------------------------------------------------
-  //   async priceConversion(
-  //     q: CmcPriceConversionV2QueryDto,
-  //   ): Promise<CmcEnvelopeDto<any>> {
-  //     this.guard();
-  //     const fn = this.apiClient.priceConversion;
-  //     if (!fn) {
-  //       throw new UnprocessableEntityException({
-  //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //         message: 'CMC endpoint "tools/price-conversion" is not registered',
-  //         errors: { endpoint: 'NotRegistered' },
-  //       });
-  //     }
-  //     const params = { ...(q ?? {}) };
-  //     if (!params.convert) params.convert = this.defaultFiat;
-  //     const raw = await fn({ params });
-  //     return GroupPlainToInstance(CmcEnvelopeDto<any>, raw, [RoleEnum.admin]);
-  //   }
+  // ---------------------------------------------------------------------------
+  // Tools
+  // ---------------------------------------------------------------------------
+  async priceConversionV1(
+    q: CmcPriceConversionV1QueryDto,
+  ): Promise<CmcToolsPriceConversionV1Dto> {
+    const dto: any = { ...(q ?? {}) };
+
+    if (dto.convert_id) {
+      delete dto.convert;
+    } else if (!dto.convert) {
+      dto.convert = this.defaultFiat;
+    }
+
+    const payload = await this.apiClient.priceConversionV1({ query: dto });
+    return GroupPlainToInstance(CmcToolsPriceConversionV1Dto, payload, [
+      RoleEnum.admin,
+    ]);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Fiat
+  // ---------------------------------------------------------------------------
+  async getFiatMap(q: CmcFiatMapQueryDto): Promise<CmcFiatMapDto> {
+    const payload = await this.apiClient.getFiatMap({ query: q ?? {} });
+    return GroupPlainToInstance(CmcFiatMapDto, payload, [RoleEnum.admin]);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Blockchain
+  // ---------------------------------------------------------------------------
+  async getBlockchainStatisticsLatest(
+    q: CmcBlockchainStatisticsLatestQueryDto,
+  ): Promise<CmcBlockchainStatisticsLatestDto> {
+    const payload = await this.apiClient.getBlockchainStatisticsLatest({
+      query: q ?? {},
+    });
+    return GroupPlainToInstance(CmcBlockchainStatisticsLatestDto, payload, [
+      RoleEnum.admin,
+    ]);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Fear & Greed
+  // ---------------------------------------------------------------------------
+  async getFearAndGreedHistorical(
+    q: CmcFearAndGreedHistoricalQueryDto,
+  ): Promise<CmcFearAndGreedHistoricalDto> {
+    const payload = await this.apiClient.getFearAndGreedHistorical({
+      query: q ?? {},
+    });
+    return GroupPlainToInstance(CmcFearAndGreedHistoricalDto, payload, [
+      RoleEnum.admin,
+    ]);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Cryptocurrency - Assets and lists
+  // ---------------------------------------------------------------------------
+  async getCryptoMap(q: CmcCryptoMapQueryDto): Promise<CmcCryptoMapV1Dto> {
+    const payload = await this.apiClient.getCryptoMap({ query: q ?? {} });
+    return GroupPlainToInstance(CmcCryptoMapV1Dto, payload, [RoleEnum.admin]);
+  }
+
+  async getCryptoInfo(q: CmcCryptoInfoQueryDto): Promise<CmcCryptoInfoV1Dto> {
+    const payload = await this.apiClient.getCryptoInfo({ query: q ?? {} });
+    return GroupPlainToInstance(CmcCryptoInfoV1Dto, payload, [RoleEnum.admin]);
+  }
+
+  async getCryptoListingsLatest(
+    q: CmcCryptoListingsLatestQueryDto,
+  ): Promise<CmcCryptoListingsLatestV1Dto> {
+    const dto: any = { ...(q ?? {}) };
+    if (!dto.convert) dto.convert = this.defaultFiat;
+
+    const payload = await this.apiClient.getCryptoListingsLatest({
+      query: dto,
+    });
+    return GroupPlainToInstance(CmcCryptoListingsLatestV1Dto, payload, [
+      RoleEnum.admin,
+    ]);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Cryptocurrency - Quotes and OHLCV
+  // ---------------------------------------------------------------------------
+  async getQuotesLatest(
+    q: CmcCryptoQuotesLatestV1QueryDto,
+  ): Promise<CmcCryptoQuotesLatestV1Dto> {
+    const dto: any = { ...(q ?? {}) };
+    if (!dto.convert) dto.convert = this.defaultFiat;
+
+    const payload = await this.apiClient.getQuotesLatest({ query: dto });
+    return GroupPlainToInstance(CmcCryptoQuotesLatestV1Dto, payload, [
+      RoleEnum.admin,
+    ]);
+  }
+
+  async getQuotesHistorical(
+    q: CmcCryptoQuotesHistoricalV1QueryDto,
+  ): Promise<CmcCryptoQuotesHistoricalV1Dto> {
+    const dto: any = { ...(q ?? {}) };
+    if (!dto.convert) dto.convert = this.defaultFiat;
+
+    const payload = await this.apiClient.getQuotesHistorical({ query: dto });
+    return GroupPlainToInstance(CmcCryptoQuotesHistoricalV1Dto, payload, [
+      RoleEnum.admin,
+    ]);
+  }
+
+  async getOhlcvLatest(
+    q: CmcCryptoOhlcvLatestV1QueryDto,
+  ): Promise<CmcCryptoOhlcvLatestV1Dto> {
+    const dto: any = { ...(q ?? {}) };
+    if (!dto.convert) dto.convert = this.defaultFiat;
+
+    const payload = await this.apiClient.getOhlcvLatest({ query: dto });
+    return GroupPlainToInstance(CmcCryptoOhlcvLatestV1Dto, payload, [
+      RoleEnum.admin,
+    ]);
+  }
+
+  async getOhlcvHistorical(
+    q: CmcCryptoOhlcvHistoricalV1QueryDto,
+  ): Promise<CmcCryptoOhlcvHistoricalV1Dto> {
+    const dto: any = { ...(q ?? {}) };
+    if (!dto.convert) dto.convert = this.defaultFiat;
+
+    const payload = await this.apiClient.getOhlcvHistorical({ query: dto });
+    return GroupPlainToInstance(CmcCryptoOhlcvHistoricalV1Dto, payload, [
+      RoleEnum.admin,
+    ]);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Cryptocurrency - Market pairs
+  // ---------------------------------------------------------------------------
+  async getMarketPairsLatest(
+    q: CmcCryptoMarketPairsLatestV1QueryDto,
+  ): Promise<CmcCryptoMarketPairsLatestV1Dto> {
+    const dto: any = { ...(q ?? {}) };
+    if (!dto.convert) dto.convert = this.defaultFiat;
+
+    const payload = await this.apiClient.getMarketPairsLatest({ query: dto });
+    return GroupPlainToInstance(CmcCryptoMarketPairsLatestV1Dto, payload, [
+      RoleEnum.admin,
+    ]);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Cryptocurrency - Trending
+  // ---------------------------------------------------------------------------
+  async getTrendingLatest(
+    q: CmcTrendingQueryDto,
+  ): Promise<CmcTrendingLatestV1Dto> {
+    const payload = await this.apiClient.getTrendingLatest({ query: q ?? {} });
+    return GroupPlainToInstance(CmcTrendingLatestV1Dto, payload, [
+      RoleEnum.admin,
+    ]);
+  }
+
+  async getTrendingMostVisited(
+    q: CmcTrendingQueryDto,
+  ): Promise<CmcTrendingMostVisitedV1Dto> {
+    const payload = await this.apiClient.getTrendingMostVisited({
+      query: q ?? {},
+    });
+    return GroupPlainToInstance(CmcTrendingMostVisitedV1Dto, payload, [
+      RoleEnum.admin,
+    ]);
+  }
+
+  async getTrendingGainersLosers(
+    q: CmcTrendingQueryDto,
+  ): Promise<CmcTrendingGainersLosersV1Dto> {
+    const payload = await this.apiClient.getTrendingGainersLosers({
+      query: q ?? {},
+    });
+    return GroupPlainToInstance(CmcTrendingGainersLosersV1Dto, payload, [
+      RoleEnum.admin,
+    ]);
+  }
 }

@@ -24,7 +24,7 @@ export class Account {
     default: KycStatus.PENDING,
     nullable: false,
   })
-  KycStatus?: KycStatus = KycStatus.PENDING;
+  kycStatus?: KycStatus = KycStatus.PENDING;
 
   @ApiProperty({
     type: () => String,

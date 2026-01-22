@@ -1,4 +1,4 @@
-export enum CmcEnvironmenType {
+export enum CmcEnvironmentType {
   SANDBOX = 'sandbox',
   PRODUCTION = 'production',
 }

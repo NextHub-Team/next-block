@@ -22,10 +22,10 @@ interface DisabledEndpointOptions {
 
 const DEFAULT_MESSAGE = 'This endpoint is disabled';
 
-const createDisabledInterceptor = (
+function createDisabledInterceptor(
   message: string,
   status: HttpStatus,
-): Type<NestInterceptor> => {
+): Type<NestInterceptor> {
   class DisabledEndpointInterceptor implements NestInterceptor {
     private readonly logger = new Logger(DisabledEndpointInterceptor.name);
 
@@ -49,7 +49,7 @@ const createDisabledInterceptor = (
   }
 
   return mixin(DisabledEndpointInterceptor);
-};
+}
 
 export function DisabledEndpoint(
   options: DisabledEndpointOptions = {},

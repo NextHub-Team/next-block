@@ -1,7 +1,7 @@
 /**
  * Converts Prometheus text-based metrics to JSON
  */
-export const parseMetrics = (metricsText: string): Record<string, any> => {
+export function parseMetrics(metricsText: string): Record<string, any> {
   const metrics: Record<string, any> = {};
 
   const lines = metricsText.split('\n');
@@ -32,4 +32,4 @@ export const parseMetrics = (metricsText: string): Record<string, any> => {
   }
 
   return metrics;
-};
+}

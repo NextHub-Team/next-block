@@ -1,4 +1,4 @@
-import { CmcEnvironmenType } from '../types/cmc-enum.type';
+import { CmcEnvironmentType } from '../types/cmc-enum.type';
 
 export interface CmcConfig {
   /** Whether CMC integration is enabled */
@@ -8,7 +8,7 @@ export interface CmcConfig {
   apiKey: string;
 
   /** Environment type for CMC (e.g., prod, sandbox, dev) */
-  envType: CmcEnvironmenType;
+  envType: CmcEnvironmentType;
 
   /** Time-to-live for cached responses in milliseconds */
   ttlMs: number;

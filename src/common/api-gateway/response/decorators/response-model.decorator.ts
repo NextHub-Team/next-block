@@ -26,4 +26,6 @@ import { SetMetadata } from '@nestjs/common';
  * The metadata key used internally is 'response:providerName'.
  */
 export const PROVIDER_NAME = 'response:providerName';
-export const ResponseModel = (key: string) => SetMetadata(PROVIDER_NAME, key);
+export function ResponseModel(key: string) {
+  return SetMetadata(PROVIDER_NAME, key);
+}

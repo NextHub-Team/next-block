@@ -1,5 +1,5 @@
 import * as path from 'path';
 
-export const getUploadsPath = () => {
+export function getUploadsPath() {
   return path.resolve(__dirname, '..', 'uploads');
-};
+}

@@ -4,6 +4,6 @@ export function capitalize(value: string): string {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
-export function isEmpty(value: string): boolean {
-  return value.length > 0 ? false : true;
+export function isEmpty(value?: string): boolean {
+  return value == null || value.length === 0;
 }

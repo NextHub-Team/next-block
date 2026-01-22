@@ -65,6 +65,15 @@ import { FireblocksCwService } from '../fireblocks-cw.service';
 export class FireblocksCwAdminController {
   constructor(private readonly admin: FireblocksCwAdminService) {}
 
+  @Get('/')
+  @ApiOkResponse({ type: FireblocksVaultAccountsPageDto })
+  @ApiOperationRoles('List Fireblocks vault accounts', [RoleEnum.admin])
+  async listVaultAccounts(
+    @Query() query: VaultAccountsQueryDto,
+  ): Promise<FireblocksVaultAccountsPageDto> {
+    return this.admin.listVaultAccounts(query);
+  }
+
   @Get('assets')
   @ApiOkResponse({ type: FireblocksPaginatedAssetWalletResponseDto })
   @ApiOperationRoles('List Fireblocks asset wallets', [RoleEnum.admin])
@@ -94,15 +103,6 @@ export class FireblocksCwAdminController {
     @Body() body: SpecialAddressesRequestDto,
   ): Promise<FireblocksSpecialAddressesResponseDto> {
     return this.admin.createSpecialAddresses(body);
-  }
-
-  @Get()
-  @ApiOkResponse({ type: FireblocksVaultAccountsPageDto })
-  @ApiOperationRoles('List Fireblocks vault accounts', [RoleEnum.admin])
-  async listVaultAccounts(
-    @Query() query: VaultAccountsQueryDto,
-  ): Promise<FireblocksVaultAccountsPageDto> {
-    return this.admin.listVaultAccounts(query);
   }
 
   @Get('accounts/bulk')

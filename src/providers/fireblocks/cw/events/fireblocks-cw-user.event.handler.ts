@@ -155,7 +155,7 @@ export class FireblocksCwUserAddedEventHandler extends InternalEventHandlerBase 
           accountId: vaultAccount.id as string,
           providerName: AccountProviderName.FIREBLOCKS,
           user: { id: user.id },
-          KycStatus: KycStatus.VERIFIED,
+          kycStatus: KycStatus.VERIFIED,
           label: FireblocksCwUserAddedEventHandler.ACCOUNT_LABEL,
           status: AccountStatus.ACTIVE,
           customerRefId,

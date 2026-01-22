@@ -88,7 +88,7 @@ export class FireblocksCwSyncService {
         accountId: params.vaultAccount.id,
         providerName: AccountProviderName.FIREBLOCKS,
         user: { id: userId },
-        KycStatus: params.kycStatus ?? KycStatus.VERIFIED,
+        kycStatus: params.kycStatus ?? KycStatus.VERIFIED,
         label,
         status: params.status ?? AccountStatus.ACTIVE,
         customerRefId: `${customerRefId}`,

@@ -37,13 +37,13 @@ const defaults: AwsSecretsManagerConfig = {
   debug: AWS_SECRETS_MANAGER_DEBUG,
 };
 
-const parseSecretIds = (value?: string): string[] => {
+function parseSecretIds(value?: string): string[] {
   if (!value) return defaults.secretIds;
   return value
     .split(',')
     .map((item) => item.trim())
     .filter(Boolean);
-};
+}
 
 export default createToggleableConfig<
   AwsSecretsManagerConfig,

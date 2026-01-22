@@ -1,9 +1,7 @@
 // -----------------------------------------------------------------------------
-// CMC — Tools DTOs
+// CMC - Tools DTOs
 // Endpoints covered:
-//   • GET /v1/tools/price-conversion
-//   • GET /v2/tools/price-conversion
-//   • GET /v1/tools/postman  (status-only/error payload)
+//   - GET /v1/tools/price-conversion
 // -----------------------------------------------------------------------------
 
 import { Exclude, Expose, Type } from 'class-transformer';
@@ -20,7 +18,7 @@ import { CmcEnvelopeDto, CmcStatusDto } from './cmc-base.response.dto';
 import { CmcKeyedMap } from '../utils/cmc-helper';
 
 // -----------------------------------------------------------------------------
-// Shared DTOs for price-conversion (v1 & v2 share the same shape in samples)
+// Shared DTOs for price-conversion
 // -----------------------------------------------------------------------------
 
 @Exclude()
@@ -57,7 +55,7 @@ export class CmcToolsPriceConversionQuoteItemDto {
 @Exclude()
 export class CmcToolsPriceConversionQuoteDto {
   @ApiProperty({
-    description: 'Map of quote currency → quote item',
+    description: 'Map of quote currency to quote item',
     type: 'object',
     additionalProperties: {
       $ref: getSchemaPath(CmcToolsPriceConversionQuoteItemDto),
@@ -155,50 +153,6 @@ export class CmcToolsPriceConversionV1Dto extends CmcEnvelopeDto<CmcToolsPriceCo
   data!: CmcToolsPriceConversionDataDto;
 
   @ApiProperty({ type: () => CmcStatusDto })
-  @ValidateNested()
-  @Type(() => CmcStatusDto)
-  @Expose()
-  status!: CmcStatusDto;
-}
-
-// -----------------------------------------------------------------------------
-// GET /v2/tools/price-conversion  (same response shape as v1 sample)
-// -----------------------------------------------------------------------------
-
-@Exclude()
-@ApiExtraModels(
-  CmcToolsPriceConversionDataDto,
-  CmcToolsPriceConversionQuoteDto,
-  CmcToolsPriceConversionQuoteItemDto,
-  CmcStatusDto,
-)
-export class CmcToolsPriceConversionV2Dto extends CmcEnvelopeDto<CmcToolsPriceConversionDataDto> {
-  @ApiProperty({ type: () => CmcToolsPriceConversionDataDto })
-  @ValidateNested()
-  @Type(() => CmcToolsPriceConversionDataDto)
-  @Expose()
-  data!: CmcToolsPriceConversionDataDto;
-
-  @ApiProperty({ type: () => CmcStatusDto })
-  @ValidateNested()
-  @Type(() => CmcStatusDto)
-  @Expose()
-  status!: CmcStatusDto;
-}
-
-// -----------------------------------------------------------------------------
-// GET /v1/tools/postman (status-only error/info payload)
-// Sample:
-// { "status": { "timestamp": "...", "error_code": 400, "error_message": "Invalid value for \"id\"", ... } }
-// -----------------------------------------------------------------------------
-
-@Exclude()
-@ApiExtraModels(CmcStatusDto)
-export class CmcToolsPostmanDto {
-  @ApiProperty({
-    description: 'CMC status block (errors, rate limits, etc.)',
-    type: () => CmcStatusDto,
-  })
   @ValidateNested()
   @Type(() => CmcStatusDto)
   @Expose()

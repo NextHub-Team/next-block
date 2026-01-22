@@ -11,24 +11,29 @@ const ENVIRONMENT_URL_KEY: Record<
   [FireblocksEnvironmentType.PROD_EU2]: 'PROD_EU2',
 };
 
-export const getFireblocksBaseUrl = (
+export function getFireblocksBaseUrl(
   envType: FireblocksEnvironmentType,
-): string => {
+): string {
   const key = ENVIRONMENT_URL_KEY[envType] ?? 'SANDBOX';
   return FIREBLOCKS_ENVIRONMENT_BASE_URL[key];
-};
+}
 
-export const isRateLimitError = (error: any): boolean =>
-  Boolean(error?.response?.status === 429);
+export function isRateLimitError(error: any): boolean {
+  return Boolean(error?.response?.status === 429);
+}
 
-export const isPolicyRejection = (error: any): boolean =>
-  error?.response?.data?.status === 'REJECTED' ||
-  error?.response?.data?.code === 'POLICY_REJECTION';
+export function isPolicyRejection(error: any): boolean {
+  return (
+    error?.response?.data?.status === 'REJECTED' ||
+    error?.response?.data?.code === 'POLICY_REJECTION'
+  );
+}
 
-export const isPendingPolicy = (error: any): boolean =>
-  error?.response?.data?.status === 'PENDING_AUTHORIZATION';
+export function isPendingPolicy(error: any): boolean {
+  return error?.response?.data?.status === 'PENDING_AUTHORIZATION';
+}
 
-export const isInvalidRequest = (error: any): boolean => {
+export function isInvalidRequest(error: any): boolean {
   const status =
     error?.response?.status ??
     error?.response?.statusCode ??
@@ -44,15 +49,15 @@ export const isInvalidRequest = (error: any): boolean => {
     code === 1504 ||
     code === '1504'
   );
-};
+}
 
-export const buildVaultName = (
+export function buildVaultName(
   userId: string | number,
   socialId?: string | null,
-): string => {
+): string {
   const suffix =
     typeof socialId === 'string' && socialId.trim().length > 0
       ? socialId.trim()
       : `${userId}`;
   return `user::${suffix}`;
-};
+}

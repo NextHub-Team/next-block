@@ -10,7 +10,7 @@ import {
   CMC_REQUEST_TIMEOUT_MS,
   CMC_TTL_MS,
 } from '../types/cmc-const.type';
-import { CmcEnvironmenType } from '../types/cmc-enum.type';
+import { CmcEnvironmentType } from '../types/cmc-enum.type';
 import { mapEnvType } from '../../../utils/helpers/env.helper';
 import { createToggleableConfig } from '../../../config/config.helper';
 
@@ -92,14 +92,14 @@ export default createToggleableConfig<
       env.CMC_REQUEST_TIMEOUT_MS ?? defaults.requestTimeoutMs;
     const maxRetries = env.CMC_MAX_RETRIES ?? defaults.maxRetries;
 
-    const envType = mapEnvType<CmcEnvironmenType>(
+    const envType = mapEnvType<CmcEnvironmentType>(
       env.CMC_ENV_TYPE,
       {
-        prod: CmcEnvironmenType.PRODUCTION,
-        production: CmcEnvironmenType.PRODUCTION,
-        sandbox: CmcEnvironmenType.SANDBOX,
-        dev: CmcEnvironmenType.SANDBOX,
-        development: CmcEnvironmenType.SANDBOX,
+        prod: CmcEnvironmentType.PRODUCTION,
+        production: CmcEnvironmentType.PRODUCTION,
+        sandbox: CmcEnvironmentType.SANDBOX,
+        dev: CmcEnvironmentType.SANDBOX,
+        development: CmcEnvironmentType.SANDBOX,
       },
       defaults.envType,
     );

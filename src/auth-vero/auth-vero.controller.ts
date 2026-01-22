@@ -18,6 +18,7 @@ import { AuthService } from '../auth/auth.service';
 import { AuthVeroService } from './auth-vero.service';
 import { AuthVeroLoginDto } from './dto/auth-vero-login.dto';
 import { LoginResponseDto } from '../auth/dto/login-response.dto';
+import { AuthVeroCreateDto } from './dto/auth-vero-create.dto';
 import { AuthVeroBulkCreateDto } from './dto/auth-vero-bulk-create.dto';
 import { AuthVeroBulkUpdateDto } from './dto/auth-vero-bulk-update.dto';
 import { Roles } from '../roles/roles.decorator';
@@ -54,6 +55,21 @@ export class AuthVeroController {
       profile,
       exp,
     );
+  }
+
+  @ApiBearerAuth()
+  @Roles(RoleEnum.admin)
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @ApiCreatedResponse({
+    type: User,
+  })
+  @SerializeOptions({
+    groups: ['admin'],
+  })
+  @Post('/register')
+  @HttpCode(HttpStatus.CREATED)
+  createUser(@Body() createDto: AuthVeroCreateDto): Promise<User> {
+    return this.authVeroService.createUser(createDto);
   }
 
   @ApiBearerAuth()

@@ -23,6 +23,7 @@ import {
   InternalEventsOptions,
   buildInternalEventsOptions,
 } from './internal-events-config.type';
+import { numberValidator } from 'src/utils/helpers/env.helper';
 
 class InternalEventsEnvValidator {
   @IsBoolean()
@@ -101,30 +102,26 @@ class InternalEventsEnvValidator {
   INTERNAL_EVENTS_REDIS_RETRY_MAX_MS?: number;
 }
 
-const toNumber = (value: number | string | undefined, fallback: number) => {
-  if (typeof value === 'number' && Number.isFinite(value)) return value;
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : fallback;
-};
-
-const buildDefaults = (): InternalEventsConfig => ({
-  enable: INTERNAL_EVENTS_DEFAULT_ENABLE,
-  serviceName: INTERNAL_EVENTS_DEFAULT_SERVICE_NAME,
-  streamName: INTERNAL_EVENTS_DEFAULT_STREAM_NAME,
-  dlqStreamName: INTERNAL_EVENTS_DEFAULT_DLQ_STREAM_NAME,
-  redisUrl: INTERNAL_EVENTS_DEFAULT_REDIS_URL,
-  dispatchIntervalMs: INTERNAL_EVENTS_DEFAULT_DISPATCH_INTERVAL_MS,
-  dispatchBatchSize: INTERNAL_EVENTS_DEFAULT_DISPATCH_BATCH_SIZE,
-  outboxRetentionDays: INTERNAL_EVENTS_DEFAULT_OUTBOX_RETENTION_DAYS,
-  consumerBlockMs: INTERNAL_EVENTS_DEFAULT_CONSUMER_BLOCK_MS,
-  consumerCount: INTERNAL_EVENTS_DEFAULT_CONSUMER_COUNT,
-  idempotencyTtlSeconds: INTERNAL_EVENTS_DEFAULT_IDEMPOTENCY_TTL_SECONDS,
-  maxRetries: INTERNAL_EVENTS_DEFAULT_MAX_RETRIES,
-  pendingClaimAfterMs: INTERNAL_EVENTS_DEFAULT_PENDING_CLAIM_AFTER_MS,
-  streamTrimMaxLen: INTERNAL_EVENTS_DEFAULT_STREAM_TRIM_MAX_LEN,
-  redisRetryStepMs: INTERNAL_EVENTS_DEFAULT_REDIS_RETRY_STEP_MS,
-  redisRetryMaxMs: INTERNAL_EVENTS_DEFAULT_REDIS_RETRY_MAX_MS,
-});
+function buildDefaults(): InternalEventsConfig {
+  return {
+    enable: INTERNAL_EVENTS_DEFAULT_ENABLE,
+    serviceName: INTERNAL_EVENTS_DEFAULT_SERVICE_NAME,
+    streamName: INTERNAL_EVENTS_DEFAULT_STREAM_NAME,
+    dlqStreamName: INTERNAL_EVENTS_DEFAULT_DLQ_STREAM_NAME,
+    redisUrl: INTERNAL_EVENTS_DEFAULT_REDIS_URL,
+    dispatchIntervalMs: INTERNAL_EVENTS_DEFAULT_DISPATCH_INTERVAL_MS,
+    dispatchBatchSize: INTERNAL_EVENTS_DEFAULT_DISPATCH_BATCH_SIZE,
+    outboxRetentionDays: INTERNAL_EVENTS_DEFAULT_OUTBOX_RETENTION_DAYS,
+    consumerBlockMs: INTERNAL_EVENTS_DEFAULT_CONSUMER_BLOCK_MS,
+    consumerCount: INTERNAL_EVENTS_DEFAULT_CONSUMER_COUNT,
+    idempotencyTtlSeconds: INTERNAL_EVENTS_DEFAULT_IDEMPOTENCY_TTL_SECONDS,
+    maxRetries: INTERNAL_EVENTS_DEFAULT_MAX_RETRIES,
+    pendingClaimAfterMs: INTERNAL_EVENTS_DEFAULT_PENDING_CLAIM_AFTER_MS,
+    streamTrimMaxLen: INTERNAL_EVENTS_DEFAULT_STREAM_TRIM_MAX_LEN,
+    redisRetryStepMs: INTERNAL_EVENTS_DEFAULT_REDIS_RETRY_STEP_MS,
+    redisRetryMaxMs: INTERNAL_EVENTS_DEFAULT_REDIS_RETRY_MAX_MS,
+  };
+}
 
 export default createToggleableConfig<
   InternalEventsConfig,
@@ -143,47 +140,47 @@ export default createToggleableConfig<
     const redisUrl =
       env.INTERNAL_EVENTS_REDIS_URL ?? INTERNAL_EVENTS_DEFAULT_REDIS_URL;
 
-    const dispatchIntervalMs = toNumber(
+    const dispatchIntervalMs = numberValidator(
       env.INTERNAL_EVENTS_DISPATCH_INTERVAL_MS,
       INTERNAL_EVENTS_DEFAULT_DISPATCH_INTERVAL_MS,
     );
-    const dispatchBatchSize = toNumber(
+    const dispatchBatchSize = numberValidator(
       env.INTERNAL_EVENTS_DISPATCH_BATCH_SIZE,
       INTERNAL_EVENTS_DEFAULT_DISPATCH_BATCH_SIZE,
     );
-    const outboxRetentionDays = toNumber(
+    const outboxRetentionDays = numberValidator(
       env.INTERNAL_EVENTS_OUTBOX_RETENTION_DAYS,
       INTERNAL_EVENTS_DEFAULT_OUTBOX_RETENTION_DAYS,
     );
-    const consumerBlockMs = toNumber(
+    const consumerBlockMs = numberValidator(
       env.INTERNAL_EVENTS_CONSUMER_BLOCK_MS,
       INTERNAL_EVENTS_DEFAULT_CONSUMER_BLOCK_MS,
     );
-    const consumerCount = toNumber(
+    const consumerCount = numberValidator(
       env.INTERNAL_EVENTS_CONSUMER_COUNT,
       INTERNAL_EVENTS_DEFAULT_CONSUMER_COUNT,
     );
-    const idempotencyTtlSeconds = toNumber(
+    const idempotencyTtlSeconds = numberValidator(
       env.INTERNAL_EVENTS_IDEMPOTENCY_TTL_SECONDS,
       INTERNAL_EVENTS_DEFAULT_IDEMPOTENCY_TTL_SECONDS,
     );
-    const maxRetries = toNumber(
+    const maxRetries = numberValidator(
       env.INTERNAL_EVENTS_MAX_RETRIES,
       INTERNAL_EVENTS_DEFAULT_MAX_RETRIES,
     );
-    const pendingClaimAfterMs = toNumber(
+    const pendingClaimAfterMs = numberValidator(
       env.INTERNAL_EVENTS_PENDING_CLAIM_AFTER_MS,
       INTERNAL_EVENTS_DEFAULT_PENDING_CLAIM_AFTER_MS,
     );
-    const streamTrimMaxLen = toNumber(
+    const streamTrimMaxLen = numberValidator(
       env.INTERNAL_EVENTS_STREAM_TRIM_MAX_LEN,
       INTERNAL_EVENTS_DEFAULT_STREAM_TRIM_MAX_LEN,
     );
-    const redisRetryStepMs = toNumber(
+    const redisRetryStepMs = numberValidator(
       env.INTERNAL_EVENTS_REDIS_RETRY_STEP_MS,
       INTERNAL_EVENTS_DEFAULT_REDIS_RETRY_STEP_MS,
     );
-    const redisRetryMaxMs = toNumber(
+    const redisRetryMaxMs = numberValidator(
       env.INTERNAL_EVENTS_REDIS_RETRY_MAX_MS,
       INTERNAL_EVENTS_DEFAULT_REDIS_RETRY_MAX_MS,
     );
@@ -214,10 +211,11 @@ export default createToggleableConfig<
   }),
 });
 
-export const buildInternalEventsOptionsFromConfig = (
+export function buildInternalEventsOptionsFromConfig(
   overrides: Partial<InternalEventsOptions> = {},
-): InternalEventsOptions =>
-  buildInternalEventsOptions({
+): InternalEventsOptions {
+  return buildInternalEventsOptions({
     ...buildDefaults(),
     ...overrides,
   });
+}

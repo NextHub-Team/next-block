@@ -3,11 +3,13 @@ import {
   Injectable,
   Logger,
   UnauthorizedException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService, TokenExpiredError } from '@nestjs/jwt';
 import jwksRsa, { JwksClient, RsaSigningKey } from 'jwks-rsa';
 import { AuthVeroLoginDto } from './dto/auth-vero-login.dto';
+import { AuthVeroCreateDto } from './dto/auth-vero-create.dto';
 import { AuthVeroBulkCreateDto } from './dto/auth-vero-bulk-create.dto';
 import { AuthVeroBulkUpdateDto } from './dto/auth-vero-bulk-update.dto';
 import { SocialInterface } from '../social/interfaces/social.interface';
@@ -167,6 +169,23 @@ export class AuthVeroService {
     const exp = decodedToken.exp;
     const profile = this.veroMapper.mapPayloadToSocial(decodedToken);
     return { profile, exp };
+  }
+
+  async createUser(createDto: AuthVeroCreateDto): Promise<User> {
+    const [user] = await this.bulkCreateUsers({
+      users: [createDto],
+    });
+
+    if (!user) {
+      this.logger.debug(
+        'Vero create - no user created or matched for single request',
+      );
+      throw new UnprocessableEntityException(
+        'User could not be created or matched',
+      );
+    }
+
+    return user;
   }
 
   async bulkCreateUsers(bulkCreateDto: AuthVeroBulkCreateDto): Promise<User[]> {

@@ -38,7 +38,7 @@ export class AccountsService {
     accountId: Account['accountId'];
     providerName: AccountProviderName;
     user: { id: User['id'] };
-    KycStatus?: KycStatus;
+    kycStatus?: KycStatus;
     label?: Account['label'];
     status?: AccountStatus;
     customerRefId?: Account['customerRefId'];
@@ -56,7 +56,7 @@ export class AccountsService {
       });
 
       const updated = await this.update(existing.id, {
-        KycStatus: payload.KycStatus ?? existing.KycStatus,
+        kycStatus: payload.kycStatus ?? existing.kycStatus,
         label: payload.label ?? existing.label,
         status: payload.status ?? existing.status,
         accountId: payload.accountId,
@@ -88,7 +88,7 @@ export class AccountsService {
 
     return this.create({
       user: payload.user,
-      KycStatus: payload.KycStatus,
+      kycStatus: payload.kycStatus,
       label: payload.label,
       status: payload.status,
       accountId: payload.accountId,
@@ -127,7 +127,7 @@ export class AccountsService {
 
       name: createAccountDto.name ?? null,
 
-      KycStatus: createAccountDto.KycStatus ?? KycStatus.PENDING,
+      kycStatus: createAccountDto.kycStatus ?? KycStatus.PENDING,
 
       label: createAccountDto.label,
 
@@ -189,7 +189,7 @@ export class AccountsService {
 
         name: dto.name ?? null,
 
-        KycStatus: dto.KycStatus ?? KycStatus.PENDING,
+        kycStatus: dto.kycStatus ?? KycStatus.PENDING,
 
         label: dto.label,
 
@@ -313,7 +313,7 @@ export class AccountsService {
 
   async hasCompletedKyc(userId: User['id']): Promise<boolean> {
     const accounts = await this.accountRepository.findAllByUserId(userId);
-    return accounts.some((account) => account.KycStatus === KycStatus.VERIFIED);
+    return accounts.some((account) => account.kycStatus === KycStatus.VERIFIED);
   }
 
   async findByAccountId(
@@ -414,8 +414,8 @@ export class AccountsService {
     if (typeof updateAccountDto.name !== 'undefined') {
       payload.name = updateAccountDto.name;
     }
-    if (typeof updateAccountDto.KycStatus !== 'undefined') {
-      payload.KycStatus = updateAccountDto.KycStatus;
+    if (typeof updateAccountDto.kycStatus !== 'undefined') {
+      payload.kycStatus = updateAccountDto.kycStatus;
     }
     if (typeof updateAccountDto.label !== 'undefined') {
       payload.label = updateAccountDto.label;

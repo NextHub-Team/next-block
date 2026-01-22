@@ -1,8 +1,7 @@
 // -----------------------------------------------------------------------------
-// CMC — Fear & Greed Index DTOs
+// CMC - Fear and Greed Index DTOs
 // Endpoints covered:
-//   • GET /v3/fear-and-greed/latest
-//   • GET /v3/fear-and-greed/historical
+//   - GET /v3/fear-and-greed/historical
 // -----------------------------------------------------------------------------
 
 import { Exclude, Expose, Type } from 'class-transformer';
@@ -52,26 +51,6 @@ export class CmcFearAndGreedDataPointDto {
   @IsDateString()
   @Expose()
   timestamp!: string;
-}
-
-// -----------------------------------------------------------------------------
-// GET /v3/fear-and-greed/latest
-// -----------------------------------------------------------------------------
-
-@Exclude()
-@ApiExtraModels(CmcFearAndGreedDataPointDto, CmcStatusDto)
-export class CmcFearAndGreedLatestDto extends CmcEnvelopeDto<CmcFearAndGreedDataPointDto> {
-  @ApiProperty({ type: () => CmcFearAndGreedDataPointDto })
-  @ValidateNested()
-  @Type(() => CmcFearAndGreedDataPointDto)
-  @Expose()
-  data!: CmcFearAndGreedDataPointDto;
-
-  @ApiProperty({ type: () => CmcStatusDto })
-  @ValidateNested()
-  @Type(() => CmcStatusDto)
-  @Expose()
-  status!: CmcStatusDto;
 }
 
 // -----------------------------------------------------------------------------

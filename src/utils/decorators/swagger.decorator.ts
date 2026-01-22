@@ -7,7 +7,7 @@ import {
 import { applyDecorators } from '@nestjs/common';
 import { RoleEnum } from '../../roles/roles.enum';
 import { RoleGroupsDict } from '../types/const.type';
-import { capitalizeFirst } from '../transformers/text.transformer';
+import { capitalizeFirst } from '../transformers/string.transformer';
 
 interface ApiCustomResponseOptions {
   type: any;

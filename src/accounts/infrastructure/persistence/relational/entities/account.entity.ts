@@ -37,8 +37,9 @@ export class AccountEntity extends EntityRelationalHelper {
     enum: KycStatus,
     enumName: 'account_kyc_status_enum',
     default: KycStatus.PENDING,
+    name: 'KycStatus',
   })
-  KycStatus?: KycStatus;
+  kycStatus?: KycStatus;
 
   @Column({
     nullable: true,

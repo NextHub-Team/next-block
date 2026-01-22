@@ -53,7 +53,7 @@ export class AccountDto {
   })
   @IsEnum(KycStatus)
   @Expose()
-  KycStatus: KycStatus;
+  kycStatus: KycStatus;
 
   @ApiPropertyOptional({
     description: 'Label displayed in the UI',

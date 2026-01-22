@@ -11,7 +11,7 @@ export class AccountMapper {
 
     domainEntity.name = raw.name;
 
-    domainEntity.KycStatus = raw.KycStatus;
+    domainEntity.kycStatus = raw.kycStatus;
 
     domainEntity.label = raw.label;
 
@@ -38,7 +38,7 @@ export class AccountMapper {
 
     persistenceEntity.name = domainEntity.name;
 
-    persistenceEntity.KycStatus = domainEntity.KycStatus;
+    persistenceEntity.kycStatus = domainEntity.kycStatus;
 
     persistenceEntity.label = domainEntity.label;
 

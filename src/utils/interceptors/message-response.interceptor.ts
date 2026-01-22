@@ -28,27 +28,29 @@ import { Observable, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { TypeMessage } from '../types/message.type';
 
-const toNumber = (v: any, fallback = HttpStatus.OK) => {
+function toNumber(v: any, fallback = HttpStatus.OK) {
   const n = Number(v);
   return Number.isFinite(n) ? n : fallback;
-};
-const ensureMsg = (msg: any, code: number) => {
+}
+function ensureMsg(msg: any, code: number) {
   const s = typeof msg === 'string' ? msg.trim() : '';
   return s.length
     ? s
     : (TypeMessage.getMessageByStatus(code) ?? (code < 400 ? 'OK' : 'Error'));
-};
-const isPlainObject = (v: any) =>
-  v !== null && typeof v === 'object' && !Array.isArray(v);
-const isEmptyObject = (v: any) =>
-  isPlainObject(v) && Object.keys(v).length === 0;
-const omitKeys = (obj: Record<string, any>, keys: string[]) => {
+}
+function isPlainObject(v: any) {
+  return v !== null && typeof v === 'object' && !Array.isArray(v);
+}
+function isEmptyObject(v: any) {
+  return isPlainObject(v) && Object.keys(v).length === 0;
+}
+function omitKeys(obj: Record<string, any>, keys: string[]) {
   const out: Record<string, any> = {};
   for (const k of Object.keys(obj)) {
     if (!keys.includes(k)) out[k] = obj[k];
   }
   return out;
-};
+}
 
 type StandardResponse<T = unknown> = {
   status: number;
@@ -59,12 +61,15 @@ type StandardResponse<T = unknown> = {
   hasNextPage: boolean;
 };
 
-const isEnvelope = (r: any) =>
-  r &&
-  typeof r === 'object' &&
-  ('status' in r || 'statusCode' in r) &&
-  'success' in r &&
-  ('data' in r || 'error' in r);
+function isEnvelope(r: any) {
+  return (
+    r &&
+    typeof r === 'object' &&
+    ('status' in r || 'statusCode' in r) &&
+    'success' in r &&
+    ('data' in r || 'error' in r)
+  );
+}
 
 @Injectable()
 export class StandardResponseInterceptor implements NestInterceptor {

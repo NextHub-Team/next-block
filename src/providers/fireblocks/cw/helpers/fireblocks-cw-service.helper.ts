@@ -1,9 +1,9 @@
 import { Logger } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 
-export const normalizeNumericUserId = (
+export function normalizeNumericUserId(
   id: string | number | null | undefined,
-): number | undefined => {
+): number | undefined {
   if (typeof id === 'number' && Number.isFinite(id)) {
     return id;
   }
@@ -16,11 +16,11 @@ export const normalizeNumericUserId = (
   }
 
   return undefined;
-};
+}
 
-export const cleanMetadata = (
+export function cleanMetadata(
   metadata: Record<string, unknown>,
-): Record<string, unknown> | undefined => {
+): Record<string, unknown> | undefined {
   const cleaned = Object.fromEntries(
     Object.entries(metadata).filter(([, value]) => {
       if (value === null || value === undefined) {
@@ -36,13 +36,13 @@ export const cleanMetadata = (
   );
 
   return Object.keys(cleaned).length ? cleaned : undefined;
-};
+}
 
-export const logFireblocksError = (
+export function logFireblocksError(
   logger: Logger,
   action: string,
   error: unknown,
-): void => {
+): void {
   const message = error instanceof Error ? error.message : `${error}`;
   const errObj = error as any;
   const details =
@@ -66,9 +66,9 @@ export const logFireblocksError = (
     }`,
     detailsString,
   );
-};
+}
 
-export const getFireblocksMessage = (error: unknown): string | undefined => {
+export function getFireblocksMessage(error: unknown): string | undefined {
   const errObj = error as any;
   const candidate =
     errObj?.response?.data?.errorMessage ??
@@ -81,7 +81,8 @@ export const getFireblocksMessage = (error: unknown): string | undefined => {
     return candidate;
   }
   return undefined;
-};
+}
 
-export const ensureIdempotencyKey = (key?: string): string =>
-  key && key.trim().length > 0 ? key.trim() : uuidv4();
+export function ensureIdempotencyKey(key?: string): string {
+  return key && key.trim().length > 0 ? key.trim() : uuidv4();
+}

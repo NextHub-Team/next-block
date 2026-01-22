@@ -1,4 +1,4 @@
-import { CmcEnvironmenType } from './cmc-enum.type';
+import { CmcEnvironmentType } from './cmc-enum.type';
 
 export const CMC_ENABLE = false;
 
@@ -16,4 +16,4 @@ export const CMC_PRO_BASE_URL = 'https://pro-api.coinmarketcap.com';
 
 export const CMC_SANDBOX_BASE_URL = 'https://sandbox-api.coinmarketcap.com';
 
-export const CMC_ENV_TYPE = CmcEnvironmenType.SANDBOX;
+export const CMC_ENV_TYPE = CmcEnvironmentType.SANDBOX;

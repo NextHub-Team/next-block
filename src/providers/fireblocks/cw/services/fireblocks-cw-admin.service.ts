@@ -337,7 +337,7 @@ export class FireblocksCwAdminService extends AbstractCwService {
     idempotencyKey?: string,
   ): Promise<VaultActionStatus> {
     this.guardEnabledAndLog();
-    this.logger.log(`Unhiding vault account ${vaultAccountId} from UI`);
+    this.logger.log(`unhide vault account ${vaultAccountId} from UI`);
     const response = await this.sdk.vaults.unhideVaultAccount({
       vaultAccountId,
       idempotencyKey,
