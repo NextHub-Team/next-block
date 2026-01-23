@@ -48,6 +48,7 @@ import fireblocksConfig from './providers/fireblocks/cw/config/fireblocks.config
 import { FireblocksCwModule } from './providers/fireblocks/cw/fireblocks-cw.module';
 import queuedashConfig from './common/queuedash/config/queuedash.config';
 import internalEventsConfig from './common/internal-events/config/internal-events.config';
+import cacheConfig from './common/cache/config/cache.config';
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
@@ -64,6 +65,7 @@ import { InternalEventsModule as InternalEventsCoreModule } from './common/inter
 import { SleevesTransactionsModule } from './sleeves-transactions/sleeves-transactions.module';
 import { SleevesModule } from './sleeves/sleeves.module';
 import { AssetRegistriesModule } from './asset-registries/asset-registries.module';
+import { CacheModule } from './common/cache/cache.module';
 
 @Module({
   imports: [
@@ -94,6 +96,7 @@ import { AssetRegistriesModule } from './asset-registries/asset-registries.modul
         fireblocksConfig,
         queuedashConfig,
         internalEventsConfig,
+        cacheConfig,
       ],
       envFilePath: ['.env'],
     }),
@@ -143,6 +146,7 @@ import { AssetRegistriesModule } from './asset-registries/asset-registries.modul
     GorushModule,
     MinioModule,
     LoggerModule,
+    CacheModule,
     SocketIoModule,
     CmcModule,
     ProvidersModule,

@@ -15,6 +15,7 @@ import { AwsSecretsManagerConfig } from './types/aws-secrets-manager-config.type
 import { FireblocksConfig } from '../providers/fireblocks/cw/config/fireblocks-config.type';
 import { QueueDashConfig } from '../common/queuedash/config/queuedash-config.type';
 import { InternalEventsConfig } from '../common/internal-events/config/internal-events-config.type';
+import { CacheConfig } from '../common/cache/config/cache-config.type';
 
 export type AllConfigType = {
   app: AppConfig;
@@ -34,4 +35,5 @@ export type AllConfigType = {
   fireblocks: FireblocksConfig;
   queuedash: QueueDashConfig;
   internalEvents: InternalEventsConfig;
+  cache: CacheConfig;
 };
