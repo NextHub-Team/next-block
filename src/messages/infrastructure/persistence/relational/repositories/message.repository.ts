@@ -6,7 +6,7 @@ import { NullableType } from '../../../../../utils/types/nullable.type';
 import { Message } from '../../../../domain/message';
 import { MessageRepository } from '../../message.repository';
 import { MessageMapper } from '../mappers/message.mapper';
-import { IPaginationOptions } from '../../../../../utils/types/pagination-options';
+import { IPaginationOptions } from '../../../../../utils/types/pagination-options.type';
 
 @Injectable()
 export class MessageRelationalRepository implements MessageRepository {

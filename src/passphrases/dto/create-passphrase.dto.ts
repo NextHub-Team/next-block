@@ -9,7 +9,7 @@ import {
 } from 'class-validator';
 
 import { ApiProperty } from '@nestjs/swagger';
-import { PassphraseLocation } from '../types/passphrases.enum';
+import { PassphraseLocation } from '../types/passphrases-enum.type';
 import { getEnumErrorMessage } from '../../utils/helpers/enum.helper';
 
 export class BaseCreatePassphraseDto {

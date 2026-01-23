@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import os from 'os';
 import { InternalEventsRedisService } from './internal-events.redis.service';
 import { InternalEventsRegistry } from './internal-events.registry';
-import { INTERNAL_EVENTS_OPTIONS } from './types/internal-events.constants';
+import { INTERNAL_EVENTS_OPTIONS } from './types/internal-events-constants.type';
 import { InternalEvent } from '../../internal-events/domain/internal-event';
 import { InternalEventsOptions } from './config/internal-events-config.type';
 import { LoggerService } from '../logger/logger.service';

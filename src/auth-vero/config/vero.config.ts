@@ -13,6 +13,10 @@ import {
   BASE_VALUE_JWKS_URL,
   DEFAULT_JWKS_CACHE_MAX_AGE,
 } from '../types/vero-const.type';
+import {
+  booleanValidator,
+  numberValidator,
+} from '../../utils/helpers/env.helper';
 
 class EnvironmentVariablesValidator {
   @IsString()
@@ -37,11 +41,15 @@ export default registerAs<VeroConfig>('vero', () => {
     ? process.env.VERO_JWKS_URL
     : BASE_VALUE_JWKS_URL;
 
-  const jwksUriCacheMaxAge = process.env.VERO_CACHE_MAX_AGE
-    ? Number(process.env.VERO_CACHE_MAX_AGE)
-    : DEFAULT_JWKS_CACHE_MAX_AGE;
+  const jwksUriCacheMaxAge = numberValidator(
+    process.env.VERO_CACHE_MAX_AGE,
+    DEFAULT_JWKS_CACHE_MAX_AGE,
+  );
 
-  const enableDynamicCache = process.env.VERO_ENABLE_DYNAMIC_CACHE === 'true';
+  const enableDynamicCache = booleanValidator(
+    process.env.VERO_ENABLE_DYNAMIC_CACHE,
+    false,
+  );
 
   return {
     jwksUri,

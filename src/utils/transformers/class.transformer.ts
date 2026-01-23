@@ -1,6 +1,6 @@
 import { plainToInstance } from 'class-transformer';
 import { RoleEnum } from '../../roles/roles.enum';
-import { RoleGroupsDict } from '../types/const.type';
+import { RoleGroupsDict } from '../types/role-groups-const.type';
 /**
  * For single object transformation using role-based group serialization
  */

@@ -1,5 +1,5 @@
 import { SetMetadata } from '@nestjs/common';
-import { INTERNAL_EVENT_HANDLER_METADATA } from '../types/internal-events.constants';
+import { INTERNAL_EVENT_HANDLER_METADATA } from '../types/internal-events-constants.type';
 
 export function InternalEventHandler(eventType: string) {
   return SetMetadata(INTERNAL_EVENT_HANDLER_METADATA, eventType);

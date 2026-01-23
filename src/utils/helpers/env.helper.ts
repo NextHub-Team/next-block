@@ -9,18 +9,19 @@ export function mapEnvType<T>(
 }
 
 export function booleanValidator(
-  value: string | undefined,
+  value: string | undefined | boolean,
   defaultValue: boolean,
 ): boolean {
-  const v = value?.trim();
+  if (typeof value === 'boolean') return value;
+  const v = value?.trim().toLowerCase();
   if (!v) return defaultValue;
-
-  // strict: only "true" => true, anything else => false
-  return v.toLowerCase() === 'true';
+  if (v === 'true') return true;
+  if (v === 'false') return false;
+  return defaultValue;
 }
 
 /**
- * Parses a number from string.
+ * Parses a number from string or number.
  * - Returns defaultValue if value is undefined/empty/whitespace or not a valid finite number.
  * - Accepts integers and floats (e.g., "10", "10.5", "-3").
  * - Rejects NaN / Infinity.
@@ -29,6 +30,10 @@ export function numberValidator(
   value: string | undefined | number,
   defaultValue: number,
 ): number {
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : defaultValue;
+  }
+
   const v = value?.trim();
   if (!v) return defaultValue;
 

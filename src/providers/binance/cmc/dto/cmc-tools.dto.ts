@@ -15,7 +15,7 @@ import {
 import { ApiExtraModels, ApiProperty, getSchemaPath } from '@nestjs/swagger';
 
 import { CmcEnvelopeDto, CmcStatusDto } from './cmc-base.response.dto';
-import { CmcKeyedMap } from '../utils/cmc-helper';
+import { CmcKeyedMap } from '../helper/cmc-helper';
 
 // -----------------------------------------------------------------------------
 // Shared DTOs for price-conversion

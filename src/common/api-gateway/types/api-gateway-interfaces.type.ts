@@ -1,4 +1,4 @@
-import { HttpMethod } from './api-gateway.enum';
+import { HttpMethod } from './api-gateway-enum.type';
 
 export interface ApiEndpoint {
   name: string; // Function name

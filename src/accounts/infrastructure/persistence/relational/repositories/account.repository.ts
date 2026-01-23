@@ -6,7 +6,7 @@ import { NullableType } from '../../../../../utils/types/nullable.type';
 import { Account } from '../../../../domain/account';
 import { AccountRepository } from '../../account.repository';
 import { AccountMapper } from '../mappers/account.mapper';
-import { IPaginationOptions } from '../../../../../utils/types/pagination-options';
+import { IPaginationOptions } from '../../../../../utils/types/pagination-options.type';
 import { User } from '../../../../../users/domain/user';
 import {
   AccountProviderName,

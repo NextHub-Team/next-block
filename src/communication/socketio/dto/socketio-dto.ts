@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Exclude, Expose, Type } from 'class-transformer';
+import { Exclude, Expose, Transform, Type } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
@@ -7,6 +7,7 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
+import { lowerCaseTransformer } from '../../../utils/transformers/string.transformer';
 
 @Exclude()
 export class SocketIoHealthDto {
@@ -67,6 +68,7 @@ export class SocketUserDto {
   @Expose()
   @IsOptional()
   @IsString()
+  @Transform(lowerCaseTransformer)
   email?: string | null;
 
   @ApiPropertyOptional({ description: 'User role (shape depends on app)' })

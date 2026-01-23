@@ -7,8 +7,8 @@ import { NullableType } from '../../../../../utils/types/nullable.type';
 import { Notification } from '../../../../domain/notification';
 import { NotificationRepository } from '../../notification.repository';
 import { NotificationMapper } from '../mappers/notification.mapper';
-import { IPaginationOptions } from '../../../../../utils/types/pagination-options';
-import { OrderType } from '../../../../../utils/types/order-type';
+import { IPaginationOptions } from '../../../../../utils/types/pagination-options.type';
+import { OrderType } from '../../../../../utils/types/order-enum.type';
 import {
   FilterNotificationDto,
   SortNotificationDto,

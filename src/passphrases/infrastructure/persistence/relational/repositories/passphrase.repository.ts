@@ -6,7 +6,7 @@ import { NullableType } from '../../../../../utils/types/nullable.type';
 import { Passphrase } from '../../../../domain/passphrase';
 import { PassphraseRepository } from '../../passphrase.repository';
 import { PassphraseMapper } from '../mappers/passphrase.mapper';
-import { IPaginationOptions } from '../../../../../utils/types/pagination-options';
+import { IPaginationOptions } from '../../../../../utils/types/pagination-options.type';
 
 @Injectable()
 export class PassphraseRelationalRepository implements PassphraseRepository {

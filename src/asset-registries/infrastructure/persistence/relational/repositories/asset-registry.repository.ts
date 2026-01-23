@@ -6,7 +6,7 @@ import { NullableType } from '../../../../../utils/types/nullable.type';
 import { AssetRegistry } from '../../../../domain/asset-registry';
 import { AssetRegistryRepository } from '../../asset-registry.repository';
 import { AssetRegistryMapper } from '../mappers/asset-registry.mapper';
-import { IPaginationOptions } from '../../../../../utils/types/pagination-options';
+import { IPaginationOptions } from '../../../../../utils/types/pagination-options.type';
 
 @Injectable()
 export class AssetRegistryRelationalRepository

@@ -1,4 +1,4 @@
-import { HttpMethod } from './types/api-gateway.enum';
+import { HttpMethod } from './types/api-gateway-enum.type';
 import {
   AnyApiGatewayConfig,
   EndpointDefinition,

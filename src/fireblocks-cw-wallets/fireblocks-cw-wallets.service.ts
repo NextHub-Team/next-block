@@ -14,9 +14,9 @@ import {
 import { CreateFireblocksCwWalletDto } from './dto/create-fireblocks-cw-wallet.dto';
 import { UpdateFireblocksCwWalletDto } from './dto/update-fireblocks-cw-wallet.dto';
 import { FireblocksCwWalletRepository } from './infrastructure/persistence/fireblocks-cw-wallet.repository';
-import { IPaginationOptions } from '../utils/types/pagination-options';
+import { IPaginationOptions } from '../utils/types/pagination-options.type';
 import { FireblocksCwWallet } from './domain/fireblocks-cw-wallet';
-import { FIREBLOCKS_CW_WALLET_BULK_LIMIT_DEFAULT } from './types/fireblocks-cw-wallets.const';
+import { FIREBLOCKS_CW_WALLET_BULK_LIMIT_DEFAULT } from './types/fireblocks-cw-wallets-const.type';
 import { TypeMessage } from '../utils/types/message.type';
 
 @Injectable()

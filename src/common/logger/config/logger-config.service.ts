@@ -3,6 +3,7 @@ import { IsString, IsBoolean, IsOptional } from 'class-validator';
 import { LoggerConfig } from './logger.config';
 import validateConfig from '../../../utils/validate-config';
 import { NodeEnv } from '../../../utils/types/gobal.type';
+import { booleanValidator } from '../../../utils/helpers/env.helper';
 
 class LoggerEnvironmentValidator {
   @IsOptional()
@@ -49,10 +50,10 @@ export default registerAs<LoggerConfig>('logger', (): LoggerConfig => {
 
   return {
     level: defaultLogLevel,
-    consoleEnabled: process.env.LOG_CONSOLE_ENABLED !== 'false',
-    fileEnabled: process.env.LOG_FILE_ENABLED === 'true',
+    consoleEnabled: booleanValidator(process.env.LOG_CONSOLE_ENABLED, true),
+    fileEnabled: booleanValidator(process.env.LOG_FILE_ENABLED, false),
     filePath: process.env.LOG_FILE_PATH || 'logs/app.log',
-    remoteEnabled: process.env.LOG_REMOTE_ENABLED === 'true',
+    remoteEnabled: booleanValidator(process.env.LOG_REMOTE_ENABLED, false),
     remoteEndpoint: process.env.LOG_REMOTE_ENDPOINT,
     context: process.env.LOG_CONTEXT || 'App',
   } as LoggerConfig;

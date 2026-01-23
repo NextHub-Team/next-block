@@ -1,6 +1,6 @@
 import { DeepPartial } from '../../../utils/types/deep-partial.type';
 import { NullableType } from '../../../utils/types/nullable.type';
-import { IPaginationOptions } from '../../../utils/types/pagination-options';
+import { IPaginationOptions } from '../../../utils/types/pagination-options.type';
 import { AddressBook } from '../../domain/address-book';
 import { User } from '../../../users/domain/user';
 

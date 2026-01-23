@@ -6,7 +6,7 @@ import { NullableType } from '../../../../../utils/types/nullable.type';
 import { SleevesTransaction } from '../../../../domain/sleeves-transaction';
 import { SleevesTransactionRepository } from '../../sleeves-transaction.repository';
 import { SleevesTransactionMapper } from '../mappers/sleeves-transaction.mapper';
-import { IPaginationOptions } from '../../../../../utils/types/pagination-options';
+import { IPaginationOptions } from '../../../../../utils/types/pagination-options.type';
 
 @Injectable()
 export class SleevesTransactionRelationalRepository

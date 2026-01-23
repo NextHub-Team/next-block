@@ -5,7 +5,7 @@ import {
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
 import { MessageRepository } from './infrastructure/persistence/message.repository';
-import { IPaginationOptions } from '../utils/types/pagination-options';
+import { IPaginationOptions } from '../utils/types/pagination-options.type';
 import { Message } from './domain/message';
 
 @Injectable()

@@ -12,7 +12,7 @@ import {
 } from './dto/create-passphrase.dto';
 import { UpdatePassphraseDto } from './dto/update-passphrase.dto';
 import { PassphraseRepository } from './infrastructure/persistence/passphrase.repository';
-import { IPaginationOptions } from '../utils/types/pagination-options';
+import { IPaginationOptions } from '../utils/types/pagination-options.type';
 import { Passphrase } from './domain/passphrase';
 import { JwtPayloadType } from '../auth/strategies/types/jwt-payload.type';
 import { PassphraseUserResponseDto } from './dto/passphrase-response.dto';

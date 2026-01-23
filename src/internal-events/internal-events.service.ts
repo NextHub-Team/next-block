@@ -6,7 +6,7 @@ import { ConfigService } from '@nestjs/config';
 import { CreateInternalEventDto } from './dto/create-internal-event.dto';
 import { UpdateInternalEventDto } from './dto/update-internal-event.dto';
 import { InternalEventRepository } from './infrastructure/persistence/internal-event.repository';
-import { IPaginationOptions } from '../utils/types/pagination-options';
+import { IPaginationOptions } from '../utils/types/pagination-options.type';
 import { InternalEvent } from './domain/internal-event';
 import { DeepPartial } from '../utils/types/deep-partial.type';
 import { LoggerService } from '../common/logger/logger.service';

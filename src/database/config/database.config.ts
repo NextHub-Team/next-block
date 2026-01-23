@@ -11,6 +11,10 @@ import {
 } from 'class-validator';
 import validateConfig from '../../utils/validate-config';
 import { DatabaseConfig } from './database-config.type';
+import {
+  booleanValidator,
+  numberValidator,
+} from '../../utils/helpers/env.helper';
 
 class EnvironmentVariablesValidator {
   @ValidateIf((envValues) => envValues.DATABASE_URL)
@@ -84,24 +88,23 @@ export default registerAs<DatabaseConfig>('database', () => {
     url: process.env.DATABASE_URL,
     type: process.env.DATABASE_TYPE,
     host: process.env.DATABASE_HOST,
-    port: process.env.DATABASE_PORT
-      ? parseInt(process.env.DATABASE_PORT, 10)
-      : 5432,
+    port: numberValidator(process.env.DATABASE_PORT, 5432),
     password: process.env.DATABASE_PASSWORD,
     name: process.env.DATABASE_NAME,
     username: process.env.DATABASE_USERNAME,
-    synchronize: process.env.DATABASE_SYNCHRONIZE === 'true',
-    maxConnections: process.env.DATABASE_MAX_CONNECTIONS
-      ? parseInt(process.env.DATABASE_MAX_CONNECTIONS, 10)
-      : 100,
-    sslEnabled: process.env.DATABASE_SSL_ENABLED === 'true',
-    rejectUnauthorized: process.env.DATABASE_REJECT_UNAUTHORIZED === 'true',
+    synchronize: booleanValidator(process.env.DATABASE_SYNCHRONIZE, false),
+    maxConnections: numberValidator(process.env.DATABASE_MAX_CONNECTIONS, 100),
+    sslEnabled: booleanValidator(process.env.DATABASE_SSL_ENABLED, false),
+    rejectUnauthorized: booleanValidator(
+      process.env.DATABASE_REJECT_UNAUTHORIZED,
+      false,
+    ),
     ca: process.env.DATABASE_CA,
     key: process.env.DATABASE_KEY,
     cert: process.env.DATABASE_CERT,
     logging:
       process.env.DATABASE_LOGGING === undefined
         ? undefined
-        : process.env.DATABASE_LOGGING === 'true',
+        : booleanValidator(process.env.DATABASE_LOGGING, false),
   };
 });

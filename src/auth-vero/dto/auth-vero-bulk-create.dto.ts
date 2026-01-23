@@ -9,7 +9,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
-import { lowerCaseTransformer } from '../../utils/transformers/lower-case.transformer';
+import { lowerCaseTransformer } from '../../utils/transformers/string.transformer';
 
 export class AuthVeroBulkCreateUserDto {
   @ApiProperty({ example: 'user@example.com' })

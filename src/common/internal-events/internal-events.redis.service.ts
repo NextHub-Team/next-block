@@ -1,7 +1,7 @@
 import { Inject, Injectable, OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
-import { INTERNAL_EVENTS_OPTIONS } from './types/internal-events.constants';
+import { INTERNAL_EVENTS_OPTIONS } from './types/internal-events-constants.type';
 import { InternalEventsOptions } from './config/internal-events-config.type';
 import {
   INTERNAL_EVENTS_DEFAULT_REDIS_RETRY_MAX_MS,

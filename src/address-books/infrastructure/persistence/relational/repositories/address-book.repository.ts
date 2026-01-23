@@ -6,7 +6,7 @@ import { NullableType } from '../../../../../utils/types/nullable.type';
 import { AddressBook } from '../../../../domain/address-book';
 import { AddressBookRepository } from '../../address-book.repository';
 import { AddressBookMapper } from '../mappers/address-book.mapper';
-import { IPaginationOptions } from '../../../../../utils/types/pagination-options';
+import { IPaginationOptions } from '../../../../../utils/types/pagination-options.type';
 import { User } from '../../../../../users/domain/user';
 
 @Injectable()

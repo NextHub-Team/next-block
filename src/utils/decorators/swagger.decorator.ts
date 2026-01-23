@@ -6,7 +6,7 @@ import {
 } from '@nestjs/swagger';
 import { applyDecorators } from '@nestjs/common';
 import { RoleEnum } from '../../roles/roles.enum';
-import { RoleGroupsDict } from '../types/const.type';
+import { RoleGroupsDict } from '../types/role-groups-const.type';
 import { capitalizeFirst } from '../transformers/string.transformer';
 
 interface ApiCustomResponseOptions {

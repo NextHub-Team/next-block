@@ -14,6 +14,18 @@ import {
   Matches,
   Min,
 } from 'class-validator';
+import {
+  CmcCryptocurrencyType,
+  CmcCryptoListingsSort,
+  CmcCryptoMapSort,
+  CmcListingStatus,
+  CmcSortDirection,
+} from '../types/cmc-enum.type';
+import { defaultStringTransformer } from '../../../utils/transformers/string.transformer';
+import {
+  numberTransformer,
+  optionalNumberTransformer,
+} from '../../../utils/transformers/number.transformer';
 
 // -----------------------------------------------------------------------------
 // Shared fragments
@@ -26,7 +38,7 @@ export class CmcPagingQueryDto {
     example: 1,
     minimum: 1,
   })
-  @Transform(({ value }) => (value !== undefined ? Number(value) : undefined))
+  @Transform(optionalNumberTransformer)
   @IsOptional()
   @IsInt()
   @Min(1)
@@ -38,7 +50,7 @@ export class CmcPagingQueryDto {
     example: 100,
     minimum: 1,
   })
-  @Transform(({ value }) => (value !== undefined ? Number(value) : undefined))
+  @Transform(optionalNumberTransformer)
   @IsOptional()
   @IsInt()
   @Min(1)
@@ -82,10 +94,7 @@ export class CmcConvertQueryDto {
     description: 'Convert to these symbols (CSV)',
     example: 'USD,EUR',
   })
-  @Transform(
-    ({ value }) => (value === undefined || value === null ? 'USD' : value),
-    { toClassOnly: true },
-  )
+  @Transform(defaultStringTransformer('USD'), { toClassOnly: true })
   @IsOptional()
   @IsString()
   @Expose()
@@ -139,7 +148,7 @@ export class CmcCountQueryDto {
     description: 'Number of data points to return (when interval is used)',
     example: 100,
   })
-  @Transform(({ value }) => (value !== undefined ? Number(value) : undefined))
+  @Transform(optionalNumberTransformer)
   @IsOptional()
   @IsInt()
   @Min(1)
@@ -163,13 +172,13 @@ export class CmcAuxQueryDto {
 export class CmcSortDirQueryDto {
   @ApiPropertyOptional({
     description: 'Sort direction',
-    enum: ['asc', 'desc'],
+    enum: CmcSortDirection,
     example: 'desc',
   })
   @IsOptional()
-  @IsEnum(['asc', 'desc'])
+  @IsEnum(CmcSortDirection)
   @Expose()
-  sort_dir?: 'asc' | 'desc';
+  sort_dir?: CmcSortDirection;
 }
 
 @Exclude()
@@ -179,7 +188,7 @@ export class CmcLimitOnlyQueryDto {
     example: 10,
     minimum: 1,
   })
-  @Transform(({ value }) => (value !== undefined ? Number(value) : undefined))
+  @Transform(optionalNumberTransformer)
   @IsOptional()
   @IsInt()
   @Min(1)
@@ -195,7 +204,7 @@ export class CmcTrendingQueryDto {
     example: 1,
     minimum: 1,
   })
-  @Transform(({ value }) => (value !== undefined ? Number(value) : undefined))
+  @Transform(optionalNumberTransformer)
   @IsOptional()
   @IsInt()
   @Min(1)
@@ -207,7 +216,7 @@ export class CmcTrendingQueryDto {
     example: 10,
     minimum: 1,
   })
-  @Transform(({ value }) => (value !== undefined ? Number(value) : undefined))
+  @Transform(optionalNumberTransformer)
   @IsOptional()
   @IsInt()
   @Min(1)
@@ -262,7 +271,7 @@ export class CmcGlobalMetricsHistoricalQueryDto
   interval?: string;
 
   @ApiPropertyOptional({ description: 'Number of points', example: 100 })
-  @Transform(({ value }) => (value !== undefined ? Number(value) : undefined))
+  @Transform(optionalNumberTransformer)
   @IsOptional()
   @IsInt()
   @Min(1)
@@ -277,7 +286,7 @@ export class CmcGlobalMetricsHistoricalQueryDto
 @Exclude()
 export class CmcPriceConversionBaseQueryDto extends CmcConvertQueryDto {
   @ApiProperty({ description: 'Amount to convert', example: 1.23 })
-  @Transform(({ value }) => Number(value))
+  @Transform(numberTransformer)
   @IsNumber()
   @Expose()
   amount!: number;
@@ -351,21 +360,21 @@ export class CmcCryptoMapQueryDto
 {
   @ApiPropertyOptional({
     description: 'Listing status',
-    enum: ['active', 'inactive', 'untracked', 'unverified'],
+    enum: CmcListingStatus,
   })
   @IsOptional()
-  @IsEnum(['active', 'inactive', 'untracked', 'unverified'])
+  @IsEnum(CmcListingStatus)
   @Expose()
-  listing_status?: 'active' | 'inactive' | 'untracked' | 'unverified';
+  listing_status?: CmcListingStatus;
 
   @ApiPropertyOptional({
     description: 'Sort by',
-    enum: ['cmc_rank', 'id', 'market_cap', 'name', 'symbol'],
+    enum: CmcCryptoMapSort,
   })
   @IsOptional()
-  @IsEnum(['cmc_rank', 'id', 'market_cap', 'name', 'symbol'])
+  @IsEnum(CmcCryptoMapSort)
   @Expose()
-  sort?: 'cmc_rank' | 'id' | 'market_cap' | 'name' | 'symbol';
+  sort?: CmcCryptoMapSort;
 
   @ApiPropertyOptional({
     description: 'Filter by symbols (CSV)',
@@ -405,52 +414,32 @@ export class CmcCryptoListingsLatestQueryDto
 
   @ApiPropertyOptional({
     description: 'Sort field',
-    enum: [
-      'market_cap',
-      'name',
-      'symbol',
-      'price',
-      'volume_24h',
-      'percent_change_24h',
-    ],
+    enum: CmcCryptoListingsSort,
   })
   @IsOptional()
-  @IsEnum([
-    'market_cap',
-    'name',
-    'symbol',
-    'price',
-    'volume_24h',
-    'percent_change_24h',
-  ])
+  @IsEnum(CmcCryptoListingsSort)
   @Expose()
-  sort?:
-    | 'market_cap'
-    | 'name'
-    | 'symbol'
-    | 'price'
-    | 'volume_24h'
-    | 'percent_change_24h';
+  sort?: CmcCryptoListingsSort;
 
   @ApiPropertyOptional({
     description: 'Sort direction',
-    enum: ['asc', 'desc'],
+    enum: CmcSortDirection,
     example: 'desc',
   })
   @IsOptional()
-  @IsEnum(['asc', 'desc'])
+  @IsEnum(CmcSortDirection)
   @Expose()
-  sort_dir?: 'asc' | 'desc';
+  sort_dir?: CmcSortDirection;
 
   @ApiPropertyOptional({
     description: 'Type',
-    enum: ['all', 'coins', 'tokens'],
+    enum: CmcCryptocurrencyType,
     example: 'all',
   })
   @IsOptional()
-  @IsEnum(['all', 'coins', 'tokens'])
+  @IsEnum(CmcCryptocurrencyType)
   @Expose()
-  cryptocurrency_type?: 'all' | 'coins' | 'tokens';
+  cryptocurrency_type?: CmcCryptocurrencyType;
 }
 
 @Exclude()
@@ -511,7 +500,7 @@ export class CmcCryptoQuotesHistoricalV1QueryDto
   interval?: string;
 
   @ApiPropertyOptional({ description: 'Number of points', example: 100 })
-  @Transform(({ value }) => (value !== undefined ? Number(value) : undefined))
+  @Transform(optionalNumberTransformer)
   @IsOptional()
   @IsInt()
   @Min(1)
@@ -595,7 +584,7 @@ export class CmcCryptoOhlcvHistoricalV1QueryDto
   interval?: string;
 
   @ApiPropertyOptional({ description: 'Number of points', example: 90 })
-  @Transform(({ value }) => (value !== undefined ? Number(value) : undefined))
+  @Transform(optionalNumberTransformer)
   @IsOptional()
   @IsInt()
   @Min(1)

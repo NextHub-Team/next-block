@@ -14,7 +14,7 @@ import {
   QueueDashBullMqEnv,
   QueueDefinition,
   QueueEventPayload,
-} from './types/queuedash.bullmq.types';
+} from './types/queuedash-bullmq.type';
 
 function parseEnv(): QueueDashBullMqEnv {
   const enabled =

@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { DiscoveryService, Reflector } from '@nestjs/core';
-import { INTERNAL_EVENT_HANDLER_METADATA } from './types/internal-events.constants';
+import { INTERNAL_EVENT_HANDLER_METADATA } from './types/internal-events-constants.type';
 import { InternalEvent } from '../../internal-events/domain/internal-event';
 
 export type InternalEventHandlerInstance = {

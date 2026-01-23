@@ -1,4 +1,4 @@
-import { HttpMethod } from './api-gateway.enum';
+import { HttpMethod } from './api-gateway-enum.type';
 
 /**
  * Represents the shape of data you can send to an API endpoint.

@@ -5,7 +5,7 @@ import {
   MINIO_PORT,
   MINIO_S3_HOST,
   MINIO_USE_SSL,
-} from '../types/minio-const';
+} from '../types/minio-const.type';
 import { createToggleableConfig } from '../../../config/config.helper';
 
 class MinioEnvValidator {

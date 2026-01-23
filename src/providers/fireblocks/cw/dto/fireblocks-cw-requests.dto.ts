@@ -12,6 +12,7 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
+import { lowerCaseTransformer } from '../../../../utils/transformers/string.transformer';
 export {
   VaultAccountParamDto,
   VaultAccountAssetParamDto,
@@ -529,6 +530,7 @@ export class BulkCreateVaultAccountUserDto {
     description: 'User email',
     example: 'user@example.com',
   })
+  @Transform(lowerCaseTransformer)
   @IsEmail()
   @Expose()
   email!: string;

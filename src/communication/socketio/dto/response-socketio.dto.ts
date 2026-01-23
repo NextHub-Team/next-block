@@ -1,6 +1,6 @@
 // src/communication/socketio/dto/response-socketio.dto.ts
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Exclude, Expose, Type } from 'class-transformer';
+import { Exclude, Expose, Transform, Type } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
@@ -10,6 +10,7 @@ import {
   ValidateNested,
   IsEmail,
 } from 'class-validator';
+import { lowerCaseTransformer } from '../../../utils/transformers/string.transformer';
 
 @Exclude()
 export class HealthDto {
@@ -80,6 +81,7 @@ export class SocketUserDto {
     description: 'User email (if available)',
     example: 'a@b.com',
   })
+  @Transform(lowerCaseTransformer)
   @IsOptional()
   @IsEmail()
   @Expose()

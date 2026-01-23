@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Exclude, Expose, Type } from 'class-transformer';
+import { Exclude, Expose, Transform, Type } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
@@ -11,6 +11,7 @@ import {
 } from 'class-validator';
 import { RoleEnum } from '../../../roles/roles.enum';
 import { RoleGroups } from '../../../utils/transformers/enum.transformer';
+import { lowerCaseTransformer } from '../../../utils/transformers/string.transformer';
 
 @Exclude()
 export class UserSocketDto {
@@ -20,6 +21,7 @@ export class UserSocketDto {
   id: string;
 
   @ApiProperty({ description: 'User email', example: 'user@example.com' })
+  @Transform(lowerCaseTransformer)
   @IsEmail()
   @Expose()
   email: string;

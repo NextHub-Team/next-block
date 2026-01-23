@@ -24,6 +24,7 @@ import {
   APP_DEFAULT_NAME,
   APP_DEFAULT_PORT,
 } from './types/app-const.type';
+import { numberValidator } from '../utils/helpers/env.helper';
 
 class EnvironmentVariablesValidator {
   @IsEnum(NodeEnv)
@@ -71,11 +72,10 @@ class EnvironmentVariablesValidator {
 
 export default registerAs<AppConfig>('app', () => {
   validateConfig(process.env, EnvironmentVariablesValidator);
-  const _port = process.env.APP_PORT
-    ? parseInt(process.env.APP_PORT, 10)
-    : process.env.PORT
-      ? parseInt(process.env.PORT, 10)
-      : APP_DEFAULT_PORT;
+  const _port = numberValidator(
+    process.env.APP_PORT,
+    numberValidator(process.env.PORT, APP_DEFAULT_PORT),
+  );
   return {
     nodeEnv: process.env.NODE_ENV || NodeEnv.DEVELOPMENT,
     name: process.env.APP_NAME || APP_DEFAULT_NAME,
@@ -90,9 +90,10 @@ export default registerAs<AppConfig>('app', () => {
     headerLanguage:
       process.env.APP_HEADER_LANGUAGE || APP_DEFAULT_HEADER_LANGUAGE,
     dbType: process.env.DATABASE_TYPE || APP_DEFAULT_DB_TYPE,
-    monitorSampleMs: process.env.MONITOR_SAMPLE_MS
-      ? parseInt(process.env.MONITOR_SAMPLE_MS, 10)
-      : APP_DEFAULT_MONITOR_SAMPLE_MS,
+    monitorSampleMs: numberValidator(
+      process.env.MONITOR_SAMPLE_MS,
+      APP_DEFAULT_MONITOR_SAMPLE_MS,
+    ),
     docsUrl:
       process.env.DOCS_URL ||
       `${APP_DEFAULT_DOCS_HOST}:${_port}${APP_DEFAULT_DOCS_PATH}`,

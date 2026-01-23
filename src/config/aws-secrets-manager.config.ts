@@ -7,7 +7,7 @@ import {
   AWS_SECRETS_MANAGER_REGION,
   AWS_SECRETS_MANAGER_SECRET_IDS,
   AWS_SECRETS_MANAGER_SET_TO_ENV,
-} from './types/aws-secrets-manager.const';
+} from './types/aws-secrets-manager-const.type';
 
 class EnvironmentVariablesValidator {
   @IsBoolean()

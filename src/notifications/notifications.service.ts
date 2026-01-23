@@ -8,7 +8,7 @@ import { Device } from '../devices/domain/device';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
 import { NotificationRepository } from './infrastructure/persistence/notification.repository';
-import { IPaginationOptions } from '../utils/types/pagination-options';
+import { IPaginationOptions } from '../utils/types/pagination-options.type';
 import { Notification } from './domain/notification';
 import {
   forwardRef,

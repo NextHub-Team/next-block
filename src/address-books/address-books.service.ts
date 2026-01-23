@@ -11,7 +11,7 @@ import {
   CreateAddressBookUserDto,
 } from './dto/create-address-book.dto';
 import { UpdateAddressBookDto } from './dto/update-address-book.dto';
-import { IPaginationOptions } from '../utils/types/pagination-options';
+import { IPaginationOptions } from '../utils/types/pagination-options.type';
 import { AddressBook } from './domain/address-book';
 import { TypeMessage } from '../utils/types/message.type';
 import { NullableType } from '../utils/types/nullable.type';

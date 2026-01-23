@@ -1,5 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { lowerCaseTransformer } from '../../utils/transformers/string.transformer';
 
 export class UserDto {
   @ApiProperty({
@@ -49,6 +51,7 @@ export class UserEventDto {
     description: 'Email associated with the user.',
     nullable: true,
   })
+  @Transform(lowerCaseTransformer)
   @IsOptional()
   @IsEmail()
   email?: string;

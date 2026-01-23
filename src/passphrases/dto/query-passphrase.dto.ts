@@ -3,8 +3,8 @@ import { IsEnum, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { Passphrase } from '../domain/passphrase';
 import { getEnumErrorMessage } from '../../utils/helpers/enum.helper';
-import { PassphraseLocation } from '../types/passphrases.enum';
-import { OrderType } from '../../utils/types/order-type';
+import { PassphraseLocation } from '../types/passphrases-enum.type';
+import { OrderType } from '../../utils/types/order-enum.type';
 
 export class FilterPassphraseDto {
   @ApiPropertyOptional({

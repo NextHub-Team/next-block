@@ -17,7 +17,7 @@ import {
   Min,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { CmcQuoteMap } from '../utils/cmc-helper';
+import { CmcQuoteMap } from '../helper/cmc-helper';
 
 // -----------------------------------------------------------------------------
 // Status + Envelope

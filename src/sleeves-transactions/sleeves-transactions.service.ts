@@ -14,7 +14,7 @@ import {
 import { CreateSleevesTransactionDto } from './dto/create-sleeves-transaction.dto';
 import { UpdateSleevesTransactionDto } from './dto/update-sleeves-transaction.dto';
 import { SleevesTransactionRepository } from './infrastructure/persistence/sleeves-transaction.repository';
-import { IPaginationOptions } from '../utils/types/pagination-options';
+import { IPaginationOptions } from '../utils/types/pagination-options.type';
 import { SleevesTransaction } from './domain/sleeves-transaction';
 import {
   SleevesTransactionPointType,

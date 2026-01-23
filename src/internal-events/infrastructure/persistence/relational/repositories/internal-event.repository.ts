@@ -6,7 +6,7 @@ import { NullableType } from '../../../../../utils/types/nullable.type';
 import { InternalEvent } from '../../../../domain/internal-event';
 import { InternalEventRepository } from '../../internal-event.repository';
 import { InternalEventMapper } from '../mappers/internal-event.mapper';
-import { IPaginationOptions } from '../../../../../utils/types/pagination-options';
+import { IPaginationOptions } from '../../../../../utils/types/pagination-options.type';
 import { DeepPartial } from '../../../../../utils/types/deep-partial.type';
 import { LoggerService } from '../../../../../common/logger/logger.service';
 

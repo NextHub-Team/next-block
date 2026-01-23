@@ -6,7 +6,7 @@ import { User } from '../users/domain/user';
 import { CreateDeviceDto, CreateDeviceUserDto } from './dto/create-device.dto';
 import { UpdateDeviceDto } from './dto/update-device.dto';
 import { DeviceRepository } from './infrastructure/persistence/device.repository';
-import { IPaginationOptions } from '../utils/types/pagination-options';
+import { IPaginationOptions } from '../utils/types/pagination-options.type';
 import { Device } from './domain/device';
 import { plainToInstance } from 'class-transformer';
 import { JwtPayloadType } from '../auth/strategies/types/jwt-payload.type';

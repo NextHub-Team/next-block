@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { InternalEventsRedisService } from '../internal-events.redis.service';
-import { INTERNAL_EVENTS_OPTIONS } from '../types/internal-events.constants';
+import { INTERNAL_EVENTS_OPTIONS } from '../types/internal-events-constants.type';
 import { InternalEventsOptions } from '../config/internal-events-config.type';
 import { LoggerService } from '../../logger/logger.service';
 import { InternalEventEntity as InternalEventOutboxEntity } from '../../../internal-events/infrastructure/persistence/relational/entities/internal-event.entity';

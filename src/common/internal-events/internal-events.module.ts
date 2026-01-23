@@ -7,7 +7,7 @@ import { InternalEventsService } from './internal-events.service';
 import { InternalEventsDispatcher } from './helper/internal-events.dispatcher';
 import { InternalEventsConsumer } from './internal-events.consumer';
 import { InternalEventsRegistry } from './internal-events.registry';
-import { INTERNAL_EVENTS_OPTIONS } from './types/internal-events.constants';
+import { INTERNAL_EVENTS_OPTIONS } from './types/internal-events-constants.type';
 import { InternalEventsRedisService } from './internal-events.redis.service';
 import { AllConfigType } from '../../config/config.type';
 import {

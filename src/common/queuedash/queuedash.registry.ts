@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { LoggerService } from '../logger/logger.service';
-import { QueueDashQueueRegistration } from './types/queuedash.types';
+import { QueueDashQueueRegistration } from './types/queuedash.type';
 
 @Injectable()
 export class QueueDashRegistry {

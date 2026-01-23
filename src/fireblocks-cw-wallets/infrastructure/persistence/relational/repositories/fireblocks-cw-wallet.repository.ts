@@ -6,7 +6,7 @@ import { NullableType } from '../../../../../utils/types/nullable.type';
 import { FireblocksCwWallet } from '../../../../domain/fireblocks-cw-wallet';
 import { FireblocksCwWalletRepository } from '../../fireblocks-cw-wallet.repository';
 import { FireblocksCwWalletMapper } from '../mappers/fireblocks-cw-wallet.mapper';
-import { IPaginationOptions } from '../../../../../utils/types/pagination-options';
+import { IPaginationOptions } from '../../../../../utils/types/pagination-options.type';
 
 @Injectable()
 export class FireblocksCwWalletRelationalRepository

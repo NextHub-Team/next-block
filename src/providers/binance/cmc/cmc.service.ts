@@ -5,7 +5,6 @@ import { ApiGatewayService } from 'src/common/api-gateway/api-gateway.service';
 import { ApiFunction } from 'src/common/api-gateway/types/api-gateway.type';
 import { BaseToggleableService } from 'src/common/base/base-toggleable.service';
 import { getCmcBaseUrl } from './cmc.helper';
-import { CmcEnvironmenType } from './types/cmc-enum.type';
 import { CMC_DEFAULT_FIAT_CURRENCY, CMC_ENABLE } from './types/cmc-const.type';
 import { ConfigGet, ConfigGetOrThrow } from '../../config/config.decorator';
 import { RoleEnum } from 'src/roles/roles.enum';
@@ -51,6 +50,7 @@ import {
   CmcTrendingLatestV1Dto,
   CmcTrendingMostVisitedV1Dto,
 } from './dto/cmc-cryptocurrency.dto';
+import { CmcEnvironmentType } from './types/cmc-enum.type';
 
 @Injectable()
 export class CmcService extends BaseToggleableService implements OnModuleInit {
@@ -59,9 +59,9 @@ export class CmcService extends BaseToggleableService implements OnModuleInit {
 
   @ConfigGet('cmc.envType', {
     inferEnvVar: true,
-    defaultValue: CmcEnvironmenType.PRODUCTION,
+    defaultValue: CmcEnvironmentType.PRODUCTION,
   })
-  private readonly envType!: CmcEnvironmenType;
+  private readonly envType!: CmcEnvironmentType;
 
   @ConfigGetOrThrow('cmc.apiKey', { inferEnvVar: true })
   private readonly apiKey!: string;

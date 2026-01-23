@@ -2,7 +2,7 @@
 // CoinMarketCap Pro API endpoints
 
 import { ApiGatewayConfig } from 'src/common/api-gateway/api-gateway-config';
-import { HttpMethod } from 'src/common/api-gateway/types/api-gateway.enum';
+import { HttpMethod } from 'src/common/api-gateway/types/api-gateway-enum.type';
 import {
   getCmcSectionVersion,
   getCmcCategoryPath,
@@ -10,7 +10,7 @@ import {
 } from '../cmc.helper';
 import { CmcCategory } from '../types/cmc-enum.type';
 import { CMC_ENV_TYPE } from '../types/cmc-const.type';
-import { unwrapData } from '../utils/cmc-helper';
+import { unwrapData } from '../helper/cmc-helper';
 
 export class CmcApiConfig extends ApiGatewayConfig {
   constructor() {

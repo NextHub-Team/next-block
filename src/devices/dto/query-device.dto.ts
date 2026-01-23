@@ -10,7 +10,7 @@ import { Transform, Type } from 'class-transformer';
 import { Device } from '../domain/device';
 import { getEnumErrorMessage } from '../../utils/helpers/enum.helper';
 import { PlatformType } from '../types/devices-enum.type';
-import { OrderType } from '../../utils/types/order-type';
+import { OrderType } from '../../utils/types/order-enum.type';
 
 export class FilterDeviceDto {
   @ApiPropertyOptional()

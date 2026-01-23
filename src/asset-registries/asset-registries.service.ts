@@ -5,7 +5,7 @@ import {
 import { CreateAssetRegistryDto } from './dto/create-asset-registry.dto';
 import { UpdateAssetRegistryDto } from './dto/update-asset-registry.dto';
 import { AssetRegistryRepository } from './infrastructure/persistence/asset-registry.repository';
-import { IPaginationOptions } from '../utils/types/pagination-options';
+import { IPaginationOptions } from '../utils/types/pagination-options.type';
 import { AssetRegistry } from './domain/asset-registry';
 
 @Injectable()

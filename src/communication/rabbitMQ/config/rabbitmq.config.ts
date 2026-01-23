@@ -8,7 +8,11 @@ import {
   RMQ_NO_ACK,
   RMQ_PERSISTENT,
   RMQ_DEFAULT_COMMUNICATION_URLS,
-} from '../types/rabbitmq.const';
+} from '../types/rabbitmq-const.type';
+import {
+  booleanValidator,
+  numberValidator,
+} from 'src/utils/helpers/env.helper';
 
 // Validator class for environment variables
 class EnvironmentVariablesValidator {
@@ -61,21 +65,22 @@ export default registerAs<RabbitMQConfig>('rabbitMQ', () => {
   validateConfig(process.env, EnvironmentVariablesValidator);
 
   return {
-    enableRabbitMQ: process.env.RABBITMQ_ENABLE?.toLowerCase() === 'true', // Convert string to boolean
+    enableRabbitMQ: booleanValidator(process.env.RABBITMQ_ENABLE, false),
     rabbitmqUrls: process.env.RABBITMQ_URLS
       ? process.env.RABBITMQ_URLS.split(',')
       : RMQ_DEFAULT_COMMUNICATION_URLS, // Default if not set
-    rabbitmqPrefetchCount: process.env.RABBITMQ_PREFETCH_COUNT
-      ? Number(process.env.RABBITMQ_PREFETCH_COUNT) // Convert to number
-      : RMQ_PREFETCH_COUNT,
-    rabbitmqNoAck: process.env.RABBITMQ_NO_ACK
-      ? process.env.RABBITMQ_NO_ACK.toLowerCase() === 'true' // Convert to boolean
-      : RMQ_NO_ACK,
-    rabbitmqQueueDurable: process.env.RABBITMQ_QUEUE_DURABLE
-      ? process.env.RABBITMQ_QUEUE_DURABLE.toLowerCase() === 'true' // Convert to boolean
-      : RMQ_QUEUE_DURABLE,
-    rabbitmqPersistent: process.env.RABBITMQ_PERSISTENT
-      ? process.env.RABBITMQ_PERSISTENT.toLowerCase() === 'true' // Convert to boolean
-      : RMQ_PERSISTENT,
+    rabbitmqPrefetchCount: numberValidator(
+      process.env.RABBITMQ_PREFETCH_COUNT,
+      RMQ_PREFETCH_COUNT,
+    ),
+    rabbitmqNoAck: booleanValidator(process.env.RABBITMQ_NO_ACK, RMQ_NO_ACK),
+    rabbitmqQueueDurable: booleanValidator(
+      process.env.RABBITMQ_QUEUE_DURABLE,
+      RMQ_QUEUE_DURABLE,
+    ),
+    rabbitmqPersistent: booleanValidator(
+      process.env.RABBITMQ_PERSISTENT,
+      RMQ_PERSISTENT,
+    ),
   };
 });

@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, PipeTransform } from '@nestjs/common';
 import { getEnumErrorMessage, isValidEnumValue } from '../helpers/enum.helper';
-import { RoleGroupsDict } from '../types/const.type';
+import { RoleGroupsDict } from '../types/role-groups-const.type';
 import { RoleEnum } from '../../roles/roles.enum';
 
 @Injectable()

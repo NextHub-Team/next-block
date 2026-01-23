@@ -6,9 +6,9 @@ import { NullableType } from '../../../../../utils/types/nullable.type';
 import { Device } from '../../../../domain/device';
 import { DeviceRepository } from '../../device.repository';
 import { DeviceMapper } from '../mappers/device.mapper';
-import { IPaginationOptions } from '../../../../../utils/types/pagination-options';
+import { IPaginationOptions } from '../../../../../utils/types/pagination-options.type';
 import { User } from '../../../../../users/domain/user';
-import { OrderType } from '../../../../../utils/types/order-type';
+import { OrderType } from '../../../../../utils/types/order-enum.type';
 import {
   FilterDeviceDto,
   SortDeviceDto,
