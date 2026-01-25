@@ -10,7 +10,9 @@ export function serializeCacheEntry<T>(entry: CacheStoredEntry<T>): string {
   return JSON.stringify(entry);
 }
 
-export function deserializeCacheEntry<T>(raw: string | null): CacheStoredEntry<T> | null {
+export function deserializeCacheEntry<T>(
+  raw: string | null,
+): CacheStoredEntry<T> | null {
   if (!raw) {
     return null;
   }

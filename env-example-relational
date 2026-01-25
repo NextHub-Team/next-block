@@ -93,15 +93,20 @@ APPLE_APP_AUDIENCE=[]
 ########################################
 # Redis
 ########################################
-REDIS_CACHE_URL=redis://redis:6379/0
 REDIS_SESSION_URL=redis://redis:6379/1
 REDIS_RATE_LIMIT_URL=redis://redis:6379/2
-#
-# Cache configuration
+REDIS_WORKER_URL=redis://redis:6379/4
+
+########################################
+# Cache System
+########################################
 CACHE_ENABLE=true
 CACHE_REDIS_URL=redis://redis:6379/0
 CACHE_KEY_PREFIX=cache
 CACHE_DEFAULT_TTL_SECONDS=300
+CACHE_DEFAULT_TTL_SECONDS_GLOBAL=300
+CACHE_DEFAULT_TTL_SECONDS_USER=60
+CACHE_DEFAULT_TTL_SECONDS_ADMIN=120
 CACHE_DEFAULT_REFRESH_AFTER_SECONDS=0
 CACHE_DEFAULT_SCOPE=global
 CACHE_DEFAULT_KEY_STRATEGY=request
@@ -111,8 +116,8 @@ CACHE_LOCK_RETRY_DELAY_MS=200
 CACHE_LOCK_RETRY_JITTER_MS=100
 CACHE_LOG_HITS=true
 CACHE_LOG_MISSES=true
-
-REDIS_WORKER_URL=redis://redis:6379/4
+CACHE_METRICS_ENABLE=false
+CACHE_METRICS_PREFIX=cache
 
 ########################################
 # Internal Events
@@ -121,7 +126,7 @@ INTERNAL_EVENTS_ENABLE=true
 INTERNAL_EVENTS_SERVICE_NAME=api
 INTERNAL_EVENTS_STREAM_NAME=internal.events
 INTERNAL_EVENTS_DLQ_STREAM_NAME=internal.events.dlq
-INTERNAL_EVENTS_REDIS_URL=redis://localhost:6379/5
+INTERNAL_EVENTS_REDIS_URL=redis://redis:6379/5
 # Interval (ms) between dispatch cycles
 INTERNAL_EVENTS_DISPATCH_INTERVAL_MS=10000
 # Max unpublished rows to push per dispatch cycle

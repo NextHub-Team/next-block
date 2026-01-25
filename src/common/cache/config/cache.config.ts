@@ -2,6 +2,7 @@ import {
   IsBoolean,
   IsIn,
   IsNumber,
+  IsOptional,
   IsString,
 } from 'class-validator';
 import { createToggleableConfig } from '../../../config/config.helper';
@@ -11,6 +12,9 @@ import {
   CACHE_DEFAULT_REFRESH_AFTER_SECONDS,
   CACHE_DEFAULT_SCOPE,
   CACHE_DEFAULT_TTL_SECONDS,
+  CACHE_DEFAULT_TTL_SECONDS_ADMIN,
+  CACHE_DEFAULT_TTL_SECONDS_GLOBAL,
+  CACHE_DEFAULT_TTL_SECONDS_USER,
   CACHE_ENABLE,
   CACHE_KEY_PREFIX,
   CACHE_LOCK_RETRY_COUNT,
@@ -19,9 +23,15 @@ import {
   CACHE_LOCK_TTL_MS,
   CACHE_LOG_HITS,
   CACHE_LOG_MISSES,
+  CACHE_METRICS_ENABLE,
+  CACHE_METRICS_PREFIX,
   CACHE_REDIS_URL,
 } from '../types/cache-const.type';
 import { CacheKeyStrategy, CacheScope } from '../cache.types';
+import {
+  booleanValidator,
+  numberValidator,
+} from '../../../utils/helpers/env.helper';
 
 class CacheEnvValidator {
   @IsBoolean()
@@ -36,13 +46,25 @@ class CacheEnvValidator {
   @IsNumber()
   CACHE_DEFAULT_TTL_SECONDS: number;
 
+  @IsOptional()
+  @IsNumber()
+  CACHE_DEFAULT_TTL_SECONDS_GLOBAL?: number;
+
+  @IsOptional()
+  @IsNumber()
+  CACHE_DEFAULT_TTL_SECONDS_USER?: number;
+
+  @IsOptional()
+  @IsNumber()
+  CACHE_DEFAULT_TTL_SECONDS_ADMIN?: number;
+
   @IsNumber()
   CACHE_DEFAULT_REFRESH_AFTER_SECONDS: number;
 
-  @IsIn(['global', 'user'])
+  @IsIn(['global', 'user', 'admin'])
   CACHE_DEFAULT_SCOPE: CacheScope;
 
-  @IsIn(['static', 'request', 'args'])
+  @IsIn(['static', 'request', 'args', 'route'])
   CACHE_DEFAULT_KEY_STRATEGY: CacheKeyStrategy;
 
   @IsNumber()
@@ -62,53 +84,91 @@ class CacheEnvValidator {
 
   @IsBoolean()
   CACHE_LOG_MISSES: boolean;
-}
 
-const defaults: CacheConfig = {
-  enable: CACHE_ENABLE,
-  redisUrl: CACHE_REDIS_URL,
-  keyPrefix: CACHE_KEY_PREFIX,
-  defaultTtlSeconds: CACHE_DEFAULT_TTL_SECONDS,
-  defaultRefreshAfterSeconds: CACHE_DEFAULT_REFRESH_AFTER_SECONDS,
-  defaultScope: CACHE_DEFAULT_SCOPE as CacheScope,
-  defaultKeyStrategy: CACHE_DEFAULT_KEY_STRATEGY as CacheKeyStrategy,
-  lockTtlMs: CACHE_LOCK_TTL_MS,
-  lockRetryCount: CACHE_LOCK_RETRY_COUNT,
-  lockRetryDelayMs: CACHE_LOCK_RETRY_DELAY_MS,
-  lockRetryJitterMs: CACHE_LOCK_RETRY_JITTER_MS,
-  logHits: CACHE_LOG_HITS,
-  logMisses: CACHE_LOG_MISSES,
-};
+  @IsBoolean()
+  CACHE_METRICS_ENABLE: boolean;
+
+  @IsString()
+  CACHE_METRICS_PREFIX: string;
+}
 
 export default createToggleableConfig<CacheConfig, CacheEnvValidator>(
   'cache',
   CacheEnvValidator,
-  defaults,
+  {
+    enable: CACHE_ENABLE,
+    redisUrl: CACHE_REDIS_URL,
+    keyPrefix: CACHE_KEY_PREFIX,
+    defaultTtlSeconds: CACHE_DEFAULT_TTL_SECONDS,
+    defaultTtlSecondsGlobal: CACHE_DEFAULT_TTL_SECONDS_GLOBAL,
+    defaultTtlSecondsUser: CACHE_DEFAULT_TTL_SECONDS_USER,
+    defaultTtlSecondsAdmin: CACHE_DEFAULT_TTL_SECONDS_ADMIN,
+    defaultRefreshAfterSeconds: CACHE_DEFAULT_REFRESH_AFTER_SECONDS,
+    defaultScope: CACHE_DEFAULT_SCOPE as CacheScope,
+    defaultKeyStrategy: CACHE_DEFAULT_KEY_STRATEGY as CacheKeyStrategy,
+    lockTtlMs: CACHE_LOCK_TTL_MS,
+    lockRetryCount: CACHE_LOCK_RETRY_COUNT,
+    lockRetryDelayMs: CACHE_LOCK_RETRY_DELAY_MS,
+    lockRetryJitterMs: CACHE_LOCK_RETRY_JITTER_MS,
+    logHits: CACHE_LOG_HITS,
+    logMisses: CACHE_LOG_MISSES,
+    metricsEnable: CACHE_METRICS_ENABLE,
+    metricsPrefix: CACHE_METRICS_PREFIX,
+  },
   {
     enableKey: 'enable',
     enableEnvKey: 'CACHE_ENABLE',
     mapEnabledConfig: (env) => ({
-      redisUrl: env.CACHE_REDIS_URL ?? defaults.redisUrl,
-      keyPrefix: env.CACHE_KEY_PREFIX ?? defaults.keyPrefix,
-      defaultTtlSeconds:
-        env.CACHE_DEFAULT_TTL_SECONDS ?? defaults.defaultTtlSeconds,
-      defaultRefreshAfterSeconds:
-        env.CACHE_DEFAULT_REFRESH_AFTER_SECONDS ??
-        defaults.defaultRefreshAfterSeconds,
-      defaultScope: env.CACHE_DEFAULT_SCOPE ?? defaults.defaultScope,
+      redisUrl: env.CACHE_REDIS_URL ?? CACHE_REDIS_URL,
+      keyPrefix: env.CACHE_KEY_PREFIX ?? CACHE_KEY_PREFIX,
+      defaultTtlSeconds: numberValidator(
+        env.CACHE_DEFAULT_TTL_SECONDS,
+        CACHE_DEFAULT_TTL_SECONDS,
+      ),
+      defaultTtlSecondsGlobal: numberValidator(
+        env.CACHE_DEFAULT_TTL_SECONDS_GLOBAL,
+        CACHE_DEFAULT_TTL_SECONDS_GLOBAL,
+      ),
+      defaultTtlSecondsUser: numberValidator(
+        env.CACHE_DEFAULT_TTL_SECONDS_USER,
+        CACHE_DEFAULT_TTL_SECONDS_USER,
+      ),
+      defaultTtlSecondsAdmin: numberValidator(
+        env.CACHE_DEFAULT_TTL_SECONDS_ADMIN,
+        CACHE_DEFAULT_TTL_SECONDS_ADMIN,
+      ),
+      defaultRefreshAfterSeconds: numberValidator(
+        env.CACHE_DEFAULT_REFRESH_AFTER_SECONDS,
+        CACHE_DEFAULT_REFRESH_AFTER_SECONDS,
+      ),
+      defaultScope: env.CACHE_DEFAULT_SCOPE ?? CACHE_DEFAULT_SCOPE,
       defaultKeyStrategy:
-        env.CACHE_DEFAULT_KEY_STRATEGY ?? defaults.defaultKeyStrategy,
-      lockTtlMs: env.CACHE_LOCK_TTL_MS ?? defaults.lockTtlMs,
-      lockRetryCount: env.CACHE_LOCK_RETRY_COUNT ?? defaults.lockRetryCount,
-      lockRetryDelayMs: env.CACHE_LOCK_RETRY_DELAY_MS ?? defaults.lockRetryDelayMs,
-      lockRetryJitterMs:
-        env.CACHE_LOCK_RETRY_JITTER_MS ?? defaults.lockRetryJitterMs,
-      logHits: env.CACHE_LOG_HITS ?? defaults.logHits,
-      logMisses: env.CACHE_LOG_MISSES ?? defaults.logMisses,
+        env.CACHE_DEFAULT_KEY_STRATEGY ?? CACHE_DEFAULT_KEY_STRATEGY,
+      lockTtlMs: numberValidator(env.CACHE_LOCK_TTL_MS, CACHE_LOCK_TTL_MS),
+      lockRetryCount: numberValidator(
+        env.CACHE_LOCK_RETRY_COUNT,
+        CACHE_LOCK_RETRY_COUNT,
+      ),
+      lockRetryDelayMs: numberValidator(
+        env.CACHE_LOCK_RETRY_DELAY_MS,
+        CACHE_LOCK_RETRY_DELAY_MS,
+      ),
+      lockRetryJitterMs: numberValidator(
+        env.CACHE_LOCK_RETRY_JITTER_MS,
+        CACHE_LOCK_RETRY_JITTER_MS,
+      ),
+      logHits: booleanValidator(env.CACHE_LOG_HITS, CACHE_LOG_HITS),
+      logMisses: booleanValidator(env.CACHE_LOG_MISSES, CACHE_LOG_MISSES),
+      metricsEnable: booleanValidator(
+        env.CACHE_METRICS_ENABLE,
+        CACHE_METRICS_ENABLE,
+      ),
+      metricsPrefix: env.CACHE_METRICS_PREFIX ?? CACHE_METRICS_PREFIX,
     }),
     mapDisabledConfig: () => ({
       logHits: false,
       logMisses: false,
+      metricsEnable: false,
     }),
   },
 );

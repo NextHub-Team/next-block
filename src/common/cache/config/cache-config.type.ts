@@ -5,6 +5,9 @@ export type CacheConfig = {
   redisUrl: string;
   keyPrefix: string;
   defaultTtlSeconds: number;
+  defaultTtlSecondsGlobal: number;
+  defaultTtlSecondsUser: number;
+  defaultTtlSecondsAdmin: number;
   defaultRefreshAfterSeconds: number;
   defaultScope: CacheScope;
   defaultKeyStrategy: CacheKeyStrategy;
@@ -14,4 +17,6 @@ export type CacheConfig = {
   lockRetryJitterMs: number;
   logHits: boolean;
   logMisses: boolean;
+  metricsEnable: boolean;
+  metricsPrefix: string;
 };

@@ -1,12 +1,9 @@
-import {
-  Injectable,
-  OnModuleDestroy,
-  OnModuleInit,
-} from '@nestjs/common';
+import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
 import Redlock from 'redlock';
 import { AllConfigType } from '../../config/config.type';
+import { LoggerService } from '../logger/logger.service';
 import { CacheConfig } from './config/cache-config.type';
 import { CacheStoredEntry } from './cache.types';
 import { deserializeCacheEntry, serializeCacheEntry } from './cache.serializer';
@@ -17,10 +14,15 @@ export class RedisCacheService implements OnModuleInit, OnModuleDestroy {
   private client?: Redis;
   private redlock?: Redlock;
   private config: CacheConfig;
+  private lastErrorMessage = '';
+  private lastErrorAt = 0;
+  private suppressedErrors = 0;
+  private lastReconnectLogAt = 0;
 
   constructor(
     private readonly configService: ConfigService<AllConfigType>,
     private readonly cacheLogger: CacheLogger,
+    private readonly loggerService: LoggerService,
   ) {
     this.config = this.configService.get('cache', {
       infer: true,
@@ -29,11 +31,69 @@ export class RedisCacheService implements OnModuleInit, OnModuleDestroy {
 
   onModuleInit() {
     if (!this.config.enable) {
+      this.loggerService.debug(
+        'Cache disabled; Redis cache client not started',
+        RedisCacheService.name,
+      );
       return;
     }
+    this.loggerService.log(
+      `Connecting to cache Redis at ${this.config.redisUrl}`,
+      RedisCacheService.name,
+    );
+    this.loggerService.debug(
+      `Cache config: prefix=${this.config.keyPrefix} ttl=${this.config.defaultTtlSeconds}s scope=${this.config.defaultScope} strategy=${this.config.defaultKeyStrategy} metrics=${this.config.metricsEnable}`,
+      RedisCacheService.name,
+    );
     this.client = new Redis(this.config.redisUrl, {
       enableReadyCheck: true,
       maxRetriesPerRequest: 3,
+    });
+    this.client.on('ready', () => {
+      this.loggerService.log(
+        `Cache Redis client ready (url=${this.config.redisUrl})`,
+        RedisCacheService.name,
+      );
+    });
+    this.client.on('error', (err) => {
+      const now = Date.now();
+      const message = err?.message ?? 'Redis error';
+      const sameAsLast = message === this.lastErrorMessage;
+      const withinWindow = now - this.lastErrorAt < 30_000;
+      if (sameAsLast && withinWindow) {
+        this.suppressedErrors += 1;
+        return;
+      }
+      if (this.suppressedErrors > 0) {
+        this.loggerService.warn(
+          `Cache Redis error repeated ${this.suppressedErrors} times (suppressed).`,
+          RedisCacheService.name,
+        );
+        this.suppressedErrors = 0;
+      }
+      this.lastErrorMessage = message;
+      this.lastErrorAt = now;
+      this.loggerService.error(
+        `Cache Redis error: ${this.formatFriendlyError(err)}`,
+        undefined,
+        RedisCacheService.name,
+      );
+    });
+    this.client.on('end', () => {
+      this.loggerService.warn(
+        'Cache Redis connection closed',
+        RedisCacheService.name,
+      );
+    });
+    this.client.on('reconnecting', (delay) => {
+      const now = Date.now();
+      if (now - this.lastReconnectLogAt >= 60_000) {
+        this.lastReconnectLogAt = now;
+        this.loggerService.debug(
+          `Cache Redis reconnecting in ${delay}ms`,
+          RedisCacheService.name,
+        );
+      }
     });
     this.redlock = new Redlock([this.client], {
       retryCount: this.config.lockRetryCount,
@@ -43,6 +103,10 @@ export class RedisCacheService implements OnModuleInit, OnModuleDestroy {
   }
 
   async onModuleDestroy() {
+    this.loggerService.debug(
+      'Closing cache Redis client',
+      RedisCacheService.name,
+    );
     await this.client?.quit();
   }
 
@@ -150,5 +214,30 @@ export class RedisCacheService implements OnModuleInit, OnModuleDestroy {
 
   private tagKey(tag: string): string {
     return `${this.config.keyPrefix}:tag:${tag}`;
+  }
+
+  private formatFriendlyError(err: Error | undefined): string {
+    if (!err) {
+      return 'Unknown Redis error';
+    }
+    const code = (err as any)?.code as string | undefined;
+    const hostname = this.safeRedisHost();
+    if (code === 'ENOTFOUND') {
+      return `Redis host could not be resolved (host=${hostname ?? 'unknown'}, url=${this.config.redisUrl}). Check CACHE_REDIS_URL.`;
+    }
+    if (code === 'ECONNREFUSED') {
+      return `Redis refused the connection (host=${hostname ?? 'unknown'}, url=${this.config.redisUrl}). Ensure Redis is reachable.`;
+    }
+    const base = err.message ?? 'Unknown Redis error';
+    return code ? `${base} (code=${code})` : base;
+  }
+
+  private safeRedisHost(): string | undefined {
+    try {
+      return new URL(this.config.redisUrl).hostname;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      return undefined;
+    }
   }
 }

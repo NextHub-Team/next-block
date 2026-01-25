@@ -24,10 +24,26 @@ export function buildCacheKey({
   args,
   context,
 }: CacheKeyInput): string {
-  const base = key ?? `${className ?? 'unknown'}:${handlerName ?? 'handler'}`;
-  const scopePart = scope === 'user' ? buildUserScope(context) : 'global';
+  const routeBase =
+    keyStrategy === 'route' ? resolveRequestPath(context) : undefined;
+  const base =
+    key ?? routeBase ?? `${className ?? 'unknown'}:${handlerName ?? 'handler'}`;
+  const scopePart = buildScopeKey(scope, context);
   const strategyPart = buildStrategyKey(keyStrategy, context, args);
   return [prefix, base, scopePart, strategyPart].filter(Boolean).join(':');
+}
+
+export function buildScopeKey(
+  scope: CacheScope,
+  context?: ExecutionContext,
+): string {
+  if (scope === 'user') {
+    return buildUserScope(context);
+  }
+  if (scope === 'admin') {
+    return 'admin';
+  }
+  return 'global';
 }
 
 export function buildUserScope(context?: ExecutionContext): string {
@@ -37,8 +53,9 @@ export function buildUserScope(context?: ExecutionContext): string {
   const http = context.switchToHttp();
   const request = http.getRequest<Request>();
   const user = (request as any)?.user;
-  if (user?.id) {
-    return `user:${user.id}`;
+  const userId = user?.id ?? user?.uid;
+  if (userId) {
+    return `user:${userId}`;
   }
   return 'anonymous';
 }
@@ -48,12 +65,21 @@ export function buildStrategyKey(
   context?: ExecutionContext,
   args?: unknown[],
 ): string {
+  if (strategy === 'route' && context) {
+    const http = context.switchToHttp();
+    const request = http.getRequest<Request>();
+    const rawKey = {
+      path: resolveRequestPath(context),
+      body: request?.body,
+    };
+    return hashObject(rawKey);
+  }
   if (strategy === 'request' && context) {
     const http = context.switchToHttp();
     const request = http.getRequest<Request>();
     const rawKey = {
       method: request?.method,
-      path: request?.route?.path ?? request?.url,
+      path: resolveRequestPath(context),
       params: request?.params,
       query: request?.query,
       body: request?.body,
@@ -64,6 +90,15 @@ export function buildStrategyKey(
     return hashObject(args ?? []);
   }
   return 'static';
+}
+
+function resolveRequestPath(context?: ExecutionContext): string | undefined {
+  if (!context) {
+    return undefined;
+  }
+  const http = context.switchToHttp();
+  const request = http.getRequest<Request>();
+  return request?.route?.path ?? request?.path ?? request?.url;
 }
 
 export function hashObject(value: unknown): string {

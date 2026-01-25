@@ -1,11 +1,14 @@
-export type CacheScope = 'global' | 'user';
-export type CacheKeyStrategy = 'static' | 'request' | 'args';
+export type CacheScope = 'global' | 'user' | 'admin';
+export type CacheKeyStrategy = 'static' | 'request' | 'args' | 'route';
 
 export type CacheOptions = {
   ttlSeconds?: number;
+  ttl?: number;
   refreshAfterSeconds?: number;
+  refreshAfter?: number;
   scope?: CacheScope;
   keyStrategy?: CacheKeyStrategy;
+  autoKey?: boolean;
   key?: string;
   tags?: string[];
   enabled?: boolean;
