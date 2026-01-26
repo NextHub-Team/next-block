@@ -1,9 +1,7 @@
 services:
   postgres:
-    image: postgres:latest
+    image: postgres:17.6-alpine
     hostname: postgres
-    networks:
-      - default
     expose:
       - 5432
     env_file:
@@ -13,11 +11,7 @@ services:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       POSTGRES_DB: ${DATABASE_NAME}
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\" -h localhost",
-        ]
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USERNAME:-root}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -26,8 +20,6 @@ services:
     build:
       context: .
       dockerfile: maildev.Dockerfile
-    networks:
-      - default
     hostname: maildev
     env_file:
       - env-example-relational
@@ -37,10 +29,8 @@ services:
 
   #  Uncomment to use redis
   redis:
-    image: redis:latest
+    image: redis:8-alpine
     hostname: redis
-    networks:
-      - default
     env_file:
       - env-example-relational
     expose:
@@ -50,8 +40,6 @@ services:
     build:
       context: .
       dockerfile: relational.e2e.Dockerfile
-    networks:
-      - default
     depends_on:
       postgres:
         condition: service_healthy
@@ -64,3 +52,7 @@ services:
       - 4000
     env_file:
       - env-example-relational
+
+networks:
+  default:
+    name: next-block-net

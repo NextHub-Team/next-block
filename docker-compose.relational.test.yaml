@@ -1,6 +1,7 @@
 services:
   postgres:
     image: postgres:17.6-alpine
+    hostname: postgres
     expose:
       - 5432
     env_file:
@@ -19,6 +20,7 @@ services:
     build:
       context: .
       dockerfile: maildev.Dockerfile
+    hostname: maildev
     env_file:
       - env-example-relational
     expose:
@@ -27,7 +29,8 @@ services:
 
   #  Uncomment to use redis
   redis:
-    image: redis:7-alpine
+    image: redis:8-alpine
+    hostname: redis
     env_file:
       - env-example-relational
     expose:
@@ -52,3 +55,7 @@ services:
     volumes:
       - ./src:/usr/src/app/src
       - ./test:/usr/src/app/test
+
+networks:
+  default:
+    name: next-block-net

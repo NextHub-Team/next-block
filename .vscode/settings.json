@@ -11,6 +11,8 @@
     "MAXLEN",
     "mhdw",
     "Ohlcv",
+    "pgadmin",
+    "PGDATA",
     "Redlock",
     "smembers",
     "Upserting",

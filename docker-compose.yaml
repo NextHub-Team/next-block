@@ -26,8 +26,7 @@ services:
       retries: 20
 
   redis:
-    # Redis Stack Server (modules) — matches typical NestJS needs: caching, queues, search, etc.
-    image: redis/redis-stack-server:7.2.0-v19
+    image: redis:8-alpine
     container_name: next-block-redis
     restart: unless-stopped
     networks:
@@ -72,7 +71,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: relational.test.Dockerfile
     container_name: next-block-app
     hostname: next-block-app
     restart: unless-stopped
@@ -80,11 +79,16 @@ services:
       - next-block-net
     ports:
       - "${APP_PORT:-3000}:${APP_PORT:-3000}"
+    env_file:
+      - .env
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
+      maildev:
+        condition: service_started
+
 
 volumes:
   next-block-postgres-data:
